@@ -1,6 +1,6 @@
-import React from "react";
 import { useUserStore } from "../store/userStore";
 import { useThemeStore } from "../store/themeStore";
+import { Link } from "react-router-dom";
 
 const Profile = () => {
   const { user } = useUserStore();
@@ -10,6 +10,7 @@ const Profile = () => {
     {
       id: "account",
       label: "Informasi Akun",
+      path: "/account-information",
       icon: (
         <svg
           className="w-5 h-5"
@@ -26,47 +27,48 @@ const Profile = () => {
         </svg>
       ),
     },
-    {
-      id: "security",
-      label: "Keamanan",
-      icon: (
-        <svg
-          className="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-          />
-        </svg>
-      ),
-    },
-    {
-      id: "notifications",
-      label: "Notifikasi",
-      icon: (
-        <svg
-          className="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-          />
-        </svg>
-      ),
-    },
+    // {
+    //   id: "security",
+    //   label: "Keamanan",
+    //   icon: (
+    //     <svg
+    //       className="w-5 h-5"
+    //       fill="none"
+    //       stroke="currentColor"
+    //       viewBox="0 0 24 24"
+    //     >
+    //       <path
+    //         strokeLinecap="round"
+    //         strokeLinejoin="round"
+    //         strokeWidth={2}
+    //         d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+    //       />
+    //     </svg>
+    //   ),
+    // },
+    // {
+    //   id: "notifications",
+    //   label: "Notifikasi",
+    //   icon: (
+    //     <svg
+    //       className="w-5 h-5"
+    //       fill="none"
+    //       stroke="currentColor"
+    //       viewBox="0 0 24 24"
+    //     >
+    //       <path
+    //         strokeLinecap="round"
+    //         strokeLinejoin="round"
+    //         strokeWidth={2}
+    //         d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+    //       />
+    //     </svg>
+    //   ),
+    // },
     {
       id: "help",
       label: "Bantuan",
+      path: "/faq",
       icon: (
         <svg
           className="w-5 h-5"
@@ -87,9 +89,6 @@ const Profile = () => {
 
   const handleMenuClick = (menuId) => {
     switch (menuId) {
-      case "account":
-        alert("Fitur Informasi Akun segera hadir");
-        break;
       case "security":
         alert("Fitur Keamanan segera hadir");
         break;
@@ -215,43 +214,34 @@ const Profile = () => {
       {/* Menu Items */}
       <div className="space-y-2">
         {menuItems.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => handleMenuClick(item.id)}
-            className="w-full bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="size-10 rounded-xl bg-[var(--c-accent)] dark:bg-slate-600 grid place-items-center text-slate-700 dark:text-slate-300">
-                  {item.icon}
+          <Link to={item.path} key={item.id}>
+            <button
+              key={item.id}
+              // onClick={() => handleMenuClick(item.id)}
+              className="w-full bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors mb-2"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="size-10 rounded-xl bg-[var(--c-accent)] dark:bg-slate-600 grid place-items-center text-slate-700 dark:text-slate-300">
+                    {item.icon}
+                  </div>
+                  <span className="font-medium text-slate-900 dark:text-slate-100">
+                    {item.label}
+                  </span>
                 </div>
-                <span className="font-medium text-slate-900 dark:text-slate-100">
-                  {item.label}
-                </span>
               </div>
-              <svg
-                className="w-5 h-5 text-slate-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </div>
-          </button>
+            </button>
+          </Link>
         ))}
       </div>
 
       {/* Logout Button */}
       <div className="mt-6">
-        <button className="w-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-2xl p-4 font-medium hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
-          Keluar
-        </button>
+        <Link to="/" key="1">
+          <button className="w-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-2xl p-4 font-medium hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
+            Keluar
+          </button>
+        </Link>
       </div>
     </div>
   );
