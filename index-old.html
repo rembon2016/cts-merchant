@@ -1,464 +1,873 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Finance Mobile – Pendapatan (dengan iframe modal)</title>
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: { primary: '#002F6C' },
-          boxShadow: { soft: '0 8px 28px rgba(2,22,47,.08)' },
-          borderRadius: { '3xl': '1.6rem' }
-        }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Finance Mobile – Pendapatan (dengan iframe modal)</title>
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: { primary: "#002F6C" },
+            boxShadow: { soft: "0 8px 28px rgba(2,22,47,.08)" },
+            borderRadius: { "3xl": "1.6rem" },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      html,
+      body {
+        font-family: Inter, ui-sans-serif, system-ui;
       }
-    }
-  </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    html, body { font-family: Inter, ui-sans-serif, system-ui; }
-    .safe-bottom { padding-bottom: calc(env(safe-area-inset-bottom) + 96px); }
-    .safe-top { padding-top: calc(env(safe-area-inset-top) + 8px); }
-    /* small overlay helper */
-    .overlay-bg { background: rgba(0,0,0,0.45); backdrop-filter: blur(2px); }
-  </style>
-</head>
-<body class="bg-gray-100 text-slate-900">
-  <main class="max-w-sm mx-auto min-h-screen safe-bottom safe-top relative">
-
-    <!-- Top Bar -->
-    <header class="px-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="size-9 rounded-full bg-primary/10 text-primary grid place-items-center font-semibold">A</div>
-        <div class="text-sm leading-tight">
-          <p class="text-slate-500">Welcome back</p>
-          <p class="font-semibold">Alex</p>
-        </div>
-      </div>
-      <div class="flex items-center gap-2">
-        <button class="p-2 rounded-xl bg-white shadow-soft" aria-label="Search">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-5 text-slate-700"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="m21 21-4.35-4.35M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/></svg>
-        </button>
-        <button class="p-2 rounded-xl bg-white shadow-soft" aria-label="Notifications">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-5 text-slate-700"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0a3 3 0 1 1-6 0m6 0H9"/></svg>
-        </button>
-      </div>
-    </header>
-
-    <!-- Income Card (no balance toggle, no history) -->
-    <section class="px-4 mt-4">
-      <div class="bg-white rounded-3xl p-4 shadow-soft">
-        <div class="flex items-center justify-between">
-          <h2 class="text-base font-semibold">Pendapatan Hari Ini</h2>
-          <span class="text-xs px-2 py-1 rounded-lg bg-slate-100 text-slate-600" id="filterSummary">Bulan ini</span>
-        </div>
-
-        <div class="mt-4">
-          <p class="text-4xl font-extrabold tracking-tight">Rp <span id="income-amount">10.000</span></p>
-          <p class="mt-2 text-xs text-slate-500">Diperbarui barusan</p>
-        </div>
-
-        <!-- Filters as chips -->
-        <div class="mt-6">
-          <div class="flex items-center gap-2">
-            <button data-filter="month" class="chip px-4 py-2 rounded-full bg-primary text-white text-sm font-medium">Month</button>
-            <button data-filter="year" class="chip px-4 py-2 rounded-full bg-slate-100 text-slate-700 text-sm font-medium">Year</button>
-            <button data-filter="range" class="chip px-4 py-2 rounded-full bg-slate-100 text-slate-700 text-sm font-medium">Range</button>
-          </div>
-
-          <!-- popovers (same as before) -->
-          <div id="popover-month" class="hidden mt-3 rounded-2xl border border-slate-200 bg-white shadow-soft p-3">
-            <p class="text-xs text-slate-500 mb-2">Pilih Bulan</p>
-            <div class="grid grid-cols-3 gap-2 text-sm">
-              <button class="opt opt-month btn">Jan</button>
-              <button class="opt opt-month btn">Feb</button>
-              <button class="opt opt-month btn">Mar</button>
-              <button class="opt opt-month btn">Apr</button>
-              <button class="opt opt-month btn">Mei</button>
-              <button class="opt opt-month btn">Jun</button>
-              <button class="opt opt-month btn">Jul</button>
-              <button class="opt opt-month btn">Agu</button>
-              <button class="opt opt-month btn">Sep</button>
-              <button class="opt opt-month btn">Okt</button>
-              <button class="opt opt-month btn">Nov</button>
-              <button class="opt opt-month btn">Des</button>
-            </div>
-          </div>
-
-          <div id="popover-year" class="hidden mt-3 rounded-2xl border border-slate-200 bg-white shadow-soft p-3">
-            <p class="text-xs text-slate-500 mb-2">Pilih Tahun</p>
-            <div class="grid grid-cols-4 gap-2 text-sm">
-              <button class="opt opt-year btn">2023</button>
-              <button class="opt opt-year btn">2024</button>
-              <button class="opt opt-year btn">2025</button>
-              <button class="opt opt-year btn">2026</button>
-            </div>
-          </div>
-
-          <div id="popover-range" class="hidden mt-3 rounded-2xl border border-slate-200 bg-white shadow-soft p-3">
-            <p class="text-xs text-slate-500 mb-2">Pilih Rentang Tanggal</p>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <label class="text-xs text-slate-600">Dari
-                <input id="date-from" type="date" class="mt-1 w-full rounded-xl border-slate-200 focus:border-primary focus:ring-primary/30" />
-              </label>
-              <label class="text-xs text-slate-600">Sampai
-                <input id="date-to" type="date" class="mt-1 w-full rounded-xl border-slate-200 focus:border-primary focus:ring-primary/30" />
-              </label>
-            </div>
-            <div class="mt-3 flex justify-end gap-2">
-              <button id="range-clear" class="px-3 py-1.5 rounded-xl text-sm bg-slate-100 text-slate-700">Reset</button>
-              <button id="range-apply" class="px-3 py-1.5 rounded-xl text-sm bg-primary text-white">Terapkan</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Quick Menus: Soundbox, POS, No-Bank, CS -->
-    <section class="px-4 mt-4">
-      <div class="grid grid-cols-4 gap-3">
-        <!-- Soundbox: tambahkan id & data-url -->
-        <button id="btn-soundbox" data-url="http://8.219.81.253:8809/" data-title="Soundbox" class="bg-white rounded-2xl p-3 flex flex-col items-center gap-2 shadow-soft">
-          <span class="grid place-items-center size-12 rounded-xl bg-primary/10 text-primary">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M11 5 6 9H3v6h3l5 4V5Zm6.5 2.5a5 5 0 0 1 0 9M15 9a3 3 0 0 1 0 6"/></svg>
-          </span>
-          <span class="text-xs font-medium">Soundbox</span>
-        </button>
-
-        <button class="bg-white rounded-2xl p-3 flex flex-col items-center gap-2 shadow-soft">
-          <span class="grid place-items-center size-12 rounded-xl bg-primary/10 text-primary">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-6"><rect width="18" height="12" x="3" y="6" rx="2" ry="2" stroke-width="1.75"/><path d="M3 10h18" stroke-width="1.75"/></svg>
-          </span>
-          <span class="text-xs font-medium">POS</span>
-        </button>
-
-        <!-- No-Bank: tambahkan id & data-url -->
-        <button id="btn-nobank" data-url="https://nobank.id/" data-title="No-Bank" class="bg-white rounded-2xl p-3 flex flex-col items-center gap-2 shadow-soft">
-          <span class="grid place-items-center size-12 rounded-xl bg-primary/10 text-primary">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-6">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 10h18M6 10v8m12-8v8M4 18h16M3 6l9-3 9 3"/>
-              <path stroke="currentColor" stroke-width="1.75" stroke-linecap="round" d="m4 4 16 16"/>
-            </svg>
-          </span>
-          <span class="text-xs font-medium">No-Bank</span>
-        </button>
-
-        <button class="bg-white rounded-2xl p-3 flex flex-col items-center gap-2 shadow-soft">
-          <span class="grid place-items-center size-12 rounded-xl bg-primary/10 text-primary">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 11a9 9 0 1 1 18 0v6a3 3 0 0 1-3 3h-2v-6h5M6 20H5a2 2 0 0 1-2-2v-6h5v6H6Z"/></svg>
-          </span>
-          <span class="text-xs font-medium">CS</span>
-        </button>
-      </div>
-    </section>
-
-    <!-- Today's Transactions -->
-    <section class="px-4 mt-6">
-      <div class="flex items-center justify-between mb-2">
-        <h3 class="text-base font-semibold">Transaksi Hari Ini</h3>
-      </div>
-      <div class="space-y-2">
-        <!-- Example comes from your DB screenshot -->
-        <article class="bg-white rounded-2xl p-3 shadow-soft flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="size-10 rounded-xl bg-primary/10 text-primary grid place-items-center text-sm font-bold">TX</div>
-            <div>
-              <p class="font-medium">TXN001 • MERCHANT001</p>
-              <p class="text-xs text-slate-500">2025-08-15 10:30 • CASH</p>
-              <p class="text-xs text-slate-500">Pembayaran tun</p>
-            </div>
-          </div>
-          <div class="text-right">
-            <p class="font-semibold text-primary">Rp 10.000</p>
-            <p class="text-xs text-green-600">SUCCESS</p>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <div class="h-28"></div>
-
-    <!-- Bottom Tab Bar -->
-    <nav class="fixed bottom-0 inset-x-0">
-      <div class="max-w-sm mx-auto">
-        <div class="mx-4 mb-4 rounded-3xl bg-white shadow-soft border border-slate-100 px-2 py-2 grid grid-cols-5 gap-1">
-          <a href="#" class="group flex flex-col items-center gap-1 py-1">
-            <span class="size-9 grid place-items-center rounded-2xl bg-primary/10 text-primary">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 10.5 12 4l9 6.5V20a1 1 0 0 1-1 1h-4v-6H8v6H4a1 1 0 0 1-1-1v-9.5Z"/></svg>
-            </span>
-            <span class="text-[11px] font-medium text-primary">Home</span>
-          </a>
-          <a href="./transaction.html" class="group flex flex-col items-center gap-1 py-1">
-            <span class="size-9 grid place-items-center rounded-2xl bg-slate-100 text-slate-700">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 7h13m0 0-3-3m3 3-3 3M21 17H8m0 0 3-3m-3 3 3 3"/></svg>
-            </span>
-            <span class="text-[11px] text-slate-600">Transaksi</span>
-          </a>
-          <a href="./pos.html" class="group flex flex-col items-center gap-1 py-1">
-            <span class="size-9 grid place-items-center rounded-2xl bg-slate-100 text-slate-700">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-5"><rect width="18" height="12" x="3" y="6" rx="2" ry="2" stroke-width="1.75"/><path d="M3 10h18" stroke-width="1.75"/></svg>
-            </span>
-            <span class="text-[11px] text-slate-600">POS</span>
-          </a>
-          <a href="./cs.html" class="group flex flex-col items-center gap-1 py-1">
-            <span class="size-9 grid place-items-center rounded-2xl bg-slate-100 text-slate-700">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 11a9 9 0 1 1 18 0v6a3 3 0 0 1-3 3h-2v-6h5M6 20H5a2 2 0 0 1-2-2v-6h5v6H6Z"/></svg>
-            </span>
-            <span class="text-[11px] text-slate-600">CS</span>
-          </a>
-          <a href="./profile.html" class="group flex flex-col items-center gap-1 py-1">
-            <span class="size-9 grid place-items-center rounded-2xl bg-slate-100 text-slate-700">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm7 8a7 7 0 0 0-14 0"/></svg>
-            </span>
-            <span class="text-[11px] text-slate-600">Profil</span>
-          </a>
-        </div>
-      </div>
-    </nav>
-  </main>
-
-  <!-- ===== IFRAME FULLPAGE MODAL (root-level) ===== -->
-  <div id="iframeModal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="iframeModalTitle">
-    <!-- background overlay -->
-    <div class="absolute inset-0 overlay-bg" aria-hidden="true"></div>
-
-    <!-- modal content: full height -->
-    <div class="relative z-50 flex flex-col h-full bg-white">
-      <!-- header -->
-      <header class="flex items-center justify-between px-4 py-3 bg-primary text-white safe-top">
+      .safe-bottom {
+        padding-bottom: calc(env(safe-area-inset-bottom) + 96px);
+      }
+      .safe-top {
+        padding-top: calc(env(safe-area-inset-top) + 8px);
+      }
+      /* small overlay helper */
+      .overlay-bg {
+        background: rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(2px);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 text-slate-900">
+    <main class="max-w-sm mx-auto min-h-screen safe-bottom safe-top relative">
+      <!-- Top Bar -->
+      <header class="px-4 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <button id="modalBack" class="p-2 rounded-md bg-white/20 hover:bg-white/30" title="Back (iframe)">
-            <!-- left arrow -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/></svg>
-          </button>
-          <h3 id="iframeModalTitle" class="text-base font-semibold">Loading...</h3>
+          <div
+            class="size-9 rounded-full bg-primary/10 text-primary grid place-items-center font-semibold"
+          >
+            A
+          </div>
+          <div class="text-sm leading-tight">
+            <p class="text-slate-500">Welcome back</p>
+            <p class="font-semibold">Alex</p>
+          </div>
         </div>
-
         <div class="flex items-center gap-2">
-          <a id="openInNewTab" class="px-3 py-1 rounded-md bg-white/20 hover:bg-white/30 text-sm" href="#" target="_blank" rel="noopener noreferrer">Buka di tab baru</a>
-          <button id="modalClose" class="p-2 rounded-md bg-white/20 hover:bg-white/30" title="Close">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/></svg>
+          <button
+            class="p-2 rounded-xl bg-white shadow-soft"
+            aria-label="Search"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              class="size-5 text-slate-700"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.75"
+                d="m21 21-4.35-4.35M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"
+              />
+            </svg>
+          </button>
+          <button
+            class="p-2 rounded-xl bg-white shadow-soft"
+            aria-label="Notifications"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              class="size-5 text-slate-700"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.75"
+                d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0a3 3 0 1 1-6 0m6 0H9"
+              />
+            </svg>
           </button>
         </div>
       </header>
 
-      <!-- iframe area -->
-      <div class="flex-1 relative">
-        <!-- loading spinner -->
-        <div id="iframeSpinner" class="absolute inset-0 flex items-center justify-center bg-white/60 z-10">
-          <div class="flex items-center gap-2">
-            <svg class="animate-spin h-6 w-6 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-            </svg>
-            <span class="text-sm text-slate-700">Memuat...</span>
+      <!-- Income Card (no balance toggle, no history) -->
+      <section class="px-4 mt-4">
+        <div class="bg-white rounded-3xl p-4 shadow-soft">
+          <div class="flex items-center justify-between">
+            <h2 class="text-base font-semibold">Pendapatan Hari Ini</h2>
+            <span
+              class="text-xs px-2 py-1 rounded-lg bg-slate-100 text-slate-600"
+              id="filterSummary"
+              >Bulan ini</span
+            >
+          </div>
+
+          <div class="mt-4">
+            <p class="text-4xl font-extrabold tracking-tight">
+              Rp <span id="income-amount">10.000</span>
+            </p>
+            <p class="mt-2 text-xs text-slate-500">Diperbarui barusan</p>
+          </div>
+
+          <!-- Filters as chips -->
+          <div class="mt-6">
+            <div class="flex items-center gap-2">
+              <button
+                data-filter="month"
+                class="chip px-4 py-2 rounded-full bg-primary text-white text-sm font-medium"
+              >
+                Month
+              </button>
+              <button
+                data-filter="year"
+                class="chip px-4 py-2 rounded-full bg-slate-100 text-slate-700 text-sm font-medium"
+              >
+                Year
+              </button>
+              <button
+                data-filter="range"
+                class="chip px-4 py-2 rounded-full bg-slate-100 text-slate-700 text-sm font-medium"
+              >
+                Range
+              </button>
+            </div>
+
+            <!-- popovers (same as before) -->
+            <div
+              id="popover-month"
+              class="hidden mt-3 rounded-2xl border border-slate-200 bg-white shadow-soft p-3"
+            >
+              <p class="text-xs text-slate-500 mb-2">Pilih Bulan</p>
+              <div class="grid grid-cols-3 gap-2 text-sm">
+                <button class="opt opt-month btn">Jan</button>
+                <button class="opt opt-month btn">Feb</button>
+                <button class="opt opt-month btn">Mar</button>
+                <button class="opt opt-month btn">Apr</button>
+                <button class="opt opt-month btn">Mei</button>
+                <button class="opt opt-month btn">Jun</button>
+                <button class="opt opt-month btn">Jul</button>
+                <button class="opt opt-month btn">Agu</button>
+                <button class="opt opt-month btn">Sep</button>
+                <button class="opt opt-month btn">Okt</button>
+                <button class="opt opt-month btn">Nov</button>
+                <button class="opt opt-month btn">Des</button>
+              </div>
+            </div>
+
+            <div
+              id="popover-year"
+              class="hidden mt-3 rounded-2xl border border-slate-200 bg-white shadow-soft p-3"
+            >
+              <p class="text-xs text-slate-500 mb-2">Pilih Tahun</p>
+              <div class="grid grid-cols-4 gap-2 text-sm">
+                <button class="opt opt-year btn">2023</button>
+                <button class="opt opt-year btn">2024</button>
+                <button class="opt opt-year btn">2025</button>
+                <button class="opt opt-year btn">2026</button>
+              </div>
+            </div>
+
+            <div
+              id="popover-range"
+              class="hidden mt-3 rounded-2xl border border-slate-200 bg-white shadow-soft p-3"
+            >
+              <p class="text-xs text-slate-500 mb-2">Pilih Rentang Tanggal</p>
+              <div class="grid grid-cols-2 gap-2 text-sm">
+                <label class="text-xs text-slate-600"
+                  >Dari
+                  <input
+                    id="date-from"
+                    type="date"
+                    class="mt-1 w-full rounded-xl border-slate-200 focus:border-primary focus:ring-primary/30"
+                  />
+                </label>
+                <label class="text-xs text-slate-600"
+                  >Sampai
+                  <input
+                    id="date-to"
+                    type="date"
+                    class="mt-1 w-full rounded-xl border-slate-200 focus:border-primary focus:ring-primary/30"
+                  />
+                </label>
+              </div>
+              <div class="mt-3 flex justify-end gap-2">
+                <button
+                  id="range-clear"
+                  class="px-3 py-1.5 rounded-xl text-sm bg-slate-100 text-slate-700"
+                >
+                  Reset
+                </button>
+                <button
+                  id="range-apply"
+                  class="px-3 py-1.5 rounded-xl text-sm bg-primary text-white"
+                >
+                  Terapkan
+                </button>
+              </div>
+            </div>
           </div>
         </div>
+      </section>
 
-        <!-- iframe -->
-        <iframe id="iframeFrame" src="" class="w-full h-full border-0"></iframe>
+      <!-- Quick Menus: Soundbox, POS, No-Bank, CS -->
+      <section class="px-4 mt-4">
+        <div class="grid grid-cols-4 gap-3">
+          <!-- Soundbox: tambahkan id & data-url -->
+          <button
+            id="btn-soundbox"
+            data-url="http://8.219.81.253:8809/"
+            data-title="Soundbox"
+            class="bg-white rounded-2xl p-3 flex flex-col items-center gap-2 shadow-soft"
+          >
+            <span
+              class="grid place-items-center size-12 rounded-xl bg-primary/10 text-primary"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.75"
+                  d="M11 5 6 9H3v6h3l5 4V5Zm6.5 2.5a5 5 0 0 1 0 9M15 9a3 3 0 0 1 0 6"
+                />
+              </svg>
+            </span>
+            <span class="text-xs font-medium">Soundbox</span>
+          </button>
 
-        <!-- fallback / error (tampil jika iframe gagal) -->
-        <div id="iframeFallback" class="absolute inset-0 hidden items-center justify-center p-4 bg-white/95 z-20 text-center">
-          <div>
-            <p class="mb-3 text-slate-700">Konten tidak dapat ditampilkan di dalam aplikasi (kemungkinan situs menolak embed di iframe).</p>
-            <div class="flex gap-2 justify-center">
-              <a id="fallbackOpenLink" class="px-4 py-2 rounded bg-primary text-white" href="#" target="_blank" rel="noopener noreferrer">Buka di tab baru</a>
-              <button id="fallbackClose" class="px-4 py-2 rounded border">Tutup</button>
+          <button
+            class="bg-white rounded-2xl p-3 flex flex-col items-center gap-2 shadow-soft"
+          >
+            <span
+              class="grid place-items-center size-12 rounded-xl bg-primary/10 text-primary"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <rect
+                  width="18"
+                  height="12"
+                  x="3"
+                  y="6"
+                  rx="2"
+                  ry="2"
+                  stroke-width="1.75"
+                />
+                <path d="M3 10h18" stroke-width="1.75" />
+              </svg>
+            </span>
+            <span class="text-xs font-medium">POS</span>
+          </button>
+
+          <!-- No-Bank: tambahkan id & data-url -->
+          <button
+            id="btn-nobank"
+            data-url="https://nobank.id/"
+            data-title="No-Bank"
+            class="bg-white rounded-2xl p-3 flex flex-col items-center gap-2 shadow-soft"
+          >
+            <span
+              class="grid place-items-center size-12 rounded-xl bg-primary/10 text-primary"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.75"
+                  d="M3 10h18M6 10v8m12-8v8M4 18h16M3 6l9-3 9 3"
+                />
+                <path
+                  stroke="currentColor"
+                  stroke-width="1.75"
+                  stroke-linecap="round"
+                  d="m4 4 16 16"
+                />
+              </svg>
+            </span>
+            <span class="text-xs font-medium">No-Bank</span>
+          </button>
+
+          <button
+            class="bg-white rounded-2xl p-3 flex flex-col items-center gap-2 shadow-soft"
+          >
+            <span
+              class="grid place-items-center size-12 rounded-xl bg-primary/10 text-primary"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.75"
+                  d="M3 11a9 9 0 1 1 18 0v6a3 3 0 0 1-3 3h-2v-6h5M6 20H5a2 2 0 0 1-2-2v-6h5v6H6Z"
+                />
+              </svg>
+            </span>
+            <span class="text-xs font-medium">CS</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Today's Transactions -->
+      <section class="px-4 mt-6">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-base font-semibold">Transaksi Hari Ini</h3>
+        </div>
+        <div class="space-y-2">
+          <!-- Example comes from your DB screenshot -->
+          <article
+            class="bg-white rounded-2xl p-3 shadow-soft flex items-center justify-between"
+          >
+            <div class="flex items-center gap-3">
+              <div
+                class="size-10 rounded-xl bg-primary/10 text-primary grid place-items-center text-sm font-bold"
+              >
+                TX
+              </div>
+              <div>
+                <p class="font-medium">TXN001 • MERCHANT001</p>
+                <p class="text-xs text-slate-500">2025-08-15 10:30 • CASH</p>
+                <p class="text-xs text-slate-500">Pembayaran tun</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="font-semibold text-primary">Rp 10.000</p>
+              <p class="text-xs text-green-600">SUCCESS</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <div class="h-28"></div>
+
+      <!-- Bottom Tab Bar -->
+      <nav class="fixed bottom-0 inset-x-0">
+        <div class="max-w-sm mx-auto">
+          <div
+            class="mx-4 mb-4 rounded-3xl bg-white shadow-soft border border-slate-100 px-2 py-2 grid grid-cols-5 gap-1"
+          >
+            <a href="#" class="group flex flex-col items-center gap-1 py-1">
+              <span
+                class="size-9 grid place-items-center rounded-2xl bg-primary/10 text-primary"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  class="size-5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.75"
+                    d="M3 10.5 12 4l9 6.5V20a1 1 0 0 1-1 1h-4v-6H8v6H4a1 1 0 0 1-1-1v-9.5Z"
+                  />
+                </svg>
+              </span>
+              <span class="text-[11px] font-medium text-primary">Home</span>
+            </a>
+            <a
+              href="./transaction.html"
+              class="group flex flex-col items-center gap-1 py-1"
+            >
+              <span
+                class="size-9 grid place-items-center rounded-2xl bg-slate-100 text-slate-700"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  class="size-5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.75"
+                    d="M3 7h13m0 0-3-3m3 3-3 3M21 17H8m0 0 3-3m-3 3 3 3"
+                  />
+                </svg>
+              </span>
+              <span class="text-[11px] text-slate-600">Transaksi</span>
+            </a>
+            <a
+              href="./pos.html"
+              class="group flex flex-col items-center gap-1 py-1"
+            >
+              <span
+                class="size-9 grid place-items-center rounded-2xl bg-slate-100 text-slate-700"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  class="size-5"
+                >
+                  <rect
+                    width="18"
+                    height="12"
+                    x="3"
+                    y="6"
+                    rx="2"
+                    ry="2"
+                    stroke-width="1.75"
+                  />
+                  <path d="M3 10h18" stroke-width="1.75" />
+                </svg>
+              </span>
+              <span class="text-[11px] text-slate-600">POS</span>
+            </a>
+            <a
+              href="./cs.html"
+              class="group flex flex-col items-center gap-1 py-1"
+            >
+              <span
+                class="size-9 grid place-items-center rounded-2xl bg-slate-100 text-slate-700"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  class="size-5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.75"
+                    d="M3 11a9 9 0 1 1 18 0v6a3 3 0 0 1-3 3h-2v-6h5M6 20H5a2 2 0 0 1-2-2v-6h5v6H6Z"
+                  />
+                </svg>
+              </span>
+              <span class="text-[11px] text-slate-600">CS</span>
+            </a>
+            <a
+              href="./profile.html"
+              class="group flex flex-col items-center gap-1 py-1"
+            >
+              <span
+                class="size-9 grid place-items-center rounded-2xl bg-slate-100 text-slate-700"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  class="size-5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.75"
+                    d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm7 8a7 7 0 0 0-14 0"
+                  />
+                </svg>
+              </span>
+              <span class="text-[11px] text-slate-600">Profil</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </main>
+
+    <!-- ===== IFRAME FULLPAGE MODAL (root-level) ===== -->
+    <div
+      id="iframeModal"
+      class="fixed inset-0 z-50 hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="iframeModalTitle"
+    >
+      <!-- background overlay -->
+      <div class="absolute inset-0 overlay-bg" aria-hidden="true"></div>
+
+      <!-- modal content: full height -->
+      <div class="relative z-50 flex flex-col h-full bg-white">
+        <!-- header -->
+        <header
+          class="flex items-center justify-between px-4 py-3 bg-primary text-white safe-top"
+        >
+          <div class="flex items-center gap-3">
+            <button
+              id="modalBack"
+              class="p-2 rounded-md bg-white/20 hover:bg-white/30"
+              title="Back (iframe)"
+            >
+              <!-- left arrow -->
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+            <h3 id="iframeModalTitle" class="text-base font-semibold">
+              Loading...
+            </h3>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <a
+              id="openInNewTab"
+              class="px-3 py-1 rounded-md bg-white/20 hover:bg-white/30 text-sm"
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Buka di tab baru</a
+            >
+            <button
+              id="modalClose"
+              class="p-2 rounded-md bg-white/20 hover:bg-white/30"
+              title="Close"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        <!-- iframe area -->
+        <div class="flex-1 relative">
+          <!-- loading spinner -->
+          <div
+            id="iframeSpinner"
+            class="absolute inset-0 flex items-center justify-center bg-white/60 z-10"
+          >
+            <div class="flex items-center gap-2">
+              <svg
+                class="animate-spin h-6 w-6 text-primary"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                ></path>
+              </svg>
+              <span class="text-sm text-slate-700">Memuat...</span>
+            </div>
+          </div>
+
+          <!-- iframe -->
+          <iframe
+            id="iframeFrame"
+            src=""
+            class="w-full h-full border-0"
+          ></iframe>
+
+          <!-- fallback / error (tampil jika iframe gagal) -->
+          <div
+            id="iframeFallback"
+            class="absolute inset-0 hidden items-center justify-center p-4 bg-white/95 z-20 text-center"
+          >
+            <div>
+              <p class="mb-3 text-slate-700">
+                Konten tidak dapat ditampilkan di dalam aplikasi (kemungkinan
+                situs menolak embed di iframe).
+              </p>
+              <div class="flex gap-2 justify-center">
+                <a
+                  id="fallbackOpenLink"
+                  class="px-4 py-2 rounded bg-primary text-white"
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Buka di tab baru</a
+                >
+                <button id="fallbackClose" class="px-4 py-2 rounded border">
+                  Tutup
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- existing script for chips/popovers (untouched) -->
-  <script>
-    // Helpers
-    const $ = (sel, el=document) => el.querySelector(sel);
-    const $$ = (sel, el=document) => Array.from(el.querySelectorAll(sel));
+    <!-- existing script for chips/popovers (untouched) -->
+    <script>
+      // Helpers
+      const $ = (sel, el = document) => el.querySelector(sel);
+      const $$ = (sel, el = document) => Array.from(el.querySelectorAll(sel));
 
-    const chips = $$('.chip');
-    const popMonth = $('#popover-month');
-    const popYear = $('#popover-year');
-    const popRange = $('#popover-range');
-    const summary = $('#filterSummary');
+      const chips = $$(".chip");
+      const popMonth = $("#popover-month");
+      const popYear = $("#popover-year");
+      const popRange = $("#popover-range");
+      const summary = $("#filterSummary");
 
-    function hideAllPopovers(){
-      [popMonth, popYear, popRange].forEach(p => p.classList.add('hidden'));
-    }
-
-    chips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        chips.forEach(c => c.className = c.className.replace(' bg-primary text-white',' bg-slate-100 text-slate-700'));
-        chip.className = chip.className.replace(' bg-slate-100 text-slate-700', ' bg-primary text-white');
-        hideAllPopovers();
-        const key = chip.dataset.filter;
-        if(key==='month') popMonth.classList.remove('hidden');
-        if(key==='year') popYear.classList.remove('hidden');
-        if(key==='range') popRange.classList.remove('hidden');
-      });
-    });
-
-    // Select month
-    $$('.opt-month').forEach(btn => {
-      btn.addEventListener('click', () => {
-        hideAllPopovers();
-        summary.textContent = `Bulan: ${btn.textContent}`;
-      });
-    });
-
-    // Select year
-    $$('.opt-year').forEach(btn => {
-      btn.addEventListener('click', () => {
-        hideAllPopovers();
-        summary.textContent = `Tahun: ${btn.textContent}`;
-      });
-    });
-
-    // Range
-    $('#range-apply').addEventListener('click', () => {
-      const from = $('#date-from').value; const to = $('#date-to').value;
-      if(from && to) summary.textContent = `Range: ${from} → ${to}`;
-      hideAllPopovers();
-    });
-    $('#range-clear').addEventListener('click', () => {
-      $('#date-from').value = ''; $('#date-to').value = '';
-      summary.textContent = 'Bulan ini'; hideAllPopovers();
-    });
-
-    // Dismiss popovers when clicking outside
-    document.addEventListener('click', (e) => {
-      const wrap = e.target.closest('#popover-month, #popover-year, #popover-range, .chip');
-      if(!wrap) hideAllPopovers();
-    });
-
-    // Utility class for option buttons (added via JS for progressive enhancement)
-    $$('.btn').forEach(b => b.classList.add('px-3','py-1.5','rounded-xl','bg-slate-100','hover:bg-primary/10','hover:text-primary'));
-  </script>
-
-  <!-- NEW: Modal / iframe handling -->
-  <script>
-    (function(){
-      const body = document.body;
-      const btnSoundbox = document.getElementById('btn-soundbox');
-      const btnNoBank = document.getElementById('btn-nobank');
-
-      const modal = document.getElementById('iframeModal');
-      const iframe = document.getElementById('iframeFrame');
-      const spinner = document.getElementById('iframeSpinner');
-      const fallback = document.getElementById('iframeFallback');
-      const fallbackLink = document.getElementById('fallbackOpenLink');
-      const fallbackClose = document.getElementById('fallbackClose');
-      const modalTitle = document.getElementById('iframeModalTitle');
-      const openInNewTab = document.getElementById('openInNewTab');
-      const modalBack = document.getElementById('modalBack');
-      const modalClose = document.getElementById('modalClose');
-
-      let loadTimer = null;
-      let currentUrl = '';
-
-      function openModal(url, title){
-        currentUrl = url;
-        modalTitle.textContent = title || 'Web';
-        // set open in new tab link
-        openInNewTab.href = url;
-        fallbackLink.href = url;
-
-        // show modal
-        modal.classList.remove('hidden');
-        body.classList.add('overflow-hidden');
-
-        // show spinner & hide fallback
-        spinner.classList.remove('hidden');
-        fallback.classList.add('hidden');
-
-        // set iframe src (start load)
-        // set about:blank first to force reload if previously used
-        iframe.src = 'about:blank';
-        // small delay to ensure navigation changes
-        setTimeout(()=> {
-          try {
-            iframe.src = url;
-          } catch(e){
-            // cross-origin assignment should be fine; catch unexpected
-            console.error('iframe src set error', e);
-          }
-        }, 50);
-
-        // fallback if not loaded within X ms
-        if(loadTimer) clearTimeout(loadTimer);
-        loadTimer = setTimeout(() => {
-          // if iframe still not loaded, show fallback
-          spinner.classList.add('hidden');
-          fallback.classList.remove('hidden');
-        }, 7000);
-
-        // attach onload to hide spinner when load completes
-        iframe.onload = function(){
-          // clear timer and hide spinner/fallback if content loaded
-          if(loadTimer){ clearTimeout(loadTimer); loadTimer = null; }
-          spinner.classList.add('hidden');
-          // fallback remains hidden - content loaded (or browser fired onload)
-          fallback.classList.add('hidden');
-          // note: we cannot access iframe.contentWindow.location for cross-origin pages
-        };
+      function hideAllPopovers() {
+        [popMonth, popYear, popRange].forEach((p) => p.classList.add("hidden"));
       }
 
-      function closeModal(){
-        // stop loading and hide modal
-        try { iframe.src = 'about:blank'; } catch(e) {}
-        modal.classList.add('hidden');
-        body.classList.remove('overflow-hidden');
-        spinner.classList.remove('hidden');
-        fallback.classList.add('hidden');
-        if(loadTimer){ clearTimeout(loadTimer); loadTimer = null; }
-      }
+      chips.forEach((chip) => {
+        chip.addEventListener("click", () => {
+          chips.forEach(
+            (c) =>
+              (c.className = c.className.replace(
+                " bg-primary text-white",
+                " bg-slate-100 text-slate-700"
+              ))
+          );
+          chip.className = chip.className.replace(
+            " bg-slate-100 text-slate-700",
+            " bg-primary text-white"
+          );
+          hideAllPopovers();
+          const key = chip.dataset.filter;
+          if (key === "month") popMonth.classList.remove("hidden");
+          if (key === "year") popYear.classList.remove("hidden");
+          if (key === "range") popRange.classList.remove("hidden");
+        });
+      });
 
-      // Attempt to instruct iframe to go back (may be blocked by cross-origin)
-      function tryIframeBack(){
-        try {
-          // best-effort: call history.back on iframe's window
-          const win = iframe.contentWindow;
-          if(win && typeof win.history !== 'undefined'){
-            // try to go back in iframe's history
-            win.history.back();
-          } else {
-            alert('Tidak dapat kembali (konten tidak mengizinkan). Silakan gunakan tombol "Buka di tab baru".');
-          }
-        } catch(err){
-          // likely cross-origin: cannot access contentWindow.history
-          alert('Tidak dapat kembali karena pembatasan cross-origin. Silakan buka di tab baru untuk navigasi.');
+      // Select month
+      $$(".opt-month").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          hideAllPopovers();
+          summary.textContent = `Bulan: ${btn.textContent}`;
+        });
+      });
+
+      // Select year
+      $$(".opt-year").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          hideAllPopovers();
+          summary.textContent = `Tahun: ${btn.textContent}`;
+        });
+      });
+
+      // Range
+      $("#range-apply").addEventListener("click", () => {
+        const from = $("#date-from").value;
+        const to = $("#date-to").value;
+        if (from && to) summary.textContent = `Range: ${from} → ${to}`;
+        hideAllPopovers();
+      });
+      $("#range-clear").addEventListener("click", () => {
+        $("#date-from").value = "";
+        $("#date-to").value = "";
+        summary.textContent = "Bulan ini";
+        hideAllPopovers();
+      });
+
+      // Dismiss popovers when clicking outside
+      document.addEventListener("click", (e) => {
+        const wrap = e.target.closest(
+          "#popover-month, #popover-year, #popover-range, .chip"
+        );
+        if (!wrap) hideAllPopovers();
+      });
+
+      // Utility class for option buttons (added via JS for progressive enhancement)
+      $$(".btn").forEach((b) =>
+        b.classList.add(
+          "px-3",
+          "py-1.5",
+          "rounded-xl",
+          "bg-slate-100",
+          "hover:bg-primary/10",
+          "hover:text-primary"
+        )
+      );
+    </script>
+
+    <!-- NEW: Modal / iframe handling -->
+    <script>
+      (function () {
+        const body = document.body;
+        const btnSoundbox = document.getElementById("btn-soundbox");
+        const btnNoBank = document.getElementById("btn-nobank");
+
+        const modal = document.getElementById("iframeModal");
+        const iframe = document.getElementById("iframeFrame");
+        const spinner = document.getElementById("iframeSpinner");
+        const fallback = document.getElementById("iframeFallback");
+        const fallbackLink = document.getElementById("fallbackOpenLink");
+        const fallbackClose = document.getElementById("fallbackClose");
+        const modalTitle = document.getElementById("iframeModalTitle");
+        const openInNewTab = document.getElementById("openInNewTab");
+        const modalBack = document.getElementById("modalBack");
+        const modalClose = document.getElementById("modalClose");
+
+        let loadTimer = null;
+        let currentUrl = "";
+
+        function openModal(url, title) {
+          currentUrl = url;
+          modalTitle.textContent = title || "Web";
+          // set open in new tab link
+          openInNewTab.href = url;
+          fallbackLink.href = url;
+
+          // show modal
+          modal.classList.remove("hidden");
+          body.classList.add("overflow-hidden");
+
+          // show spinner & hide fallback
+          spinner.classList.remove("hidden");
+          fallback.classList.add("hidden");
+
+          // set iframe src (start load)
+          // set about:blank first to force reload if previously used
+          iframe.src = "about:blank";
+          // small delay to ensure navigation changes
+          setTimeout(() => {
+            try {
+              iframe.src = url;
+            } catch (e) {
+              // cross-origin assignment should be fine; catch unexpected
+              console.error("iframe src set error", e);
+            }
+          }, 50);
+
+          // fallback if not loaded within X ms
+          if (loadTimer) clearTimeout(loadTimer);
+          loadTimer = setTimeout(() => {
+            // if iframe still not loaded, show fallback
+            spinner.classList.add("hidden");
+            fallback.classList.remove("hidden");
+          }, 7000);
+
+          // attach onload to hide spinner when load completes
+          iframe.onload = function () {
+            // clear timer and hide spinner/fallback if content loaded
+            if (loadTimer) {
+              clearTimeout(loadTimer);
+              loadTimer = null;
+            }
+            spinner.classList.add("hidden");
+            // fallback remains hidden - content loaded (or browser fired onload)
+            fallback.classList.add("hidden");
+            // note: we cannot access iframe.contentWindow.location for cross-origin pages
+          };
         }
-      }
 
-      // wire buttons
-      if(btnSoundbox) btnSoundbox.addEventListener('click', ()=> openModal(btnSoundbox.dataset.url, btnSoundbox.dataset.title));
-      if(btnNoBank) btnNoBank.addEventListener('click', ()=> openModal(btnNoBank.dataset.url, btnNoBank.dataset.title));
+        function closeModal() {
+          // stop loading and hide modal
+          try {
+            iframe.src = "about:blank";
+          } catch (e) {}
+          modal.classList.add("hidden");
+          body.classList.remove("overflow-hidden");
+          spinner.classList.remove("hidden");
+          fallback.classList.add("hidden");
+          if (loadTimer) {
+            clearTimeout(loadTimer);
+            loadTimer = null;
+          }
+        }
 
-      modalClose.addEventListener('click', closeModal);
-      fallbackClose.addEventListener('click', closeModal);
-      openInNewTab.addEventListener('click', () => {
-        // allow link to open; close modal so user focus is on new tab
-        // but do not prevent default.
-        closeModal();
-      });
+        // Attempt to instruct iframe to go back (may be blocked by cross-origin)
+        function tryIframeBack() {
+          try {
+            // best-effort: call history.back on iframe's window
+            const win = iframe.contentWindow;
+            if (win && typeof win.history !== "undefined") {
+              // try to go back in iframe's history
+              win.history.back();
+            } else {
+              alert(
+                'Tidak dapat kembali (konten tidak mengizinkan). Silakan gunakan tombol "Buka di tab baru".'
+              );
+            }
+          } catch (err) {
+            // likely cross-origin: cannot access contentWindow.history
+            alert(
+              "Tidak dapat kembali karena pembatasan cross-origin. Silakan buka di tab baru untuk navigasi."
+            );
+          }
+        }
 
-      // Back button
-      modalBack.addEventListener('click', tryIframeBack);
+        // wire buttons
+        if (btnSoundbox)
+          btnSoundbox.addEventListener("click", () =>
+            openModal(btnSoundbox.dataset.url, btnSoundbox.dataset.title)
+          );
+        if (btnNoBank)
+          btnNoBank.addEventListener("click", () =>
+            openModal(btnNoBank.dataset.url, btnNoBank.dataset.title)
+          );
 
-      // ESC to close
-      document.addEventListener('keydown', (e) => {
-        if(e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
-      });
+        modalClose.addEventListener("click", closeModal);
+        fallbackClose.addEventListener("click", closeModal);
+        openInNewTab.addEventListener("click", () => {
+          // allow link to open; close modal so user focus is on new tab
+          // but do not prevent default.
+          closeModal();
+        });
 
-      // Click outside to close? we use explicit close only to avoid accidental closes.
-    })();
-  </script>
-</body>
+        // Back button
+        modalBack.addEventListener("click", tryIframeBack);
+
+        // ESC to close
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && !modal.classList.contains("hidden"))
+            closeModal();
+        });
+
+        // Click outside to close? we use explicit close only to avoid accidental closes.
+      })();
+    </script>
+  </body>
 </html>

@@ -1,32 +1,32 @@
-import React from 'react'
+import React from "react";
 
 const About = () => {
   const transactions = [
     {
       id: 1,
-      type: 'income',
+      type: "income",
       amount: 25000,
-      description: 'Penjualan Produk A',
-      date: '2024-01-15',
-      time: '14:30'
+      description: "Penjualan Produk A",
+      date: "2024-01-15",
+      time: "14:30",
     },
     {
       id: 2,
-      type: 'income',
+      type: "income",
       amount: 15000,
-      description: 'Penjualan Produk B',
-      date: '2024-01-15',
-      time: '12:15'
+      description: "Penjualan Produk B",
+      date: "2024-01-15",
+      time: "12:15",
     },
     {
       id: 3,
-      type: 'expense',
+      type: "expense",
       amount: 5000,
-      description: 'Biaya Admin',
-      date: '2024-01-14',
-      time: '09:00'
-    }
-  ]
+      description: "Biaya Admin",
+      date: "2024-01-14",
+      time: "09:00",
+    },
+  ];
 
   return (
     <div className="px-4 py-6">
@@ -41,7 +41,7 @@ const About = () => {
 
       {/* Filter Buttons */}
       <div className="flex gap-2 mb-6">
-        <button className="px-4 py-2 rounded-full bg-[var(--c-primary)] text-white text-sm font-medium">
+        <button className="px-4 py-2 rounded-full bg-[var(--c-accent)] text-slate-900 text-sm font-medium">
           Semua
         </button>
         <button className="px-4 py-2 rounded-full bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-medium border border-slate-200 dark:border-slate-600">
@@ -55,24 +55,46 @@ const About = () => {
       {/* Transaction List */}
       <div className="space-y-3">
         {transactions.map((transaction) => (
-          <div 
+          <div
             key={transaction.id}
             className="bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`size-10 rounded-xl grid place-items-center ${
-                  transaction.type === 'income' 
-                    ? 'bg-green-100 dark:bg-green-900/30' 
-                    : 'bg-red-100 dark:bg-red-900/30'
-                }`}>
-                  {transaction.type === 'income' ? (
-                    <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                <div
+                  className={`size-10 rounded-xl grid place-items-center ${
+                    transaction.type === "income"
+                      ? "bg-green-100 dark:bg-green-900/30"
+                      : "bg-red-100 dark:bg-red-900/30"
+                  }`}
+                >
+                  {transaction.type === "income" ? (
+                    <svg
+                      className="w-5 h-5 text-green-600 dark:text-green-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 4v16m8-8H4"
+                      />
                     </svg>
                   ) : (
-                    <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                    <svg
+                      className="w-5 h-5 text-red-600 dark:text-red-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M20 12H4"
+                      />
                     </svg>
                   )}
                 </div>
@@ -86,12 +108,15 @@ const About = () => {
                 </div>
               </div>
               <div className="text-right">
-                <p className={`font-semibold ${
-                  transaction.type === 'income' 
-                    ? 'text-green-600 dark:text-green-400' 
-                    : 'text-red-600 dark:text-red-400'
-                }`}>
-                  {transaction.type === 'income' ? '+' : '-'}Rp {transaction.amount.toLocaleString('id-ID')}
+                <p
+                  className={`font-semibold ${
+                    transaction.type === "income"
+                      ? "text-green-600 dark:text-green-400"
+                      : "text-red-600 dark:text-red-400"
+                  }`}
+                >
+                  {transaction.type === "income" ? "+" : "-"}Rp{" "}
+                  {transaction.amount.toLocaleString("id-ID")}
                 </p>
               </div>
             </div>
@@ -106,7 +131,7 @@ const About = () => {
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default About
+export default About;
