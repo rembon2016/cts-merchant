@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>POS — Finance App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { primary: '#002F6C' },
+          boxShadow: { soft: '0 10px 30px rgba(2,22,47,.08)' }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    html,body { font-family: Inter, ui-sans-serif, system-ui; }
+    .safe-bottom { padding-bottom: calc(env(safe-area-inset-bottom) + 96px); }
+    .safe-top { padding-top: calc(env(safe-area-inset-top) + 8px); }
+    .product-img { background: linear-gradient(135deg,#e6eefc,#f8fbff); }
+    .no-select { user-select: none; }
+  </style>
+</head>
+<body class="bg-gray-100 text-slate-900">
+  <main class="max-w-sm mx-auto min-h-screen safe-bottom safe-top relative pb-32">
+
+    <!-- Topbar -->
+    <header class="px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-primary/10 text-primary grid place-items-center font-semibold">A</div>
+        <div>
+          <p class="text-slate-500 text-xs">POS</p>
+          <p class="font-semibold">Toko Demo</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="p-2 rounded-xl bg-white shadow-soft" title="Open transactions">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 6h10M7 14h10M7 18h10"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Top quick menu boxes (Transaksi / Kategori / Produk) -->
+    <section class="px-4 mt-3">
+      <div class="grid grid-cols-3 gap-3">
+        <button class="bg-white rounded-2xl p-3 shadow-soft flex flex-col items-start gap-2">
+          <div class="text-primary font-semibold">Transaksi</div>
+          <div class="text-xs text-slate-500">Riwayat & kasir</div>
+        </button>
+        <button class="bg-white rounded-2xl p-3 shadow-soft flex flex-col items-start gap-2">
+          <div class="text-primary font-semibold">Kategori</div>
+          <div class="text-xs text-slate-500">Atur kategori</div>
+        </button>
+        <button class="bg-white rounded-2xl p-3 shadow-soft flex flex-col items-start gap-2">
+          <div class="text-primary font-semibold">Produk</div>
+          <div class="text-xs text-slate-500">Tambah & edit</div>
+        </button>
+      </div>
+    </section>
+
+    <!-- Filters: category chips + search -->
+    <section class="px-4 mt-4">
+      <div class="flex items-center gap-2">
+        <div id="categoryWrap" class="flex gap-2 overflow-x-auto pb-1">
+          <!-- chips inserted by JS -->
+        </div>
+        <div class="ml-auto w-24">
+          <input id="q" type="search" placeholder="Cari..." class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Product list -->
+    <section class="px-4 mt-4">
+      <div id="productGrid" class="grid grid-cols-2 gap-3">
+        <!-- products via JS -->
+      </div>
+
+      <div id="noProd" class="hidden text-center text-slate-500 py-6">Tidak ada produk</div>
+    </section>
+
+      <nav class="fixed bottom-0 inset-x-0">
+      <div class="max-w-sm mx-auto">
+        <div class="mx-4 mb-4 rounded-3xl bg-white shadow-soft border border-slate-100 px-2 py-2 grid grid-cols-5 gap-1">
+          <a href="./index.html" class="group flex flex-col items-center gap-1 py-1">
+            <span class="size-9 grid place-items-center rounded-2xl bg-primary/10 text-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 10.5 12 4l9 6.5V20a1 1 0 0 1-1 1h-4v-6H8v6H4a1 1 0 0 1-1-1v-9.5Z"/></svg>
+            </span>
+            <span class="text-[11px] font-medium text-primary">Home</span>
+          </a>
+          <a href="./transaction.html" class="group flex flex-col items-center gap-1 py-1">
+            <span class="size-9 grid place-items-center rounded-2xl bg-slate-100 text-slate-700">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 7h13m0 0-3-3m3 3-3 3M21 17H8m0 0 3-3m-3 3 3 3"/></svg>
+            </span>
+            <span class="text-[11px] text-slate-600">Transaksi</span>
+          </a>
+          <a href="./pos.html" class="group flex flex-col items-center gap-1 py-1">
+            <span class="size-9 grid place-items-center rounded-2xl bg-slate-100 text-slate-700">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-5"><rect width="18" height="12" x="3" y="6" rx="2" ry="2" stroke-width="1.75"/><path d="M3 10h18" stroke-width="1.75"/></svg>
+            </span>
+            <span class="text-[11px] text-slate-600">POS</span>
+          </a>
+          <!--<a href="#" class="group flex flex-col items-center gap-1 py-1">-->
+          <!--  <span class="size-9 grid place-items-center rounded-2xl bg-slate-100 text-slate-700">-->
+          <!--    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M11 5 6 9H3v6h3l5 4V5Zm6.5 2.5a5 5 0 0 1 0 9M15 9a3 3 0 0 1 0 6"/></svg>-->
+          <!--  </span>-->
+          <!--  <span class="text-[11px] text-slate-600">Soundbox</span>-->
+          <!--</a>-->
+          <a href="./cs.html" class="group flex flex-col items-center gap-1 py-1">
+            <span class="size-9 grid place-items-center rounded-2xl bg-slate-100 text-slate-700">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 11a9 9 0 1 1 18 0v6a3 3 0 0 1-3 3h-2v-6h5M6 20H5a2 2 0 0 1-2-2v-6h5v6H6Z"/></svg>
+            </span>
+            <span class="text-[11px] text-slate-600">CS</span>
+          </a>
+          <a href="./profile.html" class="group flex flex-col items-center gap-1 py-1">
+            <span class="size-9 grid place-items-center rounded-2xl bg-slate-100 text-slate-700">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm7 8a7 7 0 0 0-14 0"/></svg>
+            </span>
+            <span class="text-[11px] text-slate-600">Profil</span>
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Floating Cart Button -->
+    <button id="cartBtn" class="fixed right-4 bottom-24 bg-primary text-white rounded-full w-16 h-16 shadow-lg flex items-center justify-center flex-col no-select z-40">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13 5.4 5M7 13l-2 8h14l-2-8M10 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM18 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>
+      <span id="cartCount" class="text-xs">0</span>
+    </button>
+
+    <!-- Cart panel (slide from right) -->
+    <div id="cartPanel" class="fixed right-0 top-0 h-full w-full sm:w-[420px] max-w-full bg-white shadow-2xl transform translate-x-full transition-transform z-50">
+      <div class="p-4 border-b">
+        <div class="flex items-center justify-between">
+          <div>
+            <h4 class="font-semibold text-lg">Keranjang</h4>
+            <p class="text-xs text-slate-500">Item yang dipilih</p>
+          </div>
+          <button id="closeCart" class="px-2 py-1 rounded-lg bg-slate-100">Tutup</button>
+        </div>
+      </div>
+      <div class="p-4 overflow-y-auto h-[70vh]" id="cartItemsWrap">
+        <!-- cart items -->
+      </div>
+      <div class="p-4 border-t">
+        <div class="flex items-center justify-between mb-3">
+          <div class="text-slate-500">Subtotal</div>
+          <div id="cartSubtotal" class="font-semibold text-lg">Rp 0</div>
+        </div>
+        <button id="checkoutBtn" class="w-full bg-primary text-white py-3 rounded-xl">Checkout</button>
+      </div>
+    </div>
+
+    <!-- Product Variant Modal -->
+    <div id="modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40">
+      <div class="bg-white rounded-2xl w-11/12 max-w-md p-4">
+        <div class="flex items-start justify-between">
+          <div>
+            <h4 id="modalTitle" class="font-semibold text-lg">Produk</h4>
+            <p id="modalCat" class="text-xs text-slate-500">Kategori</p>
+          </div>
+          <button id="modalClose" class="text-slate-500">✕</button>
+        </div>
+        <div class="mt-3">
+          <div id="variantWrap" class="space-y-2">
+            <!-- radio variants -->
+          </div>
+          <div class="mt-3 flex items-center gap-3">
+            <div class="flex items-center gap-2 border rounded-xl px-2 py-1">
+              <button id="qtyDec" class="px-2">-</button>
+              <div id="qtyVal" class="px-3">1</div>
+              <button id="qtyInc" class="px-2">+</button>
+            </div>
+            <div class="ml-auto text-right">
+              <div class="text-xs text-slate-500">Total</div>
+              <div id="modalTotal" class="font-semibold text-lg">Rp 0</div>
+            </div>
+          </div>
+          <div class="mt-4 flex gap-2">
+            <button id="modalAdd" class="flex-1 bg-primary text-white py-2 rounded-xl">Tambah ke Keranjang</button>
+            <button id="modalBuy" class="flex-1 border rounded-xl py-2">Beli Sekarang</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Sample data
+    const categories = ['Semua', 'Makanan', 'Minuman', 'Pulsa', 'Snack'];
+    const products = [
+      { id: 1, name: 'Nasi Goreng Spesial', category: 'Makanan', price: 25000, image:'', variants: null },
+      { id: 2, name: 'Kopi Latte', category: 'Minuman', price: 0, image:'', variants: [ {id:'s',name:'Small',price:12000}, {id:'m',name:'Medium',price:15000}, {id:'l',name:'Large',price:18000} ] },
+      { id: 3, name: 'Air Mineral 600ml', category: 'Minuman', price: 5000, image:'', variants: null },
+      { id: 4, name: 'Pulsa 50K', category: 'Pulsa', price: 50000, image:'', variants: [{id:'pulsa50',name:'50.000',price:50000}] },
+      { id: 5, name: 'Donat Coklat', category: 'Snack', price: 8000, image:'', variants: null },
+      { id: 6, name: 'Es Teh Manis', category: 'Minuman', price: 7000, image:'', variants: null }
+    ];
+
+    // State
+    let activeCategory = 'Semua';
+    let query = '';
+    let cart = []; // each item: {productId, variantId|null, name, price, qty}
+
+    // Utils
+    const $ = (s, el=document) => el.querySelector(s);
+    const $$ = (s, el=document) => Array.from(el.querySelectorAll(s));
+    const fmtIDR = v => new Intl.NumberFormat('id-ID', { style:'currency', currency:'IDR', maximumFractionDigits:0 }).format(v);
+
+    // Render category chips
+    function renderCategories(){
+      const wrap = document.getElementById('categoryWrap'); wrap.innerHTML='';
+      categories.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = `px-3 py-2 rounded-full text-sm ${cat===activeCategory? 'bg-primary text-white':'bg-white text-slate-700 shadow-sm'}`;
+        btn.textContent = cat;
+        btn.addEventListener('click', ()=>{ activeCategory = cat; document.getElementById('q').value=''; query=''; applyFilter(); });
+        wrap.appendChild(btn);
+      });
+    }
+
+    // Render product grid
+    function renderProducts(){
+      const grid = document.getElementById('productGrid'); grid.innerHTML='';
+      const filtered = products.filter(p => (activeCategory==='Semua' || p.category===activeCategory) && (p.name.toLowerCase().includes(query.toLowerCase())));
+      if(filtered.length===0){ document.getElementById('noProd').classList.remove('hidden'); }
+      else document.getElementById('noProd').classList.add('hidden');
+
+      filtered.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-2xl p-3 shadow-soft cursor-pointer';
+        card.innerHTML = `
+          <div class="product-img rounded-xl h-28 mb-3 grid place-items-center">
+            <div class="text-xs text-slate-400">GAMBAR</div>
+          </div>
+          <div class="text-sm font-medium">${p.name}</div>
+          <div class="mt-2 flex items-center justify-between">
+            <div class="text-sm font-semibold">${p.variants? fmtIDR(p.variants[0].price) : fmtIDR(p.price)}</div>
+            <div>
+              <button class="addBtn text-xs px-3 py-1 rounded-full bg-primary text-white">Tambah</button>
+            </div>
+          </div>
+          <div class="text-xs text-slate-400 mt-1">${p.category}${p.variants? ' • variant':' '}</div>
+        `;
+
+        // click card to open modal or quick add
+        card.querySelector('.addBtn').addEventListener('click', (e)=>{
+          e.stopPropagation();
+          openProduct(p);
+        });
+
+        grid.appendChild(card);
+      });
+    }
+
+    // Open product modal
+    const modal = $('#modal');
+    const variantWrap = $('#variantWrap');
+    let modalProduct = null; let modalSelectedVariant = null; let modalQty = 1;
+
+    function openProduct(p){
+      modalProduct = p; modalSelectedVariant = null; modalQty = 1;
+      $('#modalTitle').textContent = p.name; $('#modalCat').textContent = p.category;
+      variantWrap.innerHTML = '';
+
+      if(p.variants && p.variants.length){
+        p.variants.forEach((v, idx) => {
+          const id = `v_${p.id}_${v.id}`;
+          const row = document.createElement('label');
+          row.className = 'flex items-center gap-3 p-2 rounded-xl border cursor-pointer';
+          row.innerHTML = `
+            <input type="radio" name="variant" value="${v.id}" class="hidden" ${idx===0?'checked':''} />
+            <div class="flex-1">
+              <div class="font-medium">${v.name}</div>
+              <div class="text-xs text-slate-500">${fmtIDR(v.price)}</div>
+            </div>
+          `;
+          row.querySelector('input').addEventListener('change', ()=>{
+            modalSelectedVariant = v; updateModalTotal();
+          });
+          // set first as selected
+          if(idx===0) modalSelectedVariant = v;
+          variantWrap.appendChild(row);
+        });
+      } else {
+        variantWrap.innerHTML = `<div class="p-2 text-sm text-slate-600">Tidak ada variant. Harga: ${fmtIDR(p.price)}</div>`;
+      }
+
+      $('#qtyVal').textContent = modalQty;
+      updateModalTotal();
+      modal.classList.remove('hidden');
+    }
+
+    function updateModalTotal(){
+      const price = modalProduct.variants && modalSelectedVariant ? modalSelectedVariant.price : modalProduct.price;
+      $('#modalTotal').textContent = fmtIDR(price * modalQty);
+    }
+
+    // quantity buttons
+    $('#qtyInc').addEventListener('click', ()=>{ modalQty++; $('#qtyVal').textContent = modalQty; updateModalTotal(); });
+    $('#qtyDec').addEventListener('click', ()=>{ if(modalQty>1) modalQty--; $('#qtyVal').textContent = modalQty; updateModalTotal(); });
+
+    $('#modalClose').addEventListener('click', ()=>{ modal.classList.add('hidden'); });
+
+    // Add to cart
+    $('#modalAdd').addEventListener('click', ()=>{
+      const p = modalProduct; if(!p) return;
+      const variant = (p.variants && modalSelectedVariant) ? modalSelectedVariant : null;
+      addToCart(p.id, variant ? variant.id : null, p.name, variant ? variant.price : p.price, modalQty, variant ? variant.name : null);
+      modal.classList.add('hidden');
+      renderCart();
+    });
+
+    // Buy now (add and open cart)
+    $('#modalBuy').addEventListener('click', ()=>{
+      $('#modalAdd').click(); openCart();
+    });
+
+    // Cart functions
+    function addToCart(productId, variantId, name, price, qty, variantName=null){
+      const key = variantId ? `${productId}_${variantId}` : `${productId}`;
+      const existing = cart.find(i=>i.key===key);
+      if(existing){ existing.qty += qty; }
+      else cart.push({ key, productId, variantId, name, variantName, price, qty });
+      renderCart();
+    }
+
+    function renderCart(){
+      $('#cartCount').textContent = cart.reduce((s,i)=>s+i.qty,0);
+      const wrap = $('#cartItemsWrap'); wrap.innerHTML = '';
+      if(cart.length===0) wrap.innerHTML = '<div class="text-center text-slate-500 py-8">Keranjang kosong</div>';
+      cart.forEach((it, idx) => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between gap-3 p-3 border rounded-xl mb-3';
+        row.innerHTML = `
+          <div>
+            <div class="font-medium">${it.name}${it.variantName? ' • ' + it.variantName : ''}</div>
+            <div class="text-xs text-slate-500">${fmtIDR(it.price)} • x${it.qty}</div>
+          </div>
+          <div class="text-right">
+            <div class="font-medium">${fmtIDR(it.price * it.qty)}</div>
+            <div class="flex items-center gap-2 mt-2">
+              <button class="text-xs px-2 py-1 border rounded" data-idx="${idx}" data-act="dec">-</button>
+              <div class="text-sm">${it.qty}</div>
+              <button class="text-xs px-2 py-1 border rounded" data-idx="${idx}" data-act="inc">+</button>
+            </div>
+            <button class="text-xs text-red-600 mt-2" data-idx="${idx}" data-act="remove">Hapus</button>
+          </div>
+        `;
+        wrap.appendChild(row);
+      });
+      const subtotal = cart.reduce((s,i)=>s + i.price * i.qty,0);
+      $('#cartSubtotal').textContent = fmtIDR(subtotal);
+
+      // attach event listeners for inc/dec/remove
+      $$('[data-act]', wrap).forEach(btn => {
+        btn.addEventListener('click', (e)=>{
+          const idx = Number(btn.dataset.idx);
+          const act = btn.dataset.act;
+          if(act==='inc'){ cart[idx].qty++; }
+          if(act==='dec'){ if(cart[idx].qty>1) cart[idx].qty--; }
+          if(act==='remove'){ cart.splice(idx,1); }
+          renderCart();
+        });
+      });
+    }
+
+    function openCart(){
+      const panel = $('#cartPanel'); panel.classList.remove('translate-x-full');
+      panel.style.transform = 'translateX(0)';
+      panel.classList.remove('hidden');
+    }
+    function closeCart(){
+      const panel = $('#cartPanel'); panel.style.transform = 'translateX(100%)';
+      setTimeout(()=> panel.classList.add('hidden'),300);
+    }
+
+    $('#cartBtn').addEventListener('click', ()=> openCart());
+    $('#closeCart').addEventListener('click', ()=> closeCart());
+
+    // Search input
+    $('#q').addEventListener('input', (e)=>{ query = e.target.value; applyFilter(); });
+
+    function applyFilter(){ renderCategories(); renderProducts(); }
+
+    // Checkout (demo)
+    $('#checkoutBtn').addEventListener('click', ()=>{
+      if(cart.length===0){ alert('Keranjang kosong'); return; }
+      alert('Checkout demo — total: ' + $('#cartSubtotal').textContent);
+      cart = []; renderCart(); closeCart();
+    });
+
+    // init
+    (function init(){ renderCategories(); renderProducts(); renderCart(); })();
+
+  </script>
+</body>
+</html>
