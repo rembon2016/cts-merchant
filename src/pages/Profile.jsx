@@ -1,68 +1,108 @@
-import React from 'react'
-import { useUserStore } from '../store/userStore'
-import { useThemeStore } from '../store/themeStore'
+import React from "react";
+import { useUserStore } from "../store/userStore";
+import { useThemeStore } from "../store/themeStore";
 
 const Profile = () => {
-  const { user } = useUserStore()
-  const { isDark, toggleTheme } = useThemeStore()
+  const { user } = useUserStore();
+  const { isDark, toggleTheme } = useThemeStore();
 
   const menuItems = [
     {
-      id: 'account',
-      label: 'Informasi Akun',
+      id: "account",
+      label: "Informasi Akun",
       icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+          />
         </svg>
-      )
+      ),
     },
     {
-      id: 'security',
-      label: 'Keamanan',
+      id: "security",
+      label: "Keamanan",
       icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+          />
         </svg>
-      )
+      ),
     },
     {
-      id: 'notifications',
-      label: 'Notifikasi',
+      id: "notifications",
+      label: "Notifikasi",
       icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+          />
         </svg>
-      )
+      ),
     },
     {
-      id: 'help',
-      label: 'Bantuan',
+      id: "help",
+      label: "Bantuan",
       icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
         </svg>
-      )
-    }
-  ]
+      ),
+    },
+  ];
 
   const handleMenuClick = (menuId) => {
     switch (menuId) {
-      case 'account':
-        alert('Fitur Informasi Akun segera hadir')
-        break
-      case 'security':
-        alert('Fitur Keamanan segera hadir')
-        break
-      case 'notifications':
-        alert('Fitur Notifikasi segera hadir')
-        break
-      case 'help':
-        alert('Fitur Bantuan segera hadir')
-        break
+      case "account":
+        alert("Fitur Informasi Akun segera hadir");
+        break;
+      case "security":
+        alert("Fitur Keamanan segera hadir");
+        break;
+      case "notifications":
+        alert("Fitur Notifikasi segera hadir");
+        break;
+      case "help":
+        alert("Fitur Bantuan segera hadir");
+        break;
       default:
-        break
+        break;
     }
-  }
+  };
 
   return (
     <div className="px-4 py-6">
@@ -117,20 +157,40 @@ const Profile = () => {
       <div className="bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600 mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-slate-100 dark:bg-slate-600 grid place-items-center">
+            <div className="size-10 rounded-xl bg-[var(--c-accent)] dark:bg-slate-600 grid place-items-center">
               {isDark ? (
-                <svg className="w-5 h-5 text-slate-700 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                <svg
+                  className="w-5 h-5 text-slate-700 dark:text-slate-300"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                  />
                 </svg>
               ) : (
-                <svg className="w-5 h-5 text-slate-700 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                <svg
+                  className="w-5 h-5 text-slate-700 dark:text-slate-300"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                  />
                 </svg>
               )}
             </div>
             <div>
               <p className="font-medium text-slate-900 dark:text-slate-100">
-                {isDark ? 'Mode Gelap' : 'Mode Terang'}
+                {isDark ? "Mode Gelap" : "Mode Terang"}
               </p>
               <p className="text-sm text-slate-500 dark:text-slate-400">
                 Ubah tampilan aplikasi
@@ -140,12 +200,12 @@ const Profile = () => {
           <button
             onClick={toggleTheme}
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              isDark ? 'bg-[var(--c-primary)]' : 'bg-slate-200'
+              isDark ? "bg-[var(--c-primary)]" : "bg-slate-200"
             }`}
           >
             <span
               className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                isDark ? 'translate-x-6' : 'translate-x-1'
+                isDark ? "translate-x-6" : "translate-x-1"
               }`}
             />
           </button>
@@ -162,15 +222,25 @@ const Profile = () => {
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="size-10 rounded-xl bg-slate-100 dark:bg-slate-600 grid place-items-center text-slate-700 dark:text-slate-300">
+                <div className="size-10 rounded-xl bg-[var(--c-accent)] dark:bg-slate-600 grid place-items-center text-slate-700 dark:text-slate-300">
                   {item.icon}
                 </div>
                 <span className="font-medium text-slate-900 dark:text-slate-100">
                   {item.label}
                 </span>
               </div>
-              <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              <svg
+                className="w-5 h-5 text-slate-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </div>
           </button>
@@ -184,7 +254,7 @@ const Profile = () => {
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Profile
+export default Profile;
