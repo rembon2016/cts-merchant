@@ -218,7 +218,7 @@ const Profile = () => {
             <button
               key={item.id}
               // onClick={() => handleMenuClick(item.id)}
-              className="w-full bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors mb-2"
+              className="w-full bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors mb-4"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
