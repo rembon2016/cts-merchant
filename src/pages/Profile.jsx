@@ -156,10 +156,10 @@ const Profile = () => {
       <div className="bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600 mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-[var(--c-accent)] dark:bg-slate-600 grid place-items-center">
+            <div className="size-10 rounded-xl bg-[var(--c-accent)] grid place-items-center">
               {isDark ? (
                 <svg
-                  className="w-5 h-5 text-slate-700 dark:text-slate-300"
+                  className="w-5 h-5 text-slate-700 dark:text-slate-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -188,7 +188,7 @@ const Profile = () => {
               )}
             </div>
             <div>
-              <p className="font-medium text-slate-900 dark:text-slate-100">
+              <p className="font-medium dark:text-slate-100 text-slatte-600">
                 {isDark ? "Mode Gelap" : "Mode Terang"}
               </p>
               <p className="text-sm text-slate-500 dark:text-slate-400">
@@ -199,7 +199,7 @@ const Profile = () => {
           <button
             onClick={toggleTheme}
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              isDark ? "bg-[var(--c-primary)]" : "bg-slate-200"
+              isDark ? "bg-[var(--c-accent)]" : "bg-slate-200"
             }`}
           >
             <span
@@ -222,7 +222,7 @@ const Profile = () => {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="size-10 rounded-xl bg-[var(--c-accent)] dark:bg-slate-600 grid place-items-center text-slate-700 dark:text-slate-300">
+                  <div className="size-10 rounded-xl bg-[var(--c-accent)] grid place-items-center text-slate-700 dark:text-slate-600">
                     {item.icon}
                   </div>
                   <span className="font-medium text-slate-900 dark:text-slate-100">
@@ -237,7 +237,7 @@ const Profile = () => {
 
       {/* Logout Button */}
       <div className="mt-6">
-        <Link to="/" key="1">
+        <Link to="/login">
           <button className="w-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-2xl p-4 font-medium hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
             Keluar
           </button>

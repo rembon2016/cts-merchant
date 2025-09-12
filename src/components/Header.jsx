@@ -1,6 +1,7 @@
 import React from "react";
 import { useUserStore } from "../store/userStore";
 import { useThemeStore } from "../store/themeStore";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const { user } = useUserStore();
@@ -72,25 +73,27 @@ const Header = () => {
             />
           </svg>
         </button>
-        <button
-          className="p-2 rounded-xl bg-white dark:bg-slate-700 shadow-soft"
-          aria-label="Notifikasi"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            className="w-5 h-5 text-slate-700 dark:text-slate-300"
-            fill="none"
-            stroke="currentColor"
+        <Link to="/notification">
+          <button
+            className="p-2 rounded-xl bg-white dark:bg-slate-700 shadow-soft"
+            aria-label="Notifikasi"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="1.75"
-              d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0a3 3 0 1 1-6 0m6 0H9"
-            />
-          </svg>
-        </button>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              className="w-5 h-5 text-slate-700 dark:text-slate-300"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.75"
+                d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0a3 3 0 1 1-6 0m6 0H9"
+              />
+            </svg>
+          </button>
+        </Link>
       </div>
     </header>
   );

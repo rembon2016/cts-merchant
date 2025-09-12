@@ -6,6 +6,9 @@ import About from "./pages/About";
 import Profile from "./pages/Profile";
 import FaQ from "./pages/FaQ";
 import AccountInformation from "./pages/AccountInformation";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Notification from "./pages/Notification";
 import { useThemeStore } from "./store/themeStore";
 
 function App() {
@@ -24,6 +27,9 @@ function App() {
               element={<AccountInformation />}
             />
             <Route path="faq" element={<FaQ />} />
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
+            <Route path="notification" element={<Notification />} />
           </Route>
         </Routes>
       </Router>
