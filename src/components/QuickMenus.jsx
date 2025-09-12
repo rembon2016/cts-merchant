@@ -1,56 +1,96 @@
-import React, { useState } from 'react'
-import IframeModal from './IframeModal'
-import BottomSheet from './BottomSheet'
+import React, { useState } from "react";
+import IframeModal from "./IframeModal";
+import BottomSheet from "./BottomSheet";
 
 const QuickMenus = () => {
-  const [modalData, setModalData] = useState({ isOpen: false, url: '', title: '' })
-  const [isSheetOpen, setIsSheetOpen] = useState(false)
+  const [modalData, setModalData] = useState({
+    isOpen: false,
+    url: "",
+    title: "",
+  });
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const menuItems = [
     {
-      id: 'soundbox',
-      label: 'Soundbox',
-      url: 'http://8.219.81.253:8809/',
+      id: "soundbox",
+      label: "Soundbox",
+      url: "http://soundbox.ctsolution.id/",
       icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-6 h-6" fill="none" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M11 5 6 9H3v6h3l5 4V5Zm6.5 2.5a5 5 0 0 1 0 9M15 9a3 3 0 0 1 0 6"/>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          className="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.75"
+            d="M11 5 6 9H3v6h3l5 4V5Zm6.5 2.5a5 5 0 0 1 0 9M15 9a3 3 0 0 1 0 6"
+          />
         </svg>
-      )
+      ),
     },
     {
-      id: 'nobank',
-      label: 'Uang Saku',
-      url: 'https://nobank.id/',
+      id: "nobank",
+      label: "Uang Saku",
+      url: "https://nobank.id/",
       icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M3 10h18M6 10v8m12-8v8M4 18h16M3 6l9-3 9 3"/>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-6 h-6"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.75"
+            d="M3 10h18M6 10v8m12-8v8M4 18h16M3 6l9-3 9 3"
+          />
         </svg>
-      )
+      ),
     },
     {
-      id: 'pos',
-      label: 'POS',
-      url: './pos.html',
+      id: "pos",
+      label: "POS",
+      url: "./pos.html",
       icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <rect width="18" height="12" x="3" y="6" rx="2" ry="2" strokeWidth="1.75"/>
-          <path d="M3 10h18" strokeWidth="1.75"/>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-6 h-6"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+        >
+          <rect
+            width="18"
+            height="12"
+            x="3"
+            y="6"
+            rx="2"
+            ry="2"
+            strokeWidth="1.75"
+          />
+          <path d="M3 10h18" strokeWidth="1.75" />
         </svg>
-      )
-    }
-  ]
+      ),
+    },
+  ];
 
   const handleMenuClick = (item) => {
-    if (item.id === 'pos') {
-      window.open(item.url, '_blank')
+    if (item.id === "pos") {
+      window.open(item.url, "_blank");
     } else {
-      setModalData({ isOpen: true, url: item.url, title: item.label })
+      setModalData({ isOpen: true, url: item.url, title: item.label });
     }
-  }
+  };
 
   const closeModal = () => {
-    setModalData({ isOpen: false, url: '', title: '' })
-  }
+    setModalData({ isOpen: false, url: "", title: "" });
+  };
 
   return (
     <>
@@ -76,8 +116,19 @@ const QuickMenus = () => {
             className="bg-white dark:bg-slate-700 rounded-2xl p-3 flex flex-col items-center gap-2 shadow-soft"
           >
             <span className="grid place-items-center size-12 rounded-xl bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-300">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M12 5v.01M12 12v.01M12 19v.01"/>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.75"
+                  d="M12 5v.01M12 12v.01M12 19v.01"
+                />
               </svg>
             </span>
             <span className="text-xs font-medium text-slate-700 dark:text-slate-300">
@@ -98,14 +149,14 @@ const QuickMenus = () => {
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
         onItemClick={(url, title) => {
-          setIsSheetOpen(false)
+          setIsSheetOpen(false);
           setTimeout(() => {
-            setModalData({ isOpen: true, url, title })
-          }, 320)
+            setModalData({ isOpen: true, url, title });
+          }, 320);
         }}
       />
     </>
-  )
-}
+  );
+};
 
-export default QuickMenus
+export default QuickMenus;
