@@ -237,7 +237,7 @@ const Profile = () => {
 
       {/* Logout Button */}
       <div className="mt-6">
-        <Link to="/" key="1">
+        <Link to="/login">
           <button className="w-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-2xl p-4 font-medium hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
             Keluar
           </button>

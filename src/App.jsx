@@ -7,6 +7,8 @@ import Profile from "./pages/Profile";
 import FaQ from "./pages/FaQ";
 import AccountInformation from "./pages/AccountInformation";
 import { useThemeStore } from "./store/themeStore";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 function App() {
   const { isDark } = useThemeStore();
@@ -24,6 +26,8 @@ function App() {
               element={<AccountInformation />}
             />
             <Route path="faq" element={<FaQ />} />
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
           </Route>
         </Routes>
       </Router>
