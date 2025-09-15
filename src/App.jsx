@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Profile from "./pages/Profile";
 import FaQ from "./pages/FaQ";
+import POS from "./pages/POS";
 import AccountInformation from "./pages/AccountInformation";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -27,6 +28,7 @@ function App() {
               element={<AccountInformation />}
             />
             <Route path="faq" element={<FaQ />} />
+            <Route path="pos" element={<POS />} />
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
             <Route path="notification" element={<Notification />} />

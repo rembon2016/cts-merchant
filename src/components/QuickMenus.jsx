@@ -115,7 +115,7 @@ const QuickMenus = () => {
             onClick={() => setIsSheetOpen(true)}
             className="bg-white dark:bg-slate-700 rounded-2xl p-3 flex flex-col items-center gap-2 shadow-soft"
           >
-            <span className="grid place-items-center size-12 rounded-xl bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-300">
+            <span className="grid place-items-center size-12 rounded-xl bg-[var(--c-accent)] text-slate-600 dark:text-slate-600">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
