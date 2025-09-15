@@ -10,12 +10,16 @@ const Header = () => {
   return (
     <header className="px-4 flex items-center justify-between py-3">
       <div className="flex items-center gap-3">
-        <div className="size-9 rounded-full bg-[rgba(0,47,108,0.08)] text-primary grid place-items-center font-semibold">
+        <div className="size-9 rounded-full bg-[rgba(0,47,108,0.08)] text-primary dark:bg-slate-700 dark:text-blue-500 grid place-items-center font-semibold">
           {user.avatar}
         </div>
         <div className="text-sm leading-tight">
-          <p className="text-slate-500 text-sm">{user.greeting}</p>
-          <p className="font-semibold text-primary">{user.name}</p>
+          <p className="text-slate-500 dark:text-slate-300 text-sm">
+            {user.greeting}
+          </p>
+          <p className="font-semibold dark:text-blue-600 text-primary">
+            {user.name}
+          </p>
         </div>
       </div>
 
