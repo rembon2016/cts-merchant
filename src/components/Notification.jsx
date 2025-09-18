@@ -25,10 +25,12 @@ const Notification = () => {
           notifications.map((notif) => (
             <div
               key={notif.id}
-              className="border border-gray-200 rounded-lg p-4 mb-3 bg-gray-50 shadow-sm"
+              className="border border-gray-200 dark:border-slate-600 rounded-lg p-4 mb-3 bg-gray-50 dark:bg-slate-700 shadow-sm"
             >
               <div className="font-bold text-lg">{notif.title}</div>
-              <div className="my-2 text-gray-700">{notif.message}</div>
+              <div className="my-2 text-gray-700 dark:text-gray-200">
+                {notif.message}
+              </div>
               <div className="text-xs text-gray-400">{notif.date}</div>
             </div>
           ))
