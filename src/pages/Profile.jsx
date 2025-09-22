@@ -1,9 +1,11 @@
 import { useUserStore } from "../store/userStore";
 import { useThemeStore } from "../store/themeStore";
 import { Link } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
 
 const Profile = () => {
-  const { user } = useUserStore();
+  const { user, logout } = useAuthStore();
+  const { user: userStore, isLoading } = useUserStore();
   const { isDark, toggleTheme } = useThemeStore();
 
   const menuItems = [
@@ -87,30 +89,14 @@ const Profile = () => {
     },
   ];
 
-  const handleMenuClick = (menuId) => {
-    switch (menuId) {
-      case "security":
-        alert("Fitur Keamanan segera hadir");
-        break;
-      case "notifications":
-        alert("Fitur Notifikasi segera hadir");
-        break;
-      case "help":
-        alert("Fitur Bantuan segera hadir");
-        break;
-      default:
-        break;
-    }
-  };
-
   return (
     <div className="px-4 py-6">
       {/* Profile Header */}
       <div className="bg-white dark:bg-slate-700 rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-600 mb-6">
         <div className="flex items-center gap-4">
-          <div className="size-16 rounded-full bg-[var(--c-primary)] text-white grid place-items-center text-2xl font-bold">
+          {/* <div className="size-16 rounded-full bg-[var(--c-primary)] text-white grid place-items-center text-2xl font-bold">
             {user.avatar}
-          </div>
+          </div> */}
           <div>
             <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
               {user.name}
@@ -119,9 +105,25 @@ const Profile = () => {
               Merchant Premium
             </p>
             <div className="flex items-center gap-2 mt-2">
-              <div className="size-2 rounded-full bg-green-500"></div>
-              <span className="text-sm text-green-600 dark:text-green-400 font-medium">
-                Aktif
+              <div
+                className={`size-2 rounded-full ${
+                  user?.business_account?.status === "pending"
+                    ? "bg-yellow-500"
+                    : "bg-green-500"
+                }`}
+              />
+              <span
+                className={`text-sm ${
+                  user?.business_account?.status === "pending"
+                    ? "text-yellow-600"
+                    : "text-green-600"
+                } ${
+                  user?.business_account?.status === "pending"
+                    ? "dark:text-yellow-400"
+                    : "dark:text-green-400"
+                } font-medium`}
+              >
+                {user?.business_account.status}
               </span>
             </div>
           </div>
@@ -237,11 +239,12 @@ const Profile = () => {
 
       {/* Logout Button */}
       <div className="mt-6">
-        <Link to="/login">
-          <button className="w-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-2xl p-4 font-medium hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
-            Keluar
-          </button>
-        </Link>
+        <button
+          className="w-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-2xl p-4 font-medium hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+          onClick={() => logout()}
+        >
+          {isLoading ? "Loading..." : "Keluar"}
+        </button>
       </div>
     </div>
   );

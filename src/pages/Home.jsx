@@ -1,7 +1,6 @@
-import React from 'react'
-import IncomeCard from '../components/IncomeCard'
-import QuickMenus from '../components/QuickMenus'
-import PromoSlider from '../components/PromoSlider'
+import IncomeCard from "../components/IncomeCard";
+import QuickMenus from "../components/QuickMenus";
+import PromoSlider from "../components/PromoSlider";
 
 const Home = () => {
   return (
@@ -10,7 +9,7 @@ const Home = () => {
       <QuickMenus />
       <PromoSlider />
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
