@@ -1,4 +1,3 @@
-import React from "react";
 import { useAuthStore } from "../store/authStore";
 import { useThemeStore } from "../store/themeStore";
 import { Link } from "react-router-dom";

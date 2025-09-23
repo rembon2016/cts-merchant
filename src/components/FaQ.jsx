@@ -1,36 +1,32 @@
-import { useState } from "react";
-
-const faqData = [
-  {
-    question: "Bagaimana cara mendaftar akun?",
-    answer:
-      "Klik tombol 'Daftar' di halaman utama dan isi data yang diperlukan.",
-  },
-  {
-    question: "Bagaimana cara reset password?",
-    answer:
-      "Klik 'Lupa Password' pada halaman login dan ikuti instruksi yang diberikan.",
-  },
-  {
-    question: "Bagaimana menghubungi customer service?",
-    answer:
-      "Anda dapat menghubungi kami melalui fitur chat atau email di halaman kontak.",
-  },
-];
+import { useEffect, useMemo, useState } from "react";
+import useFetchDataStore from "../store/fetchDataStore";
 
 export default function FaQ() {
   const [openIndex, setOpenIndex] = useState(null);
+  const { data, loading, error, fetchData } = useFetchDataStore();
+  const toggleIndex = (idx) => setOpenIndex(openIndex === idx ? null : idx);
 
-  const toggleIndex = (idx) => {
-    setOpenIndex(openIndex === idx ? null : idx);
-  };
+  useEffect(() => {
+    fetchData(
+      `${import.meta.env.VITE_API_ROUTES}/v1/merchant/faq?page=1&per_page=10`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  }, []);
 
-  return (
-    <div className="p-4 max-w-xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Butuh Bantuan?</h1>
+  const renderElement = useMemo(() => {
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>Error: {error}</div>;
+    if (!data || data?.faqs.length === 0) return <div>No FAQs available.</div>;
+
+    return (
       <div className="space-y-4">
-        {faqData.map((item, idx) => (
-          <div key={idx} className="bg-white rounded-2xl shadow">
+        {data?.faqs?.map((item, idx) => (
+          <div key={item.id} className="bg-white rounded-2xl shadow">
             <button
               className="w-full flex justify-between items-center p-4 focus:outline-none"
               onClick={() => toggleIndex(idx)}
@@ -62,6 +58,13 @@ export default function FaQ() {
           </div>
         ))}
       </div>
+    );
+  }, [data, loading, error, openIndex]);
+
+  return (
+    <div className="p-4 max-w-xl mx-auto">
+      <h1 className="text-2xl font-bold mb-6">Butuh Bantuan?</h1>
+      {renderElement}
     </div>
   );
 }
