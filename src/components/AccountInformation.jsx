@@ -11,7 +11,7 @@ export default function AccountInformation() {
   const renderElement = (label, value, isStatus = false) => {
     return (
       <div className="flex hover:bg-slate-100 dark:hover:bg-slate-800 transition-all rounded-lg ease-in p-2">
-        <span className="flex items-center w-[200px] font-regular text-slate-500">
+        <span className="flex items-center w-[200px] font-regular text-slate-500 dark:text-slate-400">
           {label}
         </span>
         <span
