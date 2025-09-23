@@ -1,8 +1,31 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import useFetchDataStore from "../store/fetchDataStore";
 
 export default function Transaction() {
   const { data, loading, error, fetchData } = useFetchDataStore();
+  const [activeFilter, setActiveFilter] = useState("all");
+
+  const filterButton = [
+    { name: "Semua", type: "all" },
+    { name: "Pemasukan", type: "income" },
+    { name: "Pengeluaran", type: "outcome" },
+  ];
+
+  const handleFilter = (type) => {
+    setActiveFilter(type);
+    let url = `${
+      import.meta.env.VITE_API_ROUTES
+    }/v1/merchant/transaction?page=1&per_page=10`;
+    if (type !== "all") {
+      url += `&type=${type}`;
+    }
+    fetchData(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  };
 
   useEffect(() => {
     fetchData(
@@ -117,15 +140,19 @@ export default function Transaction() {
 
       {/* Filter Buttons */}
       <div className="flex gap-2 mb-6">
-        <button className="px-4 py-2 rounded-full bg-[var(--c-accent)] text-slate-900 text-sm font-medium">
-          Semua
-        </button>
-        <button className="px-4 py-2 rounded-full bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-medium border border-slate-200 dark:border-slate-600">
-          Pemasukan
-        </button>
-        <button className="px-4 py-2 rounded-full bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-medium border border-slate-200 dark:border-slate-600">
-          Pengeluaran
-        </button>
+        {filterButton.map((item) => (
+          <button
+            key={item.type}
+            className={`px-4 py-2 rounded-full ${
+              activeFilter === item.type
+                ? "bg-[var(--c-accent)]"
+                : "bg-white dark:bg-slate-700 dark:text-slate-300"
+            } text-slate-600 text-sm font-medium border border-slate-200 dark:border-slate-600 transition-colors`}
+            onClick={() => handleFilter(item.type)}
+          >
+            {item.name}
+          </button>
+        ))}
       </div>
 
       {/* Transaction List */}
