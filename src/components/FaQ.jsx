@@ -21,7 +21,7 @@ export default function FaQ() {
   const renderElement = useMemo(() => {
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
-    if (!data || data?.faqs.length === 0) return <div>No FAQs available.</div>;
+    if (!data || data?.faqs?.length === 0) return <div>No FAQs available.</div>;
 
     return (
       <div className="space-y-4">

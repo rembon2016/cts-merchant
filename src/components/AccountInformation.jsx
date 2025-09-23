@@ -10,7 +10,7 @@ export default function AccountInformation() {
 
   const renderElement = (label, value, isStatus = false) => {
     return (
-      <div className="flex hover:bg-slate-100 transition-all ease-in p-2">
+      <div className="flex hover:bg-slate-100 dark:hover:bg-slate-800 transition-all rounded-lg ease-in p-2">
         <span className="flex items-center w-[200px] font-regular text-slate-500">
           {label}
         </span>
@@ -28,12 +28,16 @@ export default function AccountInformation() {
 
   return (
     <div className="max-w-md mx-auto p-6  rounded-lg bg-white shadow">
-      <h2 className="text-xl font-semibold mb-4">Informasi Akun</h2>
+      <h2 className="text-xl font-semibold mb-4 dark:text-slate-400">
+        Informasi Akun
+      </h2>
       <div className="flex flex-col">
         {renderElement("Nama Lengkap", userInfo?.name)}
         {renderElement("Email", userInfo?.email)}
       </div>
-      <h2 className="text-xl font-semibold my-4">Detail Bisnis</h2>
+      <h2 className="text-xl font-semibold my-4 dark:text-slate-400">
+        Detail Bisnis
+      </h2>
       <div className="flex flex-col">
         {renderElement(
           "Nama Bisnis",
@@ -78,7 +82,9 @@ export default function AccountInformation() {
         )}
         {renderElement("Status Akun", userInfo.business_account.status, true)}
       </div>
-      <h2 className="text-xl font-semibold my-4">Detail Bank</h2>
+      <h2 className="text-xl font-semibold my-4 dark:text-slate-400">
+        Detail Bank
+      </h2>
       <div className="flex flex-col">
         {renderElement(
           "Akun Bank",
