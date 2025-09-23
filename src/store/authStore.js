@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { useUserDataStore } from "./userDataStore";
 
 const SESSION_KEY = "authUser";
 const TOKEN_KEY = "authToken";
@@ -48,6 +49,9 @@ export const useAuthStore = create((set, get) => ({
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(userData.data));
       sessionStorage.setItem(TOKEN_KEY, data.access_token);
 
+      const { setUserData } = useUserDataStore.getState();
+      setUserData(userData.data);
+
       set({
         user: userData?.data,
         token: data?.access_token,
@@ -92,6 +96,9 @@ export const useAuthStore = create((set, get) => ({
 
       sessionStorage.removeItem(SESSION_KEY);
       sessionStorage.removeItem(TOKEN_KEY);
+
+      const { setUserData } = useUserDataStore.getState();
+      setUserData({});
 
       set({
         user: null,
