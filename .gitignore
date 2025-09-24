@@ -95,8 +95,4 @@ tmp/
 temp/
 
 # public folder
-<<<<<<< HEAD
-public/
-=======
 # public/images/*
->>>>>>> bc49517afe54a81573d25a24999bf5a5290f8b20

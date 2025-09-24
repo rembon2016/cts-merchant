@@ -7,9 +7,11 @@ const useFetchDataStore = create((set, get) => ({
   data: null,
   loading: false,
   error: null,
+  success: null,
   abortController: null,
   isFetching: false,
   totalData: null,
+  response: null,
 
   resetStore: () => {
     set({
@@ -69,7 +71,18 @@ const useFetchDataStore = create((set, get) => ({
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
+      if (
+        response?.code === 200 ||
+        response.status === 200 ||
+        response?.ok ||
+        response?.success
+      ) {
+        set({ success: true });
+      }
+
       const result = await response.json();
+
+      set({ response: result });
 
       // If storeOptions contains data, use that instead of the response
       const dataToStore = storeOptions.data || result?.data;
