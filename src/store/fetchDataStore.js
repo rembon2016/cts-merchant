@@ -9,6 +9,7 @@ const useFetchDataStore = create((set, get) => ({
   error: null,
   abortController: null,
   isFetching: false,
+  totalData: null,
 
   resetStore: () => {
     set({
@@ -20,13 +21,11 @@ const useFetchDataStore = create((set, get) => ({
     });
   },
 
-  fetchData: async (url, options = {}) => {
+  fetchData: async (url, options = {}, storeOptions = {}) => {
     const state = get();
 
     // If already fetching, don't start another fetch
-    if (state.isFetching) {
-      return;
-    }
+    if (state.isFetching) return;
 
     // Check cache first
     const cacheKey = JSON.stringify({ url, options });
@@ -72,13 +71,22 @@ const useFetchDataStore = create((set, get) => ({
 
       const result = await response.json();
 
+      // If storeOptions contains data, use that instead of the response
+      const dataToStore = storeOptions.data || result?.data;
+
+      const allDataCount = result?.data?.pagination?.total || null;
+      if (allDataCount !== null) {
+        set({ totalData: allDataCount });
+      }
+
       // Store in cache
       cache.set(cacheKey, {
-        data: result?.data,
+        data: dataToStore,
         timestamp: Date.now(),
+        totalData: allDataCount,
       });
 
-      set({ data: result?.data });
+      set({ data: dataToStore });
     } catch (err) {
       if (err.name === "AbortError") {
         set({ error: "Request timed out after 10 seconds" });

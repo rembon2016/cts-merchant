@@ -1,9 +1,51 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useReducer, useState } from "react";
 import useFetchDataStore from "../store/fetchDataStore";
+import { useDebounce } from "../hooks/useDebounce";
+import SearchInput from "./SearchInput";
+import LoadMoreButton from "./LoadMoreButton";
+import CustomLoading from "./CustomLoading";
+
+// Define action types
+const SET_FILTER = "SET_FILTER";
+const SET_PAGE = "SET_PAGE";
+const SET_SEARCH_QUERY = "SET_SEARCH_QUERY";
+
+// Initial state
+const initialState = {
+  activeFilter: "all",
+  searchQuery: "",
+  currentPage: 1,
+};
+
+// Reducer function
+function reducer(state, action) {
+  switch (action.type) {
+    case SET_FILTER:
+      return {
+        ...state,
+        activeFilter: action.payload,
+        currentPage: 1, // Reset page when filter changes
+      };
+    case SET_PAGE:
+      return {
+        ...state,
+        currentPage: action.payload,
+      };
+    case SET_SEARCH_QUERY:
+      return {
+        ...state,
+        searchQuery: action.payload,
+        currentPage: 1, // Reset page when searching
+      };
+    default:
+      return state;
+  }
+}
 
 export default function Transaction() {
-  const { data, loading, error, fetchData } = useFetchDataStore();
-  const [activeFilter, setActiveFilter] = useState("all");
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { data, totalData, loading, error, fetchData } = useFetchDataStore();
+  const [accumulatedData, setAccumulatedData] = useState([]);
 
   const filterButton = [
     { name: "Semua", type: "all" },
@@ -11,13 +53,35 @@ export default function Transaction() {
     { name: "Pengeluaran", type: "outcome" },
   ];
 
-  const handleFilter = (type) => {
-    setActiveFilter(type);
+  // Debounce search query with 500ms delay
+  const debouncedSearch = useDebounce(state.searchQuery, 500);
+
+  // Effect untuk mengelola accumulated data ketika data berubah
+  useEffect(() => {
+    if (data?.transactions) {
+      if (state.currentPage > 1) {
+        setAccumulatedData((prev) => [...prev, ...data.transactions]);
+      } else {
+        setAccumulatedData(data.transactions);
+      }
+    }
+  }, [data]);
+
+  const fetchTransactions = (page = 1, filter = state.activeFilter) => {
+    const searchParams = new URLSearchParams({
+      page: page.toString(),
+      per_page: "10",
+      ...(debouncedSearch && { search: debouncedSearch }),
+    });
+
     let url = `${
       import.meta.env.VITE_API_ROUTES
-    }/v1/merchant/transaction?page=1&per_page=10`;
-    if (type !== "all") {
-      url += `&type=${type}`;
+    }/v1/merchant/transaction?${searchParams.toString()}`;
+    if (filter !== "all") {
+      url += `&type=${filter}`;
+    }
+    if (debouncedSearch) {
+      url += `&search=${debouncedSearch}`;
     }
     fetchData(url, {
       method: "GET",
@@ -27,31 +91,44 @@ export default function Transaction() {
     });
   };
 
+  const handleFilter = (type) => {
+    dispatch({ type: SET_FILTER, payload: type });
+    fetchTransactions(1, type);
+  };
+
+  const handleLoadMore = () => {
+    const nextPage = state.currentPage + 1;
+    dispatch({ type: SET_PAGE, payload: nextPage });
+    fetchTransactions(nextPage);
+  };
+
+  // Initial fetch
   useEffect(() => {
-    fetchData(
-      `${
-        import.meta.env.VITE_API_ROUTES
-      }/v1/merchant/transaction?page=1&per_page=10`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-  }, []);
+    fetchTransactions(1);
+  }, [debouncedSearch, state.activeFilter]);
 
   const renderElement = useMemo(() => {
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
-    if (!data || data?.transactions?.length === 0)
-      return <div>No Transaction available.</div>;
+    if (loading && !accumulatedData.length) {
+      return <CustomLoading />;
+    }
+    if (error) {
+      return <div className="text-center text-red-500">Error: {error}</div>;
+    }
+    if (!accumulatedData.length) {
+      return (
+        <div className="text-center py-4">
+          {state.searchQuery
+            ? "Tidak ada Transaksi yang sesuai dengan pencarian Anda."
+            : "Tidak ada Transaksi tersedia."}
+        </div>
+      );
+    }
 
     return (
       <div className="space-y-3">
-        {data?.transactions?.map((item) => (
+        {accumulatedData.map((item, idx) => (
           <div
-            key={item.id}
+            key={`${item.id}-${idx}`}
             className="bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600"
           >
             <div className="flex items-center justify-between">
@@ -125,7 +202,7 @@ export default function Transaction() {
         ))}
       </div>
     );
-  }, [data, loading, error]);
+  }, [accumulatedData, loading, error]);
 
   return (
     <div className="px-4 py-6">
@@ -144,7 +221,7 @@ export default function Transaction() {
           <button
             key={item.type}
             className={`px-4 py-2 rounded-full ${
-              activeFilter === item.type
+              state.activeFilter === item.type
                 ? "bg-[var(--c-accent)]"
                 : "bg-white dark:bg-slate-700 dark:text-slate-300"
             } text-slate-600 text-sm font-medium border border-slate-200 dark:border-slate-600 transition-colors`}
@@ -155,15 +232,26 @@ export default function Transaction() {
         ))}
       </div>
 
+      <div className="mb-6">
+        <SearchInput
+          value={state.searchQuery}
+          onChange={(value) =>
+            dispatch({ type: SET_SEARCH_QUERY, payload: value })
+          }
+          placeholder="Cari transaksi..."
+        />
+      </div>
+
       {/* Transaction List */}
       {renderElement}
 
       {/* Load More Button */}
-      <div className="mt-6 text-center">
-        <button className="px-6 py-3 rounded-2xl bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors">
-          Muat Lebih Banyak
-        </button>
-      </div>
+      <LoadMoreButton
+        data={accumulatedData}
+        totalData={totalData}
+        loading={loading}
+        handleLoadMore={handleLoadMore}
+      />
     </div>
   );
 }
