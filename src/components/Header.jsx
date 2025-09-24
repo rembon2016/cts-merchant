@@ -57,7 +57,7 @@ const Header = () => {
             </svg>
           )}
         </button>
-        <button
+        {/* <button
           className="p-2 rounded-xl bg-white dark:bg-slate-700 shadow-soft"
           aria-label="Cari"
         >
@@ -75,7 +75,7 @@ const Header = () => {
               d="m21 21-4.35-4.35M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"
             />
           </svg>
-        </button>
+        </button> */}
         <Link to="/notification">
           <button
             className="p-2 rounded-xl bg-white dark:bg-slate-700 shadow-soft"

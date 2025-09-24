@@ -1,7 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 
 export default function AccountInformation() {
   const { user: userInfo } = useAuthStore();
+
+  const navigate = useNavigate();
 
   const getStatusColor = (value, isStatus) => {
     if (!isStatus) return "text-slate-600";
@@ -26,11 +29,37 @@ export default function AccountInformation() {
     );
   };
 
+  const renderIconEdit = () => {
+    return (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="lucide lucide-pencil-icon lucide-pencil hover:cursor-pointer hover:text-blue-500 transition-all my-auto"
+        onClick={() =>
+          navigate(`/account/edit/${userInfo.id}`, { replace: true })
+        }
+      >
+        <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+        <path d="m15 5 4 4" />
+      </svg>
+    );
+  };
+
   return (
     <div className="max-w-md mx-auto p-6  rounded-lg bg-white shadow">
-      <h2 className="text-xl font-semibold mb-4 dark:text-slate-400">
-        Informasi Akun
-      </h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold mb-4 dark:text-slate-400">
+          Informasi Akun
+        </h2>
+        {renderIconEdit()}
+      </div>
       <div className="flex flex-col">
         {renderElement("Nama Lengkap", userInfo?.name)}
         {renderElement("Email", userInfo?.email)}

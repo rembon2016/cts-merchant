@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Notification from "./pages/Notification";
 import { useThemeStore } from "./store/themeStore";
 import { ProtectedRoute, PublicRoute } from "./components/ProtectedRoute";
+import EditProfile from "./pages/EditProfile";
 
 function App() {
   const { isDark } = useThemeStore();
@@ -88,6 +89,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Notification />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="account/edit/:id"
+              element={
+                <ProtectedRoute>
+                  <EditProfile />
                 </ProtectedRoute>
               }
             />
