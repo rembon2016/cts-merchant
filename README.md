@@ -25,11 +25,13 @@ Aplikasi dashboard merchant modern yang dibangun dengan React, Vite, dan Tailwin
 
 1. Clone atau download proyek ini
 2. Install dependencies:
+
    ```bash
    npm install
    ```
 
 3. Jalankan development server:
+
    ```bash
    npm run dev
    ```
@@ -40,25 +42,11 @@ Aplikasi dashboard merchant modern yang dibangun dengan React, Vite, dan Tailwin
 
 ```
 src/
-├── components/          # Komponen UI reusable
-│   ├── BottomNav.jsx   # Navigasi bawah
-│   ├── BottomSheet.jsx # Modal bottom sheet
-│   ├── Header.jsx      # Header dengan user info
-│   ├── IframeModal.jsx # Modal untuk iframe
-│   ├── IncomeCard.jsx  # Kartu pendapatan
-│   ├── PromoSlider.jsx # Slider promo
-│   └── QuickMenus.jsx  # Menu cepat
-├── layouts/
-│   └── MainLayout.jsx  # Layout utama
+├── components/         # Komponen UI reusable
+├── layouts/            # Layout Aplikasi
 ├── pages/              # Halaman aplikasi
-│   ├── Home.jsx        # Dashboard utama
-│   ├── About.jsx       # Halaman transaksi
-│   └── Profile.jsx     # Profil pengguna
 ├── services/           # API services
-│   └── userService.js  # Mock API untuk user data
 ├── store/              # State management
-│   ├── userStore.js    # Store untuk data user
-│   └── themeStore.js   # Store untuk tema
 ├── App.jsx             # Root component
 ├── main.jsx            # Entry point
 └── index.css           # Global styles
@@ -70,8 +58,8 @@ Aplikasi menggunakan CSS custom properties untuk tema:
 
 ```css
 :root {
-  --c-primary: #3b82f6;    /* Warna utama */
-  --c-accent: #10b981;     /* Warna aksen */
+  --c-primary: #3b82f6; /* Warna utama */
+  --c-accent: #10b981; /* Warna aksen */
 }
 ```
 
@@ -80,16 +68,19 @@ Untuk mengubah warna tema, edit file `src/index.css`.
 ## 📱 Halaman & Fitur
 
 ### 🏠 Dashboard (Home)
+
 - Kartu pendapatan dengan filter periode
 - Quick menu untuk akses cepat
 - Slider promo dan penawaran
 
 ### 💰 Transaksi (About)
+
 - Riwayat transaksi lengkap
 - Filter berdasarkan jenis transaksi
 - Detail waktu dan kategori
 
 ### 👤 Profil (Profile)
+
 - Informasi merchant
 - Statistik transaksi
 - Pengaturan tema
@@ -98,13 +89,17 @@ Untuk mengubah warna tema, edit file `src/index.css`.
 ## 🔧 Konfigurasi
 
 ### Vite Config
+
 Konfigurasi Vite tersedia di `vite.config.js` dengan:
+
 - Plugin React
 - Server port 3000
 - Auto-open browser
 
 ### Tailwind Config
+
 Kustomisasi Tailwind di `tailwind.config.js`:
+
 - Custom colors
 - Extended shadows
 - Custom border radius
@@ -113,11 +108,13 @@ Kustomisasi Tailwind di `tailwind.config.js`:
 ## 🚀 Build & Deploy
 
 1. Build untuk production:
+
    ```bash
    npm run build
    ```
 
 2. Preview build:
+
    ```bash
    npm run preview
    ```
@@ -134,6 +131,7 @@ Menggunakan Zustand untuk state management:
 ## 📊 Mock Data
 
 Aplikasi menggunakan mock data di `userService.js` untuk:
+
 - Data user dan profil
 - Riwayat transaksi
 - Statistik pendapatan
