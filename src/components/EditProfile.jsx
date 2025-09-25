@@ -8,6 +8,7 @@ import SimpleInput from "./form/SimpleInput";
 export default function EditProfile() {
   const { user: userInfo, logout } = useAuthStore();
   const { loading, success, error, fetchData } = useFetchDataStore();
+  const [disabledButton, setDisabledButton] = useState(false);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -18,6 +19,12 @@ export default function EditProfile() {
   });
 
   const [errors, setErrors] = useState({});
+
+  const headersApi = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -61,11 +68,7 @@ export default function EditProfile() {
 
     fetchData(`${import.meta.env.VITE_API_ROUTES}/v1/user/update`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
+      headers: headersApi,
       body: JSON.stringify(updateData),
     });
   };
@@ -75,6 +78,14 @@ export default function EditProfile() {
       setTimeout(() => logout(), [1000]);
     }
   }, [success]);
+
+  useEffect(() => {
+    const hasChanged =
+      formData.name !== userInfo.name ||
+      formData.password !== "" ||
+      formData.confirmPassword !== "";
+    setDisabledButton(!hasChanged);
+  }, [formData, userInfo.name]);
 
   return (
     <div className="max-w-md mx-auto p-6 rounded-lg bg-white shadow mt-5">
@@ -143,6 +154,7 @@ export default function EditProfile() {
           <button
             type="submit"
             className="w-full bg-[var(--c-primary)] text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors"
+            disabled={disabledButton}
           >
             {loading ? "Tunggu..." : " Simpan Perubahan"}
           </button>

@@ -1,7 +1,7 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { AlertCircle } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
+import SimpleAlert from "./alert/SimpleAlert";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -88,12 +88,10 @@ export default function Login() {
     <div className="mt-10 flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
         <h2 className="text-2xl font-bold text-center mb-6">Masuk</h2>
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-            <span className="text-red-700 text-sm">{error}</span>
-          </div>
-        )}
+        <SimpleAlert
+          type={error ? "error" : null}
+          textContent={error || null}
+        />
         <form className="space-y-5">
           <div>
             <label
