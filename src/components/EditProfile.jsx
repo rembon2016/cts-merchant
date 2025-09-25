@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import useFetchDataStore from "../store/fetchDataStore";
-import { AlertCircle } from "lucide-react";
+import SimpleAlert from "./alert/SimpleAlert";
+import SimpleInput from "./form/SimpleInput";
 
 export default function EditProfile() {
   const { user: userInfo, logout } = useAuthStore();
-  const { response, loading, error, success, fetchData } = useFetchDataStore();
+  const { loading, success, error, fetchData } = useFetchDataStore();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -67,28 +68,26 @@ export default function EditProfile() {
       },
       body: JSON.stringify(updateData),
     });
-
-    if (success) {
-      setTimeout(async () => {
-        await logout();
-      }, 1000);
-    }
   };
+
+  useEffect(() => {
+    if (success) {
+      setTimeout(() => logout(), [1000]);
+    }
+  }, [success]);
 
   return (
     <div className="max-w-md mx-auto p-6 rounded-lg bg-white shadow mt-5">
-      {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
-          <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-          <span className="text-red-700 text-sm">{error}</span>
-        </div>
-      )}
-      {success && (
-        <div className="mb-6 p-4 bg-red-50 border border-green-200 rounded-lg flex items-center gap-3">
-          <AlertCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-          <span className="text-green-700 text-sm">Edit Profil Berhasil</span>
-        </div>
-      )}
+      <SimpleAlert
+        type={success ? "success" : error ? "error" : null}
+        textContent={
+          success
+            ? "Profil berhasil diubah"
+            : error
+            ? "Profil gagal diubah"
+            : null
+        }
+      />
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold dark:text-slate-400">
           Edit Profil
@@ -115,83 +114,30 @@ export default function EditProfile() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label
-            className="block text-sm font-medium text-slate-700 mb-1"
-            htmlFor="name"
-          >
-            Nama Lengkap
-          </label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-            placeholder="Masukkan nama lengkap"
-          />
-          {errors.name && (
-            <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-          )}
-        </div>
-
-        <div>
-          <label
-            className="block text-sm font-medium text-slate-700 mb-1"
-            htmlFor="email"
-          >
-            Email
-          </label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            disabled
-            className="w-full px-3 py-2 border border-slate-300 rounded-md bg-slate-100 cursor-not-allowed"
-          />
-        </div>
-
-        <div>
-          <label
-            className="block text-sm font-medium text-slate-700 mb-1"
-            htmlFor="password"
-          >
-            Password Baru
-          </label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-            placeholder="Masukkan password baru"
-          />
-          {errors.password && (
-            <p className="mt-1 text-sm text-red-600">{errors.password}</p>
-          )}
-        </div>
-
-        <div>
-          <label
-            className="block text-sm font-medium text-slate-700 mb-1"
-            htmlFor="confirmPassword"
-          >
-            Konfirmasi Password
-          </label>
-          <input
-            type="password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-            placeholder="Konfirmasi password baru"
-          />
-          {errors.confirmPassword && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.confirmPassword}
-            </p>
-          )}
-        </div>
+        <SimpleInput
+          name="name"
+          type="text"
+          label="Nama Lengkap"
+          value={formData.name}
+          errors={errors.name}
+          handleChange={handleChange}
+        />
+        <SimpleInput
+          name="password"
+          type="password"
+          label="Password Baru"
+          value={formData.password}
+          errors={errors.password}
+          handleChange={handleChange}
+        />
+        <SimpleInput
+          name="confirmPassword"
+          type="password"
+          label="Konfirmasi Password"
+          value={formData.confirmPassword}
+          errors={errors.confirmPassword}
+          handleChange={handleChange}
+        />
 
         <div className="pt-4">
           <button
