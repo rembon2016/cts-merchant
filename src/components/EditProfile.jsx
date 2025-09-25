@@ -9,6 +9,7 @@ export default function EditProfile() {
   const { user: userInfo, logout } = useAuthStore();
   const { loading, success, error, fetchData } = useFetchDataStore();
   const [disabledButton, setDisabledButton] = useState(false);
+  const [isEditPassword, setIsEditPassword] = useState(false);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -41,17 +42,24 @@ export default function EditProfile() {
       newErrors.name = "Nama Lengkap harus diisi";
     }
 
-    if (formData.password) {
-      if (formData.password.length < 6) {
-        newErrors.password = "Password minimal 6 karakter";
-      }
-      if (formData.password !== formData.confirmPassword) {
-        newErrors.confirmPassword = "Password tidak sama";
+    if (isEditPassword) {
+      if (formData.password) {
+        if (formData.password.length < 6) {
+          newErrors.password = "Password minimal 6 karakter";
+        }
+        if (formData.password !== formData.confirmPassword) {
+          newErrors.confirmPassword = "Password tidak sama";
+        }
       }
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  const handleEditPassword = (e) => {
+    e.preventDefault();
+    setIsEditPassword(!isEditPassword);
   };
 
   const handleSubmit = async (e) => {
@@ -62,8 +70,12 @@ export default function EditProfile() {
     const updateData = {
       name: formData.name,
       email: formData.email,
-      ...(formData.password && { password: formData.password }),
-      ...(formData.password && { password_confirmation: formData.password }),
+      ...(isEditPassword && {
+        password: formData.password,
+        password_confirmation: formData.confirmPassword,
+      }),
+      // ...(formData.password && { password: formData.password }),
+      // ...(formData.password && { password_confirmation: formData.password }),
     };
 
     fetchData(`${import.meta.env.VITE_API_ROUTES}/v1/user/update`, {
@@ -133,6 +145,9 @@ export default function EditProfile() {
           errors={errors.name}
           handleChange={handleChange}
         />
+        <div className="flex w-full justify-end">
+          <button onClick={(e) => handleEditPassword(e)}>Edit Password?</button>
+        </div>
         <SimpleInput
           name="password"
           type="password"
@@ -140,6 +155,7 @@ export default function EditProfile() {
           value={formData.password}
           errors={errors.password}
           handleChange={handleChange}
+          disabled={!isEditPassword}
         />
         <SimpleInput
           name="confirmPassword"
@@ -148,6 +164,7 @@ export default function EditProfile() {
           value={formData.confirmPassword}
           errors={errors.confirmPassword}
           handleChange={handleChange}
+          disabled={!isEditPassword}
         />
 
         <div className="pt-4">
