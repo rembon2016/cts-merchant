@@ -148,24 +148,28 @@ export default function EditProfile() {
         <div className="flex w-full justify-end">
           <button onClick={(e) => handleEditPassword(e)}>Edit Password?</button>
         </div>
-        <SimpleInput
-          name="password"
-          type="password"
-          label="Password Baru"
-          value={formData.password}
-          errors={errors.password}
-          handleChange={handleChange}
-          disabled={!isEditPassword}
-        />
-        <SimpleInput
-          name="confirmPassword"
-          type="password"
-          label="Konfirmasi Password"
-          value={formData.confirmPassword}
-          errors={errors.confirmPassword}
-          handleChange={handleChange}
-          disabled={!isEditPassword}
-        />
+        {isEditPassword && (
+          <>
+            <SimpleInput
+              name="password"
+              type="password"
+              label="Password Baru"
+              value={formData.password}
+              errors={errors.password}
+              handleChange={handleChange}
+              disabled={!isEditPassword}
+            />
+            <SimpleInput
+              name="confirmPassword"
+              type="password"
+              label="Konfirmasi Password"
+              value={formData.confirmPassword}
+              errors={errors.confirmPassword}
+              handleChange={handleChange}
+              disabled={!isEditPassword}
+            />
+          </>
+        )}
 
         <div className="pt-4">
           <button
