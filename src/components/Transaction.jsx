@@ -56,6 +56,12 @@ export default function Transaction() {
   // Debounce search query with 500ms delay
   const debouncedSearch = useDebounce(state.searchQuery, 500);
 
+  const headersApi = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
+  };
+
   // Effect untuk mengelola accumulated data ketika data berubah
   useEffect(() => {
     if (data?.transactions) {
@@ -85,9 +91,7 @@ export default function Transaction() {
     }
     fetchData(url, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: headersApi,
     });
   };
 

@@ -53,6 +53,12 @@ export default function FaQ() {
   // Debounce search query with 500ms delay
   const debouncedSearch = useDebounce(state.searchQuery, 500);
 
+  const headersApi = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
+  };
+
   // Effect untuk mengelola accumulated data ketika data berubah
   useEffect(() => {
     if (data?.faqs) {
@@ -78,9 +84,7 @@ export default function FaQ() {
       }/v1/merchant/faq?${searchParams.toString()}`,
       {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: headersApi,
       }
     );
   };
@@ -94,7 +98,7 @@ export default function FaQ() {
   const handleLoadMore = () => {
     const nextPage = state.currentPage + 1;
     dispatch({ type: SET_PAGE, payload: nextPage });
-    fetchFaqs(nextPage, true);
+    fetchFaqs(nextPage);
   };
 
   const renderElement = useMemo(() => {

@@ -68,6 +68,10 @@ const useFetchDataStore = create((set, get) => ({
       clearTimeout(timeoutId);
 
       if (!response.ok) {
+        set({ error: `HTTP error! status: ${response.status}` });
+        setTimeout(() => {
+          set({ error: null });
+        }, 2000);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
@@ -78,6 +82,9 @@ const useFetchDataStore = create((set, get) => ({
         response?.success
       ) {
         set({ success: true });
+        setTimeout(() => {
+          set({ success: false });
+        }, 2000);
       }
 
       const result = await response.json();
