@@ -1,14 +1,24 @@
 import { useState, useEffect, useRef } from "react";
 import useFetchDataStore from "../store/fetchDataStore";
+import PromoDetailModal from "./PromoDetailModal";
 
 const PromoSlider = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [selectedPromoId, setSelectedPromoId] = useState(null);
   const trackRef = useRef(null);
   const startXRef = useRef(0);
   const timerRef = useRef(null);
 
   const { data, fetchData } = useFetchDataStore();
+
+  const handlePromoClick = (promoId) => {
+    setSelectedPromoId(promoId);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedPromoId(null);
+  };
 
   const fetchBanner = (page = 1) => {
     fetchData(
@@ -108,9 +118,9 @@ const PromoSlider = () => {
         <h3 className="text-base font-semibold text-primary dark:text-slate-300">
           Promo Hari Ini
         </h3>
-        <a href="#" className="text-xs text-slate-500 dark:text-slate-400">
+        {/* <a href="#" className="text-xs text-slate-500 dark:text-slate-400">
           Lihat semua
-        </a>
+        </a> */}
       </div>
 
       <div
@@ -125,14 +135,18 @@ const PromoSlider = () => {
       >
         <div className="carousel-track" ref={trackRef}>
           {data?.faqs?.map((slide) => (
-            <div key={slide.id} className="slide">
+            <button
+              key={slide.id}
+              className="slide text-left"
+              onClick={() => handlePromoClick(slide.id)}
+            >
               <img
                 src={slide.thumbnail}
                 alt={slide.title}
                 className="w-full h-44 object-cover rounded-2xl shadow-soft"
                 draggable={false}
               />
-            </div>
+            </button>
           ))}
         </div>
 
@@ -152,6 +166,13 @@ const PromoSlider = () => {
           </div>
         </div>
       </div>
+      {selectedPromoId && (
+        <PromoDetailModal
+          promoId={selectedPromoId}
+          onClose={handleCloseModal}
+          promoData={data?.faqs}
+        />
+      )}
     </section>
   );
 };
