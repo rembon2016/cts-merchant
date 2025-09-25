@@ -8,6 +8,7 @@ SimpleInput.propTypes = {
   errors: PropTypes.string,
   handleChange: PropTypes.func,
   placeholder: PropTypes.string,
+  disabled: PropTypes.bool,
 };
 
 const inputClassName =
@@ -21,6 +22,7 @@ export default function SimpleInput({
   errors,
   handleChange,
   placeholder,
+  disabled,
 }) {
   return (
     <div className="relative">
@@ -37,6 +39,7 @@ export default function SimpleInput({
         onChange={handleChange}
         className={inputClassName}
         placeholder={placeholder}
+        disabled={disabled}
       />
       {errors && <p className="mt-1 text-sm text-red-600">{errors}</p>}
     </div>
