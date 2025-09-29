@@ -29,7 +29,7 @@ export default function AccountInformation() {
     );
   };
 
-  const renderIconEdit = () => {
+  const renderIconEdit = (isEditMerchant = false) => {
     return (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -43,7 +43,10 @@ export default function AccountInformation() {
         strokeLinejoin="round"
         className="lucide lucide-pencil-icon lucide-pencil hover:cursor-pointer hover:text-blue-500 transition-all my-auto"
         onClick={() =>
-          navigate(`/account/edit/${userInfo.id}`, { replace: true })
+          navigate(
+            `/${isEditMerchant ? "merchant" : "account"}/edit/${userInfo.id}`,
+            { replace: true }
+          )
         }
       >
         <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
@@ -64,9 +67,12 @@ export default function AccountInformation() {
         {renderElement("Nama Lengkap", userInfo?.name)}
         {renderElement("Email", userInfo?.email)}
       </div>
-      <h2 className="text-xl font-semibold my-4 dark:text-slate-400">
-        Detail Bisnis
-      </h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold my-4 dark:text-slate-400">
+          Merchant
+        </h2>
+        {renderIconEdit(true)}
+      </div>
       <div className="flex flex-col">
         {renderElement(
           "Nama Bisnis",
@@ -111,9 +117,6 @@ export default function AccountInformation() {
         )}
         {renderElement("Status Akun", userInfo.business_account.status, true)}
       </div>
-      <h2 className="text-xl font-semibold my-4 dark:text-slate-400">
-        Detail Bank
-      </h2>
       <div className="flex flex-col">
         {renderElement(
           "Akun Bank",

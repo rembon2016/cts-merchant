@@ -11,6 +11,7 @@ import Notification from "./pages/Notification";
 import { useThemeStore } from "./store/themeStore";
 import { ProtectedRoute, PublicRoute } from "./components/ProtectedRoute";
 import EditProfile from "./pages/EditProfile";
+import EditMerchant from "./pages/EditMerchant";
 
 function App() {
   const { isDark } = useThemeStore();
@@ -97,6 +98,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <EditProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="merchant/edit/:id"
+              element={
+                <ProtectedRoute>
+                  <EditMerchant />
                 </ProtectedRoute>
               }
             />
