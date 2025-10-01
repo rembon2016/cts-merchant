@@ -74,6 +74,74 @@ export const useAuthStore = create((set, get) => ({
       set({
         error: error.message,
         isLoading: false,
+        isLogout: false,
+      });
+      return { success: false, error: error.message };
+    }
+  },
+
+  register: async (formData) => {
+    try {
+      set({ isLoading: true, error: null });
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_ROUTES}/v1/user/create`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if (!response.ok) {
+        set({ error: data.message, isLoading: false });
+        throw new Error(data.message || "Registration failed");
+      }
+
+      const result = await response?.json();
+
+      const getUserResponse = await fetch(
+        `${import.meta.env.VITE_API_ROUTES}/v1/user`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${result?.data?.soundbox?.auth?.access_token}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
+
+      const userData = await getUserResponse.json();
+
+      // Hitung timestamp expiry (expires_in biasanya dalam detik)
+      const expiryTimestamp =
+        Date.now() + result?.data?.soundbox?.auth?.expires_in * 1000;
+
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(userData?.data));
+      sessionStorage.setItem(
+        TOKEN_KEY,
+        result?.data?.soundbox?.auth?.access_token
+      );
+      sessionStorage.setItem(EXPIRED_KEY, expiryTimestamp.toString());
+
+      set({
+        user: userData?.data,
+        isLoading: false,
+        isLogout: false,
+        error: null,
+        isLoggedIn: true,
+      });
+
+      return { success: true };
+    } catch (error) {
+      set({
+        error: error.message,
+        isLoading: false,
+        isLoggedIn: false,
+        isLogout: false,
       });
       return { success: false, error: error.message };
     }
@@ -135,6 +203,8 @@ export const useAuthStore = create((set, get) => ({
   },
 
   logout: async () => {
+    console.log("Running function logout");
+
     try {
       set({ isLoading: true, error: null });
       const token = get().token;
@@ -177,12 +247,10 @@ export const useAuthStore = create((set, get) => ({
         isLogout: true,
       });
 
-      console.log("Running function logout");
-
       return { success: true };
     } catch (error) {
       set({
-        error: error,
+        error: error.message,
         isLoading: false,
         isLogout: false,
       });

@@ -1,11 +1,9 @@
-import { useUserStore } from "../store/userStore";
 import { useThemeStore } from "../store/themeStore";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 
 const Profile = () => {
-  const { user, logout } = useAuthStore();
-  const { user: userStore, isLoading } = useUserStore();
+  const { user, logout, isLoading } = useAuthStore();
   const { isDark, toggleTheme } = useThemeStore();
 
   const menuItems = [
@@ -89,6 +87,8 @@ const Profile = () => {
     },
   ];
 
+  const handleLogout = () => logout();
+
   return (
     <div className="px-4 py-6">
       {/* Profile Header */}
@@ -123,7 +123,7 @@ const Profile = () => {
                     : "dark:text-green-400"
                 } font-medium`}
               >
-                {user?.business_account.status}
+                {user?.business_account?.status}
               </span>
             </div>
           </div>
@@ -241,7 +241,8 @@ const Profile = () => {
       <div className="mt-6">
         <button
           className="w-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-2xl p-4 font-medium hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
-          onClick={() => logout()}
+          onClick={() => handleLogout()}
+          disabled={isLoading}
         >
           {isLoading ? "Loading..." : "Keluar"}
         </button>

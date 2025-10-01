@@ -76,63 +76,63 @@ export default function AccountInformation() {
       <div className="flex flex-col">
         {renderElement(
           "Nama Bisnis",
-          userInfo.business_account.profile.business_name
+          userInfo?.business_account?.profile?.business_name
         )}
-        {renderElement("Alamat", userInfo.business_account.profile.address)}
+        {renderElement("Alamat", userInfo?.business_account?.profile?.address)}
         {renderElement(
           "Provinsi",
-          userInfo.business_account.profile.province_name
+          userInfo?.business_account?.profile?.province_name
         )}
         {renderElement(
           "Nama Kota",
-          userInfo.business_account.profile.city_name
+          userInfo?.business_account?.profile?.city_name
         )}
         {renderElement(
           "Nama Desa",
-          userInfo.business_account.profile.village_name
+          userInfo?.business_account?.profile?.village_name
         )}
         {renderElement(
           "Distrik",
-          userInfo.business_account.profile.subdistrict_name
+          userInfo?.business_account?.profile?.subdistrict_name
         )}
         {renderElement(
           "Skala Bisnis",
-          userInfo.business_account.profile.business_scale
+          userInfo?.business_account?.profile?.business_scale
         )}
         {renderElement(
           "Kode POS",
-          userInfo.business_account.profile.postal_code
+          userInfo?.business_account?.profile?.postal_code
         )}
         {renderElement(
           "Jenis Industri",
-          userInfo.business_account.profile.industry_name
+          userInfo?.business_account?.profile?.industry_name
         )}
         {renderElement(
           "Sub Industri",
-          userInfo.business_account.profile.sub_industry_name
+          userInfo?.business_account?.profile?.sub_industry_name
         )}
         {renderElement(
           "Kode Industri",
-          userInfo.business_account.profile.industry_code
+          userInfo?.business_account?.profile?.industry_code
         )}
-        {renderElement("Status Akun", userInfo.business_account.status, true)}
+        {renderElement("Status Akun", userInfo?.business_account?.status, true)}
       </div>
       <div className="flex flex-col">
         {renderElement(
           "Akun Bank",
-          userInfo.business_account.bank_information.account_name
+          userInfo?.business_account?.bank_information?.account_name
         )}
         {renderElement(
           "Nomor Akun",
-          userInfo.business_account.bank_information.account_number
+          userInfo?.business_account?.bank_information?.account_number
         )}
         {renderElement(
           "Nama Bank",
-          userInfo.business_account.bank_information.bank_name
+          userInfo?.business_account?.bank_information?.bank_name
         )}
         {renderElement(
           "Kode Bank",
-          userInfo.business_account.bank_information.bank_code
+          userInfo?.business_account?.bank_information?.bank_code
         )}
       </div>
     </div>

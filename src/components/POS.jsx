@@ -4,18 +4,18 @@ import { useThemeStore } from "../store/themeStore";
 const categories = [
   {
     name: "TRANSAKSI",
-    iconLight: "../../public/icons/transaction.svg",
-    iconDark: "../../public/icons/transaction-white.svg",
+    iconLight: "/icons/transaction.svg",
+    iconDark: "/icons/transaction-white.svg",
   },
   {
     name: "PRODUK",
-    iconLight: "../../public/icons/product.svg",
-    iconDark: "../../public/icons/product-white.svg",
+    iconLight: "/icons/product.svg",
+    iconDark: "/icons/product-white.svg",
   },
   {
     name: "MENU",
-    iconLight: "../../public/icons/menu.svg",
-    iconDark: "../../public/icons/menu-white.svg",
+    iconLight: "/icons/menu.svg",
+    iconDark: "/icons/menu-white.svg",
   },
 ];
 const subCategories = ["Makanan", "Minuman", "Kopi", "Snack", "Lainnya"];
@@ -26,7 +26,7 @@ const products = [
     desc: "lorem ipsum dolor sit amet",
     price: "20.000",
     category: "Makanan",
-    image: "../../public/images/gambar1.jpg",
+    image: "/images/gambar1.jpg",
   },
   {
     id: 2,
@@ -34,7 +34,7 @@ const products = [
     desc: "lorem ipsum dolor sit amet",
     price: "5.000",
     category: "Minuman",
-    image: "../../public/images/gambar2.jpg",
+    image: "/images/gambar2.jpg",
   },
   {
     id: 3,
@@ -42,7 +42,7 @@ const products = [
     desc: "lorem ipsum dolor sit amet",
     price: "15.000",
     category: "Kopi",
-    image: "../../public/images/gambar3.jpg",
+    image: "/images/gambar3.jpg",
   },
   {
     id: 4,
@@ -50,7 +50,7 @@ const products = [
     desc: "lorem ipsum dolor sit amet",
     price: "7.000",
     category: "Snack",
-    image: "../../public/images/gambar4.jpg",
+    image: "/images/gambar4.jpg",
   },
   {
     id: 5,
@@ -58,7 +58,7 @@ const products = [
     desc: "lorem ipsum dolor sit amet",
     price: "12.000",
     category: "Lainnya",
-    image: "../../public/images/gambar5.jpg",
+    image: "/images/gambar5.jpg",
   },
   {
     id: 6,
@@ -66,7 +66,7 @@ const products = [
     desc: "lorem ipsum dolor sit amet",
     price: "10.000",
     category: "Minuman",
-    image: "../../public/images/gambar6.jpg",
+    image: "/images/gambar6.jpg",
   },
 ];
 
@@ -162,9 +162,7 @@ export default function POS() {
                   <button className="w-20 h-12 text-slace-600 rounded-full border-2 border-slate-600 flex justify-center items-center">
                     <img
                       src={`${
-                        isDark
-                          ? "../../public/icons/cart-white.svg"
-                          : "../../public/icons/cart.svg"
+                        isDark ? "/icons/cart-white.svg" : "/icons/cart.svg"
                       }`}
                       alt={product.name || "Product Image"}
                       className="w-8 h-8"
