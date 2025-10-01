@@ -86,7 +86,7 @@ export default function EditMerchant() {
   const headersApi = {
     "Content-Type": "application/json",
     Accept: "application/json",
-    Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
+    Authorization: `Bearer 155|mvmV6GllJ3C68P39CljU7sdFUvn2Ltm1HxsDMCFJcfd613c8`,
   };
 
   const handleChange = (e) => {
@@ -102,6 +102,10 @@ export default function EditMerchant() {
 
     if (!formData.businessName.trim()) {
       newErrors.businessName = "Nama Bisnis harus diisi";
+    }
+
+    if (!formData.businessScale.trim()) {
+      newErrors.businessScale = "Skala Bisnis harus diisi";
     }
 
     setErrors(newErrors);
@@ -180,7 +184,9 @@ export default function EditMerchant() {
 
   useEffect(() => {
     if (success) {
+      setDisabledButton(true);
       setTimeout(() => logout(), [1000]);
+      setDisabledButton(false);
     }
   }, [success]);
 

@@ -35,7 +35,7 @@ export default function SimpleInput({
       <input
         type={type}
         name={name}
-        value={type === "file" ? "" : value}
+        value={type === "file" ? null : value}
         onChange={handleChange}
         className={inputClassName}
         placeholder={placeholder}

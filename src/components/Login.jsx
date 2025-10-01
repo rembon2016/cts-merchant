@@ -12,7 +12,7 @@ export default function Login() {
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
-  const { login, isLoggedIn, isLoading } = useAuthStore();
+  const { login, isLoggedIn, isLoading, isLogout } = useAuthStore();
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -92,6 +92,9 @@ export default function Login() {
           type={error ? "error" : null}
           textContent={error || null}
         />
+        {isLogout && (
+          <SimpleAlert type="success" textContent="Anda Berhasil Keluar" />
+        )}
         <form className="space-y-5">
           <div>
             <label

@@ -12,9 +12,24 @@ import { useThemeStore } from "./store/themeStore";
 import { ProtectedRoute, PublicRoute } from "./components/ProtectedRoute";
 import EditProfile from "./pages/EditProfile";
 import EditMerchant from "./pages/EditMerchant";
+import { useAuthStore } from "./store/authStore";
+import { useEffect } from "react";
 
 function App() {
   const { isDark } = useThemeStore();
+  const { startAutoLogoutTimer, isLoggedIn, checkTokenExpiry, logout } =
+    useAuthStore();
+
+  useEffect(() => {
+    // Cek apakah sudah expired saat aplikasi dimuat
+    if (isLoggedIn) {
+      if (checkTokenExpiry()) {
+        logout();
+      } else {
+        startAutoLogoutTimer();
+      }
+    }
+  }, [isLoggedIn]);
 
   return (
     <div className={isDark ? "dark" : ""}>
