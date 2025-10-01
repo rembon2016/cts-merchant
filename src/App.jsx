@@ -14,11 +14,24 @@ import EditProfile from "./pages/EditProfile";
 import EditMerchant from "./pages/EditMerchant";
 import { useAuthStore } from "./store/authStore";
 import { useEffect } from "react";
+import { useRegisterSW } from "virtual:pwa-register/react";
 
 function App() {
   const { isDark } = useThemeStore();
   const { startAutoLogoutTimer, isLoggedIn, checkTokenExpiry, logout } =
     useAuthStore();
+
+  const {
+    needRefresh: [needRefresh],
+    updateServiceWorker,
+  } = useRegisterSW({
+    onRegistered(r) {
+      console.log("SW Registered: " + r);
+    },
+    onRegisterError(error) {
+      console.log("SW registration error", error);
+    },
+  });
 
   useEffect(() => {
     // Cek apakah sudah expired saat aplikasi dimuat
@@ -33,6 +46,12 @@ function App() {
 
   return (
     <div className={isDark ? "dark" : ""}>
+      {needRefresh && (
+        <div className="update-notification">
+          <span>Update tersedia!</span>
+          <button onClick={() => updateServiceWorker(true)}>Reload</button>
+        </div>
+      )}
       <Router>
         <Routes>
           <Route path="/" element={<MainLayout />}>

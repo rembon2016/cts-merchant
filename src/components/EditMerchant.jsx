@@ -86,7 +86,7 @@ export default function EditMerchant() {
   const headersApi = {
     "Content-Type": "application/json",
     Accept: "application/json",
-    Authorization: `Bearer 155|mvmV6GllJ3C68P39CljU7sdFUvn2Ltm1HxsDMCFJcfd613c8`,
+    Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
   };
 
   const handleChange = (e) => {
