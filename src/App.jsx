@@ -7,6 +7,7 @@ import FaQ from "./pages/FaQ";
 import POS from "./pages/POS";
 import AccountInformation from "./pages/AccountInformation";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Notification from "./pages/Notification";
 import { useThemeStore } from "./store/themeStore";
 import { ProtectedRoute, PublicRoute } from "./components/ProtectedRoute";
@@ -111,14 +112,14 @@ function App() {
                 </PublicRoute>
               }
             />
-            {/* <Route
+            <Route
               path="register"
               element={
                 <PublicRoute>
                   <Register />
                 </PublicRoute>
               }
-            /> */}
+            />
             <Route
               path="notification"
               element={

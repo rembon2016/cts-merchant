@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuthStore } from "../store/authStore";
 import SimpleAlert from "./alert/SimpleAlert";
@@ -86,8 +86,19 @@ export default function Login() {
 
   return (
     <div className="mt-10 flex items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
-        <h2 className="text-2xl font-bold text-center mb-6">Masuk</h2>
+      <div className="w-full max-w-md rounded-lg p-8">
+        <div className="flex flex-col gap-3 mb-6">
+          <img
+            src="/public/images/logo-cts.png"
+            alt="logo"
+            className="w-24 h-24 mx-auto"
+          />
+          <h3 className="font-bold text-4xl text-center">Merchant</h3>
+        </div>
+        <div className="flex flex-col gap-1 my-8">
+          <h2 className="text-2xl font-bold text-start">Masuk</h2>
+          <p className="text-slate-600 text-base">Masuk ke CTS Merchant</p>
+        </div>
         <SimpleAlert
           type={error ? "error" : null}
           textContent={error || null}
@@ -95,10 +106,10 @@ export default function Login() {
         {isLogout && (
           <SimpleAlert type="success" textContent="Anda Berhasil Keluar" />
         )}
-        <form className="space-y-5">
+        <form className="space-y-2">
           <div>
             <label
-              className="block text-sm font-medium mb-1"
+              className="block text-sm font-medium mb-2"
               htmlFor="username"
             >
               Username / Email
@@ -107,7 +118,7 @@ export default function Login() {
               type="text"
               id="email"
               name="email"
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-slate-800"
+              className="w-full p-4 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-slate-800"
               placeholder="Masukkan username atau email"
               onChange={handleChange}
               value={formData?.email}
@@ -119,17 +130,14 @@ export default function Login() {
             )}
           </div>
           <div>
-            <label
-              className="block text-sm font-medium mb-1"
-              htmlFor="password"
-            >
+            <label className="block text-sm font-medium mb-" htmlFor="password">
               Password
             </label>
             <input
               type="password"
               id="password"
               name="password"
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-slate-800"
+              className="w-full p-4 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-slate-800"
               placeholder="Masukkan password"
               onChange={handleChange}
               value={formData?.password}
@@ -140,9 +148,11 @@ export default function Login() {
               </p>
             )}
           </div>
+        </form>
+        <div className="mt-6 flex flex-col gap-3">
           <button
             type="submit"
-            className="w-full py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition"
+            className="w-full py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition"
             onClick={handleSubmit}
           >
             {isLoading ? (
@@ -161,7 +171,7 @@ export default function Login() {
               Daftar
             </Link>
           </h6> */}
-        </form>
+        </div>
       </div>
     </div>
   );
