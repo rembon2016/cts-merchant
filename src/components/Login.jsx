@@ -82,17 +82,13 @@ export default function Login() {
   return (
     <div className="mt-10 flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-md rounded-lg p-8">
-        <div className="flex flex-col gap-3 mb-6">
+        <div className="flex flex-col mb-6">
           <img
-            src="/images/logo-cts.png"
+            src="/images/logo-cts-blue.svg"
             alt="deskripsi"
             className="w-24 h-24 mx-auto"
           />
           <h3 className="font-bold text-4xl text-center">Merchant</h3>
-        </div>
-        <div className="flex flex-col gap-1 my-8">
-          <h2 className="text-2xl font-bold text-start">Masuk</h2>
-          <p className="text-slate-600 text-base">Masuk ke CTS Merchant</p>
         </div>
         <SimpleAlert
           type={error ? "error" : null}
@@ -101,6 +97,10 @@ export default function Login() {
         {isLogout && (
           <SimpleAlert type="success" textContent="Anda Berhasil Keluar" />
         )}
+        <div className="flex flex-col gap-1 my-8">
+          <h2 className="text-2xl font-bold text-start">Masuk</h2>
+          <p className="text-slate-600 text-base">Masuk ke CTS Merchant</p>
+        </div>
         <form className="space-y-2">
           <div>
             <label
@@ -159,13 +159,13 @@ export default function Login() {
               "Masuk"
             )}
           </button>
-          {/* <h6 className="flex justify-center gap-1">
+          <h6 className="flex justify-center gap-1">
             Belum Punya Akun?
             <Link to="/register" className="text-blue-600">
               {" "}
               Daftar
             </Link>
-          </h6> */}
+          </h6>
         </div>
       </div>
     </div>

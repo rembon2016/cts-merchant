@@ -32,7 +32,7 @@ export const useAuthStore = create((set, get) => ({
       const data = await response.json();
 
       if (!response.ok) {
-        set({ error: data.message, isLoading: false });
+        set({ error: data?.message, isLoading: false });
         throw new Error(data.message || "Login failed");
       }
 
@@ -95,12 +95,12 @@ export const useAuthStore = create((set, get) => ({
         }
       );
 
-      if (!response.ok) {
-        set({ error: data.message, isLoading: false });
-        throw new Error(data.message || "Registration failed");
-      }
-
       const result = await response?.json();
+
+      if (!response.ok) {
+        set({ error: result?.message, isLoading: false });
+        throw new Error(result?.message || "Registration failed");
+      }
 
       const getUserResponse = await fetch(
         `${import.meta.env.VITE_API_ROUTES}/v1/user`,
@@ -114,7 +114,7 @@ export const useAuthStore = create((set, get) => ({
         }
       );
 
-      const userData = await getUserResponse.json();
+      const userData = await getUserResponse?.json();
 
       // Hitung timestamp expiry (expires_in biasanya dalam detik)
       const expiryTimestamp =
@@ -129,21 +129,22 @@ export const useAuthStore = create((set, get) => ({
 
       set({
         user: userData?.data,
+        token: result?.data?.soundbox?.auth?.access_token,
+        isLoggedIn: true,
         isLoading: false,
         isLogout: false,
         error: null,
-        isLoggedIn: true,
       });
 
       return { success: true };
     } catch (error) {
+      console.log(error);
       set({
-        error: error.message,
+        error: error?.message,
         isLoading: false,
         isLoggedIn: false,
-        isLogout: false,
       });
-      return { success: false, error: error.message };
+      return { success: false, error: error?.message };
     }
   },
 
@@ -203,10 +204,8 @@ export const useAuthStore = create((set, get) => ({
   },
 
   logout: async () => {
-    console.log("Running function logout");
-
     try {
-      set({ isLoading: true, error: null });
+      set({ isLoading: true });
       const token = get().token;
 
       // Clear auto logout timer saat logout manual
@@ -227,7 +226,10 @@ export const useAuthStore = create((set, get) => ({
         }
       );
 
+      const result = await response?.json();
+
       if (!response.ok) {
+        set({ error: result?.message, isLoading: false });
         throw new Error("Logout failed");
       }
 

@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import SimpleAlert from "./alert/SimpleAlert";
 
 export default function Register() {
-  const { register, isLoading } = useAuthStore();
+  const { register, isLoading, success } = useAuthStore();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
@@ -15,6 +15,14 @@ export default function Register() {
   const [checked, setChecked] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (success) {
+      setTimeout(() => {
+        navigate("/", { replace: true });
+      }, 500);
+    }
+  }, [success, navigate]);
 
   const validateForm = () => {
     const errors = {};
@@ -83,7 +91,7 @@ export default function Register() {
         setError(result.error || "Register failed");
       }
       // Navigation is handled by useEffect when isLoggedIn changes
-      navigate("/", { replace: true });
+      // navigate("/register", { replace: true });
     } catch (err) {
       setError(err.message || "An error occurred during login");
     }
@@ -92,27 +100,22 @@ export default function Register() {
   return (
     <div className="mt-5 flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-md rounded-lg p-8">
-        <div className="flex flex-col gap-3 mb-6">
+        <div className="flex flex-col mb-6">
           <img
-            src="/images/logo-cts.png"
+            src="/images/logo-cts-blue.svg"
             alt="deskripsi"
             className="w-24 h-24 mx-auto"
           />
-          {/* <img
-            src="./public/images/logo-cts.png"
-            alt="logo"
-            className="w-24 h-24 mx-auto"
-          /> */}
           <h3 className="font-bold text-4xl text-center">Merchant</h3>
-        </div>
-        <div className="flex flex-col gap-1 my-8">
-          <h2 className="text-2xl font-bold text-start">Daftar</h2>
-          <p className="text-slate-600 text-base">Buat akun CTS Merchant</p>
         </div>
         <SimpleAlert
           type={error ? "error" : null}
           textContent={error || null}
         />
+        <div className="flex flex-col gap-1 my-8">
+          <h2 className="text-2xl font-bold text-start">Daftar</h2>
+          <p className="text-slate-600 text-base">Buat akun CTS Merchant</p>
+        </div>
         <form className="space-y-2">
           <div>
             <label className="block text-sm font-medium  mb-1" htmlFor="name">
