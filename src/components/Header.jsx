@@ -1,24 +1,24 @@
-import React from "react";
-import { useUserStore } from "../store/userStore";
+import { useEffect } from "react";
+import { useAuthStore } from "../store/authStore";
 import { useThemeStore } from "../store/themeStore";
 import { Link } from "react-router-dom";
 
 const Header = () => {
-  const { user } = useUserStore();
+  const { user } = useAuthStore();
   const { isDark, toggleTheme } = useThemeStore();
 
   return (
     <header className="px-4 flex items-center justify-between py-3">
       <div className="flex items-center gap-3">
         <div className="size-9 rounded-full bg-[rgba(0,47,108,0.08)] text-primary dark:bg-slate-700 dark:text-blue-500 grid place-items-center font-semibold">
-          {user.avatar}
+          {user?.name[0]}
         </div>
         <div className="text-sm leading-tight">
           <p className="text-slate-500 dark:text-slate-300 text-sm">
-            {user.greeting}
+            Selamat Datang
           </p>
-          <p className="font-semibold dark:text-blue-600 text-primary">
-            {user.name}
+          <p className="font-semibold dark:text-blue-400 text-primary">
+            {user?.name}
           </p>
         </div>
       </div>
@@ -58,7 +58,7 @@ const Header = () => {
             </svg>
           )}
         </button>
-        <button
+        {/* <button
           className="p-2 rounded-xl bg-white dark:bg-slate-700 shadow-soft"
           aria-label="Cari"
         >
@@ -76,7 +76,7 @@ const Header = () => {
               d="m21 21-4.35-4.35M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"
             />
           </svg>
-        </button>
+        </button> */}
         <Link to="/notification">
           <button
             className="p-2 rounded-xl bg-white dark:bg-slate-700 shadow-soft"
