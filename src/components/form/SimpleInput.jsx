@@ -35,11 +35,12 @@ export default function SimpleInput({
       <input
         type={type}
         name={name}
-        value={value}
+        value={type === "file" ? null : value}
         onChange={handleChange}
         className={inputClassName}
         placeholder={placeholder}
         disabled={disabled}
+        {...(type === "file" && { accept: "image/*, .pdf" })}
       />
       {errors && <p className="mt-1 text-sm text-red-600">{errors}</p>}
     </div>

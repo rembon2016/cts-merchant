@@ -72,6 +72,7 @@ const useFetchDataStore = create((set, get) => ({
         setTimeout(() => {
           set({ error: null });
         }, 2000);
+        console.error(response);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 

@@ -7,16 +7,52 @@ import FaQ from "./pages/FaQ";
 import POS from "./pages/POS";
 import AccountInformation from "./pages/AccountInformation";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Notification from "./pages/Notification";
 import { useThemeStore } from "./store/themeStore";
 import { ProtectedRoute, PublicRoute } from "./components/ProtectedRoute";
 import EditProfile from "./pages/EditProfile";
+import EditMerchant from "./pages/EditMerchant";
+import { useAuthStore } from "./store/authStore";
+import { useEffect } from "react";
+import { useRegisterSW } from "virtual:pwa-register/react";
 
 function App() {
   const { isDark } = useThemeStore();
+  const { startAutoLogoutTimer, isLoggedIn, checkTokenExpiry, logout } =
+    useAuthStore();
+
+  const {
+    needRefresh: [needRefresh],
+    updateServiceWorker,
+  } = useRegisterSW({
+    onRegistered(r) {
+      console.log("SW Registered: " + r);
+    },
+    onRegisterError(error) {
+      console.log("SW registration error", error);
+    },
+  });
+
+  useEffect(() => {
+    // Cek apakah sudah expired saat aplikasi dimuat
+    if (isLoggedIn) {
+      if (checkTokenExpiry()) {
+        logout();
+      } else {
+        startAutoLogoutTimer();
+      }
+    }
+  }, [isLoggedIn]);
 
   return (
     <div className={isDark ? "dark" : ""}>
+      {needRefresh && (
+        <div className="update-notification">
+          <span>Update tersedia!</span>
+          <button onClick={() => updateServiceWorker(true)}>Reload</button>
+        </div>
+      )}
       <Router>
         <Routes>
           <Route path="/" element={<MainLayout />}>
@@ -76,14 +112,14 @@ function App() {
                 </PublicRoute>
               }
             />
-            {/* <Route
+            <Route
               path="register"
               element={
                 <PublicRoute>
                   <Register />
                 </PublicRoute>
               }
-            /> */}
+            />
             <Route
               path="notification"
               element={
@@ -97,6 +133,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <EditProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="merchant/edit/:id"
+              element={
+                <ProtectedRoute>
+                  <EditMerchant />
                 </ProtectedRoute>
               }
             />

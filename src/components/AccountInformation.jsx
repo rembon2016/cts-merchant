@@ -29,7 +29,7 @@ export default function AccountInformation() {
     );
   };
 
-  const renderIconEdit = () => {
+  const renderIconEdit = (isEditMerchant = false) => {
     return (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -43,7 +43,10 @@ export default function AccountInformation() {
         strokeLinejoin="round"
         className="lucide lucide-pencil-icon lucide-pencil hover:cursor-pointer hover:text-blue-500 transition-all my-auto"
         onClick={() =>
-          navigate(`/account/edit/${userInfo.id}`, { replace: true })
+          navigate(
+            `/${isEditMerchant ? "merchant" : "account"}/edit/${userInfo.id}`,
+            { replace: true }
+          )
         }
       >
         <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
@@ -64,72 +67,72 @@ export default function AccountInformation() {
         {renderElement("Nama Lengkap", userInfo?.name)}
         {renderElement("Email", userInfo?.email)}
       </div>
-      <h2 className="text-xl font-semibold my-4 dark:text-slate-400">
-        Detail Bisnis
-      </h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold my-4 dark:text-slate-400">
+          Merchant
+        </h2>
+        {renderIconEdit(true)}
+      </div>
       <div className="flex flex-col">
         {renderElement(
           "Nama Bisnis",
-          userInfo.business_account.profile.business_name
+          userInfo?.business_account?.profile?.business_name
         )}
-        {renderElement("Alamat", userInfo.business_account.profile.address)}
+        {renderElement("Alamat", userInfo?.business_account?.profile?.address)}
         {renderElement(
           "Provinsi",
-          userInfo.business_account.profile.province_name
+          userInfo?.business_account?.profile?.province_name
         )}
         {renderElement(
           "Nama Kota",
-          userInfo.business_account.profile.city_name
+          userInfo?.business_account?.profile?.city_name
         )}
         {renderElement(
           "Nama Desa",
-          userInfo.business_account.profile.village_name
+          userInfo?.business_account?.profile?.village_name
         )}
         {renderElement(
           "Distrik",
-          userInfo.business_account.profile.subdistrict_name
+          userInfo?.business_account?.profile?.subdistrict_name
         )}
         {renderElement(
           "Skala Bisnis",
-          userInfo.business_account.profile.business_scale
+          userInfo?.business_account?.profile?.business_scale
         )}
         {renderElement(
           "Kode POS",
-          userInfo.business_account.profile.postal_code
+          userInfo?.business_account?.profile?.postal_code
         )}
         {renderElement(
           "Jenis Industri",
-          userInfo.business_account.profile.industry_name
+          userInfo?.business_account?.profile?.industry_name
         )}
         {renderElement(
           "Sub Industri",
-          userInfo.business_account.profile.sub_industry_name
+          userInfo?.business_account?.profile?.sub_industry_name
         )}
         {renderElement(
           "Kode Industri",
-          userInfo.business_account.profile.industry_code
+          userInfo?.business_account?.profile?.industry_code
         )}
-        {renderElement("Status Akun", userInfo.business_account.status, true)}
+        {renderElement("Status Akun", userInfo?.business_account?.status, true)}
       </div>
-      <h2 className="text-xl font-semibold my-4 dark:text-slate-400">
-        Detail Bank
-      </h2>
       <div className="flex flex-col">
         {renderElement(
           "Akun Bank",
-          userInfo.business_account.bank_information.account_name
+          userInfo?.business_account?.bank_information?.account_name
         )}
         {renderElement(
           "Nomor Akun",
-          userInfo.business_account.bank_information.account_number
+          userInfo?.business_account?.bank_information?.account_number
         )}
         {renderElement(
           "Nama Bank",
-          userInfo.business_account.bank_information.bank_name
+          userInfo?.business_account?.bank_information?.bank_name
         )}
         {renderElement(
           "Kode Bank",
-          userInfo.business_account.bank_information.bank_code
+          userInfo?.business_account?.bank_information?.bank_code
         )}
       </div>
     </div>
