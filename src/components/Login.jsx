@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAuthStore } from "../store/authStore";
 import SimpleAlert from "./alert/SimpleAlert";
+import { useThemeStore } from "../store/themeStore";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -10,9 +11,11 @@ export default function Login() {
   });
   const [validationErrors, setValidationErrors] = useState({});
   const [error, setError] = useState("");
+  const [changeType, setChangeType] = useState(false);
 
   const navigate = useNavigate();
   const { login, isLoggedIn, isLoading, isLogout } = useAuthStore();
+  const { isDark } = useThemeStore();
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -54,11 +57,6 @@ export default function Login() {
         [name]: "",
       }));
     }
-
-    // Clear server error when user starts typing
-    // if (error) {
-    //   clearError();
-    // }
   };
 
   const handleSubmit = async (e) => {
@@ -84,20 +82,26 @@ export default function Login() {
     }
   };
 
+  const inputClassName =
+    "w-full p-4 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-slate-200";
+
+  const showPasswordClassName =
+    "text-sm border-none outline-none absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-600 dark:text-blue-300";
+
+  const getImage = useMemo(() => {
+    if (isDark) {
+      return "/images/logo-cts.svg";
+    } else {
+      return "/images/logo-cts-blue.svg";
+    }
+  }, [isDark]);
+
   return (
     <div className="mt-10 flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-md rounded-lg p-8">
-        <div className="flex flex-col gap-3 mb-6">
-          <img
-            src="/public/images/logo-cts.png"
-            alt="logo"
-            className="w-24 h-24 mx-auto"
-          />
+        <div className="flex flex-col mb-6">
+          <img src={getImage} alt="deskripsi" className="w-24 h-24 mx-auto" />
           <h3 className="font-bold text-4xl text-center">Merchant</h3>
-        </div>
-        <div className="flex flex-col gap-1 my-8">
-          <h2 className="text-2xl font-bold text-start">Masuk</h2>
-          <p className="text-slate-600 text-base">Masuk ke CTS Merchant</p>
         </div>
         <SimpleAlert
           type={error ? "error" : null}
@@ -106,7 +110,11 @@ export default function Login() {
         {isLogout && (
           <SimpleAlert type="success" textContent="Anda Berhasil Keluar" />
         )}
-        <form className="space-y-2">
+        <div className="flex flex-col gap-1 my-8">
+          <h2 className="text-2xl font-bold text-start">Masuk</h2>
+          <p className="text-slate-600 text-base">Masuk ke CTS Merchant</p>
+        </div>
+        <form className="space-y-3">
           <div>
             <label
               className="block text-sm font-medium mb-2"
@@ -118,7 +126,7 @@ export default function Login() {
               type="text"
               id="email"
               name="email"
-              className="w-full p-4 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-slate-800"
+              className={inputClassName}
               placeholder="Masukkan username atau email"
               onChange={handleChange}
               value={formData?.email}
@@ -133,15 +141,26 @@ export default function Login() {
             <label className="block text-sm font-medium mb-" htmlFor="password">
               Password
             </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              className="w-full p-4 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-slate-800"
-              placeholder="Masukkan password"
-              onChange={handleChange}
-              value={formData?.password}
-            />
+            <div className="relative">
+              <input
+                type={changeType ? "text" : "password"}
+                id="password"
+                name="password"
+                className={inputClassName}
+                placeholder="Masukkan password"
+                onChange={handleChange}
+                value={formData?.password}
+              />
+              <button
+                className={showPasswordClassName}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setChangeType(!changeType);
+                }}
+              >
+                show
+              </button>
+            </div>
             {validationErrors.password && (
               <p className="mt-1 text-sm text-red-600">
                 {validationErrors.password}
@@ -152,8 +171,9 @@ export default function Login() {
         <div className="mt-6 flex flex-col gap-3">
           <button
             type="submit"
-            className="w-full py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition"
+            className="w-full py-4 bg-[var(--c-primary)] text-white font-semibold rounded-xl hover:bg-blue-700 transition"
             onClick={handleSubmit}
+            disabled={isLoading}
           >
             {isLoading ? (
               <div className="flex items-center justify-center gap-2">
@@ -164,13 +184,13 @@ export default function Login() {
               "Masuk"
             )}
           </button>
-          {/* <h6 className="flex justify-center gap-1">
+          <h6 className="flex justify-center gap-1">
             Belum Punya Akun?
-            <Link to="/register" className="text-blue-600">
+            <Link to="/register" className="text-blue-600 dark:text-blue-300">
               {" "}
               Daftar
             </Link>
-          </h6> */}
+          </h6>
         </div>
       </div>
     </div>

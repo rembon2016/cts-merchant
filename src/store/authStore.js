@@ -32,29 +32,20 @@ export const useAuthStore = create((set, get) => ({
       const data = await response.json();
 
       if (!response.ok) {
-        set({ error: data.message, isLoading: false });
+        set({ error: data?.message, isLoading: false });
         throw new Error(data.message || "Login failed");
       }
 
-      const getUserResponse = await fetch(
-        `${import.meta.env.VITE_API_ROUTES}/v1/user`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${data.access_token}`,
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        }
-      );
+      const TOKEN = data?.access_token;
+      const EXPIRED_IN = data.expires_in;
 
-      const userData = await getUserResponse.json();
+      const userData = await get().getUser(TOKEN);
 
       // Hitung timestamp expiry (expires_in biasanya dalam detik)
-      const expiryTimestamp = Date.now() + data.expires_in * 1000;
+      const expiryTimestamp = Date.now() + EXPIRED_IN * 1000;
 
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify(userData.data));
-      sessionStorage.setItem(TOKEN_KEY, data.access_token);
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(userData?.data));
+      sessionStorage.setItem(TOKEN_KEY, TOKEN);
       sessionStorage.setItem(EXPIRED_KEY, expiryTimestamp.toString());
 
       const { setUserData } = useUserDataStore.getState();
@@ -62,7 +53,7 @@ export const useAuthStore = create((set, get) => ({
 
       set({
         user: userData?.data,
-        token: data?.access_token,
+        token: TOKEN,
         isLoggedIn: true,
         isLoading: false,
         isLogout: false,
@@ -95,55 +86,65 @@ export const useAuthStore = create((set, get) => ({
         }
       );
 
+      const result = await response?.json();
+
       if (!response.ok) {
-        set({ error: data.message, isLoading: false });
-        throw new Error(data.message || "Registration failed");
+        set({ error: result?.message, isLoading: false });
+        throw new Error(result?.message || "Registration failed");
       }
 
-      const data = await response?.json();
+      const TOKEN = result?.data?.soundbox?.auth?.access_token;
+      const EXPIRED_IN = result?.data?.soundbox?.auth?.expires_in;
 
-      const getUserResponse = await fetch(
+      const userData = await get().getUser(TOKEN);
+
+      // Hitung timestamp expiry (expires_in biasanya dalam detik)
+      const expiryTimestamp = Date.now() + EXPIRED_IN * 1000;
+
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(userData?.data));
+      sessionStorage.setItem(TOKEN_KEY, TOKEN);
+      sessionStorage.setItem(EXPIRED_KEY, expiryTimestamp.toString());
+
+      const { setUserData } = useUserDataStore.getState();
+      setUserData(userData.data);
+
+      set({
+        user: userData?.data,
+        token: TOKEN,
+        isLoggedIn: true,
+        isLoading: false,
+        isLogout: false,
+        error: null,
+      });
+
+      return { success: true };
+    } catch (error) {
+      set({
+        error: error?.message,
+        isLoading: false,
+        isLoggedIn: false,
+      });
+      return { success: false, error: error?.message };
+    }
+  },
+
+  getUser: async (tokenParams) => {
+    try {
+      const response = await fetch(
         `${import.meta.env.VITE_API_ROUTES}/v1/user`,
         {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${data?.data?.soundbox?.auth?.access_token}`,
+            Authorization: `Bearer ${tokenParams}`,
             "Content-Type": "application/json",
             Accept: "application/json",
           },
         }
       );
 
-      const userData = await getUserResponse.json();
-
-      // Hitung timestamp expiry (expires_in biasanya dalam detik)
-      const expiryTimestamp =
-        Date.now() + data?.data?.soundbox?.auth?.expires_in * 1000;
-
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify(userData?.data));
-      sessionStorage.setItem(
-        TOKEN_KEY,
-        data?.data?.soundbox?.auth?.access_token
-      );
-      sessionStorage.setItem(EXPIRED_KEY, expiryTimestamp.toString());
-
-      set({
-        user: userData?.data,
-        isLoading: false,
-        isLogout: false,
-        error: null,
-        isLoggedIn: true,
-      });
-
-      return { success: true };
+      return await response.json();
     } catch (error) {
-      set({
-        error: error.message,
-        isLoading: false,
-        isLoggedIn: false,
-        isLogout: false,
-      });
-      return { success: false, error: error.message };
+      return error;
     }
   },
 
@@ -204,7 +205,7 @@ export const useAuthStore = create((set, get) => ({
 
   logout: async () => {
     try {
-      set({ isLoading: true, error: null });
+      set({ isLoading: true });
       const token = get().token;
 
       // Clear auto logout timer saat logout manual
@@ -225,7 +226,10 @@ export const useAuthStore = create((set, get) => ({
         }
       );
 
+      const result = await response?.json();
+
       if (!response.ok) {
+        set({ error: result?.message, isLoading: false });
         throw new Error("Logout failed");
       }
 

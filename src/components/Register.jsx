@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import SimpleAlert from "./alert/SimpleAlert";
+import { useThemeStore } from "../store/themeStore";
 
 export default function Register() {
-  const { register, isLoading } = useAuthStore();
+  const { register, isLoading, success } = useAuthStore();
+  const { isDark } = useThemeStore();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
@@ -15,6 +17,26 @@ export default function Register() {
   const [checked, setChecked] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
   const [error, setError] = useState("");
+  const [changeType, setChangeType] = useState({
+    password: false,
+    confirmPassword: false,
+  });
+
+  useEffect(() => {
+    if (success) {
+      setTimeout(() => {
+        navigate("/", { replace: true });
+      }, 500);
+    }
+  }, [success, navigate]);
+
+  useEffect(() => {
+    if (success) {
+      setTimeout(() => {
+        navigate("/", { replace: true });
+      }, 500);
+    }
+  }, [success, navigate]);
 
   const validateForm = () => {
     const errors = {};
@@ -83,32 +105,50 @@ export default function Register() {
         setError(result.error || "Register failed");
       }
       // Navigation is handled by useEffect when isLoggedIn changes
-      navigate("/", { replace: true });
+      // navigate("/register", { replace: true });
     } catch (err) {
       setError(err.message || "An error occurred during login");
     }
   };
 
+  const handleChangeType = (e, name) => {
+    e.preventDefault();
+    setChangeType((prev) => ({
+      ...prev,
+      [name]: !prev[name],
+    }));
+  };
+
+  const inputClassName =
+    "w-full p-4 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-slate-200";
+
+  const showPasswordClassName =
+    "text-sm border-none outline-none absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-600 dark:text-blue-300";
+
+  const getImage = useMemo(() => {
+    if (isDark) {
+      return "/images/logo-cts.svg";
+    } else {
+      return "/images/logo-cts-blue.svg";
+    }
+  }, [isDark]);
+
   return (
     <div className="mt-5 flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-md rounded-lg p-8">
-        <div className="flex flex-col gap-3 mb-6">
-          <img
-            src="/public/images/logo-cts.png"
-            alt="logo"
-            className="w-24 h-24 mx-auto"
-          />
+        <div className="flex flex-col mb-6">
+          <img src={getImage} alt="deskripsi" className="w-24 h-24 mx-auto" />
           <h3 className="font-bold text-4xl text-center">Merchant</h3>
-        </div>
-        <div className="flex flex-col gap-1 my-8">
-          <h2 className="text-2xl font-bold text-start">Daftar</h2>
-          <p className="text-slate-600 text-base">Buat akun CTS Merchant</p>
         </div>
         <SimpleAlert
           type={error ? "error" : null}
           textContent={error || null}
         />
-        <form className="space-y-2">
+        <div className="flex flex-col gap-1 my-8">
+          <h2 className="text-2xl font-bold text-start">Daftar</h2>
+          <p className="text-slate-600 text-base">Buat akun CTS Merchant</p>
+        </div>
+        <form className="space-y-3">
           <div>
             <label className="block text-sm font-medium  mb-1" htmlFor="name">
               Nama Lengkap
@@ -118,7 +158,7 @@ export default function Register() {
               id="name"
               name="name"
               onChange={handleChange}
-              className="w-full p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={inputClassName}
               placeholder="Masukkan nama lengkap"
             />
             {validationErrors.name && (
@@ -136,7 +176,7 @@ export default function Register() {
               id="email"
               name="email"
               onChange={handleChange}
-              className="w-full p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={inputClassName}
               placeholder="Masukkan username atau email"
             />
             {validationErrors.email && (
@@ -152,14 +192,22 @@ export default function Register() {
             >
               Password
             </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              onChange={handleChange}
-              className="w-full p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Masukkan password"
-            />
+            <div className="relative">
+              <input
+                type={changeType.password ? "text" : "password"}
+                id="password"
+                name="password"
+                onChange={handleChange}
+                className={inputClassName}
+                placeholder="Masukkan password"
+              />
+              <button
+                className={showPasswordClassName}
+                onClick={(e) => handleChangeType(e, "password")}
+              >
+                show
+              </button>
+            </div>
             {validationErrors.password && (
               <p className="mt-1 text-sm text-red-600">
                 {validationErrors.password}
@@ -173,14 +221,22 @@ export default function Register() {
             >
               Konfirmasi Password
             </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              onChange={handleChange}
-              className="w-full p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Masukkan password"
-            />
+            <div className="relative">
+              <input
+                type={changeType.confirmPassword ? "text" : "password"}
+                id="confirmPassword"
+                name="confirmPassword"
+                onChange={handleChange}
+                className={inputClassName}
+                placeholder="Masukkan password"
+              />
+              <button
+                className={showPasswordClassName}
+                onClick={(e) => handleChangeType(e, "confirmPassword")}
+              >
+                show
+              </button>
+            </div>
             {validationErrors.confirmPassword && (
               <p className="mt-1 text-sm text-red-600">
                 {validationErrors.confirmPassword}
@@ -197,16 +253,16 @@ export default function Register() {
             />
             <span className="text-sm ">
               Saya setuju dengan{" "}
-              <Link to="#" className="text-blue-600">
+              <Link to="#" className="text-blue-600 dark:text-blue-300">
                 Syarat dan Ketentuan
               </Link>
             </span>
           </div>
           <button
             type="submit"
-            className="w-full p-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition"
+            className="w-full p-4 bg-[var(--c-primary)] text-white font-semibold rounded-xl hover:bg-blue-700 transition"
             onClick={handleSubmit}
-            disabled={!checked}
+            disabled={!checked || isLoading}
           >
             {isLoading ? (
               <div className="flex items-center justify-center gap-2">
@@ -219,7 +275,7 @@ export default function Register() {
           </button>
           <h6 className="flex justify-center gap-1">
             Sudah Punya Akun?
-            <Link to="/login" className="text-blue-600">
+            <Link to="/login" className="text-blue-600 dark:text-blue-300">
               {" "}
               Masuk
             </Link>
