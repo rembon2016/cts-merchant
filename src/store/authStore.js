@@ -36,25 +36,16 @@ export const useAuthStore = create((set, get) => ({
         throw new Error(data.message || "Login failed");
       }
 
-      const getUserResponse = await fetch(
-        `${import.meta.env.VITE_API_ROUTES}/v1/user`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${data.access_token}`,
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        }
-      );
+      const TOKEN = data?.access_token;
+      const EXPIRED_IN = data.expires_in;
 
-      const userData = await getUserResponse.json();
+      const userData = await get().getUser(TOKEN);
 
       // Hitung timestamp expiry (expires_in biasanya dalam detik)
-      const expiryTimestamp = Date.now() + data.expires_in * 1000;
+      const expiryTimestamp = Date.now() + EXPIRED_IN * 1000;
 
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify(userData.data));
-      sessionStorage.setItem(TOKEN_KEY, data.access_token);
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(userData?.data));
+      sessionStorage.setItem(TOKEN_KEY, TOKEN);
       sessionStorage.setItem(EXPIRED_KEY, expiryTimestamp.toString());
 
       const { setUserData } = useUserDataStore.getState();
@@ -62,7 +53,7 @@ export const useAuthStore = create((set, get) => ({
 
       set({
         user: userData?.data,
-        token: data?.access_token,
+        token: TOKEN,
         isLoggedIn: true,
         isLoading: false,
         isLogout: false,
@@ -102,34 +93,24 @@ export const useAuthStore = create((set, get) => ({
         throw new Error(result?.message || "Registration failed");
       }
 
-      const getUserResponse = await fetch(
-        `${import.meta.env.VITE_API_ROUTES}/v1/user`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${result?.data?.soundbox?.auth?.access_token}`,
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        }
-      );
+      const TOKEN = result?.data?.soundbox?.auth?.access_token;
+      const EXPIRED_IN = result?.data?.soundbox?.auth?.expires_in;
 
-      const userData = await getUserResponse?.json();
+      const userData = await get().getUser(TOKEN);
 
       // Hitung timestamp expiry (expires_in biasanya dalam detik)
-      const expiryTimestamp =
-        Date.now() + result?.data?.soundbox?.auth?.expires_in * 1000;
+      const expiryTimestamp = Date.now() + EXPIRED_IN * 1000;
 
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(userData?.data));
-      sessionStorage.setItem(
-        TOKEN_KEY,
-        result?.data?.soundbox?.auth?.access_token
-      );
+      sessionStorage.setItem(TOKEN_KEY, TOKEN);
       sessionStorage.setItem(EXPIRED_KEY, expiryTimestamp.toString());
+
+      const { setUserData } = useUserDataStore.getState();
+      setUserData(userData.data);
 
       set({
         user: userData?.data,
-        token: result?.data?.soundbox?.auth?.access_token,
+        token: TOKEN,
         isLoggedIn: true,
         isLoading: false,
         isLogout: false,
@@ -138,13 +119,32 @@ export const useAuthStore = create((set, get) => ({
 
       return { success: true };
     } catch (error) {
-      console.log(error);
       set({
         error: error?.message,
         isLoading: false,
         isLoggedIn: false,
       });
       return { success: false, error: error?.message };
+    }
+  },
+
+  getUser: async (tokenParams) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_ROUTES}/v1/user`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${tokenParams}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
+
+      return await response.json();
+    } catch (error) {
+      return error;
     }
   },
 

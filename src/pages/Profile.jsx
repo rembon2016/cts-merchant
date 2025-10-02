@@ -89,6 +89,8 @@ const Profile = () => {
 
   const handleLogout = () => logout();
 
+  const userStatus = user?.business_account?.status;
+
   return (
     <div className="px-4 py-6">
       {/* Profile Header */}
@@ -105,25 +107,11 @@ const Profile = () => {
               Merchant Premium
             </p>
             <div className="flex items-center gap-2 mt-2">
-              <div
-                className={`size-2 rounded-full ${
-                  user?.business_account?.status === "pending"
-                    ? "bg-yellow-500"
-                    : "bg-green-500"
-                }`}
-              />
+              <div className={`size-2 rounded-full bg-green-500`} />
               <span
-                className={`text-sm ${
-                  user?.business_account?.status === "pending"
-                    ? "text-yellow-600"
-                    : "text-green-600"
-                } ${
-                  user?.business_account?.status === "pending"
-                    ? "dark:text-yellow-400"
-                    : "dark:text-green-400"
-                } font-medium`}
+                className={`text-sm text-green-600 dark:text-green-400 font-medium`}
               >
-                {user?.business_account?.status}
+                {userStatus || "pending"}
               </span>
             </div>
           </div>
