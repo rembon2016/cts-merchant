@@ -100,14 +100,14 @@ export const useAuthStore = create((set, get) => ({
         throw new Error(data.message || "Registration failed");
       }
 
-      const data = await response?.json();
+      const result = await response?.json();
 
       const getUserResponse = await fetch(
         `${import.meta.env.VITE_API_ROUTES}/v1/user`,
         {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${data?.data?.soundbox?.auth?.access_token}`,
+            Authorization: `Bearer ${result?.data?.soundbox?.auth?.access_token}`,
             "Content-Type": "application/json",
             Accept: "application/json",
           },
@@ -118,12 +118,12 @@ export const useAuthStore = create((set, get) => ({
 
       // Hitung timestamp expiry (expires_in biasanya dalam detik)
       const expiryTimestamp =
-        Date.now() + data?.data?.soundbox?.auth?.expires_in * 1000;
+        Date.now() + result?.data?.soundbox?.auth?.expires_in * 1000;
 
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(userData?.data));
       sessionStorage.setItem(
         TOKEN_KEY,
-        data?.data?.soundbox?.auth?.access_token
+        result?.data?.soundbox?.auth?.access_token
       );
       sessionStorage.setItem(EXPIRED_KEY, expiryTimestamp.toString());
 
@@ -203,6 +203,8 @@ export const useAuthStore = create((set, get) => ({
   },
 
   logout: async () => {
+    console.log("Running function logout");
+
     try {
       set({ isLoading: true, error: null });
       const token = get().token;

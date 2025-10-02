@@ -94,10 +94,15 @@ export default function Register() {
       <div className="w-full max-w-md rounded-lg p-8">
         <div className="flex flex-col gap-3 mb-6">
           <img
-            src="/public/images/logo-cts.png"
-            alt="logo"
+            src="/images/logo-cts.png"
+            alt="deskripsi"
             className="w-24 h-24 mx-auto"
           />
+          {/* <img
+            src="./public/images/logo-cts.png"
+            alt="logo"
+            className="w-24 h-24 mx-auto"
+          /> */}
           <h3 className="font-bold text-4xl text-center">Merchant</h3>
         </div>
         <div className="flex flex-col gap-1 my-8">
@@ -204,7 +209,7 @@ export default function Register() {
           </div>
           <button
             type="submit"
-            className="w-full p-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition"
+            className="w-full p-4 bg-[var(--c-primary)] text-white font-semibold rounded-xl hover:bg-blue-700 transition"
             onClick={handleSubmit}
             disabled={!checked}
           >

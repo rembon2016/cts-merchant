@@ -54,11 +54,6 @@ export default function Login() {
         [name]: "",
       }));
     }
-
-    // Clear server error when user starts typing
-    // if (error) {
-    //   clearError();
-    // }
   };
 
   const handleSubmit = async (e) => {
@@ -89,8 +84,8 @@ export default function Login() {
       <div className="w-full max-w-md rounded-lg p-8">
         <div className="flex flex-col gap-3 mb-6">
           <img
-            src="/public/images/logo-cts.png"
-            alt="logo"
+            src="/images/logo-cts.png"
+            alt="deskripsi"
             className="w-24 h-24 mx-auto"
           />
           <h3 className="font-bold text-4xl text-center">Merchant</h3>
@@ -152,7 +147,7 @@ export default function Login() {
         <div className="mt-6 flex flex-col gap-3">
           <button
             type="submit"
-            className="w-full py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition"
+            className="w-full py-4 bg-[var(--c-primary)] text-white font-semibold rounded-xl hover:bg-blue-700 transition"
             onClick={handleSubmit}
           >
             {isLoading ? (

@@ -87,10 +87,7 @@ const Profile = () => {
     },
   ];
 
-  const handleLogout = async (e) => {
-    e.preventDefault();
-    await logout();
-  };
+  const handleLogout = () => logout();
 
   return (
     <div className="px-4 py-6">
@@ -244,7 +241,7 @@ const Profile = () => {
       <div className="mt-6">
         <button
           className="w-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-2xl p-4 font-medium hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
-          onClick={handleLogout}
+          onClick={() => handleLogout()}
           disabled={isLoading}
         >
           {isLoading ? "Loading..." : "Keluar"}
