@@ -84,7 +84,7 @@ export default function EditMerchant() {
   const [errors, setErrors] = useState({});
 
   const headersApi = {
-    "Content-Type": "application/json",
+    // "Content-Type": "application/json",
     Accept: "application/json",
     Authorization: `Bearer ${token}`,
   };
@@ -231,7 +231,7 @@ export default function EditMerchant() {
         <SimpleInput
           name="businessName"
           type="text"
-          label="Nama Bisnis"
+          label="Nama Bisnis *"
           value={formData.businessName}
           errors={errors.businessName}
           handleChange={handleChange}
@@ -239,7 +239,7 @@ export default function EditMerchant() {
         <SimpleInput
           name="industryName"
           type="text"
-          label="Nama Industri"
+          label="Nama Industri *"
           value={formData.industryName}
           errors={errors.industryName}
           handleChange={handleChange}
@@ -247,7 +247,7 @@ export default function EditMerchant() {
         <SimpleInput
           name="subIndustryName"
           type="text"
-          label="Nama Sub Industri"
+          label="Nama Sub Industri *"
           value={formData.subIndustryName}
           errors={errors.subIndustryName}
           handleChange={handleChange}
@@ -255,7 +255,7 @@ export default function EditMerchant() {
         <SimpleInput
           name="businessScale"
           type="text"
-          label="Skala Bisnis"
+          label="Skala Bisnis *"
           value={formData.businessScale}
           errors={errors.businessScale}
           handleChange={handleChange}
@@ -271,7 +271,7 @@ export default function EditMerchant() {
         <SimpleInput
           name="provinceName"
           type="text"
-          label="Provinsi"
+          label="Provinsi *"
           value={formData.provinceName}
           errors={errors.provinceName}
           handleChange={handleChange}
@@ -279,7 +279,7 @@ export default function EditMerchant() {
         <SimpleInput
           name="cityName"
           type="text"
-          label="Kota"
+          label="Kota *"
           value={formData.cityName}
           errors={errors.cityName}
           handleChange={handleChange}
@@ -287,7 +287,7 @@ export default function EditMerchant() {
         <SimpleInput
           name="subDistrickName"
           type="text"
-          label="Distrik"
+          label="Distrik *"
           value={formData.subDistrickName}
           errors={errors.subDistrickName}
           handleChange={handleChange}
@@ -295,7 +295,7 @@ export default function EditMerchant() {
         <SimpleInput
           name="villageName"
           type="text"
-          label="Desa"
+          label="Desa *"
           value={formData.villageName}
           errors={errors.villageName}
           handleChange={handleChange}
@@ -303,7 +303,7 @@ export default function EditMerchant() {
         <SimpleInput
           name="kodePos"
           type="text"
-          label="Kode Pos"
+          label="Kode Pos *"
           value={formData.kodePos}
           errors={errors.kodePos}
           handleChange={handleChange}
@@ -311,7 +311,7 @@ export default function EditMerchant() {
         <SimpleInput
           name="address"
           type="text"
-          label="Alamat"
+          label="Alamat *"
           value={formData.address}
           errors={errors.address}
           handleChange={handleChange}
@@ -319,7 +319,7 @@ export default function EditMerchant() {
         <SimpleInput
           name="frontsideOutlinePhoto"
           type="file"
-          label="Frontside Outlet Photo"
+          label="Frontside Outlet Photo *"
           value={formData.frontsideOutlinePhoto}
           errors={errors.frontsideOutlinePhoto}
           handleChange={handleChange}
@@ -327,14 +327,14 @@ export default function EditMerchant() {
         <SimpleInput
           name="productsPhoto"
           type="file"
-          label="Frontside Outlet Photo"
+          label="Products Foto *"
           value={formData.productsPhoto}
           errors={errors.productsPhoto}
           handleChange={handleChange}
         />
         <h3 className="font-semibold my-4">Data Manager</h3>
         <SimpleInput
-          name="cardName"
+          name="cardName *"
           type="text"
           label="Nama Kartu"
           value={formData.cardName}
@@ -342,7 +342,7 @@ export default function EditMerchant() {
           handleChange={handleChange}
         />
         <SimpleInput
-          name="cardNumber"
+          name="cardNumber *"
           type="text"
           label="Nomor Kartu"
           value={formData.cardNumber}
@@ -350,7 +350,7 @@ export default function EditMerchant() {
           handleChange={handleChange}
         />
         <SimpleInput
-          name="phoneNumber"
+          name="phoneNumber *"
           type="text"
           label="Nomor Telepon"
           value={formData.phoneNumber}
@@ -358,7 +358,7 @@ export default function EditMerchant() {
           handleChange={handleChange}
         />
         <SimpleInput
-          name="digitalSignature"
+          name="digitalSignature *"
           type="file"
           label="Tanda Tangan Digital"
           value={formData.digitalSignature}
@@ -369,7 +369,7 @@ export default function EditMerchant() {
         <SimpleInput
           name="bankName"
           type="text"
-          label="Nama Bank"
+          label="Nama Bank *"
           value={formData.bankName}
           errors={errors.bankName}
           handleChange={handleChange}
@@ -377,7 +377,7 @@ export default function EditMerchant() {
         <SimpleInput
           name="accountName"
           type="text"
-          label="Nama Akun"
+          label="Nama Akun *"
           value={formData.accountName}
           errors={errors.accountName}
           handleChange={handleChange}
@@ -385,7 +385,7 @@ export default function EditMerchant() {
         <SimpleInput
           name="accountNumber"
           type="text"
-          label="Nomor Akun"
+          label="Nomor Akun *"
           value={formData.accountNumber}
           errors={errors.accountNumber}
           handleChange={handleChange}
@@ -401,7 +401,7 @@ export default function EditMerchant() {
         <SimpleInput
           name="frontsideBankCardPhoto"
           type="file"
-          label="Foto Bagian Depan Kartu"
+          label="Foto Bagian Depan Kartu *"
           value={formData.frontsideBankCardPhoto}
           errors={errors.frontsideBankCardPhoto}
           handleChange={handleChange}
