@@ -6,7 +6,7 @@ import SimpleAlert from "./alert/SimpleAlert";
 import SimpleInput from "./form/SimpleInput";
 
 export default function EditMerchant() {
-  const { user: userInfo, logout } = useAuthStore();
+  const { user: userInfo, token, logout } = useAuthStore();
   const { loading, success, error, fetchData } = useFetchDataStore();
   const [disabledButton, setDisabledButton] = useState(false);
   const navigate = useNavigate();
@@ -86,7 +86,7 @@ export default function EditMerchant() {
   const headersApi = {
     "Content-Type": "application/json",
     Accept: "application/json",
-    Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
+    Authorization: `Bearer ${token}`,
   };
 
   const handleChange = (e) => {
