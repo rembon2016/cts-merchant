@@ -65,6 +65,8 @@ const useFetchDataStore = create((set, get) => ({
         signal: newAbortController.signal,
       });
 
+      console.log("Response: ", response);
+
       clearTimeout(timeoutId);
 
       if (!response.ok) {
@@ -78,7 +80,7 @@ const useFetchDataStore = create((set, get) => ({
 
       if (
         response?.code === 200 ||
-        response.status === 200 ||
+        response?.status === 200 ||
         response?.ok ||
         response?.success
       ) {

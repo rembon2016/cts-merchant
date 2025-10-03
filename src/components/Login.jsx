@@ -138,7 +138,10 @@ export default function Login() {
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium mb-" htmlFor="password">
+            <label
+              className="block text-sm font-medium mb-2"
+              htmlFor="password"
+            >
               Password
             </label>
             <div className="relative">
@@ -158,7 +161,7 @@ export default function Login() {
                   setChangeType(!changeType);
                 }}
               >
-                show
+                {changeType ? "Sembunyikan" : "Tampilkan"}
               </button>
             </div>
             {validationErrors.password && (
