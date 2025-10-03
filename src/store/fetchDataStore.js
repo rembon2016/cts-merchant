@@ -78,7 +78,7 @@ const useFetchDataStore = create((set, get) => ({
 
       if (
         response?.code === 200 ||
-        response.status === 200 ||
+        response?.status === 200 ||
         response?.ok ||
         response?.success
       ) {

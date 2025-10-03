@@ -29,15 +29,15 @@ export const useAuthStore = create((set, get) => ({
         }
       );
 
-      const data = await response.json();
+      const result = await response.json();
 
-      if (!response.ok) {
-        set({ error: data?.message, isLoading: false });
-        throw new Error(data.message || "Login failed");
+      if (!response?.ok) {
+        set({ error: result?.message, isLoading: false });
+        throw new Error(result?.message || "Login failed");
       }
 
-      const TOKEN = data?.access_token;
-      const EXPIRED_IN = data.expires_in;
+      const TOKEN = result?.access_token;
+      const EXPIRED_IN = result?.expires_in;
 
       const userData = await get().getUser(TOKEN);
 
@@ -49,7 +49,7 @@ export const useAuthStore = create((set, get) => ({
       sessionStorage.setItem(EXPIRED_KEY, expiryTimestamp.toString());
 
       const { setUserData } = useUserDataStore.getState();
-      setUserData(userData.data);
+      setUserData(userData?.data);
 
       set({
         user: userData?.data,
@@ -63,7 +63,7 @@ export const useAuthStore = create((set, get) => ({
       return { success: true };
     } catch (error) {
       set({
-        error: error.message,
+        error: error?.message,
         isLoading: false,
         isLogout: false,
       });

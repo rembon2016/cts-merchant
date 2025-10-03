@@ -150,7 +150,7 @@ export default function Register() {
         </div>
         <form className="space-y-3">
           <div>
-            <label className="block text-sm font-medium  mb-1" htmlFor="name">
+            <label className="block text-sm font-medium  mb-2" htmlFor="name">
               Nama Lengkap
             </label>
             <input
@@ -168,7 +168,7 @@ export default function Register() {
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium  mb-1" htmlFor="email">
+            <label className="block text-sm font-medium  mb-2" htmlFor="email">
               Email
             </label>
             <input
@@ -187,7 +187,7 @@ export default function Register() {
           </div>
           <div>
             <label
-              className="block text-sm font-medium  mb-1"
+              className="block text-sm font-medium  mb-2"
               htmlFor="password"
             >
               Password
@@ -205,7 +205,7 @@ export default function Register() {
                 className={showPasswordClassName}
                 onClick={(e) => handleChangeType(e, "password")}
               >
-                show
+                {changeType?.password ? "Sembunyikan" : "Tampilkan"}
               </button>
             </div>
             {validationErrors.password && (
@@ -216,7 +216,7 @@ export default function Register() {
           </div>
           <div>
             <label
-              className="block text-sm font-medium  mb-1"
+              className="block text-sm font-medium  mb-2"
               htmlFor="confirmPassword"
             >
               Konfirmasi Password
@@ -234,7 +234,7 @@ export default function Register() {
                 className={showPasswordClassName}
                 onClick={(e) => handleChangeType(e, "confirmPassword")}
               >
-                show
+                {changeType?.confirmPassword ? "Sembunyikan" : "Tampilkan"}
               </button>
             </div>
             {validationErrors.confirmPassword && (
