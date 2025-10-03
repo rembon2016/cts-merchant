@@ -8,6 +8,7 @@ const BottomSheet = ({ isOpen, onClose, onItemClick }) => {
       id: "soundbox",
       label: "Soundbox",
       url: "http://soundbox.ctsolution.id/",
+      target: "_blank",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -29,6 +30,7 @@ const BottomSheet = ({ isOpen, onClose, onItemClick }) => {
       id: "pos",
       label: "POS",
       url: "./pos.html",
+      target: "_blank",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -54,6 +56,7 @@ const BottomSheet = ({ isOpen, onClose, onItemClick }) => {
       id: "nobank",
       label: "Uang Saku",
       url: "https://nobank.id/",
+      target: "_blank",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -74,7 +77,7 @@ const BottomSheet = ({ isOpen, onClose, onItemClick }) => {
     {
       id: "invoice",
       label: "Invoice",
-      url: "./invoice.html",
+      url: "#",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -95,7 +98,7 @@ const BottomSheet = ({ isOpen, onClose, onItemClick }) => {
     {
       id: "cs",
       label: "CS",
-      url: "./cs.html",
+      url: "#",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -171,7 +174,7 @@ const BottomSheet = ({ isOpen, onClose, onItemClick }) => {
       return;
     }
 
-    if (item.id === "pos") {
+    if (item.target === "_blank") {
       window.open(item.url, "_blank");
     } else {
       onItemClick(item.url, item.label);

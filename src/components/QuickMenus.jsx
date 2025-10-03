@@ -15,6 +15,7 @@ const QuickMenus = () => {
       id: "soundbox",
       label: "Soundbox",
       url: "http://soundbox.ctsolution.id/",
+      target: "_blank",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -35,6 +36,7 @@ const QuickMenus = () => {
     {
       id: "nobank",
       label: "Uang Saku",
+      target: "_blank",
       url: "https://nobank.id/",
       icon: (
         <svg
@@ -57,6 +59,7 @@ const QuickMenus = () => {
       id: "pos",
       label: "POS",
       url: "./pos.html",
+      target: "_blank",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -81,7 +84,7 @@ const QuickMenus = () => {
   ];
 
   const handleMenuClick = (item) => {
-    if (item.id === "pos") {
+    if (item.target === "_blank") {
       window.open(item.url, "_blank");
     } else {
       setModalData({ isOpen: true, url: item.url, title: item.label });
