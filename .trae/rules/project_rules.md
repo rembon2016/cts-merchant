@@ -2,7 +2,7 @@
 
 ## 📋 Overview
 
-Dokumen ini berisi aturan dan panduan pengembangan untuk proyek CTS Merchant React Dashboard. Semua developer wajib mengikuti aturan ini untuk menjaga konsistensi dan kualitas kode.
+Dokumen ini berisi aturan dan panduan pengembangan untuk proyek CTS Merchant React PWA. Aplikasi ini adalah Progressive Web App yang dibangun dengan React, Vite, dan Tailwind CSS untuk merchant CTS Soundbox.
 
 ## 🏗️ Architecture Guidelines
 
@@ -10,35 +10,44 @@ Dokumen ini berisi aturan dan panduan pengembangan untuk proyek CTS Merchant Rea
 ```
 src/
 ├── components/          # Reusable UI components
+│   ├── alert/          # Alert components
+│   └── form/           # Form components
 ├── layouts/             # Layout components
 ├── pages/               # Page components (routes)
 ├── services/            # API services & external integrations
 ├── store/               # State management (Zustand)
-├── utils/               # Utility functions
-├── hooks/               # Custom React hooks
-├── constants/           # Application constants
-└── types/               # TypeScript type definitions
+├── hooks/               # Custom React hooks (useDebounce, etc.)
+└── index.css           # Global styles & Tailwind imports
 ```
 
 ### Component Architecture
 - **Atomic Design**: Gunakan prinsip atomic design (atoms, molecules, organisms)
 - **Single Responsibility**: Setiap komponen hanya memiliki satu tanggung jawab
 - **Composition over Inheritance**: Gunakan composition pattern
-- **Props Interface**: Definisikan props dengan jelas menggunakan PropTypes atau TypeScript
+- **Component Organization**: Pisahkan komponen berdasarkan fungsi (alert/, form/, dll)
+- **Route Protection**: Gunakan ProtectedRoute dan PublicRoute untuk auth guards
+- **Modal Components**: Gunakan IframeModal, PromoDetailModal, PopupBox untuk UI overlay
 
 ### State Management
 - **Zustand**: Gunakan Zustand untuk global state management
+- **Store Separation**: Pisahkan store berdasarkan domain:
+  - `authStore.js` - Authentication & session management
+  - `themeStore.js` - Dark/light theme dengan persist
+  - `userDataStore.js` - User profile data
+  - `fetchDataStore.js` - API data fetching states
+  - `faqStore.js` - FAQ data management
+  - `tokenStore.js` - Token management
 - **Local State**: Gunakan useState untuk state lokal komponen
-- **Store Structure**: Pisahkan store berdasarkan domain (userStore, themeStore, etc.)
 - **Immutability**: Selalu update state secara immutable
+- **Persistence**: Gunakan zustand/middleware persist untuk data yang perlu disimpan
 
 ## 🎨 Design System
 
 ### Color Palette
 ```css
 :root {
-  --c-primary: #3b82f6;     /* Blue 500 */
-  --c-accent: #10b981;      /* Emerald 500 */
+  --c-primary: #002F6C;     /* CTS Primary Blue */
+  --c-accent: #FFD93D;      /* CTS Accent Yellow */
   --c-success: #22c55e;     /* Green 500 */
   --c-warning: #f59e0b;     /* Amber 500 */
   --c-error: #ef4444;       /* Red 500 */
@@ -49,7 +58,7 @@ src/
 ```
 
 ### Typography
-- **Font Family**: Inter (primary), system fonts (fallback)
+- **Font Family**: Inter (primary), system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif
 - **Font Sizes**: Gunakan Tailwind typography scale (text-xs hingga text-6xl)
 - **Font Weights**: 400 (normal), 500 (medium), 600 (semibold), 700 (bold)
 - **Line Height**: 1.5 untuk body text, 1.2 untuk headings
@@ -57,73 +66,77 @@ src/
 ### Spacing & Layout
 - **Grid System**: Gunakan CSS Grid dan Flexbox
 - **Spacing Scale**: Gunakan Tailwind spacing (4px increments)
-- **Container**: Max-width 1200px untuk desktop
+- **Container**: Max-width untuk mobile-first design
 - **Breakpoints**: sm (640px), md (768px), lg (1024px), xl (1280px)
 
 ### Components Design Rules
-- **Border Radius**: 8px (rounded-lg), 16px (rounded-2xl), 24px (rounded-3xl)
-- **Shadows**: Gunakan custom shadow `shadow-soft`
+- **Border Radius**: 8px (rounded-lg), 16px (rounded-2xl), 24px (rounded-3xl), 1.6rem (rounded-3xl custom)
+- **Shadows**: Gunakan custom shadow `shadow-soft: '0 8px 28px rgba(2,22,47,.08)'`
 - **Transitions**: 150ms ease-in-out untuk hover states
 - **Focus States**: Selalu sediakan focus indicators yang jelas
+- **Dark Mode**: Gunakan class-based dark mode dengan `darkMode: 'class'`
 
 ## 💻 Coding Standards
 
 ### JavaScript/React
 ```javascript
-// ✅ Good
-const UserProfile = ({ user, onUpdate }) => {
-  const [isEditing, setIsEditing] = useState(false)
+// ✅ Good - Component dengan hooks dan auth store
+const Dashboard = () => {
+  const { user, isAuthenticated } = useAuthStore()
+  const { theme } = useThemeStore()
+  const [loading, setLoading] = useState(false)
   
-  const handleSave = useCallback((data) => {
-    onUpdate(data)
-    setIsEditing(false)
-  }, [onUpdate])
+  const handleAction = useCallback((data) => {
+    setLoading(true)
+    // Handle action
+    setLoading(false)
+  }, [])
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />
+  }
   
   return (
-    <div className="user-profile">
+    <div className={`dashboard ${theme === 'dark' ? 'dark' : ''}`}>
+      {loading && <CustomLoading />}
       {/* Component content */}
     </div>
   )
 }
 
-// ❌ Bad
-function userProfile(props) {
-  var editing = false
-  
-  function save() {
-    props.onUpdate()
-    editing = false
-  }
+// ❌ Bad - Tidak menggunakan store pattern
+function dashboard(props) {
+  var user = localStorage.getItem('user')
   
   return <div>{/* content */}</div>
 }
 ```
 
 ### Naming Conventions
-- **Components**: PascalCase (`UserProfile`, `IncomeCard`)
-- **Files**: PascalCase untuk components (`UserProfile.jsx`)
-- **Variables**: camelCase (`userName`, `isLoading`)
-- **Constants**: UPPER_SNAKE_CASE (`API_BASE_URL`)
-- **CSS Classes**: kebab-case (`user-profile`, `income-card`)
+- **Components**: PascalCase (`UserProfile`, `IncomeCard`, `ProtectedRoute`)
+- **Files**: PascalCase untuk components (`UserProfile.jsx`, `BottomNav.jsx`)
+- **Stores**: camelCase dengan suffix Store (`authStore.js`, `themeStore.js`)
+- **Variables**: camelCase (`userName`, `isLoading`, `fetchData`)
+- **Constants**: UPPER_SNAKE_CASE (`VITE_API_ROUTES`, `VITE_APP_SALT`)
+- **CSS Classes**: kebab-case atau Tailwind classes
 
 ### Import/Export Rules
 ```javascript
-// ✅ Good - Named exports untuk utilities
-export const formatCurrency = (amount) => { /* */ }
-export const validateEmail = (email) => { /* */ }
+// ✅ Good - Import order dan pattern
+import React, { useState, useEffect, useCallback } from 'react'
+import { Navigate, useNavigate } from 'react-router-dom'
+
+import { useAuthStore } from '../store/authStore'
+import { useThemeStore } from '../store/themeStore'
+import CustomLoading from '../components/CustomLoading'
+import BottomNav from '../components/BottomNav'
 
 // ✅ Good - Default export untuk components
-const UserProfile = () => { /* */ }
-export default UserProfile
+const Dashboard = () => { /* */ }
+export default Dashboard
 
-// ✅ Good - Import order
-import React from 'react'
-import { useState, useEffect } from 'react'
-import { useRouter } from 'react-router-dom'
-
-import { useUserStore } from '../store/userStore'
-import { formatCurrency } from '../utils/format'
-import Button from '../components/Button'
+// ✅ Good - Named exports untuk utilities dan stores
+export const useDebounce = (value, delay) => { /* */ }
 ```
 
 ### Error Handling
@@ -148,19 +161,28 @@ const fetchUserData = async () => {
 }
 ```
 
-## 🔧 Performance Guidelines
+## 🚀 PWA & Performance Guidelines
+
+### Progressive Web App
+- **Service Worker**: Gunakan VitePWA plugin untuk auto-generate service worker
+- **Manifest**: Konfigurasi PWA manifest untuk installable app
+- **Offline Support**: Implementasikan offline-first strategy
+- **Cache Strategy**: Gunakan workbox untuk caching assets dan API responses
+- **App Shell**: Implementasikan app shell architecture
 
 ### React Optimization
-- **Lazy Loading**: Gunakan `React.lazy()` untuk code splitting
+- **Lazy Loading**: Gunakan `React.lazy()` untuk code splitting routes
 - **Memoization**: Gunakan `useMemo` dan `useCallback` untuk expensive operations
-- **Virtual Scrolling**: Implementasikan untuk list panjang
-- **Image Optimization**: Gunakan format WebP, lazy loading untuk images
+- **Custom Hooks**: Buat custom hooks seperti `useDebounce` untuk reusable logic
+- **State Optimization**: Gunakan Zustand dengan persist untuk optimal state management
+- **Component Splitting**: Pisahkan komponen besar menjadi komponen kecil yang reusable
 
 ### Bundle Optimization
-- **Tree Shaking**: Import hanya yang diperlukan
-- **Code Splitting**: Split berdasarkan routes
-- **Asset Optimization**: Compress images dan fonts
-- **Caching**: Implementasikan proper caching strategy
+- **Vite Configuration**: Gunakan Vite untuk fast development dan optimized builds
+- **Tree Shaking**: Import hanya yang diperlukan dari libraries
+- **Code Splitting**: Split berdasarkan routes dan features
+- **Asset Optimization**: Compress images dan optimize fonts
+- **Environment Variables**: Gunakan `VITE_` prefix untuk environment variables
 
 ## 🧪 Testing Standards
 
@@ -243,7 +265,7 @@ describe('Button Component', () => {
 
 ### Build Process
 ```bash
-# Development
+# Development server
 npm run dev
 
 # Build for production
@@ -252,51 +274,88 @@ npm run build
 # Preview production build
 npm run preview
 
-# Lint code
+# Lint code (jika tersedia)
 npm run lint
 
-# Run tests
+# Run tests (jika tersedia)
 npm run test
 ```
 
 ### Environment Variables
 ```bash
-# .env.example
-VITE_API_BASE_URL=https://api.example.com
-VITE_APP_NAME=CTS Merchant
-VITE_APP_VERSION=1.0.0
+# .env
+VITE_API_ROUTES=https://api.example.com
+VITE_APP_SALT=your_app_salt_here
+VITE_APP_SECRET=your_app_secret_here
 ```
 
 ### Pre-deployment Checklist
-- [ ] All tests passing
+- [ ] All tests passing (jika ada)
 - [ ] No console errors
+- [ ] PWA manifest configured
+- [ ] Service worker working
+- [ ] Offline functionality tested
 - [ ] Performance audit passed
 - [ ] Accessibility audit passed
 - [ ] Cross-browser testing completed
 - [ ] Mobile responsiveness verified
+- [ ] Dark mode functionality working
 
 ## 📚 Documentation Standards
 
 ### Component Documentation
 ```javascript
 /**
- * Button component with multiple variants and sizes
+ * ProtectedRoute component untuk melindungi route yang memerlukan autentikasi
  * 
  * @param {Object} props - Component props
- * @param {string} props.variant - Button variant (primary, secondary, outline)
- * @param {string} props.size - Button size (sm, md, lg)
- * @param {boolean} props.disabled - Whether button is disabled
- * @param {Function} props.onClick - Click handler
- * @param {ReactNode} props.children - Button content
+ * @param {ReactNode} props.children - Child components yang akan di-render jika authenticated
  * 
  * @example
- * <Button variant="primary" size="md" onClick={handleClick}>
- *   Save Changes
- * </Button>
+ * <ProtectedRoute>
+ *   <Dashboard />
+ * </ProtectedRoute>
  */
-const Button = ({ variant = 'primary', size = 'md', disabled = false, onClick, children }) => {
-  // Component implementation
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated } = useAuthStore()
+  
+  return isAuthenticated ? children : <Navigate to="/login" replace />
 }
+
+/**
+ * CustomLoading component untuk menampilkan loading state
+ * 
+ * @example
+ * {loading && <CustomLoading />}
+ */
+const CustomLoading = () => {
+  return (
+    <div className="loading-container">
+      {/* Loading animation */}
+    </div>
+  )
+}
+```
+
+### Store Documentation
+```javascript
+/**
+ * Auth Store - Mengelola state autentikasi user
+ * 
+ * @property {Object|null} user - Data user yang sedang login
+ * @property {boolean} isAuthenticated - Status autentikasi
+ * @property {string|null} token - JWT token
+ * 
+ * @method login - Login user dengan credentials
+ * @method logout - Logout user dan clear state
+ * @method setUser - Set data user
+ */
+export const useAuthStore = create((set) => ({
+  user: null,
+  isAuthenticated: false,
+  token: null,
+  // methods...
+}))
 ```
 
 ### README Requirements

@@ -5,6 +5,8 @@ import { useUserDataStore } from "./userDataStore";
 const SESSION_KEY = "authUser";
 const TOKEN_KEY = "authToken";
 const EXPIRED_KEY = "authExpireAt";
+const TOKEN_POS_KEY = "authPosToken";
+const BRANCH_ACTIVE = "branchActive";
 
 export const useAuthStore = create((set, get) => ({
   user: JSON.parse(sessionStorage.getItem(SESSION_KEY)) || null,
@@ -47,7 +49,12 @@ export const useAuthStore = create((set, get) => ({
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(userData?.data));
       sessionStorage.setItem(TOKEN_KEY, TOKEN);
       sessionStorage.setItem(EXPIRED_KEY, expiryTimestamp.toString());
-
+      if(data?.pos){
+        const TOKEN_POS = data?.pos?.token;
+        const BRANCH = data?.pos?.branches?.[0]?.id;
+        sessionStorage.setItem(TOKEN_POS_KEY, TOKEN_POS);
+        sessionStorage.setItem(BRANCH_ACTIVE, BRANCH);
+      }
       const { setUserData } = useUserDataStore.getState();
       setUserData(userData?.data);
 
