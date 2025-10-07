@@ -51,9 +51,9 @@ export default function AccountInformation() {
   };
 
   const handleClickEdit = (editMerchant) => {
-    // if (editMerchant) {
-    //   return alert("Fitur segera hadir");
-    // }
+    if (editMerchant) {
+      return alert("Fitur segera hadir");
+    }
 
     return navigate(
       `/${editMerchant ? "merchant" : "account"}/edit/${userInfo?.id}`,

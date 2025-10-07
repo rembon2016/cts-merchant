@@ -3,6 +3,8 @@ import { useThemeStore } from "../store/themeStore";
 import { usePosStore } from "../store/posStore";
 import { useDebounce } from "../hooks/useDebounce";
 import VariantModal from "./VariantModal";
+import CustomLoading from "./CustomLoading";
+import { useCartStore } from "../store/cartStore";
 
 const categories = [
   {
@@ -27,14 +29,14 @@ export default function POS() {
   const [selectedSub, setSelectedSub] = useState("");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showVariantModal, setShowVariantModal] = useState(false);
-  const [cart, setCart] = useState([]);
   const observerRef = useRef();
 
   const { isDark } = useThemeStore();
-  const { 
-    categories: apiCategories, 
-    isLoading, 
-    error, 
+  const { addToCart } = useCartStore();
+  const {
+    categories: subCategories,
+    isLoading,
+    error,
     getCategories,
     products,
     productsLoading,
@@ -46,7 +48,7 @@ export default function POS() {
     getProductPrice,
     getProductStock,
     getTotalVariantStock,
-    hasAvailableStock
+    hasAvailableStock,
   } = usePosStore();
 
   // Debounce search input
@@ -61,35 +63,49 @@ export default function POS() {
   useEffect(() => {
     resetProducts();
     getProducts({
-      category_id: selectedSub ? apiCategories.find(cat => cat.name === selectedSub)?.id || '' : '',
+      category_id: selectedSub
+        ? subCategories.find((cat) => cat.name === selectedSub)?.id || ""
+        : "",
       search: debouncedSearch,
       page: 1,
       per_page: 20,
-      reset: true
+      reset: true,
     });
-  }, [selectedSub, debouncedSearch, apiCategories, getProducts, resetProducts]);
+  }, [selectedSub, debouncedSearch, subCategories, getProducts, resetProducts]);
 
   // Infinite scroll observer
-  const lastProductElementRef = useCallback(node => {
-    if (productsLoading) return;
-    if (observerRef.current) observerRef.current.disconnect();
-    observerRef.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMoreProducts) {
-        loadMoreProducts({
-          category_id: selectedSub ? apiCategories.find(cat => cat.name === selectedSub)?.id || '' : '',
-          search: debouncedSearch,
-          per_page: 20
-        });
-      }
-    });
-    if (node) observerRef.current.observe(node);
-  }, [productsLoading, hasMoreProducts, loadMoreProducts, selectedSub, debouncedSearch, apiCategories]);
+  const lastProductElementRef = useCallback(
+    (node) => {
+      if (productsLoading) return;
+      if (observerRef.current) observerRef.current.disconnect();
+      observerRef.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMoreProducts) {
+          loadMoreProducts({
+            category_id: selectedSub
+              ? subCategories.find((cat) => cat.name === selectedSub)?.id || ""
+              : "",
+            search: debouncedSearch,
+            per_page: 20,
+          });
+        }
+      });
+      if (node) observerRef.current.observe(node);
+    },
+    [
+      productsLoading,
+      hasMoreProducts,
+      loadMoreProducts,
+      selectedSub,
+      debouncedSearch,
+      subCategories,
+    ]
+  );
 
   // Handle product click
   const handleProductClick = (product) => {
     // Check if product has any available stock
     if (!hasAvailableStock(product)) {
-      alert('Produk ini sedang habis stok');
+      alert("Produk ini sedang habis stok");
       return;
     }
 
@@ -98,57 +114,24 @@ export default function POS() {
       setShowVariantModal(true);
     } else {
       // Add to cart directly for non-variant products
-      handleAddToCart(product);
+      addToCart(product);
     }
-  };
-
-  // Handle add to cart
-  const handleAddToCart = (product, variant = null, quantity = 1) => {
-    const stock = getProductStock(product, variant?.id);
-    
-    if (stock < quantity) {
-      alert(`Stok tidak mencukupi. Stok tersedia: ${stock}`);
-      return;
-    }
-
-    const price = getProductPrice(product, variant?.id);
-    const cartItem = {
-      id: variant ? `${product.id}-${variant.id}` : product.id.toString(),
-      productId: product.id,
-      variantId: variant?.id || null,
-      name: variant ? `${product.name} - ${variant.variant_name}` : product.name,
-      price: price,
-      quantity: quantity,
-      stock: stock,
-      image: product.image
-    };
-
-    setCart(prevCart => {
-      const existingItem = prevCart.find(item => item.id === cartItem.id);
-      if (existingItem) {
-        const newQuantity = existingItem.quantity + quantity;
-        if (newQuantity > stock) {
-          alert(`Stok tidak mencukupi. Stok tersedia: ${stock}`);
-          return prevCart;
-        }
-        return prevCart.map(item =>
-          item.id === cartItem.id
-            ? { ...item, quantity: newQuantity }
-            : item
-        );
-      }
-      return [...prevCart, cartItem];
-    });
   };
 
   // Handle variant selection
-  const handleVariantSelect = ({ product, variant, quantity, price, stock }) => {
-    handleAddToCart(product, variant, quantity);
+  const handleVariantSelect = ({
+    product,
+    variant,
+    quantity,
+    price,
+    stock,
+  }) => {
+    addToCart(product, variant, quantity);
   };
 
   // Format price
   const formatPrice = (price) => {
-    return parseFloat(price).toLocaleString('id-ID');
+    return parseFloat(price).toLocaleString("id-ID");
   };
 
   return (
@@ -181,18 +164,22 @@ export default function POS() {
             Error: {error}
           </div>
         )}
-        <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
-          {apiCategories.map((sub) => (
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          {subCategories.map((sub) => (
             <button
               key={sub.id}
-              className={`px-4 py-2 rounded border ${
+              className={`w-full flex flex-nowrap px-4 py-2 rounded border ${
                 selectedSub === sub.name
                   ? "bg-[var(--c-accent)] text-slate-600"
                   : "bg-gray-100 text-gray-700"
               } hover:bg-[var(--c-accent)] hover:text-slate-600 transition slate-600 space-nowrap rounded-full dark:text-slate-100 dark:hover:text-slate-600`}
-              onClick={() => setSelectedSub(sub.name === selectedSub ? "" : sub.name)}
+              onClick={() =>
+                setSelectedSub(sub.name === selectedSub ? "" : sub.name)
+              }
             >
-              {sub.name}
+              <span className="w-full flex justify-center items-center">
+                {sub.name}
+              </span>
             </button>
           ))}
         </div>
@@ -217,7 +204,7 @@ export default function POS() {
             Error: {productsError}
           </div>
         )}
-        
+
         {products.length === 0 && !productsLoading && !productsError ? (
           <div className="col-span-2 text-center text-gray-500">
             Produk tidak ditemukan.
@@ -226,12 +213,12 @@ export default function POS() {
           products.map((product, index) => {
             const isLastProduct = products.length === index + 1;
             const productPrice = getProductPrice(product);
-            
+
             // For variant products, show total stock across all variants
-            const productStock = product.is_variant 
-              ? getTotalVariantStock(product) 
+            const productStock = product.is_variant
+              ? getTotalVariantStock(product)
               : getProductStock(product);
-            
+
             const isOutOfStock = !hasAvailableStock(product);
 
             return (
@@ -239,22 +226,28 @@ export default function POS() {
                 key={product.id}
                 ref={isLastProduct ? lastProductElementRef : null}
                 className={`border rounded-lg shadow hover:shadow-lg transition flex flex-col items-start ${
-                  isOutOfStock ? 'opacity-50' : 'cursor-pointer'
+                  isOutOfStock ? "opacity-50" : "cursor-pointer"
                 }`}
                 onClick={() => !isOutOfStock && handleProductClick(product)}
               >
                 <div className="relative w-full">
                   <img
-                    src={product.image ? `${import.meta.env.VITE_API_IMAGE}${product.image}` : '/images/placeholder.jpg'}
+                    src={
+                      product.image
+                        ? `${import.meta.env.VITE_API_IMAGE}${product.image}`
+                        : "/images/placeholder.jpg"
+                    }
                     alt={product.name || "Product Image"}
                     className="w-full h-[100px] object-cover rounded-t-[10px]"
                     onError={(e) => {
-                      e.target.src = '/images/placeholder.jpg'
+                      e.target.src = "/images/placeholder.jpg";
                     }}
                   />
                   {isOutOfStock && (
                     <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-t-[10px]">
-                      <span className="text-white font-semibold text-sm">HABIS</span>
+                      <span className="text-white font-semibold text-sm">
+                        HABIS
+                      </span>
                     </div>
                   )}
                   {product.is_variant && (
@@ -270,17 +263,19 @@ export default function POS() {
                   </div>
                   <div className="text-slate-600 dark:text-slate-300">
                     <span>Rp.</span>
-                    <span className="font-bold text-2xl">{formatPrice(productPrice)}</span>
+                    <span className="font-bold text-2xl">
+                      {formatPrice(productPrice)}
+                    </span>
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 mb-3">
                     Stok: {productStock}
                   </div>
                   <div className="mt-3 flex gap-2 justify-between items-center">
-                    <button 
+                    <button
                       className={`w-full h-12 py-2 rounded-full transition-colors ${
-                        isOutOfStock 
-                          ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
-                          : 'bg-[var(--c-primary)] text-white hover:bg-blue-700'
+                        isOutOfStock
+                          ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                          : "bg-[var(--c-primary)] text-white hover:bg-blue-700"
                       }`}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -290,18 +285,18 @@ export default function POS() {
                       }}
                       disabled={isOutOfStock}
                     >
-                      {isOutOfStock ? 'Habis' : 'Beli'}
+                      {isOutOfStock ? "Habis" : "Beli"}
                     </button>
-                    <button 
+                    <button
                       className={`w-20 h-12 rounded-full border-2 flex justify-center items-center transition-colors ${
-                        isOutOfStock 
-                          ? 'border-gray-400 cursor-not-allowed' 
-                          : 'border-slate-600 dark:border-slate-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                        isOutOfStock
+                          ? "border-gray-400 cursor-not-allowed"
+                          : "border-slate-600 dark:border-slate-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                       }`}
                       onClick={(e) => {
                         e.stopPropagation();
                         if (!isOutOfStock) {
-                          handleAddToCart(product);
+                          addToCart(product);
                         }
                       }}
                       disabled={isOutOfStock}
@@ -317,19 +312,14 @@ export default function POS() {
                   </div>
                 </div>
               </div>
-            )
+            );
           })
         )}
-        
+      </div>
+
+      <div className="w-full text-center">
         {/* Loading indicator for infinite scroll */}
-        {productsLoading && (
-          <div className="col-span-2 text-center py-4">
-            <div className="inline-flex items-center space-x-2">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[var(--c-primary)]"></div>
-              <span className="text-gray-500">Memuat produk...</span>
-            </div>
-          </div>
-        )}
+        {productsLoading && <CustomLoading />}
       </div>
 
       {/* Variant Modal */}
@@ -342,16 +332,6 @@ export default function POS() {
         product={selectedProduct}
         onSelectVariant={handleVariantSelect}
       />
-
-      {/* Cart Summary (optional - can be expanded later) */}
-      {cart.length > 0 && (
-        <div className="fixed bottom-4 right-4 bg-[var(--c-primary)] text-white p-3 rounded-full shadow-lg">
-          <div className="flex items-center space-x-2">
-            <img src="/icons/cart-white.svg" alt="Cart" className="w-6 h-6" />
-            <span className="font-semibold">{cart.reduce((sum, item) => sum + item.quantity, 0)}</span>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

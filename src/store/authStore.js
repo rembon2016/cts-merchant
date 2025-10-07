@@ -2,8 +2,8 @@ import { create } from "zustand";
 import { useUserDataStore } from "./userDataStore";
 
 // custom hooks for checking authentication
-const SESSION_KEY = "authUser";
 const TOKEN_KEY = "authToken";
+const SESSION_KEY = "authUser";
 const EXPIRED_KEY = "authExpireAt";
 const TOKEN_POS_KEY = "authPosToken";
 const BRANCH_ACTIVE = "branchActive";
@@ -49,9 +49,9 @@ export const useAuthStore = create((set, get) => ({
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(userData?.data));
       sessionStorage.setItem(TOKEN_KEY, TOKEN);
       sessionStorage.setItem(EXPIRED_KEY, expiryTimestamp.toString());
-      if(data?.pos){
-        const TOKEN_POS = data?.pos?.token;
-        const BRANCH = data?.pos?.branches?.[0]?.id;
+      if (result?.pos) {
+        const TOKEN_POS = result?.pos?.token;
+        const BRANCH = result?.pos?.branches?.[0]?.id;
         sessionStorage.setItem(TOKEN_POS_KEY, TOKEN_POS);
         sessionStorage.setItem(BRANCH_ACTIVE, BRANCH);
       }
@@ -111,6 +111,12 @@ export const useAuthStore = create((set, get) => ({
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(userData?.data));
       sessionStorage.setItem(TOKEN_KEY, TOKEN);
       sessionStorage.setItem(EXPIRED_KEY, expiryTimestamp.toString());
+      if (result?.data?.pos) {
+        const TOKEN_POS = result?.data?.pos?.auth?.token;
+        const BRANCH = result?.data?.pos?.auth?.branches?.[0]?.pivot?.branch_id;
+        sessionStorage.setItem(TOKEN_POS_KEY, TOKEN_POS);
+        sessionStorage.setItem(BRANCH_ACTIVE, BRANCH);
+      }
 
       const { setUserData } = useUserDataStore.getState();
       setUserData(userData.data);
@@ -243,6 +249,8 @@ export const useAuthStore = create((set, get) => ({
       sessionStorage.removeItem(SESSION_KEY);
       sessionStorage.removeItem(TOKEN_KEY);
       sessionStorage.removeItem(EXPIRED_KEY);
+      sessionStorage.removeItem(TOKEN_POS_KEY);
+      sessionStorage.removeItem(BRANCH_ACTIVE);
 
       const { setUserData } = useUserDataStore.getState();
       setUserData({});
