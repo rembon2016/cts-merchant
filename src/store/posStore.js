@@ -1,4 +1,4 @@
-import { create } from 'zustand'
+import { create } from "zustand";
 
 const usePosStore = create((set, get) => ({
   // Categories state
@@ -16,68 +16,71 @@ const usePosStore = create((set, get) => ({
 
   // Get categories from API
   getCategories: async () => {
-    set({ isLoading: true, error: null })
-    
+    set({ isLoading: true, error: null });
+
     try {
-      const token = sessionStorage.getItem('authPosToken')
-      
+      const token = sessionStorage.getItem("authPosToken");
+
       if (!token) {
-        throw new Error('Token tidak ditemukan')
+        throw new Error("Token tidak ditemukan");
       }
 
-      const response = await fetch(`${import.meta.env.VITE_API_POS_ROUTES}/pos/categories`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      })
+      const response = await fetch(
+        `${import.meta.env.VITE_API_POS_ROUTES}/pos/categories`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result = await response.json()
-      
+      const result = await response.json();
+
       if (result.success && result.data) {
-        set({ 
+        set({
           categories: result.data,
           isLoading: false,
-          error: null 
-        })
+          error: null,
+        });
       } else {
-        throw new Error(result.message || 'Failed to fetch categories')
+        throw new Error(result.message || "Failed to fetch categories");
       }
     } catch (error) {
-      set({ 
-        isLoading: false, 
-        error: error.message || 'Terjadi kesalahan saat mengambil kategori' 
-      })
+      set({
+        isLoading: false,
+        error: error.message || "Terjadi kesalahan saat mengambil kategori",
+      });
     }
   },
 
   // Get products from API with pagination and filters
   getProducts: async (params = {}) => {
-    const { 
-      page = 1, 
-      per_page = 10, 
-      category_id = '', 
-      search = '', 
-      reset = false 
-    } = params
+    const {
+      page = 1,
+      per_page = 10,
+      category_id = "",
+      search = "",
+      reset = false,
+    } = params;
 
-    set({ productsLoading: true, productsError: null })
-    
+    set({ productsLoading: true, productsError: null });
+
     try {
-      const token = sessionStorage.getItem('authPosToken')
-      const branchId = sessionStorage.getItem('branchActive')
-      
+      const token = sessionStorage.getItem("authPosToken");
+      const branchId = sessionStorage.getItem("branchActive");
+
       if (!token) {
-        throw new Error('Token tidak ditemukan')
+        throw new Error("Token tidak ditemukan");
       }
 
       if (!branchId) {
-        throw new Error('Branch tidak ditemukan')
+        throw new Error("Branch tidak ditemukan");
       }
 
       const queryParams = new URLSearchParams({
@@ -85,56 +88,61 @@ const usePosStore = create((set, get) => ({
         category_id: category_id,
         page: page.toString(),
         per_page: per_page.toString(),
-        search: search
-      })
+        search: search,
+      });
 
-      const response = await fetch(`${import.meta.env.VITE_API_POS_ROUTES}/pos/products?${queryParams}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      })
+      const response = await fetch(
+        `${import.meta.env.VITE_API_POS_ROUTES}/pos/products?${queryParams}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result = await response.json()
-      
+      const result = await response.json();
+
       if (result.success && result.data) {
-        const newProducts = result.data.data || []
-        const currentProducts = reset ? [] : get().products
-        
-        set({ 
+        const newProducts = result.data.data || [];
+        const currentProducts = reset ? [] : get().products;
+
+        set({
           products: [...currentProducts, ...newProducts],
           currentPage: result.data.current_page || page,
-          hasMoreProducts: (result.data.current_page || page) < (result.data.last_page || 1),
+          hasMoreProducts:
+            (result.data.current_page || page) < (result.data.last_page || 1),
           totalProducts: result.data.total || 0,
           productsLoading: false,
-          productsError: null 
-        })
+          productsError: null,
+        });
       } else {
-        throw new Error(result.message || 'Failed to fetch products')
+        throw new Error(result.message || "Failed to fetch products");
       }
     } catch (error) {
-      set({ 
-        productsLoading: false, 
-        productsError: error.message || 'Terjadi kesalahan saat mengambil produk' 
-      })
+      set({
+        productsLoading: false,
+        productsError:
+          error.message || "Terjadi kesalahan saat mengambil produk",
+      });
     }
   },
 
   // Load more products (for infinite scroll)
   loadMoreProducts: async (params = {}) => {
-    const state = get()
-    if (state.productsLoading || !state.hasMoreProducts) return
+    const state = get();
+    if (state.productsLoading || !state.hasMoreProducts) return;
 
     await state.getProducts({
       ...params,
       page: state.currentPage + 1,
-      reset: false
-    })
+      reset: false,
+    });
   },
 
   // Reset products (for new search/filter)
@@ -144,64 +152,67 @@ const usePosStore = create((set, get) => ({
       currentPage: 1,
       hasMoreProducts: true,
       totalProducts: 0,
-      productsError: null
-    })
+      productsError: null,
+    });
   },
 
   // Get product price (prioritize product_prices over price_product)
   getProductPrice: (product, skuId = null) => {
     // If product has variants and skuId is provided
     if (product.is_variant && skuId && product.product_prices?.length > 0) {
-      const priceData = product.product_prices.find(p => p.product_sku_id === skuId)
-      if (priceData) return parseFloat(priceData.price)
+      const priceData = product.product_prices.find(
+        (p) => p.product_sku_id === skuId
+      );
+      if (priceData) return parseFloat(priceData.price);
     }
-    
+
     // If product has general product_prices
     if (product.product_prices?.length > 0) {
-      return parseFloat(product.product_prices[0].price)
+      return parseFloat(product.product_prices[0].price);
     }
-    
+
     // Fallback to price_product
-    return parseFloat(product.price_product || 0)
+    return parseFloat(product.price_product || 0);
   },
 
   // Get product stock
   getProductStock: (product, skuId = null) => {
-    const branchId = sessionStorage.getItem('branchActive')
-    if (!branchId) return 0
+    const branchId = sessionStorage.getItem("branchActive");
+    if (!branchId) return 0;
 
     if (product.is_variant && skuId) {
-      const stock = product.product_stocks?.find(s => 
-        s.branch_id === parseInt(branchId) && s.product_sku_id === skuId
-      )
-      return stock ? stock.qty : 0
+      const stock = product.product_stocks?.find(
+        (s) => s.branch_id === parseInt(branchId) && s.product_sku_id === skuId
+      );
+      return stock ? stock.qty : 0;
     }
 
-    const stock = product.product_stocks?.find(s => 
-      s.branch_id === parseInt(branchId) && !s.product_sku_id
-    )
-    return stock ? stock.qty : 0
+    const stock = product.product_stocks?.find(
+      (s) => s.branch_id === parseInt(branchId) && !s.product_sku_id
+    );
+    return stock ? stock.qty : 0;
   },
 
   // Get total variant stock for products with variants
   getTotalVariantStock: (product) => {
-    const branchId = sessionStorage.getItem('branchActive')
-    if (!branchId || !product.is_variant) return 0
+    const branchId = sessionStorage.getItem("branchActive");
+    if (!branchId || !product.is_variant) return 0;
 
-    const totalStock = product.product_stocks
-      ?.filter(s => s.branch_id === parseInt(branchId))
-      ?.reduce((total, stock) => total + (stock.qty || 0), 0) || 0
+    const totalStock =
+      product.product_stocks
+        ?.filter((s) => s.branch_id === parseInt(branchId))
+        ?.reduce((total, stock) => total + (stock.qty || 0), 0) || 0;
 
-    return totalStock
+    return totalStock;
   },
 
   // Check if product has any stock available (for variant products)
   hasAvailableStock: (product) => {
     if (!product.is_variant) {
-      return get().getProductStock(product) > 0
+      return get().getProductStock(product) > 0;
     }
-    
-    return get().getTotalVariantStock(product) > 0
+
+    return get().getTotalVariantStock(product) > 0;
   },
 
   // Clear error
@@ -212,6 +223,6 @@ const usePosStore = create((set, get) => ({
 
   // Clear products error
   clearProductsError: () => set({ productsError: null }),
-}))
+}));
 
-export { usePosStore }
+export { usePosStore };

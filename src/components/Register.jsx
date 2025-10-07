@@ -5,7 +5,7 @@ import SimpleAlert from "./alert/SimpleAlert";
 import { useThemeStore } from "../store/themeStore";
 
 export default function Register() {
-  const { register, isLoading, success } = useAuthStore();
+  const { register, isLoading, isLoggedIn } = useAuthStore();
   const { isDark } = useThemeStore();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -23,20 +23,12 @@ export default function Register() {
   });
 
   useEffect(() => {
-    if (success) {
+    if (isLoggedIn) {
       setTimeout(() => {
         navigate("/", { replace: true });
       }, 500);
     }
-  }, [success, navigate]);
-
-  useEffect(() => {
-    if (success) {
-      setTimeout(() => {
-        navigate("/", { replace: true });
-      }, 500);
-    }
-  }, [success, navigate]);
+  }, [isLoggedIn, navigate]);
 
   const validateForm = () => {
     const errors = {};
