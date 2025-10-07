@@ -65,8 +65,6 @@ const useFetchDataStore = create((set, get) => ({
         signal: newAbortController.signal,
       });
 
-      console.log("Response: ", response);
-
       clearTimeout(timeoutId);
 
       if (!response.ok) {
