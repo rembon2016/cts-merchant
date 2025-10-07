@@ -6,6 +6,7 @@ const useCartStore = create((set, get) => ({
   cart: [],
   addToCart: (product, variant = null, quantity = 1) => {
     const { getProductStock, getProductPrice } = usePosStore.getState();
+    const { tokenPos, user, activeBranch } = useSessionStore.getState();
     const stock = getProductStock(product, variant?.id);
 
     if (stock < quantity) {
@@ -27,30 +28,57 @@ const useCartStore = create((set, get) => ({
       image: product.image,
     };
 
-    const existingItem = get().cart.find((item) => item.id === cartItem.id);
+    // const existingItem = get().cart.find((item) => item.id === cartItem.id);
 
-    if (existingItem) {
-      const newQuantity = existingItem.quantity + quantity;
+    // if (existingItem) {
+    //   const newQuantity = existingItem.quantity + quantity;
 
-      if (newQuantity > stock) {
-        alert(`Stok tidak mencukupi. Stok tersedia: ${stock}`);
-        return;
+    //   if (newQuantity > stock) {
+    //     alert(`Stok tidak mencukupi. Stok tersedia: ${stock}`);
+    //     return;
+    //   }
+
+    //   set((state) => ({
+    //     cart: state.cart.map((item) =>
+    //       item.id === cartItem.id ? { ...item, quantity: newQuantity } : item
+    //     ),
+    //   }));
+    //   return;
+    // }
+
+    try {
+      const response = fetch(
+        `${import.meta.env.VITE_API_POS_ROUTES}/pos/cart/add`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${tokenPos}`,
+          },
+          body: JSON.stringify({
+            branch_id: activeBranch,
+            user_id: user?.id,
+            product_id: product?.id,
+            product_sku_id: product?.skus?.id,
+            quantity: quantity,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      set((state) => ({
-        cart: state.cart.map((item) =>
-          item.id === cartItem.id ? { ...item, quantity: newQuantity } : item
-        ),
-      }));
-      return;
-    }
+      const result = response.json();
 
-    set((state) => ({
-      cart: [...state.cart, cartItem],
-    }));
+      set({ cart: result });
+    } catch (error) {
+      console.error("Error: ", error.message);
+    }
   },
   getCart: async () => {
     const { tokenPos, user, activeBranch } = useSessionStore.getState();
+
     try {
       const response = await fetch(
         `${
@@ -71,8 +99,8 @@ const useCartStore = create((set, get) => ({
 
       const result = await response.json();
 
-      if (result.success && result.data) {
-        set({ cart: result.data });
+      if (result.success && result) {
+        set({ cart: result });
       }
     } catch (error) {
       console.error("Error: ", error.message);

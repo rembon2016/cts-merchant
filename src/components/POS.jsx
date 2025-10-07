@@ -2,9 +2,9 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useThemeStore } from "../store/themeStore";
 import { usePosStore } from "../store/posStore";
 import { useDebounce } from "../hooks/useDebounce";
+import { useCartStore } from "../store/cartStore";
 import VariantModal from "./VariantModal";
 import CustomLoading from "./CustomLoading";
-import { useCartStore } from "../store/cartStore";
 
 const MENU = [
   {
@@ -119,13 +119,7 @@ export default function POS() {
   };
 
   // Handle variant selection
-  const handleVariantSelect = ({
-    product,
-    variant,
-    quantity,
-    price,
-    stock,
-  }) => {
+  const handleVariantSelect = ({ product, variant, quantity }) => {
     addToCart(product, variant, quantity);
   };
 
@@ -294,7 +288,7 @@ export default function POS() {
                     onClick={(e) => {
                       e.stopPropagation();
                       if (!isOutOfStock) {
-                        addToCart(product);
+                        handleProductClick(product);
                       }
                     }}
                     disabled={isOutOfStock}

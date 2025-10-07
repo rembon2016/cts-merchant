@@ -104,7 +104,7 @@ const Header = () => {
               />
             </svg>
             <span className="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 text-sm font-semibold text-white bg-[var(--c-primary)] rounded-full">
-              {cart.reduce((sum, item) => sum + item.quantity, 0)}
+              {cart?.data?.items?.length}
             </span>
           </button>
         ) : null}
