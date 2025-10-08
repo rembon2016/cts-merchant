@@ -1,8 +1,10 @@
-import React from "react";
+import { useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useTotalPriceStore } from "../store/totalPriceStore";
 
 const BottomNav = () => {
   const location = useLocation();
+  const { totalPrice, setTotalPrice } = useTotalPriceStore();
 
   const navItems = [
     {
@@ -91,9 +93,61 @@ const BottomNav = () => {
     },
   ];
 
-  return (
-    <nav className="fixed bottom-0 inset-x-0">
+  let Rupiah = new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+  });
+
+  const handleAddTax = () => {
+    setTotalPrice(totalPrice + (totalPrice * 11) / 100);
+  };
+
+  const renderElements = useMemo(() => {
+    const renderElementCart = () => {
+      return (
+        <div className="mx-4 mb-4 rounded-3xl bg-white dark:bg-slate-700 shadow-soft border border-slate-100 dark:border-slate-600 px-2 py-2 ">
+          <div className="flex flex-col gap-2">
+            {/* <div className="flex justify-between items-center">
+              <h3 className="font-medium text-xl">Sub Total</h3>
+              <h3 className="font-bold text-xl">{Rupiah.format(totalPrice)}</h3>
+            </div> */}
+            {/* <div className="flex justify-between items-center">
+              <h3 className="font-medium text-xl">Pajak (+11%)</h3>
+              <h3 className="font-bold text-xl">Rp. 6.000</h3>
+            </div> */}
+            <div className="flex justify-between items-center">
+              <h3 className="font-medium text-xl">Total</h3>
+              <div className="flex gap-2">
+                {totalPrice !== 0 && (
+                  <button
+                    className="text-sm font-semibold text-[var(--c-primary)]"
+                    onClick={handleAddTax}
+                  >
+                    + Pajak
+                  </button>
+                )}
+                <h3 className="font-bold text-xl">
+                  {Rupiah.format(totalPrice)}
+                </h3>
+              </div>
+            </div>
+          </div>
+          <button
+            type="submit"
+            className="w-full py-4 bg-[var(--c-primary)] text-white font-semibold rounded-xl hover:bg-blue-700 transition mt-4"
+            // onClick={handleSubmit}
+            // disabled={isLoading}
+          >
+            Pesan Sekarang
+          </button>
+        </div>
+      );
+    };
+
+    return (
       <div className="max-w-sm mx-auto">
+        {location.pathname.includes("/cart") ? renderElementCart() : null}
         <div className="mx-4 mb-4 rounded-3xl bg-white dark:bg-slate-700 shadow-soft border border-slate-100 dark:border-slate-600 px-2 py-2 grid grid-cols-4 gap-1">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
@@ -132,8 +186,10 @@ const BottomNav = () => {
           })}
         </div>
       </div>
-    </nav>
-  );
+    );
+  }, [navItems, totalPrice, location.pathname]);
+
+  return <nav className="fixed bottom-0 inset-x-0">{renderElements}</nav>;
 };
 
 export default BottomNav;

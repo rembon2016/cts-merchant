@@ -8,8 +8,8 @@ const TOKEN_POS_KEY = "authPosToken";
 const BRANCH_ACTIVE = "branchActive";
 
 export const useSessionStore = create((set) => ({
-  user: JSON.parse(sessionStorage.getItem(SESSION_KEY)) || null,
-  token: sessionStorage.getItem(TOKEN_KEY) || null,
+  user: JSON.parse(sessionStorage.getItem(SESSION_KEY)),
+  token: sessionStorage.getItem(TOKEN_KEY),
   isLoggedIn: !!sessionStorage.getItem(TOKEN_KEY),
   expiredKey: sessionStorage.getItem(EXPIRED_KEY),
   tokenPos: sessionStorage.getItem(TOKEN_POS_KEY),

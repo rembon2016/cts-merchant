@@ -4,18 +4,19 @@ import Home from "./pages/Home";
 import Transaction from "./pages/Transaction";
 import Profile from "./pages/Profile";
 import FaQ from "./pages/FaQ";
-import POS from "./pages/POS";
+import Pos from "./pages/POS";
 import AccountInformation from "./pages/AccountInformation";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Notification from "./pages/Notification";
+import Cart from "./pages/Cart";
 import { useThemeStore } from "./store/themeStore";
 import { ProtectedRoute, PublicRoute } from "./components/ProtectedRoute";
-import EditProfile from "./pages/EditProfile";
-import EditMerchant from "./pages/EditMerchant";
 import { useAuthStore } from "./store/authStore";
 import { useEffect } from "react";
 import { useRegisterSW } from "virtual:pwa-register/react";
+import EditProfile from "./pages/EditProfile";
+import EditMerchant from "./pages/EditMerchant";
 
 function App() {
   const { isDark } = useThemeStore();
@@ -100,7 +101,7 @@ function App() {
               path="pos"
               element={
                 <ProtectedRoute>
-                  <POS />
+                  <Pos />
                 </ProtectedRoute>
               }
             />
@@ -125,6 +126,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Notification />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="cart"
+              element={
+                <ProtectedRoute>
+                  <Cart />
                 </ProtectedRoute>
               }
             />

@@ -1,12 +1,15 @@
 import { create } from "zustand";
 import { usePosStore } from "./posStore";
-import { useSessionStore } from "./sessionStore";
 
-const useCartStore = create((set, get) => ({
+const useCartStore = create((set) => ({
   cart: [],
+  isLoading: false,
+  error: false,
   addToCart: (product, variant = null, quantity = 1) => {
     const { getProductStock, getProductPrice } = usePosStore.getState();
-    const { tokenPos, user, activeBranch } = useSessionStore.getState();
+    const userId = sessionStorage.getItem("userId");
+    const tokenPos = sessionStorage.getItem("authPosToken");
+    const activeBranch = sessionStorage.getItem("branchActive");
     const stock = getProductStock(product, variant?.id);
 
     if (stock < quantity) {
@@ -57,10 +60,10 @@ const useCartStore = create((set, get) => ({
           },
           body: JSON.stringify({
             branch_id: activeBranch,
-            user_id: user?.id,
+            user_id: userId,
             product_id: product?.id,
             product_sku_id: product?.skus?.id,
-            quantity: quantity,
+            quantity,
           }),
         }
       );
@@ -69,7 +72,7 @@ const useCartStore = create((set, get) => ({
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result = response.json();
+      const result = response?.json();
 
       set({ cart: result });
     } catch (error) {
@@ -77,13 +80,17 @@ const useCartStore = create((set, get) => ({
     }
   },
   getCart: async () => {
-    const { tokenPos, user, activeBranch } = useSessionStore.getState();
-
     try {
+      const userId = sessionStorage.getItem("userId");
+      const tokenPos = sessionStorage.getItem("authPosToken");
+      const activeBranch = sessionStorage.getItem("branchActive");
+
+      set({ isLoading: true, error: null });
+
       const response = await fetch(
         `${
           import.meta.env.VITE_API_POS_ROUTES
-        }/pos/cart?branch_id=${activeBranch}&user_id=${user?.id}`,
+        }/pos/cart?branch_id=${activeBranch}&user_id=${userId}`,
         {
           method: "GET",
           headers: {
@@ -100,11 +107,43 @@ const useCartStore = create((set, get) => ({
       const result = await response.json();
 
       if (result.success && result) {
-        set({ cart: result });
+        set({ cart: result, isLoading: false });
       }
     } catch (error) {
       console.error("Error: ", error.message);
-      set({ cart: [] });
+      set({ cart: [], isLoading: false });
+    }
+  },
+  deleteCart: async (cartId) => {
+    try {
+      const tokenPos = sessionStorage.getItem("authPosToken");
+
+      set({ isLoading: true, error: null });
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_POS_ROUTES}/pos/cart/item/${cartId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${tokenPos}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        set({ error: true, isLoading: false });
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (result.success && result) {
+        set({ cart: result, isLoading: false, error: false });
+      }
+    } catch (error) {
+      console.log("Error: ", error.message);
+      set({ error: true, isLoading: false });
     }
   },
 }));

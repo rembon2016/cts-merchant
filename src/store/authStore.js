@@ -7,10 +7,14 @@ const SESSION_KEY = "authUser";
 const EXPIRED_KEY = "authExpireAt";
 const TOKEN_POS_KEY = "authPosToken";
 const BRANCH_ACTIVE = "branchActive";
+const USER_ID = "userId";
 
 export const useAuthStore = create((set, get) => ({
-  user: JSON.parse(sessionStorage.getItem(SESSION_KEY)) || null,
-  token: sessionStorage.getItem(TOKEN_KEY) || null,
+  user: JSON.parse(sessionStorage.getItem(SESSION_KEY)),
+  userId: JSON.parse(sessionStorage.getItem(USER_ID)),
+  token: sessionStorage.getItem(TOKEN_KEY),
+  tokenPos: sessionStorage.getItem(TOKEN_POS_KEY),
+  activeBranch: sessionStorage.getItem(BRANCH_ACTIVE),
   isLoggedIn: !!sessionStorage.getItem(TOKEN_KEY),
   isLoading: false,
   isLogout: false,
@@ -47,19 +51,17 @@ export const useAuthStore = create((set, get) => ({
       const expiryTimestamp = Date.now() + EXPIRED_IN * 1000;
 
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(userData?.data));
+      sessionStorage.setItem(USER_ID, JSON.stringify(userData?.data?.id));
       sessionStorage.setItem(TOKEN_KEY, TOKEN);
       sessionStorage.setItem(EXPIRED_KEY, expiryTimestamp.toString());
-      if (result?.pos) {
-        const TOKEN_POS = result?.pos?.token;
-        const BRANCH = result?.pos?.branches?.[0]?.id;
-        sessionStorage.setItem(TOKEN_POS_KEY, TOKEN_POS);
-        sessionStorage.setItem(BRANCH_ACTIVE, BRANCH);
-      }
+      sessionStorage.setItem(TOKEN_POS_KEY, result?.pos?.token);
+      sessionStorage.setItem(BRANCH_ACTIVE, result?.pos?.branches?.[0]?.id);
       const { setUserData } = useUserDataStore.getState();
       setUserData(userData?.data);
 
       set({
         user: userData?.data,
+        userId: userData?.id,
         token: TOKEN,
         isLoggedIn: true,
         isLoading: false,
@@ -109,20 +111,21 @@ export const useAuthStore = create((set, get) => ({
       const expiryTimestamp = Date.now() + EXPIRED_IN * 1000;
 
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(userData?.data));
+      sessionStorage.setItem(USER_ID, JSON.stringify(userData?.data?.id));
       sessionStorage.setItem(TOKEN_KEY, TOKEN);
       sessionStorage.setItem(EXPIRED_KEY, expiryTimestamp.toString());
-      if (result?.data?.pos) {
-        const TOKEN_POS = result?.data?.pos?.auth?.token;
-        const BRANCH = result?.data?.pos?.auth?.branches?.[0]?.pivot?.branch_id;
-        sessionStorage.setItem(TOKEN_POS_KEY, TOKEN_POS);
-        sessionStorage.setItem(BRANCH_ACTIVE, BRANCH);
-      }
+      sessionStorage.setItem(TOKEN_POS_KEY, result?.data?.pos?.auth?.token);
+      sessionStorage.setItem(
+        BRANCH_ACTIVE,
+        result?.data?.pos?.auth?.branches?.[0]?.pivot?.branch_id
+      );
 
       const { setUserData } = useUserDataStore.getState();
       setUserData(userData.data);
 
       set({
         user: userData?.data,
+        userId: userData?.id,
         token: TOKEN,
         isLoggedIn: true,
         isLoading: false,
@@ -246,8 +249,9 @@ export const useAuthStore = create((set, get) => ({
         throw new Error("Logout failed");
       }
 
-      sessionStorage.removeItem(SESSION_KEY);
       sessionStorage.removeItem(TOKEN_KEY);
+      sessionStorage.removeItem(USER_ID);
+      sessionStorage.removeItem(SESSION_KEY);
       sessionStorage.removeItem(EXPIRED_KEY);
       sessionStorage.removeItem(TOKEN_POS_KEY);
       sessionStorage.removeItem(BRANCH_ACTIVE);
@@ -257,6 +261,7 @@ export const useAuthStore = create((set, get) => ({
 
       set({
         user: null,
+        userId: null,
         token: null,
         error: null,
         isLoggedIn: false,

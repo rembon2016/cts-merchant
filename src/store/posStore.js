@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { useAuthStore } from "./authStore";
 
 const usePosStore = create((set, get) => ({
   // Categories state
@@ -69,26 +70,26 @@ const usePosStore = create((set, get) => ({
       reset = false,
     } = params;
 
+    const token = sessionStorage.getItem("authPosToken");
+    const activeBranch = sessionStorage.getItem("branchActive");
+
     set({ productsLoading: true, productsError: null });
 
     try {
-      const token = sessionStorage.getItem("authPosToken");
-      const branchId = sessionStorage.getItem("branchActive");
-
       if (!token) {
         throw new Error("Token tidak ditemukan");
       }
 
-      if (!branchId) {
+      if (!activeBranch) {
         throw new Error("Branch tidak ditemukan");
       }
 
       const queryParams = new URLSearchParams({
-        branch_id: branchId,
-        category_id: category_id,
+        branch_id: activeBranch,
         page: page.toString(),
         per_page: per_page.toString(),
-        search: search,
+        category_id,
+        search,
       });
 
       const response = await fetch(
@@ -103,7 +104,7 @@ const usePosStore = create((set, get) => ({
       );
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response?.status}`);
       }
 
       const result = await response.json();
