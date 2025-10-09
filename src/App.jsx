@@ -10,6 +10,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Notification from "./pages/Notification";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import Payment from "./pages/Payment";
 import { useThemeStore } from "./store/themeStore";
 import { ProtectedRoute, PublicRoute } from "./components/ProtectedRoute";
 import { useAuthStore } from "./store/authStore";
@@ -134,6 +136,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Cart />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="checkout"
+              element={
+                <ProtectedRoute>
+                  <Checkout />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="payment"
+              element={
+                <ProtectedRoute>
+                  <Payment />
                 </ProtectedRoute>
               }
             />

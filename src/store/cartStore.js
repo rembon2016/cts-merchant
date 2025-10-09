@@ -1,10 +1,22 @@
 import { create } from "zustand";
 import { usePosStore } from "./posStore";
 
-const useCartStore = create((set) => ({
+const useCartStore = create((set, get) => ({
   cart: [],
+  selectedCart: [],
   isLoading: false,
-  error: false,
+  discountCode: "",
+  tokenPos: sessionStorage.getItem("authPosToken") || null,
+  activeBranch: sessionStorage.getItem("branchActive") || null,
+  error: null,
+  setSelectedCart: (selectCart) => {
+    // Mendukung functional update dan direct value
+    if (typeof selectCart === "function") {
+      set((state) => ({ selectedCart: selectCart(state.selectedCart) }));
+    } else {
+      set({ selectedCart: selectCart });
+    }
+  },
   addToCart: (product, variant = null, quantity = 1) => {
     const { getProductStock, getProductPrice } = usePosStore.getState();
     const userId = sessionStorage.getItem("userId");
@@ -144,6 +156,38 @@ const useCartStore = create((set) => ({
     } catch (error) {
       console.log("Error: ", error.message);
       set({ error: true, isLoading: false });
+    }
+  },
+  checkVoucherDiscount: async (discount) => {
+    try {
+      set({ isLoading: true, error: null });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_POS_ROUTES}/pos/discount/apply`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${get().tokenPos}`,
+          },
+          body: JSON.stringify({
+            discount_code: discount,
+            branch_id: get().activeBranch,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        set({ isLoading: false, error: response?.message });
+        throw new Error("Failed to check discount code");
+      }
+
+      const result = await response.json();
+      set({ discountCode: result?.data, isLoading: false });
+      return result?.data;
+    } catch (error) {
+      console.log(error.message);
+      set({ error: error.message, isLoading: false });
     }
   },
 }));

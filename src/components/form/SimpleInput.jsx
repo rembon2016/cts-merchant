@@ -9,10 +9,9 @@ SimpleInput.propTypes = {
   handleChange: PropTypes.func,
   placeholder: PropTypes.string,
   disabled: PropTypes.bool,
+  isSelectBox: PropTypes.bool,
+  selectBoxData: PropTypes.array,
 };
-
-const inputClassName =
-  "w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-slate-600 dark:text-slate-100 dark:border-none";
 
 export default function SimpleInput({
   label,
@@ -23,25 +22,49 @@ export default function SimpleInput({
   handleChange,
   placeholder,
   disabled,
+  isSelectBox = false,
+  selectBoxData,
 }) {
+  const inputClassName = `w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500  ${
+    disabled ? "bg-gray-200" : "bg-white dark:bg-slate-600"
+  } dark:text-slate-100 font-semibold`;
+
   return (
     <div className="relative">
       <label
-        className="block text-sm font-medium text-slate-700 mb-1"
+        className="block text-sm font-semibold text-gray-700 mb-2"
         htmlFor="name"
       >
         {label}
       </label>
-      <input
-        type={type}
-        name={name}
-        value={type === "file" ? null : value}
-        onChange={handleChange}
-        className={inputClassName}
-        placeholder={placeholder}
-        disabled={disabled}
-        {...(type === "file" && { accept: "image/*, .pdf" })}
-      />
+      {!isSelectBox && (
+        <input
+          type={type}
+          name={name}
+          value={type === "file" ? null : value}
+          onChange={handleChange}
+          className={inputClassName}
+          placeholder={placeholder}
+          disabled={disabled}
+          {...(type === "file" && { accept: "image/*, .pdf" })}
+        />
+      )}
+      {isSelectBox && (
+        <select
+          name={name}
+          value={value}
+          onChange={handleChange}
+          className={inputClassName}
+          disabled={disabled}
+          placeholder={placeholder || "Pilih..."}
+        >
+          {selectBoxData?.map((item) => (
+            <option key={item?.id} value={item?.id}>
+              {item.name}
+            </option>
+          ))}
+        </select>
+      )}
       {errors && <p className="mt-1 text-sm text-red-600">{errors}</p>}
     </div>
   );

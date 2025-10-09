@@ -8,6 +8,7 @@ const EXPIRED_KEY = "authExpireAt";
 const TOKEN_POS_KEY = "authPosToken";
 const BRANCH_ACTIVE = "branchActive";
 const USER_ID = "userId";
+const CART = "cart";
 
 export const useAuthStore = create((set, get) => ({
   user: JSON.parse(sessionStorage.getItem(SESSION_KEY)),
@@ -255,6 +256,7 @@ export const useAuthStore = create((set, get) => ({
       sessionStorage.removeItem(EXPIRED_KEY);
       sessionStorage.removeItem(TOKEN_POS_KEY);
       sessionStorage.removeItem(BRANCH_ACTIVE);
+      sessionStorage.removeItem(CART);
 
       const { setUserData } = useUserDataStore.getState();
       setUserData({});

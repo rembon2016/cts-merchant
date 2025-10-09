@@ -1,10 +1,17 @@
-import { useMemo } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTotalPriceStore } from "../store/totalPriceStore";
+import { useCartStore } from "../store/cartStore";
 
 const BottomNav = () => {
   const location = useLocation();
+  const [loading, setLoading] = useState(false);
   const { totalPrice, setTotalPrice } = useTotalPriceStore();
+  const { selectedCart } = useCartStore();
+  const navigation = useNavigate();
+  const pathname = location.pathname;
+
+  const showButtonFromPath = ["/cart", "/checkout", "/payment"];
 
   const navItems = [
     {
@@ -93,6 +100,21 @@ const BottomNav = () => {
     },
   ];
 
+  const ObjectTitle = [
+    {
+      path: "/cart",
+      title: "Pesan Sekarang",
+    },
+    {
+      path: "/checkout",
+      title: "Lanjut ke Pembayaran",
+    },
+    {
+      path: "/payment",
+      title: "Bayar Sekarang",
+    },
+  ];
+
   let Rupiah = new Intl.NumberFormat("id-ID", {
     style: "currency",
     currency: "IDR",
@@ -103,10 +125,28 @@ const BottomNav = () => {
     setTotalPrice(totalPrice + (totalPrice * 11) / 100);
   };
 
+  const handleSubmit = () => {
+    setLoading(true);
+    sessionStorage.setItem("cart", JSON.stringify(selectedCart));
+
+    setTimeout(() => {
+      navigation(pathname === "/cart" ? "/checkout" : "/payment", {
+        replace: true,
+      });
+      setLoading(false);
+    }, 1000);
+  };
+
   const renderElements = useMemo(() => {
     const renderElementCart = () => {
       return (
-        <div className="mx-4 mb-4 rounded-3xl bg-white dark:bg-slate-700 shadow-soft border border-slate-100 dark:border-slate-600 px-2 py-2 ">
+        <div
+          className={`rounded-3xl bg-white dark:bg-slate-700 shadow-soft border border-slate-100 dark:border-slate-600 ${
+            showButtonFromPath.includes(location.pathname)
+              ? "p-2 mx-4 mb-2"
+              : ""
+          }`}
+        >
           <div className="flex flex-col gap-2">
             {/* <div className="flex justify-between items-center">
               <h3 className="font-medium text-xl">Sub Total</h3>
@@ -116,38 +156,45 @@ const BottomNav = () => {
               <h3 className="font-medium text-xl">Pajak (+11%)</h3>
               <h3 className="font-bold text-xl">Rp. 6.000</h3>
             </div> */}
-            <div className="flex justify-between items-center">
-              <h3 className="font-medium text-xl">Total</h3>
-              <div className="flex gap-2">
-                {totalPrice !== 0 && (
-                  <button
-                    className="text-sm font-semibold text-[var(--c-primary)]"
-                    onClick={handleAddTax}
-                  >
-                    + Pajak
-                  </button>
-                )}
-                <h3 className="font-bold text-xl">
-                  {Rupiah.format(totalPrice)}
-                </h3>
+            {location.pathname === "/cart" && (
+              <div className="flex justify-between items-center">
+                <h3 className="font-medium text-xl">Total</h3>
+                <div className="flex gap-2">
+                  {totalPrice !== 0 && (
+                    <button
+                      className="text-sm font-semibold text-[var(--c-primary)]"
+                      onClick={handleAddTax}
+                    >
+                      + Pajak
+                    </button>
+                  )}
+                  <h3 className="font-bold text-xl">
+                    {Rupiah.format(totalPrice)}
+                  </h3>
+                </div>
               </div>
-            </div>
+            )}
           </div>
-          <button
-            type="submit"
-            className="w-full py-4 bg-[var(--c-primary)] text-white font-semibold rounded-xl hover:bg-blue-700 transition mt-4"
-            // onClick={handleSubmit}
-            // disabled={isLoading}
-          >
-            Pesan Sekarang
-          </button>
+          {showButtonFromPath.includes(location.pathname) && (
+            <button
+              type="submit"
+              className="w-full py-4 bg-[var(--c-primary)] text-white font-semibold rounded-xl hover:bg-blue-700 transition mt-4"
+              onClick={handleSubmit}
+              disabled={selectedCart?.length === 0 || loading}
+            >
+              {loading
+                ? "Memproses..."
+                : ObjectTitle.find((item) => item.path === location.pathname)
+                    .title}
+            </button>
+          )}
         </div>
       );
     };
 
     return (
       <div className="max-w-sm mx-auto">
-        {location.pathname.includes("/cart") ? renderElementCart() : null}
+        {renderElementCart()}
         <div className="mx-4 mb-4 rounded-3xl bg-white dark:bg-slate-700 shadow-soft border border-slate-100 dark:border-slate-600 px-2 py-2 grid grid-cols-4 gap-1">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;

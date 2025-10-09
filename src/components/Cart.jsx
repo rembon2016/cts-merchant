@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useCartStore } from "../store/cartStore";
 import { useTotalPriceStore } from "../store/totalPriceStore";
 import { useLocation } from "react-router-dom";
@@ -6,8 +6,9 @@ import CustomLoading from "./CustomLoading";
 import SimpleAlert from "./alert/SimpleAlert";
 
 const Cart = () => {
-  const { cart, getCart, deleteCart, isLoading, error } = useCartStore();
-  const { totalPrice, setTotalPrice } = useTotalPriceStore();
+  const { cart, getCart, deleteCart, setSelectedCart, isLoading, error } =
+    useCartStore();
+  const { setTotalPrice } = useTotalPriceStore();
 
   const location = useLocation();
   const cartPath = location.pathname.includes("/cart");
@@ -31,10 +32,20 @@ const Cart = () => {
     const checkbox = event.target;
     const isChecked = checkbox.checked;
     const price = Number(checkbox.dataset.price);
+    const itemId = Number(checkbox.id);
+    const itemName = checkbox.dataset.name;
+    const itemImage = checkbox.dataset.image;
 
     if (isChecked) {
+      const newItem = { id: itemId, name: itemName, price, image: itemImage };
+      setSelectedCart((prevItems) => [...prevItems, newItem]);
+
       setTotalPrice((prevTotal) => prevTotal + price);
     } else {
+      setSelectedCart((prevItems) =>
+        prevItems.filter((item) => item.id !== itemId)
+      );
+
       setTotalPrice((prevTotal) => prevTotal - price);
     }
   };
@@ -49,12 +60,23 @@ const Cart = () => {
     });
 
     if (isChecked) {
+      const allItems = cart?.data?.items?.map((item) => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        image: item.image,
+      }));
+      setSelectedCart(allItems);
+
       const total = cart?.data?.items?.reduce(
         (acc, item) => Number(acc) + Number(item.price),
         0
       );
+
       setTotalPrice(total);
     } else {
+      setSelectedCart([]);
+
       setTotalPrice(0);
     }
   };
@@ -122,9 +144,10 @@ const Cart = () => {
                 <input
                   type="checkbox"
                   name={cartItem?.product?.name}
-                  id={cartItem?.id}
+                  id={cartItem?.product?.id}
                   data-price={cartItem?.price}
                   data-name={cartItem?.product?.name}
+                  data-image={cartItem?.product?.image}
                   onChange={handleChecked}
                   className="cursor-pointer"
                 />
