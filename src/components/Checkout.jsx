@@ -7,7 +7,7 @@ export default function Checkout() {
   const [dataCheckout, setDataCheckout] = useState([]);
   const [discountCode, setDiscountCode] = useState("");
 
-  const { checkVoucherDiscount, isLoading, error } = useCartStore();
+  const { checkVoucherDiscount, isLoading } = useCartStore();
 
   useEffect(() => {
     if (getCart !== undefined) {
