@@ -29,6 +29,8 @@ export default function SimpleInput({
     disabled ? "bg-gray-200" : "bg-white dark:bg-slate-600"
   } dark:text-slate-100 font-semibold`;
 
+  console.log("Value: ", value);
+
   return (
     <div className="relative">
       <label

@@ -1,20 +1,32 @@
 import { useLocation } from "react-router-dom";
 import { useCheckoutStore } from "../store/checkoutStore";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import SimpleInput from "./form/SimpleInput";
 
 const Payment = () => {
+  const getCart = sessionStorage.getItem("cart");
+
+  const [dataCheckout, setDataCheckout] = useState([]);
+  const [selectedData, setSelectedData] = useState(null);
   const { paymentData, getPaymentMethods } = useCheckoutStore();
 
   const location = useLocation();
   const pathname = location.pathname;
 
+  const totalPrice = dataCheckout?.items?.reduce((a, b) => a + b.price, 0) || 0;
+
+  const handleChange = (e) => setSelectedData(e.target.value);
+
   useEffect(() => {
     if (pathname !== "/payment") return;
     getPaymentMethods();
-  }, [pathname]);
+  }, [pathname, sessionStorage.getItem("authPosToken")]);
 
-  console.log("Payment Method: ", paymentData);
+  useEffect(() => {
+    if (getCart !== undefined) {
+      setDataCheckout(JSON.parse(getCart));
+    }
+  }, []);
 
   return (
     <div className="mt-4 p-4 dark:bg-slate-700 bg-white rounded-lg mb-24">
@@ -24,7 +36,8 @@ const Payment = () => {
           name="jumlahBarang"
           type="number"
           label="Jumlah Barang"
-          value={1}
+          value={dataCheckout?.items?.length || 0}
+          disabled={true}
           //   errors={errors.password}
           //   handleChange={handleChange}
           //   disabled={!isEditPassword}
@@ -33,12 +46,13 @@ const Payment = () => {
           name="harga"
           type="number"
           label="Harga"
-          value={13000}
+          value={dataCheckout?.items?.reduce((a, b) => a + b.price, 0) || 0}
+          disabled={true}
           //   errors={errors.password}
           //   handleChange={handleChange}
           //   disabled={!isEditPassword}
         />
-        <SimpleInput
+        {/* <SimpleInput
           name="biayaTambahan"
           type="number"
           label="Biaya Tambahan"
@@ -46,22 +60,23 @@ const Payment = () => {
           //   errors={errors.password}
           //   handleChange={handleChange}
           //   disabled={!isEditPassword}
-        />
+        /> */}
         <SimpleInput
           name="JenisPembayaran"
           type="text"
           label="Jenis Pembayaran"
           isSelectBox={true}
           selectBoxData={paymentData}
+          value={selectedData}
+          handleChange={handleChange}
           //   errors={errors.password}
-          //   handleChange={handleChange}
           //   disabled={!isEditPassword}
         />
         <SimpleInput
           name="totalHarga"
           type="number"
           label="Total Harga"
-          value={19000}
+          value={totalPrice}
           disabled={true}
           //   errors={errors.password}
           //   handleChange={handleChange}

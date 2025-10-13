@@ -2,14 +2,36 @@ import { useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTotalPriceStore } from "../store/totalPriceStore";
 import { useCartStore } from "../store/cartStore";
+import { useCheckoutStore } from "../store/checkoutStore";
 
 const BottomNav = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
   const { totalPrice, setTotalPrice } = useTotalPriceStore();
+  const { savePendingOrder } = useCheckoutStore();
   const { selectedCart } = useCartStore();
   const navigation = useNavigate();
   const pathname = location.pathname;
+  const getCart = sessionStorage.getItem("cart");
+
+  const processData = {
+    branch_id: sessionStorage.getItem("branchActive"),
+    user_id: sessionStorage.getItem("userId"),
+    sub_total: 0,
+    customer_id: 0,
+    discount_id: 0,
+    tax_amount: 0,
+    discount_amount: 0,
+    items: [
+      {
+        product_id: 0,
+        product_sku_id: 0,
+        quantity: 1,
+        price: 0,
+        notes: "",
+      },
+    ],
+  };
 
   const showButtonFromPath = ["/cart", "/checkout", "/payment"];
 
@@ -129,10 +151,39 @@ const BottomNav = () => {
     setLoading(true);
     sessionStorage.setItem("cart", JSON.stringify(selectedCart));
 
+    if (pathname === "/payment") {
+      proccessOrder();
+    }
+
+    if (pathname === "/checkout") {
+      processCheckout();
+    }
+
     setTimeout(() => {
-      navigation(pathname === "/cart" ? "/checkout" : "/payment", {
+      navigation("/checkout", {
         replace: true,
       });
+      setLoading(false);
+    }, 1000);
+  };
+
+  const proccessOrder = async () => await savePendingOrder(processData);
+  const processCheckout = () => {
+    if (!getCart) return;
+
+    const checkoutValue = {
+      sub_total: totalPrice,
+      tax_amount: 0,
+      discount_amount: 0,
+      discount_id: 0,
+      customer_id: 0,
+      items: JSON.parse(getCart),
+    };
+
+    sessionStorage.setItem("cart", JSON.stringify(checkoutValue));
+
+    setTimeout(() => {
+      navigation("/payment", { replace: true });
       setLoading(false);
     }, 1000);
   };
