@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useCartStore } from "../store/cartStore";
+import { useCheckoutStore } from "../store/checkoutStore";
 
 export default function Checkout() {
   const getCart = sessionStorage.getItem("cart");
@@ -7,13 +8,20 @@ export default function Checkout() {
   const [dataCheckout, setDataCheckout] = useState([]);
   const [discountCode, setDiscountCode] = useState("");
 
-  const { checkVoucherDiscount, isLoading } = useCartStore();
+  const { checkVoucherDiscount, isLoading, error } = useCartStore();
+  const { getPosSettings, posSettingsData } = useCheckoutStore();
+
+  const checkTax = async () => await getPosSettings();
 
   useEffect(() => {
     if (getCart !== undefined) {
       setDataCheckout(JSON.parse(getCart));
     }
   }, [getCart]);
+
+  useEffect(() => {
+    checkTax();
+  }, []);
 
   let Rupiah = new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -33,6 +41,9 @@ export default function Checkout() {
     e?.preventDefault();
     await checkVoucherDiscount(discountCode);
   };
+
+  const checkoutPrice = dataCheckout?.reduce((a, b) => a + b.price, 0);
+  const TOTAL = checkoutPrice + posSettingsData?.tax;
 
   const inputClassName =
     "w-full p-4 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ring-1 ring-slate-600 dark:text-slate-200";
@@ -92,9 +103,11 @@ export default function Checkout() {
                   {isLoading ? "Tunggu..." : "Cek"}
                 </button>
               </div>
-              <p className="text-sm text-red-400">
-                Voucher diskon tidak tersedia
-              </p>
+              {error && (
+                <p className="text-sm text-red-400">
+                  Voucher diskon tidak tersedia
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -113,29 +126,37 @@ export default function Checkout() {
           </div>
           <div className="flex justify-between items-center">
             <h4 className="font-semibold text-gray-500 text-md">
-              Harga Barang
+              Harga Barang ({dataCheckout?.length})
             </h4>
-            <h4 className="font-bold text-gray-700 text-md">Rp. 499</h4>
+            <h4 className="font-bold text-gray-700 text-md">
+              {Rupiah.format(checkoutPrice)}
+            </h4>
           </div>
-          <div className="flex justify-between items-center">
+          {/* <div className="flex justify-between items-center">
             <h4 className="font-semibold text-gray-500 text-md">
               Biaya Layanan
             </h4>
             <h4 className="font-bold text-gray-700 text-md">Rp. 1.000</h4>
-          </div>
+          </div> */}
           <div className="flex justify-between items-center">
             <h4 className="font-semibold text-gray-500 text-md">Diskon</h4>
-            <h4 className="font-bold text-gray-700 text-md">Rp. 0</h4>
+            <h4 className="font-bold text-gray-700 text-md">
+              {Rupiah.format(0)}
+            </h4>
           </div>
           <div className="flex justify-between items-center">
             <h4 className="font-semibold text-gray-500 text-md">Pajak</h4>
-            <h4 className="font-bold text-gray-700 text-md">Rp. 5.000</h4>
+            <h4 className="font-bold text-gray-700 text-md">
+              {Rupiah.format(posSettingsData?.tax)}
+            </h4>
           </div>
           <div className="flex justify-between items-center border-t-2 border-gray-600 mt-2">
             <h4 className="font-bold text-gray-700 text-md mt-2">
               Total Tagihan
             </h4>
-            <h4 className="font-bold text-gray-700 text-md">Rp. 6.499</h4>
+            <h4 className="font-bold text-gray-700 text-md">
+              {Rupiah.format(TOTAL)}
+            </h4>
           </div>
         </div>
       </div>
