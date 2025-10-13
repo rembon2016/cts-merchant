@@ -1,8 +1,39 @@
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTotalPriceStore } from "../store/totalPriceStore";
+import { useCartStore } from "../store/cartStore";
+import { useCheckoutStore } from "../store/checkoutStore";
 
 const BottomNav = () => {
   const location = useLocation();
+  const [loading, setLoading] = useState(false);
+  const { totalPrice, setTotalPrice } = useTotalPriceStore();
+  const { savePendingOrder } = useCheckoutStore();
+  const { selectedCart } = useCartStore();
+  const navigation = useNavigate();
+  const pathname = location.pathname;
+  const getCart = sessionStorage.getItem("cart");
+
+  const processData = {
+    branch_id: sessionStorage.getItem("branchActive") || 0,
+    user_id: sessionStorage.getItem("userId") || 0,
+    sub_total: 0,
+    customer_id: 0,
+    discount_id: 0,
+    tax_amount: 0,
+    discount_amount: 0,
+    items: [
+      {
+        product_id: 0,
+        product_sku_id: 0,
+        quantity: 1,
+        price: 0,
+        notes: "",
+      },
+    ],
+  };
+
+  const showButtonFromPath = ["/cart", "/checkout", "/payment"];
 
   const navItems = [
     {
@@ -91,9 +122,108 @@ const BottomNav = () => {
     },
   ];
 
-  return (
-    <nav className="fixed bottom-0 inset-x-0">
+  const ObjectTitle = [
+    {
+      path: "/cart",
+      title: "Pesan Sekarang",
+    },
+    {
+      path: "/checkout",
+      title: "Lanjut ke Pembayaran",
+    },
+    {
+      path: "/payment",
+      title: "Bayar Sekarang",
+    },
+  ];
+
+  let Rupiah = new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+  });
+
+  const handleAddTax = () => {
+    setTotalPrice(totalPrice + (totalPrice * 11) / 100);
+  };
+
+  const handleSubmit = () => {
+    setLoading(true);
+    sessionStorage.setItem("cart", JSON.stringify(selectedCart));
+
+    if (pathname === "/payment") {
+      proccessOrder();
+      return;
+    }
+
+    setTimeout(() => {
+      navigation(pathname === "/cart" ? "/checkout" : "/payment", {
+        replace: true,
+      });
+      setLoading(false);
+    }, 1000);
+  };
+
+  const proccessOrder = async () => await savePendingOrder(processData);
+
+  const renderElements = useMemo(() => {
+    const renderElementCart = () => {
+      return (
+        <div
+          className={`rounded-3xl bg-white dark:bg-slate-700 shadow-soft border border-slate-100 dark:border-slate-600 ${
+            showButtonFromPath.includes(location.pathname)
+              ? "p-2 mx-4 mb-2"
+              : ""
+          }`}
+        >
+          <div className="flex flex-col gap-2">
+            {/* <div className="flex justify-between items-center">
+              <h3 className="font-medium text-xl">Sub Total</h3>
+              <h3 className="font-bold text-xl">{Rupiah.format(totalPrice)}</h3>
+            </div> */}
+            {/* <div className="flex justify-between items-center">
+              <h3 className="font-medium text-xl">Pajak (+11%)</h3>
+              <h3 className="font-bold text-xl">Rp. 6.000</h3>
+            </div> */}
+            {location.pathname === "/cart" && (
+              <div className="flex justify-between items-center">
+                <h3 className="font-medium text-xl">Total</h3>
+                <div className="flex gap-2">
+                  {totalPrice !== 0 && (
+                    <button
+                      className="text-sm font-semibold text-[var(--c-primary)]"
+                      onClick={handleAddTax}
+                    >
+                      + Pajak
+                    </button>
+                  )}
+                  <h3 className="font-bold text-xl">
+                    {Rupiah.format(totalPrice)}
+                  </h3>
+                </div>
+              </div>
+            )}
+          </div>
+          {showButtonFromPath.includes(location.pathname) && (
+            <button
+              type="submit"
+              className="w-full py-4 bg-[var(--c-primary)] text-white font-semibold rounded-xl hover:bg-blue-700 transition mt-4"
+              onClick={handleSubmit}
+              disabled={selectedCart?.length === 0 || loading}
+            >
+              {loading
+                ? "Memproses..."
+                : ObjectTitle.find((item) => item.path === location.pathname)
+                    .title}
+            </button>
+          )}
+        </div>
+      );
+    };
+
+    return (
       <div className="max-w-sm mx-auto">
+        {renderElementCart()}
         <div className="mx-4 mb-4 rounded-3xl bg-white dark:bg-slate-700 shadow-soft border border-slate-100 dark:border-slate-600 px-2 py-2 grid grid-cols-4 gap-1">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
@@ -132,8 +262,10 @@ const BottomNav = () => {
           })}
         </div>
       </div>
-    </nav>
-  );
+    );
+  }, [navItems, totalPrice, location.pathname]);
+
+  return <nav className="fixed bottom-0 inset-x-0">{renderElements}</nav>;
 };
 
 export default BottomNav;

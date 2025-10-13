@@ -1,12 +1,12 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useThemeStore } from "../store/themeStore";
 import { usePosStore } from "../store/posStore";
 import { useDebounce } from "../hooks/useDebounce";
+import { useCartStore } from "../store/cartStore";
 import VariantModal from "./VariantModal";
 import CustomLoading from "./CustomLoading";
-import { useCartStore } from "../store/cartStore";
 
-const categories = [
+const MENU = [
   {
     name: "TRANSAKSI",
     iconLight: "/icons/transaction.svg",
@@ -71,7 +71,7 @@ export default function POS() {
       per_page: 20,
       reset: true,
     });
-  }, [selectedSub, debouncedSearch, subCategories, getProducts, resetProducts]);
+  }, [selectedSub, debouncedSearch, getProducts, resetProducts]);
 
   // Infinite scroll observer
   const lastProductElementRef = useCallback(
@@ -119,13 +119,7 @@ export default function POS() {
   };
 
   // Handle variant selection
-  const handleVariantSelect = ({
-    product,
-    variant,
-    quantity,
-    price,
-    stock,
-  }) => {
+  const handleVariantSelect = ({ product, variant, quantity }) => {
     addToCart(product, variant, quantity);
   };
 
@@ -134,11 +128,193 @@ export default function POS() {
     return parseFloat(price).toLocaleString("id-ID");
   };
 
+  const renderCategories = useMemo(() => {
+    if (isLoading) {
+      return (
+        <div className="mb-6">
+          <div className="text-center text-gray-500 mb-4">
+            Memuat kategori...
+          </div>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="mb-6">
+          <div className="text-center text-red-500 mb-4 p-3 bg-red-50 rounded-lg">
+            Error: {error}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="mb-6">
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          {subCategories.map((sub) => (
+            <button
+              key={sub.id}
+              className={`w-full flex flex-nowrap px-4 py-2 rounded border ${
+                selectedSub?.toLowerCase() === sub?.name?.toLowerCase()
+                  ? "bg-[var(--c-accent)] text-slate-600"
+                  : "bg-gray-100 text-gray-700"
+              } hover:bg-[var(--c-accent)] hover:text-slate-600 transition slate-600 space-nowrap rounded-full dark:text-slate-100 dark:hover:text-slate-600`}
+              onClick={() =>
+                setSelectedSub(sub?.name === selectedSub ? "" : sub?.name)
+              }
+            >
+              <span className="w-full flex justify-center items-center">
+                {sub.name}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }, [isLoading, error, subCategories, selectedSub]);
+
+  const renderProducts = useMemo(() => {
+    if (productsLoading) {
+      return (
+        <div className="w-full text-center">
+          {/* Loading indicator for infinite scroll */}
+          <CustomLoading />
+        </div>
+      );
+    }
+
+    if (productsError) {
+      return (
+        <div className="col-span-2 text-center text-red-500 p-4 bg-red-50 rounded-lg">
+          Error: {productsError}
+        </div>
+      );
+    }
+
+    if (!productsLoading && !productsError && products?.length === 0) {
+      return (
+        <div className="col-span-2 text-center text-gray-500">
+          Produk tidak ditemukan.
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-2 gap-4">
+        {products.map((product, index) => {
+          const isLastProduct = products.length === index + 1;
+          const productPrice = getProductPrice(product);
+
+          // For variant products, show total stock across all variants
+          const productStock = product.is_variant
+            ? getTotalVariantStock(product)
+            : getProductStock(product);
+
+          const isOutOfStock = !hasAvailableStock(product);
+
+          return (
+            <div
+              key={product.id}
+              ref={isLastProduct ? lastProductElementRef : null}
+              className={`border rounded-lg shadow hover:shadow-lg transition flex flex-col items-start ${
+                isOutOfStock ? "opacity-50" : "cursor-pointer"
+              }`}
+              onClick={() => !isOutOfStock && handleProductClick(product)}
+            >
+              <div className="relative w-full">
+                <img
+                  src={
+                    product.image
+                      ? `${import.meta.env.VITE_API_IMAGE}${product.image}`
+                      : "/images/placeholder.jpg"
+                  }
+                  alt={product.name || "Product Image"}
+                  className="w-full h-[100px] object-cover rounded-t-[10px]"
+                  onError={(e) => {
+                    e.target.src = "/images/placeholder.jpg";
+                  }}
+                />
+                {isOutOfStock && (
+                  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-t-[10px]">
+                    <span className="text-white font-semibold text-sm">
+                      HABIS
+                    </span>
+                  </div>
+                )}
+                {product.is_variant && (
+                  <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                    Varian
+                  </div>
+                )}
+              </div>
+              <div className="p-4 w-full">
+                <div className="font-bold text-lg">{product.name}</div>
+                <div className="font-normal text-sm mb-2 text-gray-600 dark:text-gray-400">
+                  {product.description}
+                </div>
+                <div className="text-slate-600 dark:text-slate-300">
+                  <span>Rp.</span>
+                  <span className="font-bold text-2xl">
+                    {formatPrice(productPrice)}
+                  </span>
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                  Stok: {productStock}
+                </div>
+                <div className="mt-3 flex gap-2 justify-between items-center">
+                  <button
+                    className={`w-full h-12 py-2 rounded-full transition-colors ${
+                      isOutOfStock
+                        ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                        : "bg-[var(--c-primary)] text-white hover:bg-blue-700"
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!isOutOfStock) {
+                        handleProductClick(product);
+                      }
+                    }}
+                    disabled={isOutOfStock}
+                  >
+                    {isOutOfStock ? "Habis" : "Beli"}
+                  </button>
+                  <button
+                    className={`w-20 h-12 rounded-full border-2 flex justify-center items-center transition-colors ${
+                      isOutOfStock
+                        ? "border-gray-400 cursor-not-allowed"
+                        : "border-slate-600 dark:border-slate-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!isOutOfStock) {
+                        handleProductClick(product);
+                      }
+                    }}
+                    disabled={isOutOfStock}
+                  >
+                    <img
+                      src={`${
+                        isDark ? "/icons/cart-white.svg" : "/icons/cart.svg"
+                      }`}
+                      alt="Add to cart"
+                      className="w-8 h-8"
+                    />
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }, [productsError, productsLoading, products, hasMoreProducts]);
+
   return (
     <div className="p-6 max-w-3xl mx-auto">
       {/* Kategori Produk */}
       <div className="flex gap-2 mb-6">
-        {categories.map((cat) => (
+        {MENU.map((cat) => (
           <div
             key={cat.name}
             className="w-full min-h-[100px] max-h-full flex flex-col justify-center items-center hover:bg-slate-200 dark:hover:bg-slate-600 bg-white  text-slate-600 dark:text-slate-100 rounded-lg font-semibold cursor-pointer text-[12px]"
@@ -153,37 +329,7 @@ export default function POS() {
         ))}
       </div>
       {/* Sub Kategori */}
-      <div className="mb-6">
-        {isLoading && (
-          <div className="text-center text-gray-500 mb-4">
-            Memuat kategori...
-          </div>
-        )}
-        {error && (
-          <div className="text-center text-red-500 mb-4 p-3 bg-red-50 rounded-lg">
-            Error: {error}
-          </div>
-        )}
-        <div className="flex gap-2 overflow-x-auto pb-2">
-          {subCategories.map((sub) => (
-            <button
-              key={sub.id}
-              className={`w-full flex flex-nowrap px-4 py-2 rounded border ${
-                selectedSub === sub.name
-                  ? "bg-[var(--c-accent)] text-slate-600"
-                  : "bg-gray-100 text-gray-700"
-              } hover:bg-[var(--c-accent)] hover:text-slate-600 transition slate-600 space-nowrap rounded-full dark:text-slate-100 dark:hover:text-slate-600`}
-              onClick={() =>
-                setSelectedSub(sub.name === selectedSub ? "" : sub.name)
-              }
-            >
-              <span className="w-full flex justify-center items-center">
-                {sub.name}
-              </span>
-            </button>
-          ))}
-        </div>
-      </div>
+      {renderCategories}
       {/* Pencarian */}
       <div className="flex gap-2 mb-6">
         <input
@@ -198,129 +344,7 @@ export default function POS() {
         </button>
       </div>
       {/* Daftar Produk */}
-      <div className="grid grid-cols-2 gap-4">
-        {productsError && (
-          <div className="col-span-2 text-center text-red-500 p-4 bg-red-50 rounded-lg">
-            Error: {productsError}
-          </div>
-        )}
-
-        {products.length === 0 && !productsLoading && !productsError ? (
-          <div className="col-span-2 text-center text-gray-500">
-            Produk tidak ditemukan.
-          </div>
-        ) : (
-          products.map((product, index) => {
-            const isLastProduct = products.length === index + 1;
-            const productPrice = getProductPrice(product);
-
-            // For variant products, show total stock across all variants
-            const productStock = product.is_variant
-              ? getTotalVariantStock(product)
-              : getProductStock(product);
-
-            const isOutOfStock = !hasAvailableStock(product);
-
-            return (
-              <div
-                key={product.id}
-                ref={isLastProduct ? lastProductElementRef : null}
-                className={`border rounded-lg shadow hover:shadow-lg transition flex flex-col items-start ${
-                  isOutOfStock ? "opacity-50" : "cursor-pointer"
-                }`}
-                onClick={() => !isOutOfStock && handleProductClick(product)}
-              >
-                <div className="relative w-full">
-                  <img
-                    src={
-                      product.image
-                        ? `${import.meta.env.VITE_API_IMAGE}${product.image}`
-                        : "/images/placeholder.jpg"
-                    }
-                    alt={product.name || "Product Image"}
-                    className="w-full h-[100px] object-cover rounded-t-[10px]"
-                    onError={(e) => {
-                      e.target.src = "/images/placeholder.jpg";
-                    }}
-                  />
-                  {isOutOfStock && (
-                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-t-[10px]">
-                      <span className="text-white font-semibold text-sm">
-                        HABIS
-                      </span>
-                    </div>
-                  )}
-                  {product.is_variant && (
-                    <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
-                      Varian
-                    </div>
-                  )}
-                </div>
-                <div className="p-4 w-full">
-                  <div className="font-bold text-lg">{product.name}</div>
-                  <div className="font-normal text-sm mb-2 text-gray-600 dark:text-gray-400">
-                    {product.description}
-                  </div>
-                  <div className="text-slate-600 dark:text-slate-300">
-                    <span>Rp.</span>
-                    <span className="font-bold text-2xl">
-                      {formatPrice(productPrice)}
-                    </span>
-                  </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-                    Stok: {productStock}
-                  </div>
-                  <div className="mt-3 flex gap-2 justify-between items-center">
-                    <button
-                      className={`w-full h-12 py-2 rounded-full transition-colors ${
-                        isOutOfStock
-                          ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-                          : "bg-[var(--c-primary)] text-white hover:bg-blue-700"
-                      }`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (!isOutOfStock) {
-                          handleProductClick(product);
-                        }
-                      }}
-                      disabled={isOutOfStock}
-                    >
-                      {isOutOfStock ? "Habis" : "Beli"}
-                    </button>
-                    <button
-                      className={`w-20 h-12 rounded-full border-2 flex justify-center items-center transition-colors ${
-                        isOutOfStock
-                          ? "border-gray-400 cursor-not-allowed"
-                          : "border-slate-600 dark:border-slate-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                      }`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (!isOutOfStock) {
-                          addToCart(product);
-                        }
-                      }}
-                      disabled={isOutOfStock}
-                    >
-                      <img
-                        src={`${
-                          isDark ? "/icons/cart-white.svg" : "/icons/cart.svg"
-                        }`}
-                        alt="Add to cart"
-                        className="w-8 h-8"
-                      />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })
-        )}
-      </div>
-
-      <div className="w-full text-center">
-        {/* Loading indicator for infinite scroll */}
-        {productsLoading && <CustomLoading />}
-      </div>
+      {renderProducts}
 
       {/* Variant Modal */}
       <VariantModal
