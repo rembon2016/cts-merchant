@@ -12,6 +12,7 @@ const Header = () => {
   const location = useLocation();
   const posPath = location.pathname.includes("/pos");
   const cartPath = location.pathname.includes("/cart");
+  const detailProduct = location.pathname.includes("/product/");
 
   useEffect(() => {
     if (!posPath) return;
@@ -69,7 +70,7 @@ const Header = () => {
             </svg>
           )}
         </button>
-        {posPath || cartPath ? (
+        {posPath || cartPath || detailProduct ? (
           <Link to="/cart">
             <button
               className="p-2 rounded-xl bg-white dark:bg-slate-700 shadow-soft relative"
@@ -105,10 +106,7 @@ const Header = () => {
                 />
               </svg>
               <span className="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 text-sm font-semibold text-white bg-[var(--c-primary)] rounded-full">
-                {cart?.data?.items?.reduce(
-                  (acc, item) => acc + item?.quantity,
-                  0
-                ) || 0}
+                {cart?.data?.items?.length || 0}
               </span>
             </button>
           </Link>
