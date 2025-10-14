@@ -1,14 +1,21 @@
 import { useEffect, useMemo, useState } from "react";
 import { useCartStore } from "../store/cartStore";
 import { useCheckoutStore } from "../store/checkoutStore";
+import { formatCurrency } from "../helper/currency";
 import CustomLoading from "./CustomLoading";
+import SimpleInput from "./form/SimpleInput";
 
 export default function Checkout() {
-  const getCart = sessionStorage.getItem("cart");
-
-  const [dataCheckout, setDataCheckout] = useState([]);
+  const getCart = JSON.parse(sessionStorage.getItem("cart"));
   const [discountCode, setDiscountCode] = useState("");
+  // const [showExitModal, setShowExitModal] = useState(false);
 
+  const {
+    paymentData,
+    getPaymentMethods,
+    selectPaymentMethod,
+    setSelectPaymentMethod,
+  } = useCheckoutStore();
   const { checkVoucherDiscount, isLoading, error } = useCartStore();
   const {
     getPosSettings,
@@ -18,24 +25,17 @@ export default function Checkout() {
 
   const checkTax = async () => await getPosSettings();
 
-  const checkoutPrice = dataCheckout?.items?.reduce((a, b) => a + b.price, 0);
-  const TOTAL = checkoutPrice + posSettingsData?.tax;
+  const checkoutPrice = getCart?.items?.reduce(
+    (a, b) => a + Number.parseFloat(b.subtotal),
+    0
+  );
 
-  useEffect(() => {
-    if (getCart !== undefined) {
-      setDataCheckout(JSON.parse(getCart));
-    }
-  }, [getCart]);
+  const TOTAL = checkoutPrice + checkoutPrice * (posSettingsData?.tax / 100);
 
   useEffect(() => {
     checkTax();
+    getPaymentMethods();
   }, []);
-
-  let Rupiah = new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    minimumFractionDigits: 0,
-  });
 
   // Tambahkan base URL untuk gambar
   const getImageUrl = (imagePath) => {
@@ -49,6 +49,8 @@ export default function Checkout() {
     e?.preventDefault();
     await checkVoucherDiscount(discountCode);
   };
+
+  const handleChange = (e) => setSelectPaymentMethod(e.target.value);
 
   const renderElementsDetailTransaction = useMemo(() => {
     if (loadingPos) {
@@ -73,10 +75,11 @@ export default function Checkout() {
           </div>
           <div className="flex justify-between items-center">
             <h4 className="font-semibold text-gray-500 text-md">
-              Harga Barang ({dataCheckout?.items?.length})
+              Harga Barang (
+              {getCart?.items?.length > 0 ? getCart?.items?.length : 0})
             </h4>
             <h4 className="font-bold text-gray-700 text-md">
-              {Rupiah.format(checkoutPrice)}
+              {formatCurrency(checkoutPrice)}
             </h4>
           </div>
           {/* <div className="flex justify-between items-center">
@@ -88,13 +91,20 @@ export default function Checkout() {
           <div className="flex justify-between items-center">
             <h4 className="font-semibold text-gray-500 text-md">Diskon</h4>
             <h4 className="font-bold text-gray-700 text-md">
-              {Rupiah.format(0)}
+              {formatCurrency(0)}
             </h4>
           </div>
           <div className="flex justify-between items-center">
             <h4 className="font-semibold text-gray-500 text-md">Pajak</h4>
             <h4 className="font-bold text-gray-700 text-md">
-              {Rupiah.format(posSettingsData?.tax)}
+              {(() => {
+                const tax = posSettingsData?.tax;
+                const num = Number(tax);
+                if (!tax && tax !== 0) return "-";
+                if (Number.isNaN(num)) return "-";
+                return Math.trunc(num);
+              })()}
+              %
             </h4>
           </div>
           <div className="flex justify-between items-center border-t-2 border-gray-600 mt-2">
@@ -102,20 +112,20 @@ export default function Checkout() {
               Total Tagihan
             </h4>
             <h4 className="font-bold text-gray-700 text-md">
-              {Rupiah.format(TOTAL)}
+              {formatCurrency(TOTAL)}
             </h4>
           </div>
         </div>
       </div>
     );
-  }, [loadingPos, dataCheckout, posSettingsData, checkoutPrice, TOTAL]);
+  }, [loadingPos, posSettingsData, checkoutPrice, TOTAL]);
 
   const inputClassName =
     "w-full p-4 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ring-1 ring-slate-600 dark:text-slate-200";
 
   return (
     <div className="w-full h-full p-4 rounded-lg flex flex-col gap-3">
-      {dataCheckout?.items?.map((data) => (
+      {getCart?.items?.map((data) => (
         <div
           className="flex items-center justify-between gap-2 w-full"
           key={data?.id}
@@ -132,7 +142,7 @@ export default function Checkout() {
                 <h3 className="font-medium">
                   Harga:{" "}
                   <span className="text-[var(--c-primary)] font-extrabold">
-                    {Rupiah.format(data?.price)}
+                    {formatCurrency(data?.price)}
                   </span>
                 </h3>
               </div>
@@ -178,7 +188,33 @@ export default function Checkout() {
         </div>
       </div>
 
+      <div className="bg-white p-4 rounded-xl">
+        <SimpleInput
+          name="JenisPembayaran"
+          type="text"
+          label="Jenis Pembayaran"
+          isSelectBox={true}
+          selectBoxData={paymentData}
+          value={selectPaymentMethod}
+          handleChange={handleChange}
+          //   errors={errors.password}
+          //   disabled={!isEditPassword}
+        />
+      </div>
+
       {renderElementsDetailTransaction}
+
+      {/* {showExitModal && (
+        <SimpleModal
+          onClose={() => setShowExitModal(false)}
+          handleClick={handleConfirmLeave}
+          title={"Konfirmasi Keluar"}
+          content={
+            "Anda yakin ingin meninggalkan halaman checkout? Keranjang sesi akan dihapus."
+          }
+          showButton={true}
+        />
+      )} */}
     </div>
   );
 }

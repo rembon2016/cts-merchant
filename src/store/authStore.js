@@ -20,6 +20,8 @@ export const useAuthStore = create((set, get) => ({
   isLoading: false,
   isLogout: false,
   error: null,
+  autoLogoutTimer: null,
+  checkInterval: null,
 
   login: async (credentials) => {
     try {
@@ -165,59 +167,102 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
-  // Fungsi untuk mengecek apakah token sudah expired
-  checkTokenExpiry: () => {
-    const expireTime = sessionStorage.getItem(EXPIRED_KEY);
-
-    if (!expireTime) {
-      return false;
-    }
-
-    const currentTime = Date.now();
-    const expiryTimestamp = parseInt(expireTime, 10);
-
-    // Jika waktu sekarang sudah melewati waktu expire
-    if (currentTime >= expiryTimestamp) {
-      return true;
-    }
-
-    return false;
+  // clear session storage
+  clearSession: () => {
+    sessionStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(USER_ID);
+    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(EXPIRED_KEY);
+    sessionStorage.removeItem(TOKEN_POS_KEY);
+    sessionStorage.removeItem(BRANCH_ACTIVE);
+    sessionStorage.removeItem(CART);
   },
 
-  // Fungsi untuk memulai auto logout checker
-  startAutoLogoutTimer: () => {
-    const expireTime = sessionStorage.getItem(EXPIRED_KEY);
+  // Setup auto logout
+  setupAutoLogout: () => {
+    const expiredAt = sessionStorage.getItem(EXPIRED_KEY);
 
-    if (!expireTime) {
+    if (!expiredAt) {
+      console.warn("No expiration time found");
       return;
     }
 
+    const expiredTimestamp = Number.parseInt(expiredAt, 10);
     const currentTime = Date.now();
-    const expiryTimestamp = parseInt(expireTime, 10);
-    const timeUntilExpiry = expiryTimestamp - currentTime;
+    const timeUntilExpiry = expiredTimestamp - currentTime;
+
+    // Clear existing timers
+    get().clearAutoLogoutTimer();
 
     // Jika sudah expired, logout langsung
     if (timeUntilExpiry <= 0) {
-      get().logout();
+      console.log("Session expired, logging out...");
+      get().handleAutoLogout();
       return;
     }
 
-    // Set timeout untuk logout otomatis
-    const timeoutId = setTimeout(() => {
-      get().logout();
+    // Set timeout untuk auto logout
+    const timer = setTimeout(() => {
+      get().handleAutoLogout();
     }, timeUntilExpiry);
 
-    // Simpan timeout ID untuk bisa di-clear nanti
-    set({ autoLogoutTimerId: timeoutId });
+    // Set interval untuk check setiap detik (sebagai backup)
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const expired = Number.parseInt(sessionStorage.getItem(EXPIRED_KEY), 10);
+
+      if (now >= expired) {
+        get().handleAutoLogout();
+      }
+    }, 1000);
+
+    set({ autoLogoutTimer: timer, checkInterval: interval });
   },
 
-  // Fungsi untuk membersihkan auto logout timer
+  // Clear auto logout timer
   clearAutoLogoutTimer: () => {
-    const timerId = get().autoLogoutTimerId;
-    if (timerId) {
-      clearTimeout(timerId);
-      set({ autoLogoutTimerId: null });
+    const { autoLogoutTimer, checkInterval } = get();
+
+    if (autoLogoutTimer) {
+      clearTimeout(autoLogoutTimer);
     }
+    if (checkInterval) {
+      clearInterval(checkInterval);
+    }
+
+    set({ autoLogoutTimer: null, checkInterval: null });
+  },
+
+  // Handle auto logout (tanpa API call)
+  handleAutoLogout: async () => {
+    // Clear timers
+    get().clearAutoLogoutTimer();
+    get().logout();
+
+    // Clear user data store
+    const { setUserData } = useUserDataStore.getState();
+    setUserData({});
+
+    // Update state
+    set({
+      user: null,
+      userId: null,
+      token: null,
+      tokenPos: null,
+      activeBranch: null,
+      error: null,
+      isLoggedIn: false,
+      isLoading: false,
+      isLogout: true,
+    });
+
+    // Reset isLogout setelah 3 detik
+    setTimeout(() => {
+      set({ isLogout: false });
+    }, 3000);
+
+    // Optional: Show notification
+    alert("Sesi Anda telah berakhir. Silakan login kembali.");
   },
 
   logout: async () => {
@@ -250,13 +295,7 @@ export const useAuthStore = create((set, get) => ({
         throw new Error("Logout failed");
       }
 
-      sessionStorage.removeItem(TOKEN_KEY);
-      sessionStorage.removeItem(USER_ID);
-      sessionStorage.removeItem(SESSION_KEY);
-      sessionStorage.removeItem(EXPIRED_KEY);
-      sessionStorage.removeItem(TOKEN_POS_KEY);
-      sessionStorage.removeItem(BRANCH_ACTIVE);
-      sessionStorage.removeItem(CART);
+      get().clearSession();
 
       const { setUserData } = useUserDataStore.getState();
       setUserData({});
@@ -271,6 +310,13 @@ export const useAuthStore = create((set, get) => ({
         isLogout: true,
       });
 
+      if (response.ok) {
+        setTimeout(() => {
+          set({ isLogout: false });
+        }, 3000);
+        return () => clearTimeout();
+      }
+
       return { success: true };
     } catch (error) {
       set({
@@ -280,6 +326,11 @@ export const useAuthStore = create((set, get) => ({
       });
       return { success: false, error: error.message };
     }
+  },
+
+  setExpiration: (expireTimestamp) => {
+    sessionStorage.setItem(EXPIRED_KEY, expireTimestamp);
+    get().setupAutoLogout();
   },
 }));
 

@@ -20,19 +20,19 @@ export default defineConfig({
         start_url: "/",
         icons: [
           {
-            src: "/images/pwa-192x192.png",
+            src: "/images/pwa-192x192.svg",
             sizes: "192x192",
-            type: "image/png",
+            type: "image/svg",
           },
           {
-            src: "/images/pwa-512x512.png",
+            src: "/images/pwa-512x512.svg",
             sizes: "512x512",
-            type: "image/png",
+            type: "image/svg",
           },
           {
-            src: "/images/pwa-512x512.png",
+            src: "/images/pwa-512x512.svg",
             sizes: "512x512",
-            type: "image/png",
+            type: "image/svg",
             purpose: "any maskable",
           },
         ],
@@ -57,5 +57,14 @@ export default defineConfig({
   ],
   server: {
     port: 3000,
+    // server: {
+    //   proxy: {
+    //     "/api": {
+    //       target: "https://pos.ctsolution.id/api",
+    //       changeOrigin: true,
+    //       rewrite: (p) => p.replace(/^\/api/, ""),
+    //     },
+    //   },
+    // },
   },
 });

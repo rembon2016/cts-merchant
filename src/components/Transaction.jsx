@@ -4,6 +4,7 @@ import { useDebounce } from "../hooks/useDebounce";
 import SearchInput from "./SearchInput";
 import LoadMoreButton from "./LoadMoreButton";
 import CustomLoading from "./CustomLoading";
+import { formatCurrency } from "../helper/currency";
 
 // Define action types
 const SET_FILTER = "SET_FILTER";
@@ -47,11 +48,11 @@ export default function Transaction() {
   const { data, totalData, loading, error, fetchData } = useFetchDataStore();
   const [accumulatedData, setAccumulatedData] = useState([]);
 
-  const filterButton = [
-    { name: "Semua", type: "all" },
-    { name: "Pemasukan", type: "income" },
-    { name: "Pengeluaran", type: "outcome" },
-  ];
+  // const filterButton = [
+  //   { name: "Semua", type: "all" },
+  //   { name: "Pemasukan", type: "income" },
+  //   { name: "Pengeluaran", type: "outcome" },
+  // ];
 
   // Debounce search query with 500ms delay
   const debouncedSearch = useDebounce(state.searchQuery, 500);
@@ -138,13 +139,9 @@ export default function Transaction() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div
-                  className={`size-10 rounded-xl grid place-items-center ${
-                    item.type === "income"
-                      ? "bg-green-100 dark:bg-green-900/30"
-                      : "bg-red-100 dark:bg-red-900/30"
-                  }`}
+                  className={`size-10 rounded-xl grid place-items-center bg-blue-100 dark:bg-green-900/30`}
                 >
-                  {item.type === "income" ? (
+                  {/* {item.type === "income" ? (
                     <svg
                       className="w-5 h-5 text-green-600 dark:text-green-400"
                       fill="none"
@@ -172,7 +169,30 @@ export default function Transaction() {
                         d="M20 12H4"
                       />
                     </svg>
-                  )}
+                  )} */}
+                  <svg
+                    width="20"
+                    height="22"
+                    viewBox="0 0 20 22"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="text-blue-600 dark:text-blue-400"
+                  >
+                    <path
+                      d="M16.75 9.25V8.75C16.75 4.979 16.75 3.093 15.578 1.922C14.406 0.751 12.521 0.75 8.75 0.75C4.979 0.75 3.093 0.75 1.922 1.922C0.751 3.094 0.75 4.979 0.75 8.75V13.25C0.75 16.537 0.75 18.181 1.658 19.288C1.82467 19.4907 2.00933 19.6753 2.212 19.842C3.32 20.75 4.962 20.75 8.25 20.75M4.75 5.75H12.75M4.75 9.75H8.75"
+                      stroke="blue"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M15.75 17.25L14.25 16.7V14.25M9.75 16.25C9.75 16.8409 9.8664 17.4261 10.0925 17.9721C10.3187 18.518 10.6502 19.0141 11.068 19.432C11.4859 19.8498 11.982 20.1813 12.5279 20.4075C13.0739 20.6336 13.6591 20.75 14.25 20.75C14.8409 20.75 15.4261 20.6336 15.9721 20.4075C16.518 20.1813 17.0141 19.8498 17.432 19.432C17.8498 19.0141 18.1813 18.518 18.4075 17.9721C18.6336 17.4261 18.75 16.8409 18.75 16.25C18.75 15.0565 18.2759 13.9119 17.432 13.068C16.5881 12.2241 15.4435 11.75 14.25 11.75C13.0565 11.75 11.9119 12.2241 11.068 13.068C10.2241 13.9119 9.75 15.0565 9.75 16.25Z"
+                      stroke="blue"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
                 </div>
                 <div>
                   <p className="font-medium text-slate-900 dark:text-slate-100">
@@ -181,7 +201,7 @@ export default function Transaction() {
                   <p className="text-sm text-slate-500 dark:text-slate-400">
                     {new Date(item.transaction_at).toISOString().split("T")[0]}{" "}
                     *{" "}
-                    {new Date(item.transaction_at).toLocaleTimeString("en-US", {
+                    {new Date(item.transaction_at).toLocaleTimeString("id-ID", {
                       hour: "2-digit",
                       minute: "2-digit",
                       hour12: false,
@@ -190,15 +210,9 @@ export default function Transaction() {
                 </div>
               </div>
               <div className="text-right">
-                <p
-                  className={`font-semibold ${
-                    item.type === "income"
-                      ? "text-green-600 dark:text-green-400"
-                      : "text-red-600 dark:text-red-400"
-                  }`}
-                >
-                  {item.type === "income" ? "+" : "-"}Rp{" "}
-                  {item.amount.toLocaleString("id-ID")}
+                <p className={`font-semibold text-blue-600 dark:text-blue-400`}>
+                  {/* {item.type === "income" ? "+" : "-"}Rp{" "} */}
+                  {formatCurrency(item?.amount)}
                 </p>
               </div>
             </div>
@@ -220,7 +234,7 @@ export default function Transaction() {
       </div>
 
       {/* Filter Buttons */}
-      <div className="flex gap-2 mb-6">
+      {/* <div className="flex gap-2 mb-6">
         {filterButton.map((item) => (
           <button
             key={item.type}
@@ -234,7 +248,7 @@ export default function Transaction() {
             {item.name}
           </button>
         ))}
-      </div>
+      </div> */}
 
       <div className="mb-6">
         <SearchInput

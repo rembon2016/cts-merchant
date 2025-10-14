@@ -1,4 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useThemeStore } from "./store/themeStore";
+import { ProtectedRoute, PublicRoute } from "./components/ProtectedRoute";
+import { useAuthStore } from "./store/authStore";
+import { useEffect } from "react";
+import { useRegisterSW } from "virtual:pwa-register/react";
 import MainLayout from "./layouts/MainLayout";
 import Home from "./pages/Home";
 import Transaction from "./pages/Transaction";
@@ -11,19 +16,15 @@ import Register from "./pages/Register";
 import Notification from "./pages/Notification";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
-import Payment from "./pages/Payment";
-import { useThemeStore } from "./store/themeStore";
-import { ProtectedRoute, PublicRoute } from "./components/ProtectedRoute";
-import { useAuthStore } from "./store/authStore";
-import { useEffect } from "react";
-import { useRegisterSW } from "virtual:pwa-register/react";
 import EditProfile from "./pages/EditProfile";
 import EditMerchant from "./pages/EditMerchant";
+import DetailProduct from "./pages/ProductDetail";
+import Invoice from "./pages/Invoice";
+import Order from "./pages/Order";
 
 function App() {
   const { isDark } = useThemeStore();
-  const { startAutoLogoutTimer, isLoggedIn, checkTokenExpiry, logout } =
-    useAuthStore();
+  const { isLoggedIn, setupAutoLogout, clearAutoLogoutTimer } = useAuthStore();
 
   const {
     needRefresh: [needRefresh],
@@ -38,15 +39,16 @@ function App() {
   });
 
   useEffect(() => {
-    // Cek apakah sudah expired saat aplikasi dimuat
+    // Setup auto logout saat app pertama kali load
     if (isLoggedIn) {
-      if (checkTokenExpiry()) {
-        logout();
-      } else {
-        startAutoLogoutTimer();
-      }
+      setupAutoLogout();
     }
-  }, [isLoggedIn]);
+
+    // Cleanup saat component unmount
+    return () => {
+      clearAutoLogoutTimer();
+    };
+  }, [isLoggedIn, setupAutoLogout, clearAutoLogoutTimer]);
 
   return (
     <div className={isDark ? "dark" : ""}>
@@ -148,14 +150,6 @@ function App() {
               }
             />
             <Route
-              path="payment"
-              element={
-                <ProtectedRoute>
-                  <Payment />
-                </ProtectedRoute>
-              }
-            />
-            <Route
               path="account/edit/:id"
               element={
                 <ProtectedRoute>
@@ -168,6 +162,30 @@ function App() {
               element={
                 <ProtectedRoute>
                   <EditMerchant />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="product/:id"
+              element={
+                <ProtectedRoute>
+                  <DetailProduct />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="invoice"
+              element={
+                <ProtectedRoute>
+                  <Invoice />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="order/:id"
+              element={
+                <ProtectedRoute>
+                  <Order />
                 </ProtectedRoute>
               }
             />
