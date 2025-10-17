@@ -1,4 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useThemeStore } from "./store/themeStore";
+import { ProtectedRoute, PublicRoute } from "./components/ProtectedRoute";
+import { useAuthStore } from "./store/authStore";
+import { useEffect } from "react";
+import { useRegisterSW } from "virtual:pwa-register/react";
 import MainLayout from "./layouts/MainLayout";
 import Home from "./pages/Home";
 import Transaction from "./pages/Transaction";
@@ -11,14 +16,9 @@ import Register from "./pages/Register";
 import Notification from "./pages/Notification";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
-import Payment from "./pages/Payment";
-import { useThemeStore } from "./store/themeStore";
-import { ProtectedRoute, PublicRoute } from "./components/ProtectedRoute";
-import { useAuthStore } from "./store/authStore";
-import { useEffect } from "react";
-import { useRegisterSW } from "virtual:pwa-register/react";
 import EditProfile from "./pages/EditProfile";
 import EditMerchant from "./pages/EditMerchant";
+import DetailProduct from "./pages/ProductDetail";
 
 function App() {
   const { isDark } = useThemeStore();
@@ -148,14 +148,6 @@ function App() {
               }
             />
             <Route
-              path="payment"
-              element={
-                <ProtectedRoute>
-                  <Payment />
-                </ProtectedRoute>
-              }
-            />
-            <Route
               path="account/edit/:id"
               element={
                 <ProtectedRoute>
@@ -168,6 +160,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <EditMerchant />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="product/:id"
+              element={
+                <ProtectedRoute>
+                  <DetailProduct />
                 </ProtectedRoute>
               }
             />

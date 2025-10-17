@@ -5,6 +5,9 @@ import { useDebounce } from "../hooks/useDebounce";
 import { useCartStore } from "../store/cartStore";
 import VariantModal from "./VariantModal";
 import CustomLoading from "./CustomLoading";
+import { useNavigate } from "react-router-dom";
+import { formatCurrency } from "../helper/currency";
+import SearchInput from "./SearchInput";
 
 const MENU = [
   {
@@ -53,6 +56,8 @@ export default function POS() {
 
   // Debounce search input
   const debouncedSearch = useDebounce(search, 500);
+
+  const navigate = useNavigate();
 
   // Fetch categories on component mount
   useEffect(() => {
@@ -118,14 +123,14 @@ export default function POS() {
     }
   };
 
+  // Navigate to product detail page
+  const goToProductDetail = (productId) => {
+    navigate(`/product/${productId}`);
+  };
+
   // Handle variant selection
   const handleVariantSelect = ({ product, variant, quantity }) => {
     addToCart(product, variant, quantity);
-  };
-
-  // Format price
-  const formatPrice = (price) => {
-    return parseFloat(price).toLocaleString("id-ID");
   };
 
   const renderCategories = useMemo(() => {
@@ -220,7 +225,7 @@ export default function POS() {
               className={`border rounded-lg shadow hover:shadow-lg transition flex flex-col items-start ${
                 isOutOfStock ? "opacity-50" : "cursor-pointer"
               }`}
-              onClick={() => !isOutOfStock && handleProductClick(product)}
+              onClick={() => !isOutOfStock && goToProductDetail(product.id)}
             >
               <div className="relative w-full">
                 <img
@@ -249,59 +254,45 @@ export default function POS() {
                 )}
               </div>
               <div className="p-4 w-full">
-                <div className="font-bold text-lg">{product.name}</div>
+                <div className="font-bold text-lg">
+                  {product.name.length > 10
+                    ? `${product.name.slice(0, 10)}...`
+                    : product.name}
+                </div>
                 <div className="font-normal text-sm mb-2 text-gray-600 dark:text-gray-400">
                   {product.description}
                 </div>
                 <div className="text-slate-600 dark:text-slate-300">
-                  <span>Rp.</span>
+                  {/* <span>Rp.</span> */}
                   <span className="font-bold text-2xl">
-                    {formatPrice(productPrice)}
+                    {formatCurrency(productPrice)}
                   </span>
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 mb-3">
                   Stok: {productStock}
                 </div>
-                <div className="mt-3 flex gap-2 justify-between items-center">
-                  <button
-                    className={`w-full h-12 py-2 rounded-full transition-colors ${
-                      isOutOfStock
-                        ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-                        : "bg-[var(--c-primary)] text-white hover:bg-blue-700"
-                    }`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!isOutOfStock) {
-                        handleProductClick(product);
-                      }
-                    }}
-                    disabled={isOutOfStock}
-                  >
-                    {isOutOfStock ? "Habis" : "Beli"}
-                  </button>
-                  <button
-                    className={`w-20 h-12 rounded-full border-2 flex justify-center items-center transition-colors ${
-                      isOutOfStock
-                        ? "border-gray-400 cursor-not-allowed"
-                        : "border-slate-600 dark:border-slate-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    }`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!isOutOfStock) {
-                        handleProductClick(product);
-                      }
-                    }}
-                    disabled={isOutOfStock}
-                  >
-                    <img
-                      src={`${
-                        isDark ? "/icons/cart-white.svg" : "/icons/cart.svg"
-                      }`}
-                      alt="Add to cart"
-                      className="w-8 h-8"
-                    />
-                  </button>
-                </div>
+                <button
+                  className={`w-full flex justify-center items-center gap-1 h-12 py-2 rounded-full transition-colors ${
+                    isOutOfStock
+                      ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                      : "bg-[var(--c-primary)] text-white hover:bg-blue-700"
+                  } text-[1rem]`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!isOutOfStock) {
+                      handleProductClick(product);
+                    }
+                  }}
+                  disabled={isOutOfStock}
+                >
+                  {isOutOfStock ? "Habis" : "Keranjang"}
+
+                  <img
+                    src={`/icons/cart-white.svg`}
+                    alt="Add to cart"
+                    className="w-6 h-6"
+                  />
+                </button>
               </div>
             </div>
           );
@@ -330,18 +321,12 @@ export default function POS() {
       </div>
       {/* Sub Kategori */}
       {renderCategories}
-      {/* Pencarian */}
-      <div className="flex gap-2 mb-6">
-        <input
-          type="text"
-          placeholder="Cari produk..."
+      <div className="mb-6">
+        <SearchInput
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="border rounded px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          onChange={(value) => setSearch(value)}
+          placeholder="Cari produk..."
         />
-        <button className="px-4 py-2 bg-[var(--c-primary)] text-white rounded hover:bg-[var(--c-primary)] transition">
-          Cari
-        </button>
       </div>
       {/* Daftar Produk */}
       {renderProducts}

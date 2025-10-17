@@ -177,32 +177,40 @@ const usePosStore = create((set, get) => ({
   },
 
   // Get product stock
-  getProductStock: (product, skuId = null) => {
+  getProductStock: (product, skuId = null, isFromDetail = false) => {
     const branchId = sessionStorage.getItem("branchActive");
     if (!branchId) return 0;
 
-    if (product.is_variant && skuId) {
-      const stock = product.product_stocks?.find(
-        (s) => s.branch_id === parseInt(branchId) && s.product_sku_id === skuId
+    if (!isFromDetail && product?.is_variant && skuId) {
+      const stock = product?.product_stocks?.find(
+        (s) =>
+          s?.branch_id === parseInt(branchId) && s?.product_sku_id === skuId
       );
       return stock ? stock.qty : 0;
     }
 
-    const stock = product.product_stocks?.find(
-      (s) => s.branch_id === parseInt(branchId) && !s.product_sku_id
-    );
-    return stock ? stock.qty : 0;
+    if (isFromDetail) {
+      const stock = product?.stocks?.find(
+        (s) => s?.branch_id === parseInt(branchId)
+      );
+      return stock ? stock?.qty : 0;
+    } else {
+      const stock = product?.product_stocks?.find(
+        (s) => s?.branch_id === parseInt(branchId) && !s?.product_sku_id
+      );
+      return stock ? stock?.qty : 0;
+    }
   },
 
   // Get total variant stock for products with variants
   getTotalVariantStock: (product) => {
     const branchId = sessionStorage.getItem("branchActive");
-    if (!branchId || !product.is_variant) return 0;
+    if (!branchId || !product?.is_variant) return 0;
 
     const totalStock =
-      product.product_stocks
-        ?.filter((s) => s.branch_id === parseInt(branchId))
-        ?.reduce((total, stock) => total + (stock.qty || 0), 0) || 0;
+      product?.product_stocks
+        ?.filter((s) => s?.branch_id === parseInt(branchId))
+        ?.reduce((total, stock) => total + (stock?.qty || 0), 0) || 0;
 
     return totalStock;
   },

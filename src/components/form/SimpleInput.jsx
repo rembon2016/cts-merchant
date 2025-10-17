@@ -6,6 +6,8 @@ SimpleInput.propTypes = {
   name: PropTypes.string,
   value: PropTypes.string,
   errors: PropTypes.string,
+  min: PropTypes.number,
+  max: PropTypes.number,
   handleChange: PropTypes.func,
   placeholder: PropTypes.string,
   disabled: PropTypes.bool,
@@ -24,9 +26,11 @@ export default function SimpleInput({
   disabled,
   isSelectBox = false,
   selectBoxData,
+  min,
+  max,
 }) {
   const inputClassName = `w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500  ${
-    disabled ? "bg-gray-200" : "bg-white dark:bg-slate-600"
+    disabled ? "bg-gray-200 dark:bg-slate-600" : "bg-white dark:bg-slate-600"
   } dark:text-slate-100 font-semibold`;
 
   return (
@@ -46,6 +50,8 @@ export default function SimpleInput({
           className={inputClassName}
           placeholder={placeholder}
           disabled={disabled}
+          min={min}
+          max={max}
           {...(type === "file" && { accept: "image/*, .pdf" })}
         />
       )}

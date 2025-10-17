@@ -60,7 +60,20 @@ const useFetchDataStore = create((set, get) => ({
         }
       }, TIMEOUT_DURATION);
 
+      // Ensure requests use CORS mode by default and provide helpful headers.
+      // Note: This does not bypass server-side CORS restrictions — the backend
+      // must allow the requesting origin. If you still see CORS errors, add a
+      // dev proxy in vite.config.js or enable CORS on the backend (examples
+      // provided in the repo docs or below).
       const response = await fetch(url, {
+        mode: options.mode || "cors",
+        credentials: options.credentials || "same-origin",
+        headers: {
+          Accept: "application/json",
+          "Content-Type":
+            options.headers?.["Content-Type"] || "application/json",
+          ...(options.headers || {}),
+        },
         ...options,
         signal: newAbortController.signal,
       });
@@ -109,8 +122,19 @@ const useFetchDataStore = create((set, get) => ({
 
       set({ data: dataToStore });
     } catch (err) {
+      // Distinguish common network / CORS errors
       if (err.name === "AbortError") {
         set({ error: "Request timed out after 10 seconds" });
+      } else if (
+        err instanceof TypeError &&
+        (err.message === "Failed to fetch" ||
+          err.message === "NetworkError when attempting to fetch resource.")
+      ) {
+        // Likely a network error or blocked by CORS
+        set({
+          error:
+            "Network error or cross-origin request blocked (CORS). Check backend CORS headers or configure a dev proxy.",
+        });
       } else {
         set({ error: err.message });
       }

@@ -186,14 +186,14 @@ const BottomSheet = ({ isOpen, onClose, onItemClick }) => {
   return (
     <>
       {/* Overlay */}
-      <div className="fixed inset-0 z-40 overlay-bg" onClick={handleClose} />
+      <button className="fixed inset-0 z-40" onClick={handleClose} />
 
       {/* Bottom Sheet */}
-      <div className="fixed inset-x-0 bottom-0 z-50 pointer-events-none">
+      <div className="fixed inset-x-0 bottom-[3.2rem] pointer-events-none z-10">
         <div className="mx-auto max-w-sm w-full mb-4 px-4 pointer-events-auto">
           <div
             ref={sheetRef}
-            className="rounded-t-3xl bg-white dark:bg-slate-700 shadow-soft p-4 sheet"
+            className="rounded-t-3xl bg-white dark:bg-slate-700 shadow-soft p-4 h-[300px] sheet"
             style={{
               borderTopLeftRadius: "1.25rem",
               borderTopRightRadius: "1.25rem",

@@ -271,6 +271,13 @@ export const useAuthStore = create((set, get) => ({
         isLogout: true,
       });
 
+      if (response.ok) {
+        setTimeout(() => {
+          set({ isLogout: false });
+        }, 3000);
+        return () => clearTimeout();
+      }
+
       return { success: true };
     } catch (error) {
       set({
