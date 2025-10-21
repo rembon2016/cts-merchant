@@ -17,11 +17,7 @@ export default function Checkout() {
     setSelectPaymentMethod,
   } = useCheckoutStore();
   const { checkVoucherDiscount, isLoading, error } = useCartStore();
-  const {
-    getPosSettings,
-    posSettingsData,
-    isLoading: loadingPos,
-  } = useCheckoutStore();
+  const { getPosSettings, posSettingsData } = useCheckoutStore();
 
   const checkTax = async () => await getPosSettings();
 
@@ -53,13 +49,13 @@ export default function Checkout() {
   const handleChange = (e) => setSelectPaymentMethod(e.target.value);
 
   const renderElementsDetailTransaction = useMemo(() => {
-    if (loadingPos) {
-      return (
-        <div className="w-full text-center">
-          <CustomLoading />
-        </div>
-      );
-    }
+    // if (loadingPos) {
+    //   return (
+    //     <div className="w-full text-center">
+    //       <CustomLoading />
+    //     </div>
+    //   );
+    // }
 
     return (
       <div className="bg-white p-4 rounded-xl mb-24">
@@ -118,7 +114,7 @@ export default function Checkout() {
         </div>
       </div>
     );
-  }, [loadingPos, posSettingsData, checkoutPrice, TOTAL]);
+  }, [posSettingsData, checkoutPrice, TOTAL]);
 
   const inputClassName =
     "w-full p-4 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ring-1 ring-slate-600 dark:text-slate-200";
