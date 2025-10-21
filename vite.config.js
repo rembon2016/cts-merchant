@@ -57,14 +57,5 @@ export default defineConfig({
   ],
   server: {
     port: 3000,
-    // server: {
-    //   proxy: {
-    //     "/api": {
-    //       target: "https://pos.ctsolution.id/api",
-    //       changeOrigin: true,
-    //       rewrite: (p) => p.replace(/^\/api/, ""),
-    //     },
-    //   },
-    // },
   },
 });
