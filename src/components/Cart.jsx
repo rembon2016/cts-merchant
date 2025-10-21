@@ -42,12 +42,16 @@ const Cart = () => {
     const itemId = Number(checkbox.id);
     const itemName = checkbox.dataset.name;
     const itemImage = checkbox.dataset.image;
+    const itemQuantity = checkbox.dataset.quantity;
+    const itemSku = checkbox.dataset.sku;
 
     if (isChecked) {
       const newItem = {
-        id: itemId,
+        product_id: itemId,
         name: itemName,
         image: itemImage,
+        product_sku_id: Number.parseInt(itemSku),
+        quantity: itemQuantity,
         price,
         subtotal,
       };
@@ -76,17 +80,23 @@ const Cart = () => {
     const isChecked = checkbox.checked;
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
 
-    checkboxes.forEach((checkbox) => {
+    // checkboxes.forEach((checkbox) => {
+    //   checkbox.checked = isChecked;
+    // });
+
+    for (const checkbox of checkboxes) {
       checkbox.checked = isChecked;
-    });
+    }
 
     if (isChecked) {
       const allItems = cart?.data?.items?.map((item) => ({
-        id: item.product?.id ?? String(item.id),
+        product_id: item.product?.id ?? String(item.id),
         name: item.product.name,
         price: item.price,
         subtotal: item.subtotal,
         image: item.product.image,
+        sku: Number.parseInt(item.product.sku),
+        quantity: item.quantity,
       }));
       setSelectedCart(allItems);
     } else {
@@ -229,6 +239,8 @@ const Cart = () => {
                   data-subtotal={cartItem?.subtotal}
                   data-name={cartItem?.product?.name}
                   data-image={cartItem?.product?.image}
+                  data-sku={cartItem?.product?.sku}
+                  data-quantity={cartItem?.quantity}
                   onChange={handleChecked}
                   className="cursor-pointer"
                 />
@@ -281,7 +293,9 @@ const Cart = () => {
 
                         // add new selected item
                         const newItem = {
-                          id: pid,
+                          product_id: pid,
+                          product_sku_id: cartItem?.product_sku_id,
+                          quantity: newQty,
                           name: cartItem?.product?.name || cartItem?.name || "",
                           image:
                             cartItem?.product?.image || cartItem?.image || "",

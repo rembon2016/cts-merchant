@@ -1,10 +1,20 @@
 import { useThemeStore } from "../store/themeStore";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
+import { useTransactionStore } from "../store/transactionStore";
+import { useEffect, useMemo } from "react";
+import CustomLoading from "../components/CustomLoading";
 
 const Profile = () => {
-  const { user, logout, isLoading } = useAuthStore();
   const { isDark, toggleTheme } = useThemeStore();
+  const { user, logout, isLoading } = useAuthStore();
+  const {
+    total,
+    getListTransactions,
+    isLoading: loadTransaction,
+  } = useTransactionStore();
+
+  const pathname = globalThis.location.pathname;
 
   const menuItems = [
     {
@@ -91,6 +101,42 @@ const Profile = () => {
 
   const userStatus = user?.business_account?.status;
 
+  const renderStats = useMemo(() => {
+    if (loadTransaction) {
+      return <CustomLoading />;
+    }
+
+    return (
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600">
+          <div className="text-center">
+            <p className="text-2xl font-bold text-[var(--c-primary)] dark:text-slate-200">
+              {total}
+            </p>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Total Transaksi
+            </p>
+          </div>
+        </div>
+        <div className="bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600">
+          <div className="text-center">
+            <p className="text-2xl font-bold text-[var(--c-primary)] dark:text-slate-200">
+              4.8
+            </p>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Rating Merchant
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }, [total, loadTransaction]);
+
+  useEffect(() => {
+    if (!pathname.includes("/profile")) return;
+    getListTransactions();
+  }, [pathname]);
+
   return (
     <div className="px-4 py-6">
       {/* Profile Header */}
@@ -119,28 +165,7 @@ const Profile = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        <div className="bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600">
-          <div className="text-center">
-            <p className="text-2xl font-bold text-[var(--c-primary)] dark:text-slate-200">
-              156
-            </p>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Total Transaksi
-            </p>
-          </div>
-        </div>
-        <div className="bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600">
-          <div className="text-center">
-            <p className="text-2xl font-bold text-[var(--c-primary)] dark:text-slate-200">
-              4.8
-            </p>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Rating Merchant
-            </p>
-          </div>
-        </div>
-      </div>
+      {renderStats}
 
       {/* Theme Toggle */}
       <div className="bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600 mb-4">
