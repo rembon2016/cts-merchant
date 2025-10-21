@@ -1,10 +1,20 @@
 import { useThemeStore } from "../store/themeStore";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
+import { useTransactionStore } from "../store/transactionStore";
+import { useEffect, useMemo } from "react";
+import CustomLoading from "../components/CustomLoading";
 
 const Profile = () => {
-  const { user, logout, isLoading } = useAuthStore();
   const { isDark, toggleTheme } = useThemeStore();
+  const { user, logout, isLoading } = useAuthStore();
+  const {
+    total,
+    getListTransactions,
+    isLoading: loadTransaction,
+  } = useTransactionStore();
+
+  const pathname = globalThis.location.pathname;
 
   const menuItems = [
     {
@@ -91,150 +101,165 @@ const Profile = () => {
 
   const userStatus = user?.business_account?.status;
 
+  const renderElements = useMemo(() => {
+    if (loadTransaction) {
+      return <CustomLoading />;
+    }
+
+    return (
+      <>
+        <div className="bg-white dark:bg-slate-700 rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-600 mb-6">
+          <div className="flex items-center gap-4">
+            {/* <div className="size-16 rounded-full bg-[var(--c-primary)] text-white grid place-items-center text-2xl font-bold">
+            {user.avatar}
+          </div> */}
+            <div>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+                {user.name}
+              </h2>
+              <p className="text-slate-600 dark:text-slate-400">
+                Merchant Premium
+              </p>
+              <div className="flex items-center gap-2 mt-2">
+                <div className={`size-2 rounded-full bg-green-500`} />
+                <span
+                  className={`text-sm text-green-600 dark:text-green-400 font-medium`}
+                >
+                  {userStatus || "pending"}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <div className="bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-[var(--c-primary)] dark:text-slate-200">
+                {total}
+              </p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Total Transaksi
+              </p>
+            </div>
+          </div>
+          <div className="bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-[var(--c-primary)] dark:text-slate-200">
+                4.8
+              </p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Rating Merchant
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600 mb-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="size-10 rounded-xl bg-[var(--c-accent)] grid place-items-center">
+                {isDark ? (
+                  <svg
+                    className="w-5 h-5 text-slate-700 dark:text-slate-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    className="w-5 h-5 text-slate-700 dark:text-slate-300"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                    />
+                  </svg>
+                )}
+              </div>
+              <div>
+                <p className="font-medium dark:text-slate-100 text-slatte-600">
+                  {isDark ? "Mode Gelap" : "Mode Terang"}
+                </p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  Ubah tampilan aplikasi
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={toggleTheme}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                isDark ? "bg-[var(--c-accent)]" : "bg-slate-200"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  isDark ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
+        </div>
+
+        {/* Menu Items */}
+        <div className="space-y-2">
+          {menuItems.map((item) => (
+            <Link to={item.path} key={item.id}>
+              <button
+                key={item.id}
+                // onClick={() => handleMenuClick(item.id)}
+                className="w-full bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors mb-4"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="size-10 rounded-xl bg-[var(--c-accent)] grid place-items-center text-slate-700 dark:text-slate-600">
+                      {item.icon}
+                    </div>
+                    <span className="font-medium text-slate-900 dark:text-slate-100">
+                      {item.label}
+                    </span>
+                  </div>
+                </div>
+              </button>
+            </Link>
+          ))}
+        </div>
+
+        {/* Logout Button */}
+        <div className="mt-6">
+          <button
+            className="w-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-2xl p-4 font-medium hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+            onClick={() => handleLogout()}
+            disabled={isLoading}
+          >
+            {isLoading ? "Loading..." : "Keluar"}
+          </button>
+        </div>
+      </>
+    );
+  }, [total, loadTransaction, isLoading]);
+
+  useEffect(() => {
+    if (!pathname.includes("/profile")) return;
+    getListTransactions();
+  }, [pathname]);
+
   return (
     <div className="px-4 py-6">
       {/* Profile Header */}
-      <div className="bg-white dark:bg-slate-700 rounded-3xl p-6 shadow-soft border border-slate-100 dark:border-slate-600 mb-6">
-        <div className="flex items-center gap-4">
-          {/* <div className="size-16 rounded-full bg-[var(--c-primary)] text-white grid place-items-center text-2xl font-bold">
-            {user.avatar}
-          </div> */}
-          <div>
-            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
-              {user.name}
-            </h2>
-            <p className="text-slate-600 dark:text-slate-400">
-              Merchant Premium
-            </p>
-            <div className="flex items-center gap-2 mt-2">
-              <div className={`size-2 rounded-full bg-green-500`} />
-              <span
-                className={`text-sm text-green-600 dark:text-green-400 font-medium`}
-              >
-                {userStatus || "pending"}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        <div className="bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600">
-          <div className="text-center">
-            <p className="text-2xl font-bold text-[var(--c-primary)] dark:text-slate-200">
-              156
-            </p>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Total Transaksi
-            </p>
-          </div>
-        </div>
-        <div className="bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600">
-          <div className="text-center">
-            <p className="text-2xl font-bold text-[var(--c-primary)] dark:text-slate-200">
-              4.8
-            </p>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Rating Merchant
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Theme Toggle */}
-      <div className="bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600 mb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-[var(--c-accent)] grid place-items-center">
-              {isDark ? (
-                <svg
-                  className="w-5 h-5 text-slate-700 dark:text-slate-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  className="w-5 h-5 text-slate-700 dark:text-slate-300"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                  />
-                </svg>
-              )}
-            </div>
-            <div>
-              <p className="font-medium dark:text-slate-100 text-slatte-600">
-                {isDark ? "Mode Gelap" : "Mode Terang"}
-              </p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                Ubah tampilan aplikasi
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={toggleTheme}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              isDark ? "bg-[var(--c-accent)]" : "bg-slate-200"
-            }`}
-          >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                isDark ? "translate-x-6" : "translate-x-1"
-              }`}
-            />
-          </button>
-        </div>
-      </div>
-
-      {/* Menu Items */}
-      <div className="space-y-2">
-        {menuItems.map((item) => (
-          <Link to={item.path} key={item.id}>
-            <button
-              key={item.id}
-              // onClick={() => handleMenuClick(item.id)}
-              className="w-full bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors mb-4"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="size-10 rounded-xl bg-[var(--c-accent)] grid place-items-center text-slate-700 dark:text-slate-600">
-                    {item.icon}
-                  </div>
-                  <span className="font-medium text-slate-900 dark:text-slate-100">
-                    {item.label}
-                  </span>
-                </div>
-              </div>
-            </button>
-          </Link>
-        ))}
-      </div>
-
-      {/* Logout Button */}
-      <div className="mt-6">
-        <button
-          className="w-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-2xl p-4 font-medium hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
-          onClick={() => handleLogout()}
-          disabled={isLoading}
-        >
-          {isLoading ? "Loading..." : "Keluar"}
-        </button>
-      </div>
+      {renderElements}
     </div>
   );
 };
