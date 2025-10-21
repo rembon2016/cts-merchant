@@ -247,7 +247,7 @@ const Profile = () => {
         </div>
       </>
     );
-  }, [total, loadTransaction]);
+  }, [total, loadTransaction, isLoading]);
 
   useEffect(() => {
     if (!pathname.includes("/profile")) return;
