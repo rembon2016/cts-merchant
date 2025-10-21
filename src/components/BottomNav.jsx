@@ -3,11 +3,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useCartStore } from "../store/cartStore";
 import { useCheckoutStore } from "../store/checkoutStore";
 import SimpleModal from "./modal/SimpleModal";
+import { formatCurrency } from "../helper/currency";
 
 const BottomNav = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
-  const { savePendingOrder } = useCheckoutStore();
+  const { saveOrder, selectPaymentMethod } = useCheckoutStore();
   const { selectedCart, cart, setSelectedCart } = useCartStore();
   const navigation = useNavigate();
   const pathname = location.pathname;
@@ -17,30 +18,11 @@ const BottomNav = () => {
   const [pendingPath, setPendingPath] = useState(null);
 
   const totalPrice = selectedCart?.reduce(
-    (a, b) => a + parseFloat(b.subtotal),
+    (a, b) => a + Number.parseFloat(b.subtotal),
     0
   );
 
-  const processData = {
-    branch_id: sessionStorage.getItem("branchActive"),
-    user_id: sessionStorage.getItem("userId"),
-    sub_total: selectedCart?.subtotal,
-    customer_id: 0,
-    discount_id: 0,
-    tax_amount: 0,
-    discount_amount: 0,
-    items: [
-      {
-        product_id: 0,
-        product_sku_id: 0,
-        quantity: 1,
-        price: 0,
-        notes: "",
-      },
-    ],
-  };
-
-  const showButtonFromPath = ["/cart", "/checkout", "/payment"];
+  const showButtonFromPath = ["/cart", "/checkout"];
 
   const navItems = [
     {
@@ -140,12 +122,6 @@ const BottomNav = () => {
     },
   ];
 
-  let Rupiah = new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    minimumFractionDigits: 0,
-  });
-
   const handleSubmit = () => {
     if (pathname === "/cart") {
       processCart();
@@ -176,18 +152,39 @@ const BottomNav = () => {
     setLoading(true);
 
     const checkoutValue = {
+      branch_id: sessionStorage.getItem("branchActive"),
+      user_id: sessionStorage.getItem("userId"),
       sub_total: totalPrice,
       tax_amount: 0,
       discount_amount: 0,
-      discount_id: 0,
-      customer_id: 0,
-      items: JSON.parse(getCart),
+      payment_method_id: selectPaymentMethod,
+      payment_amount: totalPrice,
+      discount_id: null,
+      customer_id: null,
+      ...JSON.parse(getCart),
     };
 
-    sessionStorage.setItem("cart", JSON.stringify(checkoutValue));
-    setLoading(false);
+    proccessOrder(checkoutValue);
   };
-  const proccessOrder = async () => await savePendingOrder(processData);
+
+  const proccessOrder = async (dataCheckout) => {
+    try {
+      setLoading(true);
+      const response = await saveOrder(dataCheckout);
+
+      if (response?.success) {
+        navigation(`/order/${response?.data?.id}`, {
+          replace: true,
+        });
+      }
+
+      setLoading(false);
+      sessionStorage.removeItem("cart");
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
 
   const renderElements = useMemo(() => {
     const renderElementCart = () => {
@@ -214,7 +211,7 @@ const BottomNav = () => {
                   <div className="flex justify-between items-center">
                     <h3 className="font-medium text-xl">Total</h3>
                     <h3 className="font-bold text-xl">
-                      {Rupiah.format(totalPrice)}
+                      {formatCurrency(totalPrice)}
                     </h3>
                   </div>
                 )}

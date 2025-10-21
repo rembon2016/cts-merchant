@@ -8,10 +8,14 @@ import SimpleInput from "./form/SimpleInput";
 export default function Checkout() {
   const getCart = JSON.parse(sessionStorage.getItem("cart"));
   const [discountCode, setDiscountCode] = useState("");
-  const [selectedData, setSelectedData] = useState(null);
   // const [showExitModal, setShowExitModal] = useState(false);
 
-  const { paymentData, getPaymentMethods } = useCheckoutStore();
+  const {
+    paymentData,
+    getPaymentMethods,
+    selectPaymentMethod,
+    setSelectPaymentMethod,
+  } = useCheckoutStore();
   const { checkVoucherDiscount, isLoading, error } = useCartStore();
   const {
     getPosSettings,
@@ -22,7 +26,7 @@ export default function Checkout() {
   const checkTax = async () => await getPosSettings();
 
   const checkoutPrice = getCart?.items?.reduce(
-    (a, b) => a + parseFloat(b.subtotal),
+    (a, b) => a + Number.parseFloat(b.subtotal),
     0
   );
 
@@ -32,73 +36,6 @@ export default function Checkout() {
     checkTax();
     getPaymentMethods();
   }, []);
-
-  // Navigation guard: show confirmation modal when user tries to leave checkout
-  // useEffect(() => {
-  //   const onPop = (e) => {
-  //     if (allowNavRef.current) return;
-  //     // prevent immediate navigation and show modal
-  //     e.preventDefault();
-  //     // re-push state so the user stays on this page
-  //     try {
-  //       window.history.pushState(null, "");
-  //     } catch (err) {
-  //       // ignore
-  //     }
-  //     setShowExitModal(true);
-  //   };
-
-  //   const onBeforeUnload = (e) => {
-  //     // show native prompt for refresh/close
-  //     e.preventDefault();
-  //     e.returnValue = "";
-  //     setShowExitModal(true);
-  //     return "";
-  //   };
-
-  //   onPopRef.current = onPop;
-  //   beforeUnloadRef.current = onBeforeUnload;
-
-  //   // push an extra history entry so back button triggers popstate
-  //   try {
-  //     window.history.pushState(null, "");
-  //   } catch (err) {
-  //     // ignore
-  //   }
-  //   window.addEventListener("popstate", onPopRef.current);
-  //   window.addEventListener("beforeunload", beforeUnloadRef.current);
-
-  //   return () => {
-  //     window.removeEventListener("popstate", onPopRef.current);
-  //     window.removeEventListener("beforeunload", beforeUnloadRef.current);
-  //   };
-  // }, []);
-
-  // const handleConfirmLeave = () => {
-  //   // allow navigation and remove session cart
-  //   allowNavRef.current = true;
-  //   try {
-  //     sessionStorage.removeItem("cart");
-  //   } catch (err) {
-  //     // ignore
-  //   }
-  //   setShowExitModal(false);
-  //   // cleanup listeners then navigate back (or to home if no history)
-  //   if (onPopRef.current)
-  //     window.removeEventListener("popstate", onPopRef.current);
-  //   if (beforeUnloadRef.current)
-  //     window.removeEventListener("beforeunload", beforeUnloadRef.current);
-  //   // Use native history.back() so the browser actually goes to the previous entry
-  //   // (react-router navigate(-1) may not behave as expected when we manipulated
-  //   // history with pushState). Fallback to navigate(-1) if needed.
-  //   if (window.history.length > 1) {
-  //     try {
-  //       window.history.back();
-  //     } catch (err) {
-  //       navigate(-1);
-  //     }
-  //   } else navigate("/");
-  // };
 
   // Tambahkan base URL untuk gambar
   const getImageUrl = (imagePath) => {
@@ -113,7 +50,7 @@ export default function Checkout() {
     await checkVoucherDiscount(discountCode);
   };
 
-  const handleChange = (e) => setSelectedData(e.target.value);
+  const handleChange = (e) => setSelectPaymentMethod(e.target.value);
 
   const renderElementsDetailTransaction = useMemo(() => {
     if (loadingPos) {
@@ -258,7 +195,7 @@ export default function Checkout() {
           label="Jenis Pembayaran"
           isSelectBox={true}
           selectBoxData={paymentData}
-          value={selectedData}
+          value={selectPaymentMethod}
           handleChange={handleChange}
           //   errors={errors.password}
           //   disabled={!isEditPassword}
