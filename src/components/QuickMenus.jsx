@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import IframeModal from "./IframeModal";
 import BottomSheet from "./BottomSheet";
+import { useNavigate } from "react-router-dom";
 
 const QuickMenus = () => {
   const [modalData, setModalData] = useState({
@@ -9,6 +10,7 @@ const QuickMenus = () => {
     title: "",
   });
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const navigate = useNavigate();
 
   const menuItems = [
     {
@@ -58,8 +60,8 @@ const QuickMenus = () => {
     {
       id: "pos",
       label: "POS",
-      url: "./pos.html",
-      target: "_blank",
+      url: "/pos",
+      // target: "_blank",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -84,6 +86,12 @@ const QuickMenus = () => {
   ];
 
   const handleMenuClick = (item) => {
+    // return;
+
+    if (item.url === "/pos") {
+      navigate(item.url, { replace: true });
+    }
+
     if (item.target === "_blank") {
       window.open(item.url, "_blank");
     } else {

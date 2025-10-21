@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useUserStore } from "../store/userStore";
+// import { useDashboardStore } from "../store/dashboardStore";
+import { formatCurrency } from "../helper/currency";
 
 const IncomeCard = () => {
+  // const [data] = useDashboardStore();
   const { income, updateIncomeAmount } = useUserStore();
   const [activeChip, setActiveChip] = useState("month");
   const [showPopover, setShowPopover] = useState(null);
@@ -70,7 +73,7 @@ const IncomeCard = () => {
 
           <div className="mt-4">
             <p className="text-4xl font-extrabold tracking-tight text-white">
-              Rp <span>{income.amount}</span>
+              <span>{formatCurrency(income.amount)}</span>
             </p>
             <p className="mt-2 text-sm text-slate-200/70">
               {income.lastUpdated}
