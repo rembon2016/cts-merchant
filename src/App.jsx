@@ -19,11 +19,12 @@ import Checkout from "./pages/Checkout";
 import EditProfile from "./pages/EditProfile";
 import EditMerchant from "./pages/EditMerchant";
 import DetailProduct from "./pages/ProductDetail";
+import Invoice from "./pages/Invoice";
+import Order from "./pages/Order";
 
 function App() {
   const { isDark } = useThemeStore();
-  const { startAutoLogoutTimer, isLoggedIn, checkTokenExpiry, logout } =
-    useAuthStore();
+  const { isLoggedIn, setupAutoLogout, clearAutoLogoutTimer } = useAuthStore();
 
   const {
     needRefresh: [needRefresh],
@@ -38,15 +39,16 @@ function App() {
   });
 
   useEffect(() => {
-    // Cek apakah sudah expired saat aplikasi dimuat
+    // Setup auto logout saat app pertama kali load
     if (isLoggedIn) {
-      if (checkTokenExpiry()) {
-        logout();
-      } else {
-        startAutoLogoutTimer();
-      }
+      setupAutoLogout();
     }
-  }, [isLoggedIn]);
+
+    // Cleanup saat component unmount
+    return () => {
+      clearAutoLogoutTimer();
+    };
+  }, [isLoggedIn, setupAutoLogout, clearAutoLogoutTimer]);
 
   return (
     <div className={isDark ? "dark" : ""}>
@@ -168,6 +170,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <DetailProduct />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="invoice"
+              element={
+                <ProtectedRoute>
+                  <Invoice />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="order/:id"
+              element={
+                <ProtectedRoute>
+                  <Order />
                 </ProtectedRoute>
               }
             />

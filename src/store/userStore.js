@@ -12,7 +12,7 @@ export const useUserStore = create((set) => ({
     email: userData?.email || "",
   },
   income: {
-    amount: "10.000",
+    amount: "10000",
     period: "Bulan ini",
     lastUpdated: "Diperbarui barusan",
   },
