@@ -237,6 +237,7 @@ export const useAuthStore = create((set, get) => ({
   handleAutoLogout: async () => {
     // Clear timers
     get().clearAutoLogoutTimer();
+    get().clearSession();
     get().logout();
 
     // Clear user data store
