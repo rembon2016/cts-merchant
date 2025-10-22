@@ -247,7 +247,7 @@ const Profile = () => {
         </div>
       </>
     );
-  }, [total, loadTransaction, isLoading]);
+  }, [total, loadTransaction, isLoading, getListTransactions]);
 
   useEffect(() => {
     if (!pathname.includes("/profile")) return;
@@ -256,8 +256,6 @@ const Profile = () => {
 
   return (
     <div className="px-4 py-6">
-      {/* Profile Header */}
-
       {/* Stats Cards */}
       {renderElements}
     </div>

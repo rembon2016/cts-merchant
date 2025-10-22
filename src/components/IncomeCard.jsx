@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUserStore } from "../store/userStore";
-// import { useDashboardStore } from "../store/dashboardStore";
+import { useTransactionStore } from "../store/transactionStore";
 import { formatCurrency } from "../helper/currency";
 
 const IncomeCard = () => {
-  // const [data] = useDashboardStore();
   const { income, updateIncomeAmount } = useUserStore();
+  const { getStatisticTransaction } = useTransactionStore();
   const [activeChip, setActiveChip] = useState("month");
   const [showPopover, setShowPopover] = useState(null);
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
@@ -59,6 +59,10 @@ const IncomeCard = () => {
     setDateRange({ from: "", to: "" });
     setShowPopover(null);
   };
+
+  useEffect(() => {
+    getStatisticTransaction();
+  }, []);
 
   return (
     <section className="px-4 mt-4">
