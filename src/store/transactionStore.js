@@ -5,12 +5,17 @@ const useTransactionStore = create((set, get) => ({
   isLoading: false,
   error: null,
   transactions: [],
+  statistic: [],
   currentPage: 1,
   total: 0,
+  headersAPIContent: {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  },
 
   // Get transactions from API with pagination and filters
   getListTransactions: async () => {
-    const token = sessionStorage.getItem("authPosToken");
+    const tokenPos = sessionStorage.getItem("authPosToken");
     const activeBranch = sessionStorage.getItem("branchActive");
 
     try {
@@ -23,8 +28,8 @@ const useTransactionStore = create((set, get) => ({
         {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
+            ...get().headersAPIContent,
+            Authorization: `Bearer ${tokenPos}`,
           },
         }
       );
@@ -67,8 +72,8 @@ const useTransactionStore = create((set, get) => ({
         {
           method: "GET",
           headers: {
+            ...get().headersAPIContent,
             Authorization: `Bearer ${tokenPos}`,
-            "Content-Type": "application/json",
           },
         }
       );
@@ -86,6 +91,38 @@ const useTransactionStore = create((set, get) => ({
         error: error.message || "Terjadi kesalahan saat mengambil produk",
       });
       return null;
+    }
+  },
+
+  // Get Statitstic Transaction
+  getStatisticTransaction: async (params) => {
+    const tokenPos = sessionStorage.getItem("authToken");
+
+    try {
+      set({ isLoading: true, error: null });
+
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_API_ROUTES
+        }/v1/merchant/transaction/summary?start_date=2021-01-01&end_date=2025-10-22`,
+        {
+          headers: {
+            ...get().headersAPIContent,
+            Authorization: `Bearer ${tokenPos}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        set({ isLoading: false, statistic: [], error: "Terjadi Kesalahan" });
+        throw new Error("Failed to fetch data");
+      }
+
+      const result = await response.json();
+
+      set({ isLoading: false, statistic: result.data, error: null });
+    } catch (error) {
+      set({ isLoading: false, statistic: [], error: error.message });
     }
   },
 }));

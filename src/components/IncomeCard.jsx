@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUserStore } from "../store/userStore";
-// import { useDashboardStore } from "../store/dashboardStore";
+import { useTransactionStore } from "../store/transactionStore";
 import { formatCurrency } from "../helper/currency";
 
 const IncomeCard = () => {
-  // const [data] = useDashboardStore();
   const { income, updateIncomeAmount } = useUserStore();
+  const { getStatisticTransaction, statistic } = useTransactionStore();
   const [activeChip, setActiveChip] = useState("month");
   const [showPopover, setShowPopover] = useState(null);
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
@@ -15,6 +15,8 @@ const IncomeCard = () => {
     { id: "year", label: "Tahun" },
     { id: "range", label: "Rentang" },
   ];
+
+  const AMOUNT = formatCurrency(Number.parseFloat(statistic.amount));
 
   const months = [
     "Jan",
@@ -60,6 +62,10 @@ const IncomeCard = () => {
     setShowPopover(null);
   };
 
+  useEffect(() => {
+    getStatisticTransaction();
+  }, []);
+
   return (
     <section className="px-4 mt-4">
       <div className="income-card bg-[var(--c-primary)] text-white p-5 rounded-3xl shadow-soft">
@@ -73,7 +79,7 @@ const IncomeCard = () => {
 
           <div className="mt-4">
             <p className="text-4xl font-extrabold tracking-tight text-white">
-              <span>{formatCurrency(income.amount)}</span>
+              <span>{AMOUNT}</span>
             </p>
             <p className="mt-2 text-sm text-slate-200/70">
               {income.lastUpdated}
