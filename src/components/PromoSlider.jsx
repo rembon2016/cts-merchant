@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import useFetchDataStore from "../store/fetchDataStore";
 import PromoDetailModal from "./PromoDetailModal";
 
+const ROOT_API = import.meta.env.VITE_API_ROUTES;
+
 const PromoSlider = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -21,17 +23,14 @@ const PromoSlider = () => {
   };
 
   const fetchBanner = (page = 1) => {
-    fetchData(
-      `${import.meta.env.VITE_API_ROUTES}/v1/merchant/information-banner`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
-          // "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      }
-    );
+    fetchData(`${ROOT_API}/v1/merchant/information-banner`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
+        // "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
   };
 
   const INTERVAL = 4200;

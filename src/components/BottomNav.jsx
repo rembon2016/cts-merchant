@@ -2,8 +2,8 @@ import { useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCartStore } from "../store/cartStore";
 import { useCheckoutStore } from "../store/checkoutStore";
-import SimpleModal from "./modal/SimpleModal";
 import { formatCurrency } from "../helper/currency";
+import SimpleModal from "./modal/SimpleModal";
 
 const BottomNav = () => {
   const location = useLocation();
@@ -17,10 +17,15 @@ const BottomNav = () => {
   const [showExitModal, setShowExitModal] = useState(false);
   const [pendingPath, setPendingPath] = useState(null);
 
+  const taxPrice = Number.parseFloat(sessionStorage.getItem("tax"));
+
   const totalPrice = selectedCart?.reduce(
     (a, b) => a + Number.parseFloat(b.subtotal),
     0
   );
+
+  const TOTAL_PAYMENT =
+    Number.parseFloat(totalPrice) + Number.parseFloat(taxPrice);
 
   const showButtonFromPath = ["/cart", "/checkout"];
 
@@ -154,11 +159,11 @@ const BottomNav = () => {
     const checkoutValue = {
       branch_id: sessionStorage.getItem("branchActive"),
       user_id: sessionStorage.getItem("userId"),
-      sub_total: totalPrice,
-      tax_amount: 0,
+      sub_total: Math.ceil(totalPrice),
+      tax_amount: Math.ceil(taxPrice),
       discount_amount: 0,
       payment_method_id: selectPaymentMethod,
-      payment_amount: totalPrice,
+      payment_amount: Math.ceil(TOTAL_PAYMENT),
       discount_id: null,
       customer_id: null,
       ...JSON.parse(getCart),

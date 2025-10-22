@@ -5,6 +5,8 @@ import useFetchDataStore from "../store/fetchDataStore";
 import SimpleAlert from "./alert/SimpleAlert";
 import SimpleInput from "./form/SimpleInput";
 
+const ROOT_API = import.meta.env.VITE_API_ROUTES;
+
 export default function EditProfile() {
   const { user: userInfo, logout } = useAuthStore();
   const { loading, success, error, fetchData } = useFetchDataStore();
@@ -78,7 +80,7 @@ export default function EditProfile() {
       // ...(formData.password && { password_confirmation: formData.password }),
     };
 
-    fetchData(`${import.meta.env.VITE_API_ROUTES}/v1/user/update`, {
+    fetchData(`${ROOT_API}/v1/user/update`, {
       method: "POST",
       headers: headersApi,
       body: JSON.stringify(updateData),

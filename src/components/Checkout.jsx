@@ -1,14 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useCartStore } from "../store/cartStore";
 import { useCheckoutStore } from "../store/checkoutStore";
 import { formatCurrency } from "../helper/currency";
-import CustomLoading from "./CustomLoading";
 import SimpleInput from "./form/SimpleInput";
 
 export default function Checkout() {
   const getCart = JSON.parse(sessionStorage.getItem("cart"));
   const [discountCode, setDiscountCode] = useState("");
-  // const [showExitModal, setShowExitModal] = useState(false);
+  const [discountAmount, setDiscountAmount] = useState(0);
 
   const {
     paymentData,
@@ -25,8 +24,35 @@ export default function Checkout() {
     (a, b) => a + Number.parseFloat(b.subtotal),
     0
   );
+  const DISCOUNT_AMOUNT = JSON.parse(sessionStorage.getItem("discount"));
+  const TOTAL = () => {
+    if (!checkoutPrice) return 0;
 
-  const TOTAL = checkoutPrice + checkoutPrice * (posSettingsData?.tax / 100);
+    let subTotal;
+    let taxPrice;
+    let totalPriceWithDiscount;
+
+    if (DISCOUNT_AMOUNT?.amount !== 0) {
+      subTotal = checkoutPrice + checkoutPrice * (posSettingsData?.tax / 100);
+
+      const getTotalDiscountPrice = () => {
+        if (DISCOUNT_AMOUNT?.type !== "percentage") return;
+        const countDiscountPrice = subTotal * (DISCOUNT_AMOUNT?.amount / 100);
+        return Math.ceil(countDiscountPrice);
+      };
+
+      totalPriceWithDiscount = Math.ceil(subTotal - getTotalDiscountPrice());
+    }
+
+    return { subTotal, taxPrice, totalPriceWithDiscount };
+  };
+
+  const getAndFormatTax = () => {
+    const tax = posSettingsData?.tax;
+    if ((!tax && tax !== 0) || Number.isNaN(Number(tax))) return "-";
+    sessionStorage.setItem("tax", TOTAL().taxPrice);
+    return Math.trunc(Number(tax));
+  };
 
   useEffect(() => {
     checkTax();
@@ -44,19 +70,18 @@ export default function Checkout() {
   const checkDiscountCode = async (e) => {
     e?.preventDefault();
     await checkVoucherDiscount(discountCode);
+    sessionStorage.setItem(
+      "discount",
+      JSON.stringify({
+        type: "percentage",
+        amount: "10",
+      })
+    );
   };
 
   const handleChange = (e) => setSelectPaymentMethod(e.target.value);
 
   const renderElementsDetailTransaction = useMemo(() => {
-    // if (loadingPos) {
-    //   return (
-    //     <div className="w-full text-center">
-    //       <CustomLoading />
-    //     </div>
-    //   );
-    // }
-
     return (
       <div className="bg-white p-4 rounded-xl mb-24">
         <h3 className="font-semibold text-gray-700 text-lg mb-5">
@@ -87,20 +112,14 @@ export default function Checkout() {
           <div className="flex justify-between items-center">
             <h4 className="font-semibold text-gray-500 text-md">Diskon</h4>
             <h4 className="font-bold text-gray-700 text-md">
-              {formatCurrency(0)}
+              {formatCurrency(Math.ceil(TOTAL().subTotal))}
             </h4>
           </div>
           <div className="flex justify-between items-center">
             <h4 className="font-semibold text-gray-500 text-md">Pajak</h4>
             <h4 className="font-bold text-gray-700 text-md">
-              {(() => {
-                const tax = posSettingsData?.tax;
-                const num = Number(tax);
-                if (!tax && tax !== 0) return "-";
-                if (Number.isNaN(num)) return "-";
-                return Math.trunc(num);
-              })()}
-              %
+              {formatCurrency(Math.ceil(TOTAL().taxPrice))} ({getAndFormatTax()}
+              %)
             </h4>
           </div>
           <div className="flex justify-between items-center border-t-2 border-gray-600 mt-2">
@@ -108,13 +127,13 @@ export default function Checkout() {
               Total Tagihan
             </h4>
             <h4 className="font-bold text-gray-700 text-md">
-              {formatCurrency(TOTAL)}
+              {formatCurrency(Math.ceil(TOTAL()?.totalPriceWithDiscount))}
             </h4>
           </div>
         </div>
       </div>
     );
-  }, [posSettingsData, checkoutPrice, TOTAL]);
+  }, [posSettingsData, checkoutPrice, DISCOUNT_AMOUNT]);
 
   const inputClassName =
     "w-full p-4 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ring-1 ring-slate-600 dark:text-slate-200";

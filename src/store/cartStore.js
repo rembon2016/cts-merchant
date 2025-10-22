@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { usePosStore } from "./posStore";
 
+const ROOT_API = import.meta.env.VITE_API_POS_ROUTES;
+
 const useCartStore = create((set, get) => ({
   cart: [],
   selectedCart: [],
@@ -26,7 +28,7 @@ const useCartStore = create((set, get) => ({
     quantity = 1,
     isFromDetail = false
   ) => {
-    const { getProductStock, getProductPrice } = usePosStore.getState();
+    const { getProductStock } = usePosStore.getState();
     const userId = sessionStorage.getItem("userId");
     const tokenPos = sessionStorage.getItem("authPosToken");
     const activeBranch = sessionStorage.getItem("branchActive");
@@ -72,23 +74,20 @@ const useCartStore = create((set, get) => ({
     // }
 
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_POS_ROUTES}/pos/cart/add`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${tokenPos}`,
-          },
-          body: JSON.stringify({
-            branch_id: activeBranch,
-            user_id: userId,
-            product_id: product?.id,
-            product_sku_id: product?.skus?.id,
-            quantity,
-          }),
-        }
-      );
+      const response = await fetch(`${ROOT_API}/pos/cart/add`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenPos}`,
+        },
+        body: JSON.stringify({
+          branch_id: activeBranch,
+          user_id: userId,
+          product_id: product?.id,
+          product_sku_id: product?.skus?.id,
+          quantity,
+        }),
+      });
 
       if (!response.ok) {
         throw new Error(`Failed add to cart`);
@@ -126,9 +125,7 @@ const useCartStore = create((set, get) => ({
       set({ isLoading: true, error: null });
 
       const response = await fetch(
-        `${
-          import.meta.env.VITE_API_POS_ROUTES
-        }/pos/cart?branch_id=${activeBranch}&user_id=${userId}`,
+        `${ROOT_API}/pos/cart?branch_id=${activeBranch}&user_id=${userId}`,
         {
           method: "GET",
           headers: {
@@ -158,16 +155,13 @@ const useCartStore = create((set, get) => ({
 
       set({ isLoading: true, error: null });
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_POS_ROUTES}/pos/cart/item/${cartId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${tokenPos}`,
-          },
-        }
-      );
+      const response = await fetch(`${ROOT_API}/pos/cart/item/${cartId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenPos}`,
+        },
+      });
 
       if (!response.ok) {
         set({ error: true, isLoading: false });
@@ -193,17 +187,14 @@ const useCartStore = create((set, get) => ({
 
       set({ isLoading: true, error: null });
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_POS_ROUTES}/pos/cart/item/${cartItemId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${tokenPos}`,
-          },
-          body: JSON.stringify({ quantity }),
-        }
-      );
+      const response = await fetch(`${ROOT_API}/pos/cart/item/${cartItemId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenPos}`,
+        },
+        body: JSON.stringify({ quantity }),
+      });
 
       if (!response.ok) {
         set({ error: true, isLoading: false });
@@ -251,19 +242,16 @@ const useCartStore = create((set, get) => ({
     try {
       set({ isLoading: true, error: null });
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_POS_ROUTES}/pos/cart/clear`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${get().tokenPos}`,
-          },
-          body: JSON.stringify({
-            cart_id: cartId,
-          }),
-        }
-      );
+      const response = await fetch(`${ROOT_API}/pos/cart/clear`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${get().tokenPos}`,
+        },
+        body: JSON.stringify({
+          cart_id: cartId,
+        }),
+      });
 
       if (!response.ok) {
         set({ error: true, isLoading: false });
@@ -298,21 +286,18 @@ const useCartStore = create((set, get) => ({
   checkVoucherDiscount: async (discount) => {
     try {
       set({ isLoading: true, error: null });
-      const response = await fetch(
-        `${import.meta.env.VITE_API_POS_ROUTES}/pos/discount/apply`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${get().tokenPos}`,
-          },
-          body: JSON.stringify({
-            discount_code: discount,
-            branch_id: get().activeBranch,
-          }),
-        }
-      );
+      const response = await fetch(`${ROOT_API}/pos/discount/apply`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${get().tokenPos}`,
+        },
+        body: JSON.stringify({
+          discount_code: discount,
+          branch_id: get().activeBranch,
+        }),
+      });
 
       if (!response.ok) {
         set({ isLoading: false, error: response?.message });
