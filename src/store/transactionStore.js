@@ -95,8 +95,28 @@ const useTransactionStore = create((set, get) => ({
   },
 
   // Get Statitstic Transaction
-  getStatisticTransaction: async (params) => {
+  getStatisticTransaction: async (value, type) => {
     const tokenPos = sessionStorage.getItem("authToken");
+
+    const params = { startDate: "start_date", endDate: "end_date" };
+
+    const yearNow = new Date().getFullYear();
+    const monthNow = new Date().getMonth() + 1;
+    const dayNow = new Date().getDate();
+
+    const defaultDateStart = "2020-01-01";
+
+    let queryParams;
+
+    if (type === "range") {
+      queryParams = `${params?.startDate}=${value?.from}&${params?.endDate}=${value?.to}`;
+    } else if (type === "month") {
+      queryParams = `${params?.startDate}=${defaultDateStart}&${params?.endDate}=${yearNow}-${value}-01`;
+    } else if (type === "year") {
+      queryParams = `${params?.startDate}=${defaultDateStart}&${params?.endDate}=${value}-${monthNow}-01`;
+    } else {
+      queryParams = `${params?.startDate}=${defaultDateStart}&${params?.endDate}=${yearNow}-${monthNow}-${dayNow}`;
+    }
 
     try {
       set({ isLoading: true, error: null });
@@ -104,7 +124,7 @@ const useTransactionStore = create((set, get) => ({
       const response = await fetch(
         `${
           import.meta.env.VITE_API_ROUTES
-        }/v1/merchant/transaction/summary?start_date=2021-01-01&end_date=2025-10-22`,
+        }/v1/merchant/transaction/summary?${queryParams}`,
         {
           headers: {
             ...get().headersAPIContent,

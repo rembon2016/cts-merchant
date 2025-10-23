@@ -4,11 +4,12 @@ import { useTransactionStore } from "../store/transactionStore";
 import { formatCurrency } from "../helper/currency";
 
 const IncomeCard = () => {
-  const { income, updateIncomeAmount } = useUserStore();
-  const { getStatisticTransaction, statistic } = useTransactionStore();
-  const [activeChip, setActiveChip] = useState("month");
-  const [showPopover, setShowPopover] = useState(null);
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
+  const [activeChip, setActiveChip] = useState("");
+  const [showPopover, setShowPopover] = useState(null);
+  const { income, updateIncomeAmount } = useUserStore();
+  const { getStatisticTransaction, statistic, isLoading } =
+    useTransactionStore();
 
   const chips = [
     { id: "month", label: "Bulan" },
@@ -19,21 +20,61 @@ const IncomeCard = () => {
   const AMOUNT = formatCurrency(Number.parseFloat(statistic.amount));
 
   const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "Mei",
-    "Jun",
-    "Jul",
-    "Agu",
-    "Sep",
-    "Okt",
-    "Nov",
-    "Des",
+    {
+      key: "01",
+      value: "Jan",
+    },
+    {
+      key: "02",
+      value: "Feb",
+    },
+    {
+      key: "03",
+      value: "Mar",
+    },
+    {
+      key: "04",
+      value: "Apr",
+    },
+    {
+      key: "05",
+      value: "Mei",
+    },
+    {
+      key: "06",
+      value: "Jun",
+    },
+    {
+      key: "07",
+      value: "Jul",
+    },
+    {
+      key: "08",
+      value: "Agu",
+    },
+    {
+      key: "09",
+      value: "Sep",
+    },
+    {
+      key: "10",
+      value: "Okt",
+    },
+    {
+      key: "11",
+      value: "Nov",
+    },
+    {
+      key: "12",
+      value: "Des",
+    },
   ];
 
-  const years = ["2023", "2024", "2025", "2026"];
+  // build an array of 4 years as strings: [currentYear-3, currentYear-2, currentYear-1, currentYear]
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 4 }, (_, i) =>
+    (currentYear - 3 + i).toString()
+  );
 
   const handleChipClick = (chipId) => {
     setActiveChip(chipId);
@@ -43,17 +84,15 @@ const IncomeCard = () => {
   const handleOptionClick = (value, type) => {
     // Simulate income update based on selection
     const amounts = {
-      month: Math.floor(Math.random() * 50000) + 10000,
-      year: Math.floor(Math.random() * 500000) + 100000,
-      range: Math.floor(Math.random() * 100000) + 20000,
+      [type]: getStatisticTransaction(value, type),
     };
-    updateIncomeAmount(amounts[type] || amounts.month);
+    updateIncomeAmount(amounts || amounts?.range);
     setShowPopover(null);
   };
 
   const handleRangeApply = () => {
     if (dateRange.from && dateRange.to) {
-      handleOptionClick(null, "range");
+      handleOptionClick(dateRange, "range");
     }
   };
 
@@ -79,7 +118,7 @@ const IncomeCard = () => {
 
           <div className="mt-4">
             <p className="text-4xl font-extrabold tracking-tight text-white">
-              <span>{AMOUNT}</span>
+              <span>{isLoading ? "..." : AMOUNT}</span>
             </p>
             <p className="mt-2 text-sm text-slate-200/70">
               {income.lastUpdated}
@@ -109,10 +148,10 @@ const IncomeCard = () => {
                 {months.map((month) => (
                   <button
                     key={month}
-                    onClick={() => handleOptionClick(month, "month")}
+                    onClick={() => handleOptionClick(month?.key, "month")}
                     className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
                   >
-                    {month}
+                    {month?.value}
                   </button>
                 ))}
               </div>
