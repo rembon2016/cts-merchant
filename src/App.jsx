@@ -11,6 +11,7 @@ import Profile from "./pages/Profile";
 import FaQ from "./pages/FaQ";
 import Pos from "./pages/POS";
 import PosTransaction from "./pages/POS/transaction";
+import PosTransactionDetail from "./pages/POS/detail";
 import PosProducts from "./pages/POS/products";
 import AccountInformation from "./pages/AccountInformation";
 import Login from "./pages/Login";
@@ -22,7 +23,6 @@ import EditProfile from "./pages/EditProfile";
 import EditMerchant from "./pages/EditMerchant";
 import DetailProduct from "./pages/ProductDetail";
 import Invoice from "./pages/Invoice";
-import Order from "./pages/Order";
 
 function App() {
   const { isDark } = useThemeStore();
@@ -120,6 +120,14 @@ function App() {
               }
             />
             <Route
+              path="pos/transaction/:id"
+              element={
+                <ProtectedRoute>
+                  <PosTransactionDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="pos/products"
               element={
                 <ProtectedRoute>
@@ -196,14 +204,6 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Invoice />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="order/:id"
-              element={
-                <ProtectedRoute>
-                  <Order />
                 </ProtectedRoute>
               }
             />

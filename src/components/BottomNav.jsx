@@ -178,7 +178,7 @@ const BottomNav = () => {
       const response = await saveOrder(dataCheckout);
 
       if (response?.success) {
-        navigation(`/order/${response?.data?.id}`, {
+        navigation(`/pos/transaction/${response?.data?.id}`, {
           replace: true,
         });
         sessionStorage.removeItem("cart");
