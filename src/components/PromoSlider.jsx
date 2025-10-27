@@ -23,7 +23,7 @@ const PromoSlider = () => {
   };
 
   const fetchBanner = (page = 1) => {
-    fetchData(`${ROOT_API}/v1/merchant/information-banner`, {
+    fetchData(`/api/v1/merchant/information-banner`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,

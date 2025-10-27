@@ -82,7 +82,7 @@ export default function Transaction() {
       ...(debouncedSearch && { search: debouncedSearch }),
     });
 
-    let url = `${ROOT_API}/v1/merchant/transaction?${searchParams.toString()}`;
+    let url = `/api/v1/merchant/transaction?${searchParams.toString()}`;
     if (filter !== "all") {
       url += `&type=${filter}`;
     }

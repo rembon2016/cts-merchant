@@ -74,7 +74,7 @@ const useCartStore = create((set, get) => ({
     // }
 
     try {
-      const response = await fetch(`${ROOT_API}/pos/cart/add`, {
+      const response = await fetch(`/api/pos/cart/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -125,7 +125,7 @@ const useCartStore = create((set, get) => ({
       set({ isLoading: true, error: null });
 
       const response = await fetch(
-        `${ROOT_API}/pos/cart?branch_id=${activeBranch}&user_id=${userId}`,
+        `/api/pos/cart?branch_id=${activeBranch}&user_id=${userId}`,
         {
           method: "GET",
           headers: {
@@ -155,7 +155,7 @@ const useCartStore = create((set, get) => ({
 
       set({ isLoading: true, error: null });
 
-      const response = await fetch(`${ROOT_API}/pos/cart/item/${cartId}`, {
+      const response = await fetch(`/api/pos/cart/item/${cartId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -187,7 +187,7 @@ const useCartStore = create((set, get) => ({
 
       set({ isLoading: true, error: null });
 
-      const response = await fetch(`${ROOT_API}/pos/cart/item/${cartItemId}`, {
+      const response = await fetch(`/api/pos/cart/item/${cartItemId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -242,7 +242,7 @@ const useCartStore = create((set, get) => ({
     try {
       set({ isLoading: true, error: null });
 
-      const response = await fetch(`${ROOT_API}/pos/cart/clear`, {
+      const response = await fetch(`/api/pos/cart/clear`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -286,7 +286,7 @@ const useCartStore = create((set, get) => ({
   checkVoucherDiscount: async (discount) => {
     try {
       set({ isLoading: true, error: null });
-      const response = await fetch(`${ROOT_API}/pos/discount/apply`, {
+      const response = await fetch(`/api/pos/discount/apply`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

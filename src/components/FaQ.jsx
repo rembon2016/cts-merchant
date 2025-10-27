@@ -80,7 +80,7 @@ export default function FaQ() {
       ...(debouncedSearch && { search: debouncedSearch }),
     });
 
-    fetchData(`${ROOT_API}/v1/merchant/faq?${searchParams.toString()}`, {
+    fetchData(`/api/v1/merchant/faq?${searchParams.toString()}`, {
       method: "GET",
       headers: headersApi,
     });
