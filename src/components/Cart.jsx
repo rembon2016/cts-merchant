@@ -14,7 +14,6 @@ const Cart = () => {
     deleteCartItems,
     clearCart,
     setSelectedCart,
-    selectedCart,
     isLoading,
     error,
     success,
@@ -176,8 +175,6 @@ const Cart = () => {
         </div>
       );
     }
-
-    console.log("Selected Cart: ", selectedCart);
 
     return (
       <div className="mt-4 p-4 bg-white dark:bg-slate-700 rounded-lg">

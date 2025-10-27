@@ -305,6 +305,9 @@ const useCartStore = create((set, get) => ({
       }
 
       const result = await response.json();
+
+      sessionStorage.setItem("discount", JSON.stringify(result?.data));
+
       set({ discountCode: result?.data, isLoading: false });
       return result?.data;
     } catch (error) {

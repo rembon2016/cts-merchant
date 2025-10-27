@@ -17,15 +17,15 @@ const BottomNav = () => {
   const [showExitModal, setShowExitModal] = useState(false);
   const [pendingPath, setPendingPath] = useState(null);
 
-  const taxPrice = Number.parseFloat(sessionStorage.getItem("tax"));
+  const taxPrice = sessionStorage.getItem("tax");
+  const discountPrice = JSON.parse(sessionStorage.getItem("discount"));
 
   const totalPrice = selectedCart?.reduce(
     (a, b) => a + Number.parseFloat(b.subtotal),
     0
   );
 
-  const TOTAL_PAYMENT =
-    Number.parseFloat(totalPrice) + Number.parseFloat(taxPrice);
+  const TOTAL_PAYMENT = 0;
 
   const showButtonFromPath = ["/cart", "/checkout"];
 
@@ -163,7 +163,7 @@ const BottomNav = () => {
       tax_amount: Math.ceil(taxPrice),
       discount_amount: 0,
       payment_method_id: selectPaymentMethod,
-      payment_amount: Math.ceil(TOTAL_PAYMENT),
+      payment_amount: JSON.parse(sessionStorage.getItem("totalPayment")),
       discount_id: null,
       customer_id: null,
       ...JSON.parse(getCart),
@@ -181,10 +181,12 @@ const BottomNav = () => {
         navigation(`/order/${response?.data?.id}`, {
           replace: true,
         });
+        sessionStorage.removeItem("cart");
+        sessionStorage.removeItem("tax");
+        sessionStorage.removeItem("discount");
       }
 
       setLoading(false);
-      sessionStorage.removeItem("cart");
     } catch (error) {
       console.log(error);
       setLoading(false);
@@ -302,6 +304,8 @@ const BottomNav = () => {
   const handleConfirmExit = () => {
     // clear session cart and selectedCart then navigate
     sessionStorage.removeItem("cart");
+    sessionStorage.removeItem("discount");
+    sessionStorage.removeItem("tax");
     setSelectedCart([]);
     setShowExitModal(false);
     if (pendingPath) navigation(pendingPath);

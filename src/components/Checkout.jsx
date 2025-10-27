@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useCartStore } from "../store/cartStore";
 import { useCheckoutStore } from "../store/checkoutStore";
 import { formatCurrency } from "../helper/currency";
 import SimpleInput from "./form/SimpleInput";
+import { isEmpty } from "../helper/is-empty";
 
 export default function Checkout() {
   const getCart = JSON.parse(sessionStorage.getItem("cart"));
   const [discountCode, setDiscountCode] = useState("");
-  const [discountAmount, setDiscountAmount] = useState(0);
 
   const {
     paymentData,
@@ -21,37 +21,44 @@ export default function Checkout() {
   const checkTax = async () => await getPosSettings();
 
   const checkoutPrice = getCart?.items?.reduce(
-    (a, b) => a + Number.parseFloat(b.subtotal),
+    (a, b) => a + Number.parseInt(b.subtotal),
     0
   );
   const DISCOUNT_AMOUNT = JSON.parse(sessionStorage.getItem("discount"));
+
   const TOTAL = () => {
     if (!checkoutPrice) return 0;
 
-    let subTotal;
-    let taxPrice;
-    let totalPriceWithDiscount;
+    let taxPrice, discountPrice;
 
-    if (DISCOUNT_AMOUNT?.amount !== 0) {
-      subTotal = checkoutPrice + checkoutPrice * (posSettingsData?.tax / 100);
+    if (!isEmpty(DISCOUNT_AMOUNT)) getPriceWithDiscount();
+    if (posSettingsData?.tax !== 0) getPriceWithTax();
 
-      const getTotalDiscountPrice = () => {
-        if (DISCOUNT_AMOUNT?.type !== "percentage") return;
-        const countDiscountPrice = subTotal * (DISCOUNT_AMOUNT?.amount / 100);
-        return Math.ceil(countDiscountPrice);
-      };
+    taxPrice = getPriceWithTax();
+    discountPrice = getPriceWithDiscount();
 
-      totalPriceWithDiscount = Math.ceil(subTotal - getTotalDiscountPrice());
-    }
+    return { taxPrice, discountPrice };
+  };
 
-    return { subTotal, taxPrice, totalPriceWithDiscount };
+  const getPriceWithDiscount = () => {
+    return (checkoutPrice * DISCOUNT_AMOUNT?.amount) / 100 || 0;
+  };
+
+  const getPriceWithTax = () => {
+    return (checkoutPrice * posSettingsData?.tax) / 100;
   };
 
   const getAndFormatTax = () => {
     const tax = posSettingsData?.tax;
     if ((!tax && tax !== 0) || Number.isNaN(Number(tax))) return "-";
-    sessionStorage.setItem("tax", TOTAL().taxPrice);
+    sessionStorage.setItem("tax", TOTAL()?.taxPrice);
     return Math.trunc(Number(tax));
+  };
+
+  const getTotalPrice = () => {
+    const total = checkoutPrice + TOTAL()?.taxPrice - TOTAL()?.discountPrice;
+    sessionStorage.setItem("totalPayment", Math.ceil(total));
+    return Math.ceil(total);
   };
 
   useEffect(() => {
@@ -70,13 +77,6 @@ export default function Checkout() {
   const checkDiscountCode = async (e) => {
     e?.preventDefault();
     await checkVoucherDiscount(discountCode);
-    sessionStorage.setItem(
-      "discount",
-      JSON.stringify({
-        type: "percentage",
-        amount: "10",
-      })
-    );
   };
 
   const handleChange = (e) => setSelectPaymentMethod(e.target.value);
@@ -88,37 +88,31 @@ export default function Checkout() {
           Detail Transaksi
         </h3>
         <div className="flex flex-col gap-2">
-          <div className="flex justify-between items-center">
+          {/* <div className="flex justify-between items-center">
             <h4 className="font-semibold text-gray-500 text-md">
               Kode Transaksi
             </h4>
             <h4 className="font-bold text-gray-700 text-md">BRG-001-2K25</h4>
-          </div>
+          </div> */}
           <div className="flex justify-between items-center">
             <h4 className="font-semibold text-gray-500 text-md">
-              Harga Barang (
-              {getCart?.items?.length > 0 ? getCart?.items?.length : 0})
+              Harga Barang ({Math.max(getCart?.items?.length > 0) || 0})
             </h4>
             <h4 className="font-bold text-gray-700 text-md">
               {formatCurrency(checkoutPrice)}
             </h4>
           </div>
-          {/* <div className="flex justify-between items-center">
-            <h4 className="font-semibold text-gray-500 text-md">
-              Biaya Layanan
-            </h4>
-            <h4 className="font-bold text-gray-700 text-md">Rp. 1.000</h4>
-          </div> */}
           <div className="flex justify-between items-center">
             <h4 className="font-semibold text-gray-500 text-md">Diskon</h4>
             <h4 className="font-bold text-gray-700 text-md">
-              {formatCurrency(Math.ceil(TOTAL().subTotal))}
+              {formatCurrency(Math.ceil(TOTAL()?.discountPrice) || 0)}
             </h4>
           </div>
           <div className="flex justify-between items-center">
             <h4 className="font-semibold text-gray-500 text-md">Pajak</h4>
             <h4 className="font-bold text-gray-700 text-md">
-              {formatCurrency(Math.ceil(TOTAL().taxPrice))} ({getAndFormatTax()}
+              {formatCurrency(Math.ceil(TOTAL()?.taxPrice) || 0)} (
+              {getAndFormatTax()}
               %)
             </h4>
           </div>
@@ -127,13 +121,13 @@ export default function Checkout() {
               Total Tagihan
             </h4>
             <h4 className="font-bold text-gray-700 text-md">
-              {formatCurrency(Math.ceil(TOTAL()?.totalPriceWithDiscount))}
+              {formatCurrency(getTotalPrice())}
             </h4>
           </div>
         </div>
       </div>
     );
-  }, [posSettingsData, checkoutPrice, DISCOUNT_AMOUNT]);
+  }, [{ ...TOTAL() }, checkoutPrice, getCart?.items?.length]);
 
   const inputClassName =
     "w-full p-4 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ring-1 ring-slate-600 dark:text-slate-200";

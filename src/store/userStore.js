@@ -13,7 +13,7 @@ export const useUserStore = create((set) => ({
   },
   income: {
     amount: "10000",
-    period: "Bulan ini",
+    period: "Hari ini",
     lastUpdated: "Baru saja diperbaharui",
   },
   setUser: (user) => set({ user }),
