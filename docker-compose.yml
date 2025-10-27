@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  cts-merchant:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cts-merchant-app
+    ports:
+      - "8801:80"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - VITE_API_ROUTES=https://soundbox.ctsolution.id/api
+    networks:
+      - cts-merchant-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80"]
+      timeout: 5s
+      interval: 30s
+      retries: 3
+      start_period: 40s
+
+networks:
+  cts-merchant-network:
+    driver: bridge
+
+# Optional: Add volumes if you need persistent data
+# volumes:
+#   cts-merchant-data:

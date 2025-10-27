@@ -1,0 +1,23 @@
+# Docker Compose untuk Development (optional)
+version: '3.8'
+
+services:
+  cts-merchant-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: cts-merchant-dev-app
+    ports:
+      - "8801:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+    networks:
+      - cts-merchant-dev-network
+
+networks:
+  cts-merchant-dev-network:
+    driver: bridge
