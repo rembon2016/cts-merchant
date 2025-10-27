@@ -14,11 +14,13 @@ const MENU = [
     name: "TRANSAKSI",
     iconLight: "/icons/transaction.svg",
     iconDark: "/icons/transaction-white.svg",
+    path: "/pos/transaction",
   },
   {
     name: "PRODUK",
     iconLight: "/icons/product.svg",
     iconDark: "/icons/product-white.svg",
+    path: "/pos/products",
   },
   {
     name: "MENU",
@@ -306,9 +308,10 @@ export default function POS() {
       {/* Kategori Produk */}
       <div className="flex gap-2 mb-6">
         {MENU.map((cat) => (
-          <div
+          <button
             key={cat.name}
             className="w-full min-h-[100px] max-h-full flex flex-col justify-center items-center hover:bg-slate-200 dark:hover:bg-slate-600 bg-white  text-slate-600 dark:text-slate-100 rounded-lg font-semibold cursor-pointer text-[12px]"
+            onClick={() => navigate(cat?.path, { replace: true })}
           >
             <img
               src={isDark ? cat.iconDark : cat.iconLight}
@@ -316,7 +319,7 @@ export default function POS() {
               className="w-10 h-10 mb-2 "
             />
             {cat.name}
-          </div>
+          </button>
         ))}
       </div>
       {/* Sub Kategori */}

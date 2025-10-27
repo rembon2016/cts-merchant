@@ -10,6 +10,8 @@ import Transaction from "./pages/Transaction";
 import Profile from "./pages/Profile";
 import FaQ from "./pages/FaQ";
 import Pos from "./pages/POS";
+import PosTransaction from "./pages/POS/transaction";
+import PosProducts from "./pages/POS/products";
 import AccountInformation from "./pages/AccountInformation";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -106,6 +108,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Pos />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="pos/transaction"
+              element={
+                <ProtectedRoute>
+                  <PosTransaction />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="pos/products"
+              element={
+                <ProtectedRoute>
+                  <PosProducts />
                 </ProtectedRoute>
               }
             />
