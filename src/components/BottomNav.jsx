@@ -193,6 +193,8 @@ const BottomNav = () => {
     }
   };
 
+  console.log(import.meta.env.VITE_API_ROUTES);
+
   const renderElements = useMemo(() => {
     const renderElementCart = () => {
       return (
@@ -264,14 +266,14 @@ const BottomNav = () => {
                     return;
                   }
 
-                  if (
-                    item.path === "/pos" &&
-                    import.meta.env.VITE_API_ROUTES ===
-                      "https://dev-soundbox.ctsolution.id/api"
-                  ) {
-                    alert("fitur ini belum tersedia");
-                    return;
-                  }
+                  // if (
+                  //   item.path === "/pos" &&
+                  //   import.meta.env.VITE_API_ROUTES ===
+                  //     "https://dev-soundbox.ctsolution.id/api"
+                  // ) {
+                  //   alert("fitur ini belum tersedia");
+                  //   return;
+                  // }
 
                   navigation(item.path);
                 }}
