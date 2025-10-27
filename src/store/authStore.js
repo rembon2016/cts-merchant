@@ -9,6 +9,10 @@ const TOKEN_POS_KEY = "authPosToken";
 const BRANCH_ACTIVE = "branchActive";
 const USER_ID = "userId";
 const CART = "cart";
+const DISCOUNT = "discount";
+const TAX = "tax";
+const TOTAL_PAYMENT = "totalPayment";
+const ROOT_API = import.meta.env.VITE_API_ROUTES;
 
 export const useAuthStore = create((set, get) => ({
   user: JSON.parse(sessionStorage.getItem(SESSION_KEY)),
@@ -27,16 +31,14 @@ export const useAuthStore = create((set, get) => ({
     try {
       set({ isLoading: true, error: null });
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_ROUTES}/v1/auth/token/user`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(credentials),
-        }
-      );
+      const response = await fetch(`/api/v1/auth/token/user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(credentials),
+      });
 
       const result = await response.json();
 
@@ -87,16 +89,14 @@ export const useAuthStore = create((set, get) => ({
     try {
       set({ isLoading: true, error: null });
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_ROUTES}/v1/user/create`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch(`/api/v1/user/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
       const result = await response?.json();
 
@@ -149,17 +149,14 @@ export const useAuthStore = create((set, get) => ({
 
   getUser: async (tokenParams) => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_ROUTES}/v1/user`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${tokenParams}`,
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        }
-      );
+      const response = await fetch(`/api/v1/user`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${tokenParams}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
 
       return await response.json();
     } catch (error) {
@@ -176,6 +173,9 @@ export const useAuthStore = create((set, get) => ({
     sessionStorage.removeItem(TOKEN_POS_KEY);
     sessionStorage.removeItem(BRANCH_ACTIVE);
     sessionStorage.removeItem(CART);
+    sessionStorage.removeItem(TAX);
+    sessionStorage.removeItem(DISCOUNT);
+    sessionStorage.removeItem(TOTAL_PAYMENT);
   },
 
   // Setup auto logout
@@ -279,16 +279,14 @@ export const useAuthStore = create((set, get) => ({
         throw new Error("No authentication token found");
       }
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_ROUTES}/v1/auth/token/revoke`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`/api/v1/auth/token/revoke`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
 
       const result = await response?.json();
 

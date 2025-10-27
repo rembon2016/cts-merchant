@@ -1,6 +1,8 @@
 import { create } from "zustand";
 
-export const useCheckoutStore = create((set, get) => ({
+const ROOT_API = import.meta.env.VITE_API_POS_ROUTES;
+
+export const useCheckoutStore = create((set) => ({
   totalPrice: 0,
   selectPaymentMethod: 1,
   isLoading: false,
@@ -23,17 +25,14 @@ export const useCheckoutStore = create((set, get) => ({
 
       set({ isLoading: true, error: null });
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_POS_ROUTES}/pos/payment-methods`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${tokenPos}`,
-          },
-        }
-      );
+      const response = await fetch(`${ROOT_API}/pos/payment-methods`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${tokenPos}`,
+        },
+      });
 
       if (!response.ok) {
         throw new Error("Failed to fetch payment methods");
@@ -53,17 +52,14 @@ export const useCheckoutStore = create((set, get) => ({
 
       set({ isLoading: true, error: null });
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_POS_ROUTES}/pos/settings`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${tokenPos}`,
-          },
-        }
-      );
+      const response = await fetch(`${ROOT_API}/pos/settings`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${tokenPos}`,
+        },
+      });
 
       if (!response.ok) {
         set({ error: "Failed to fetch" });
@@ -83,18 +79,15 @@ export const useCheckoutStore = create((set, get) => ({
 
       set({ isLoading: true, error: null });
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_POS_ROUTES}/pos/transaction/save`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${tokenPos}`,
-          },
-          body: JSON.stringify(orderData),
-        }
-      );
+      const response = await fetch(`${ROOT_API}/pos/transaction/save`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${tokenPos}`,
+        },
+        body: JSON.stringify(orderData),
+      });
 
       if (!response.ok) {
         set({
@@ -115,6 +108,8 @@ export const useCheckoutStore = create((set, get) => ({
         response,
       });
 
+      sessionStorage.removeItem("tax");
+
       if (response) {
         setTimeout(() => {
           set({ success: null });
@@ -134,7 +129,7 @@ export const useCheckoutStore = create((set, get) => ({
       set({ isLoading: true, error: null });
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_POS_ROUTES}/transactions/${transactionId}`,
+        `${ROOT_API}/transactions/${transactionId}`,
         {
           method: "GET",
           headers: {

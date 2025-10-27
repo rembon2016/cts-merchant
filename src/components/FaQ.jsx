@@ -5,6 +5,8 @@ import SearchInput from "./SearchInput";
 import LoadMoreButton from "./LoadMoreButton";
 import CustomLoading from "./CustomLoading";
 
+const ROOT_API = import.meta.env.VITE_API_ROUTES;
+
 // Define action types
 const TOGGLE_INDEX = "TOGGLE_INDEX";
 const SET_SEARCH_QUERY = "SET_SEARCH_QUERY";
@@ -78,15 +80,10 @@ export default function FaQ() {
       ...(debouncedSearch && { search: debouncedSearch }),
     });
 
-    fetchData(
-      `${
-        import.meta.env.VITE_API_ROUTES
-      }/v1/merchant/faq?${searchParams.toString()}`,
-      {
-        method: "GET",
-        headers: headersApi,
-      }
-    );
+    fetchData(`${ROOT_API}/v1/merchant/faq?${searchParams.toString()}`, {
+      method: "GET",
+      headers: headersApi,
+    });
   };
 
   // Fetch data when component mounts or when search changes

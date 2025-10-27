@@ -10,6 +10,7 @@ import { formatCurrency } from "../helper/currency";
 const SET_FILTER = "SET_FILTER";
 const SET_PAGE = "SET_PAGE";
 const SET_SEARCH_QUERY = "SET_SEARCH_QUERY";
+const ROOT_API = import.meta.env.VITE_API_ROUTES;
 
 // Initial state
 const initialState = {
@@ -81,9 +82,7 @@ export default function Transaction() {
       ...(debouncedSearch && { search: debouncedSearch }),
     });
 
-    let url = `${
-      import.meta.env.VITE_API_ROUTES
-    }/v1/merchant/transaction?${searchParams.toString()}`;
+    let url = `${ROOT_API}/v1/merchant/transaction?${searchParams.toString()}`;
     if (filter !== "all") {
       url += `&type=${filter}`;
     }

@@ -1,5 +1,8 @@
 import { create } from "zustand";
 
+const ROOT_API = import.meta.env.VITE_API_ROUTES;
+const ROOT_API_POS = import.meta.env.VITE_API_POS_ROUTES;
+
 const useTransactionStore = create((set, get) => ({
   // Categories state
   isLoading: false,
@@ -22,9 +25,7 @@ const useTransactionStore = create((set, get) => ({
       set({ isLoading: true, error: null });
 
       const response = await fetch(
-        `${
-          import.meta.env.VITE_API_POS_ROUTES
-        }/transactions?branch_id=${activeBranch}`,
+        `/api/transactions?branch_id=${activeBranch}`,
         {
           method: "GET",
           headers: {
@@ -67,16 +68,13 @@ const useTransactionStore = create((set, get) => ({
     try {
       set({ isLoading: true, error: null });
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_POS_ROUTES}/transactions/${transactionId}`,
-        {
-          method: "GET",
-          headers: {
-            ...get().headersAPIContent,
-            Authorization: `Bearer ${tokenPos}`,
-          },
-        }
-      );
+      const response = await fetch(`/api/transactions/${transactionId}`, {
+        method: "GET",
+        headers: {
+          ...get().headersAPIContent,
+          Authorization: `Bearer ${tokenPos}`,
+        },
+      });
 
       if (!response.ok) {
         set({ isLoading: false, error: `Gagal mendapatkan produk` });
@@ -122,9 +120,7 @@ const useTransactionStore = create((set, get) => ({
       set({ isLoading: true, error: null });
 
       const response = await fetch(
-        `${
-          import.meta.env.VITE_API_ROUTES
-        }/v1/merchant/transaction/summary?${queryParams}`,
+        `/api/v1/merchant/transaction/summary?${queryParams}`,
         {
           headers: {
             ...get().headersAPIContent,

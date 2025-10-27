@@ -57,8 +57,9 @@ const Cart = () => {
       };
       setSelectedCart((prevItems) => [...prevItems, newItem]);
     } else {
+      // Remove by product_id (store uses product_id for selected items)
       setSelectedCart((prevItems) =>
-        prevItems.filter((item) => item.id !== itemId)
+        prevItems.filter((item) => String(item.product_id) !== String(itemId))
       );
     }
 
@@ -275,26 +276,25 @@ const Cart = () => {
                         const price = Number(cartItem?.price ?? 0);
                         const subtotal = price * Number(newQty);
 
-                        const foundIndex = prevItems.findIndex(
-                          (it) =>
-                            String(it.id) === String(pid) ||
-                            String(it.id) === String(cartItem?.id)
-                        );
+                        const matchByPid = (it) =>
+                          String(it.product_id ?? it.id) === String(pid);
 
-                        if (foundIndex > -1) {
-                          // update existing
+                        // If exists, update price, subtotal and quantity
+                        if (prevItems.some(matchByPid)) {
                           return prevItems.map((it) =>
-                            String(it.id) === String(pid) ||
-                            String(it.id) === String(cartItem?.id)
-                              ? { ...it, price, subtotal }
+                            matchByPid(it)
+                              ? { ...it, price, subtotal, quantity: newQty }
                               : it
                           );
                         }
 
-                        // add new selected item
+                        // add new selected item (normalize shape)
                         const newItem = {
                           product_id: pid,
-                          product_sku_id: cartItem?.product_sku_id,
+                          product_sku_id:
+                            cartItem?.product_sku_id ??
+                            cartItem?.product?.sku ??
+                            null,
                           quantity: newQty,
                           name: cartItem?.product?.name || cartItem?.name || "",
                           image:

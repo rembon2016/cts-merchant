@@ -17,7 +17,7 @@ const IncomeCard = () => {
     { id: "range", label: "Rentang" },
   ];
 
-  const AMOUNT = formatCurrency(Number.parseFloat(statistic.amount));
+  const AMOUNT = formatCurrency(Number.parseFloat(statistic.amount || 0));
 
   const months = [
     {
