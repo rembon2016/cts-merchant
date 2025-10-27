@@ -4,10 +4,13 @@ import { formatCurrency } from "../helper/currency";
 import { useTransactionStore } from "../store/transactionStore";
 import { useEffect, useMemo } from "react";
 import CustomLoading from "./CustomLoading";
+import { useNavigate } from "react-router-dom";
 
 export default function POSTransaction() {
   const { transactions, isLoading, getListTransactions } =
     useTransactionStore();
+
+  const navigate = useNavigate();
 
   // compute total for "Today" group (summing trx.total values)
   const todayGroup = transactions.find((g) => g.date_group === "Today") || {
@@ -69,48 +72,52 @@ export default function POSTransaction() {
 
                   <div className="space-y-3">
                     {group.transactions.map((trx) => (
-                      <div
-                        key={trx.id}
-                        className="bg-white border border-gray-100 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center gap-3 shadow-sm"
+                      <button
+                        onClick={() => navigate(`/pos/transaction/${trx.id}`)}
                       >
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-md flex items-center justify-center font-semibold flex-shrink-0">
-                            {trx.transaction_type === "sale" ? "S" : "T"}
-                          </div>
+                        <div
+                          key={trx.id}
+                          className="bg-white border border-gray-100 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center gap-3 shadow-sm"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-md flex items-center justify-center font-semibold flex-shrink-0">
+                              {trx.transaction_type === "sale" ? "S" : "T"}
+                            </div>
 
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2">
-                              <div className="text-sm font-medium text-gray-800 truncate">
-                                {trx.code}
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <div className="text-sm font-medium text-gray-800 truncate">
+                                  {trx.code}
+                                </div>
+                                <div className="text-xs text-gray-400">
+                                  • {trx.time}
+                                </div>
                               </div>
-                              <div className="text-xs text-gray-400">
-                                • {trx.time}
+                              <div className="text-xs text-gray-500 mt-1 truncate">
+                                {trx.branch?.name} • {trx.item_count} item
+                              </div>
+                              <div className="text-xs text-gray-400 truncate">
+                                oleh {trx.created_by}
                               </div>
                             </div>
-                            <div className="text-xs text-gray-500 mt-1 truncate">
-                              {trx.branch?.name} • {trx.item_count} item
-                            </div>
-                            <div className="text-xs text-gray-400 truncate">
-                              oleh {trx.created_by}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="ml-auto flex items-center gap-4 mt-2  w-full ">
-                          <div className="ml-auto flex flex-row-reverse items-center gap-2">
-                            <div className="text-sm font-semibold text-gray-800">
-                              {formatCurrency(trx.total)}
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              {trx.payment_method?.name}
-                            </div>
                           </div>
 
-                          {/* <div>
+                          <div className="ml-auto flex items-center gap-4 mt-2  w-full ">
+                            <div className="ml-auto flex flex-row-reverse items-center gap-2">
+                              <div className="text-sm font-semibold text-gray-800">
+                                {formatCurrency(trx.total)}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {trx.payment_method?.name}
+                              </div>
+                            </div>
+
+                            {/* <div>
                           <StatusBadge status={trx.status} />
                         </div> */}
+                          </div>
                         </div>
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </section>
