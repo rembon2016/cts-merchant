@@ -27,7 +27,7 @@ const usePosStore = create((set, get) => ({
         throw new Error("Token tidak ditemukan");
       }
 
-      const response = await fetch(`/api/pos/categories`, {
+      const response = await fetch(`${ROOT_API}/pos/categories`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -90,7 +90,7 @@ const usePosStore = create((set, get) => ({
         search,
       });
 
-      const response = await fetch(`/api/pos/products?${queryParams}`, {
+      const response = await fetch(`${ROOT_API}/pos/products?${queryParams}`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,

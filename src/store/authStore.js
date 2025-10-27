@@ -31,7 +31,7 @@ export const useAuthStore = create((set, get) => ({
     try {
       set({ isLoading: true, error: null });
 
-      const response = await fetch(`/api/v1/auth/token/user`, {
+      const response = await fetch(`${ROOT_API}/v1/auth/token/user`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -89,7 +89,7 @@ export const useAuthStore = create((set, get) => ({
     try {
       set({ isLoading: true, error: null });
 
-      const response = await fetch(`/api/v1/user/create`, {
+      const response = await fetch(`${ROOT_API}/v1/user/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -149,7 +149,7 @@ export const useAuthStore = create((set, get) => ({
 
   getUser: async (tokenParams) => {
     try {
-      const response = await fetch(`/api/v1/user`, {
+      const response = await fetch(`${ROOT_API}/v1/user`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${tokenParams}`,
@@ -279,7 +279,7 @@ export const useAuthStore = create((set, get) => ({
         throw new Error("No authentication token found");
       }
 
-      const response = await fetch(`/api/v1/auth/token/revoke`, {
+      const response = await fetch(`${ROOT_API}/v1/auth/token/revoke`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,

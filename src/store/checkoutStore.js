@@ -25,7 +25,7 @@ export const useCheckoutStore = create((set) => ({
 
       set({ isLoading: true, error: null });
 
-      const response = await fetch(`/api/pos/payment-methods`, {
+      const response = await fetch(`${ROOT_API}/pos/payment-methods`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -52,7 +52,7 @@ export const useCheckoutStore = create((set) => ({
 
       set({ isLoading: true, error: null });
 
-      const response = await fetch(`/api/pos/settings`, {
+      const response = await fetch(`${ROOT_API}/pos/settings`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -79,7 +79,7 @@ export const useCheckoutStore = create((set) => ({
 
       set({ isLoading: true, error: null });
 
-      const response = await fetch(`/api/pos/transaction/save`, {
+      const response = await fetch(`${ROOT_API}/pos/transaction/save`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -128,14 +128,17 @@ export const useCheckoutStore = create((set) => ({
 
       set({ isLoading: true, error: null });
 
-      const response = await fetch(`/api/transactions/${transactionId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          Authorization: `Bearer ${tokenPos}`,
-        },
-      });
+      const response = await fetch(
+        `${ROOT_API}/transactions/${transactionId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${tokenPos}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         set({ error: "Failed to fetch" });

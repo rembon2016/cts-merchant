@@ -4,8 +4,7 @@ import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  // Load env file based on `mode` in the current working directory.
-  const env = loadEnv(mode, process.cwd(), "");
+  const env = loadEnv(mode, process.cwd());
 
   return {
     plugins: [
@@ -60,22 +59,22 @@ export default defineConfig(({ mode }) => {
       }),
     ],
     server: {
-      host: "0.0.0.0",
+      // host: "0.0.0.0",
       port: 3000,
-      proxy: {
-        "/api": {
-          target: env.VITE_API_ROUTES,
-          changeOrigin: true,
-          secure: false,
-          rewrite: (path) => path.replace(/^\/api/, "/api"),
-        },
-        "/api2": {
-          target: env.VITE_API_POS_ROUTES,
-          changeOrigin: true,
-          secure: false,
-          rewrite: (path) => path.replace(/^\/api2/, "/api"),
-        },
-      },
+      // proxy: {
+      //   "/api": {
+      //     target: env.VITE_API1_TARGET,
+      //     changeOrigin: true,
+      //     secure: false,
+      //     rewrite: (path) => path.replace(/^\/api/, "/api"),
+      //   },
+      //   "/api2": {
+      //     target: env.VITE_API2_TARGET,
+      //     changeOrigin: true,
+      //     secure: false,
+      //     rewrite: (path) => path.replace(/^\/api2/, "/api"),
+      //   },
+      // },
     },
   };
 });
