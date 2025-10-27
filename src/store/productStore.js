@@ -42,16 +42,13 @@ const useProductStore = create((set, get) => ({
         search,
       });
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_POS_ROUTES}/products?${queryParams}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`/api/products?${queryParams}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!response.ok) {
         set({
@@ -103,16 +100,13 @@ const useProductStore = create((set, get) => ({
         throw new Error("Branch tidak ditemukan");
       }
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_POS_ROUTES}/products/${productId}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${tokenPos}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`/api/products/${productId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${tokenPos}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!response.ok) {
         set({ isLoading: false, error: `Gagal mendapatkan produk` });
