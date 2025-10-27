@@ -193,6 +193,8 @@ const BottomNav = () => {
     }
   };
 
+  console.log(import.meta.env.VITE_API_ROUTES);
+
   const renderElements = useMemo(() => {
     const renderElementCart = () => {
       return (
@@ -261,6 +263,15 @@ const BottomNav = () => {
                   ) {
                     setPendingPath(item.path);
                     setShowExitModal(true);
+                    return;
+                  }
+
+                  if (
+                    item.path === "/pos" &&
+                    import.meta.env.VITE_API_ROUTES ===
+                      "https://dev-soundbox.ctsolution.id/api"
+                  ) {
+                    alert("fitur ini belum tersedia");
                     return;
                   }
 
