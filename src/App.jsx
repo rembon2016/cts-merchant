@@ -23,6 +23,7 @@ import EditProfile from "./pages/EditProfile";
 import EditMerchant from "./pages/EditMerchant";
 import DetailProduct from "./pages/ProductDetail";
 import Invoice from "./pages/Invoice";
+import AddInvoice from "./pages/Invoice/add";
 
 function App() {
   const { isDark } = useThemeStore();
@@ -204,6 +205,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Invoice />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="invoice/add"
+              element={
+                <ProtectedRoute>
+                  <AddInvoice />
                 </ProtectedRoute>
               }
             />

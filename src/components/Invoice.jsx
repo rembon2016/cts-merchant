@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { formatCurrency } from "../helper/currency";
+import { useNavigate } from "react-router-dom";
 
 const sampleData = [
   {
@@ -42,6 +43,8 @@ const sampleData = [
 const Invoice = () => {
   const [selected, setSelected] = useState(sampleData[0]);
 
+  const navigate = useNavigate();
+
   const summary = useMemo(() => {
     const total = sampleData.length;
     const paid = sampleData.filter((s) => s.status === "Paid").length;
@@ -63,7 +66,10 @@ const Invoice = () => {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <button className="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm hover:bg-indigo-700">
+            <button
+              className="p-4 bg-[var(--c-primary)] text-white rounded-md text-sm hover:bg-indigo-700"
+              onClick={() => navigate("/invoice/add", { replace: true })}
+            >
               Buat Invoice
             </button>
             <input
@@ -76,21 +82,21 @@ const Invoice = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Summary + list */}
-          <div className="lg:col-span-3 space-y-6">
-            <div className="flex flex-row justify-between overflow-x-auto">
-              <div className="w-full max-w-[115px] flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
+          <div className="lg:col-span-3 space-y-2">
+            <div className="grid grid-cols-3 gap-1">
+              <div className="w-full flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
                 <div className="text-xs text-gray-500">Total Invoice</div>
                 <div className="mt-2 text-xl font-medium text-gray-900">
                   {summary.total}
                 </div>
               </div>
-              <div className="w-full max-w-[115px] flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
+              <div className="w-full flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
                 <div className="text-xs text-gray-500">Belum Bayar</div>
                 <div className="mt-2 text-xl font-medium text-gray-900">
                   {summary.unpaid}
                 </div>
               </div>
-              <div className="w-full max-w-[115px] flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
+              <div className="w-full flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
                 <div className="text-xs text-gray-500">Terlambat</div>
                 <div className="mt-2 text-xl font-medium text-gray-900">
                   {summary.overdue}
@@ -98,69 +104,49 @@ const Invoice = () => {
               </div>
             </div>
 
-            <div className="bg-white border rounded-lg shadow-sm">
-              <div className="p-4 border-b">
-                <h2 className="text-sm font-medium text-gray-900">
-                  Daftar Invoice
-                </h2>
-                <p className="text-xs text-gray-500">
-                  Klik pada baris untuk melihat detail
-                </p>
-              </div>
-              <div className="p-2">
-                <div className="divide-y">
-                  {sampleData.map((inv) => (
-                    <div
-                      key={inv.invoiceNumber}
-                      onClick={() => setSelected(inv)}
-                      role="button"
-                      tabIndex={0}
-                      className={`grid grid-cols-12 items-center gap-4 p-3 hover:bg-gray-50 cursor-pointer ${
-                        selected?.invoiceNumber === inv.invoiceNumber
-                          ? "ring-2 ring-indigo-200 bg-indigo-50"
-                          : "bg-white"
-                      }`}
-                    >
-                      <div className="col-span-5 min-w-0">
-                        <div className="text-sm font-medium text-gray-900 truncate">
-                          {inv.invoiceNumber}
-                        </div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          {inv.date} • Jatuh tempo: {inv.dueDate}
-                        </div>
+            <div className="p-2">
+              <div className="divide-y flex flex-col gap-3">
+                {sampleData.map((inv) => (
+                  <button
+                    key={inv.invoiceNumber}
+                    onClick={() => setSelected(inv)}
+                    className={`bg-white dark:bg-slate-700 rounded-lg p-4 shadow-soft border border-slate-100 dark:border-slate-600 ${
+                      selected?.invoiceNumber === inv.invoiceNumber
+                        ? "ring-2 ring-indigo-200 bg-indigo-50"
+                        : "bg-white"
+                    }`}
+                  >
+                    <div className="flex flex-col gap-1 items-start">
+                      <div className="text-sm font-medium text-gray-900 truncate">
+                        {inv.invoiceNumber}
                       </div>
-
-                      <div className="col-span-2 text-sm text-gray-700">
-                        {/* empty or could show customer */}
-                        {/* kept for layout symmetry */}
-                      </div>
-
-                      <div className="text-right text-sm font-medium text-gray-900">
-                        {formatCurrency(inv.amount)}
-                      </div>
-
-                      <div className="ml-10">
-                        <span
-                          className={`inline-block px-2 py-1 rounded-full text-xs ${
-                            inv.status === "Paid"
-                              ? "bg-green-100 text-green-800"
-                              : inv.status === "Overdue"
-                              ? "bg-red-100 text-red-800"
-                              : "bg-yellow-100 text-yellow-800"
-                          }`}
-                        >
-                          {inv.status}
-                        </span>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {inv.date} • Jatuh tempo: {inv.dueDate}
                       </div>
                     </div>
-                  ))}
-                </div>
+
+                    <div className="text-sm font-medium text-gray-900 flex items-center gap-1 justify-end">
+                      {formatCurrency(inv.amount)}
+                      <span
+                        className={`inline-block px-2 py-1 rounded-full text-xs ${
+                          inv.status === "Paid"
+                            ? "bg-green-100 text-green-800"
+                            : inv.status === "Overdue"
+                            ? "bg-red-100 text-red-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {inv.status}
+                      </span>
+                    </div>
+                  </button>
+                ))}
               </div>
             </div>
           </div>
 
           {/* Detail panel */}
-          <aside className="lg:col-span-1">
+          {/* <aside className="lg:col-span-1">
             <div className="sticky top-6 p-4 bg-white border rounded-lg shadow-sm">
               <h3 className="text-sm font-medium text-gray-900">
                 Detail Invoice
@@ -214,7 +200,7 @@ const Invoice = () => {
                 </div>
               )}
             </div>
-          </aside>
+          </aside> */}
         </div>
       </div>
     </div>
