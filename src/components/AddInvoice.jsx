@@ -3,15 +3,15 @@ import SimpleInput from "./form/SimpleInput";
 const Invoice = () => {
   const dataBarang = [
     {
-      label: "Barang 1",
+      id: "Barang 1",
       name: "Kopi Liong",
     },
     {
-      label: "Barang 2",
+      id: "Barang 2",
       name: "Kerupuk",
     },
     {
-      label: "Barang 3",
+      id: "Barang 3",
       name: "Teh Kotak",
     },
   ];
