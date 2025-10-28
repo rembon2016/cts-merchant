@@ -23,6 +23,7 @@ import EditProfile from "./pages/EditProfile";
 import EditMerchant from "./pages/EditMerchant";
 import DetailProduct from "./pages/ProductDetail";
 import Invoice from "./pages/Invoice";
+import DetailInvoice from "./pages/Invoice/detail";
 import AddInvoice from "./pages/Invoice/add";
 
 function App() {
@@ -213,6 +214,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <AddInvoice />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="invoice/detail/:id"
+              element={
+                <ProtectedRoute>
+                  <DetailInvoice />
                 </ProtectedRoute>
               }
             />

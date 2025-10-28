@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { formatCurrency } from "../helper/currency";
 import { useNavigate } from "react-router-dom";
+import { formatDate } from "../helper/format-date";
 
 const sampleData = [
   {
@@ -41,8 +42,6 @@ const sampleData = [
 ];
 
 const Invoice = () => {
-  const [selected, setSelected] = useState(sampleData[0]);
-
   const navigate = useNavigate();
 
   const summary = useMemo(() => {
@@ -109,23 +108,24 @@ const Invoice = () => {
                 {sampleData.map((inv) => (
                   <button
                     key={inv.invoiceNumber}
-                    onClick={() => setSelected(inv)}
-                    className={`bg-white dark:bg-slate-700 rounded-lg p-4 shadow-soft border border-slate-100 dark:border-slate-600 ${
-                      selected?.invoiceNumber === inv.invoiceNumber
-                        ? "ring-2 ring-indigo-200 bg-indigo-50"
-                        : "bg-white"
-                    }`}
+                    onClick={() =>
+                      navigate(`/invoice/detail/${inv.invoiceNumber}`, {
+                        replace: true,
+                      })
+                    }
+                    className={`bg-white dark:bg-slate-700 rounded-lg p-4 shadow-soft border border-slate-100 dark:border-slate-600`}
                   >
                     <div className="flex flex-col gap-1 items-start">
                       <div className="text-sm font-medium text-gray-900 truncate">
                         {inv.invoiceNumber}
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
-                        {inv.date} • Jatuh tempo: {inv.dueDate}
+                        Mulai: {formatDate(inv.date)} • Jatuh tempo:{" "}
+                        {formatDate(inv.dueDate)}
                       </div>
                     </div>
 
-                    <div className="text-sm font-medium text-gray-900 flex items-center gap-1 justify-end">
+                    <div className="text-sm font-medium text-gray-900 flex items-center gap-1 justify-end mt-3">
                       {formatCurrency(inv.amount)}
                       <span
                         className={`inline-block px-2 py-1 rounded-full text-xs ${
@@ -136,7 +136,11 @@ const Invoice = () => {
                             : "bg-yellow-100 text-yellow-800"
                         }`}
                       >
-                        {inv.status}
+                        {inv.status.toLocaleLowerCase() === "paid"
+                          ? "Lunas"
+                          : inv.status.toLocaleLowerCase() === "overdue"
+                          ? "Terlambat"
+                          : "Belum Bayar"}
                       </span>
                     </div>
                   </button>

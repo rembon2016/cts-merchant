@@ -1,6 +1,6 @@
 import SimpleInput from "./form/SimpleInput";
 
-const Invoice = () => {
+const AddInvoice = () => {
   const dataBarang = [
     {
       id: "Barang 1",
@@ -77,4 +77,4 @@ const Invoice = () => {
   );
 };
 
-export default Invoice;
+export default AddInvoice;
