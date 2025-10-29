@@ -7,6 +7,9 @@ const useProductStore = create((set, get) => ({
   hasMoreProducts: true,
   error: null,
   products: [],
+  brands: [],
+  typeProducts: [],
+  units: [],
   currentPage: 1,
   total: 0,
 
@@ -184,6 +187,263 @@ const useProductStore = create((set, get) => ({
 
     // Fallback to price_product
     return parseFloat(product?.price_product || 0);
+  },
+
+  // Get brand from a product
+  getBrands: async () => {
+    const token = sessionStorage.getItem("authPosToken");
+
+    try {
+      set({ isLoading: true });
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_POS_ROUTES}/brands`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        set({ isLoading: false, error: `Gagal mendapatkan produk` });
+        throw new Error(`HTTP error! status: ${response?.status}`);
+      }
+
+      const result = await response.json();
+
+      set({ isLoading: false, brands: result?.data, error: null });
+    } catch (error) {
+      console.log("Error", error.message);
+      set({ error: error.message });
+    }
+  },
+
+  // Get categories from a product
+  getCategories: async () => {
+    const token = sessionStorage.getItem("authPosToken");
+
+    try {
+      set({ isLoading: true });
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_POS_ROUTES}/categories`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        set({ isLoading: false, error: `Gagal mendapatkan produk` });
+        throw new Error(`HTTP error! status: ${response?.status}`);
+      }
+
+      const result = await response.json();
+
+      set({
+        isLoading: false,
+        categories: result?.data?.categories,
+        error: null,
+      });
+    } catch (error) {
+      console.log("Error", error.message);
+      set({ error: error.message });
+    }
+  },
+
+  // Get type from a product
+  getTypeProducts: async () => {
+    const token = sessionStorage.getItem("authPosToken");
+
+    try {
+      set({ isLoading: true });
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_POS_ROUTES}/type-products`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        set({ isLoading: false, error: `Gagal mendapatkan produk` });
+        throw new Error(`HTTP error! status: ${response?.status}`);
+      }
+
+      const result = await response.json();
+
+      set({ isLoading: false, typeProducts: result?.data, error: null });
+    } catch (error) {
+      console.log("Error", error.message);
+      set({ error: error.message });
+    }
+  },
+
+  // Get unit from a product
+  getUnits: async () => {
+    const token = sessionStorage.getItem("authPosToken");
+
+    try {
+      set({ isLoading: true });
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_POS_ROUTES}/units`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        set({ isLoading: false, error: `Gagal mendapatkan produk` });
+        throw new Error(`HTTP error! status: ${response?.status}`);
+      }
+
+      const result = await response.json();
+
+      set({ isLoading: false, units: result?.data, error: null });
+    } catch (error) {
+      console.log("Error", error.message);
+      set({ error: error.message });
+    }
+  },
+
+  // Add new products
+  addProducts: async (formData) => {
+    const token = sessionStorage.getItem("authPosToken");
+
+    try {
+      set({ isLoading: true, error: null });
+
+      // Detect if there is any File in the formData values
+      const hasFile = Object.values(formData || {}).some(
+        (v) =>
+          v instanceof File ||
+          (Array.isArray(v) && v.some((i) => i instanceof File))
+      );
+
+      let body;
+      const headers = {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+
+      if (hasFile) {
+        // Use FormData for file upload
+        body = new FormData();
+
+        Object.entries(formData || {}).forEach(([key, value]) => {
+          if (value instanceof File) {
+            body.append(key, value, value.name);
+          } else if (Array.isArray(value)) {
+            // append arrays; files inside arrays are appended as key[]
+            value.forEach((item) => {
+              if (item instanceof File)
+                body.append(`${key}[]`, item, item.name);
+              else if (item && typeof item === "object")
+                body.append(`${key}[]`, JSON.stringify(item));
+              else body.append(`${key}[]`, item);
+            });
+          } else if (value && typeof value === "object") {
+            // for nested objects, stringify them
+            body.append(key, JSON.stringify(value));
+          } else if (value !== undefined && value !== null) {
+            body.append(key, String(value));
+          }
+        });
+        // NOTE: do NOT set Content-Type header for FormData — browser will set boundary
+      } else {
+        headers["Content-Type"] = "application/json";
+        body = JSON.stringify(formData);
+      }
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_POS_ROUTES}/products`,
+        {
+          method: "POST",
+          headers,
+          body,
+        }
+      );
+
+      if (!response.ok) {
+        set({ isLoading: false, error: `Gagal menambahkan produk` });
+        throw new Error(`HTTP error! status: ${response?.status}`);
+      }
+
+      const result = await response.json();
+
+      set({
+        isLoading: false,
+        products: [...get().products, result?.data],
+        error: null,
+      });
+    } catch (error) {
+      console.log("Error", error);
+      set({ error: error.message, isLoading: false });
+    }
+  },
+
+  // Add new categories
+  addCategories: async (formData) => {
+    const token = sessionStorage.getItem("authPosToken");
+
+    try {
+      set({ isLoading: true, error: null });
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_POS_ROUTES}/categories`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if (!response.ok) {
+        set({ isLoading: false, error: `Gagal menambahkan kategori` });
+        throw new Error(`HTTP error! status: ${response?.status}`);
+      }
+
+      const result = await response.json();
+
+      set({
+        isLoading: false,
+        categories: [...get().categories, result?.data],
+        error: null,
+        success: true,
+      });
+
+      if (response.ok) {
+        setTimeout(() => {
+          set({ success: null });
+        }, 2000);
+      }
+    } catch (error) {
+      console.log("Error", error);
+      set({ error: error.message, isLoading: false });
+    }
   },
 
   // Check if product has any stock available (for variant products)

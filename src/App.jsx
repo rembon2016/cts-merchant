@@ -13,6 +13,8 @@ import Pos from "./pages/POS";
 import PosTransaction from "./pages/POS/transaction";
 import PosTransactionDetail from "./pages/POS/detail";
 import PosProducts from "./pages/POS/products";
+import PosAddProducts from "./pages/POS/add-products";
+import PosAddCategories from "./pages/POS/add-categories";
 import AccountInformation from "./pages/AccountInformation";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -134,6 +136,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <PosProducts />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="pos/tambah-produk"
+              element={
+                <ProtectedRoute>
+                  <PosAddProducts />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="pos/tambah-kategori"
+              element={
+                <ProtectedRoute>
+                  <PosAddCategories />
                 </ProtectedRoute>
               }
             />

@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { formatCurrency } from "../helper/currency";
 import SimpleInput from "./form/SimpleInput";
 import CustomSelectBox from "./form/CustomSelectBox";
 import { useInvoiceStore } from "../store/invoiceStore";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 
 const dataBarang = [
   {
@@ -43,9 +44,35 @@ const AddInvoice = () => {
   });
   const [errors, setErrors] = useState({});
 
-  const { addInvoices, isLoading, error } = useInvoiceStore();
+  const { addInvoices, isLoading, error, success } = useInvoiceStore();
 
   const navigate = useNavigate();
+
+  const validateForm = () => {
+    const validateErrors = {};
+
+    if (!selectedData.customer_name) {
+      validateErrors.customer_name = "Nama Customer wajib di isi";
+    }
+
+    if (!selectedData.products) {
+      validateErrors.products = "Products wajib di pilih";
+    }
+
+    if (!selectedData.invoice_date) {
+      validateErrors.invoice_date = "Tanggal Penagihan wajib di isi";
+    }
+
+    if (!selectedData.invoice_due_date) {
+      validateErrors.invoice_due_date = "Tenggat Waktu Pembayaran wajib di isi";
+    }
+
+    if (!selectedData.bill_address) {
+      validateErrors.bill_address = "Alamat Penagihan wajib di isi";
+    }
+
+    return validateErrors;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,7 +82,6 @@ const AddInvoice = () => {
       [name]: value,
     }));
 
-    // Clear validation error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -65,36 +91,76 @@ const AddInvoice = () => {
   };
 
   const handleSubmit = async () => {
-    const checkError = Object.keys(errors).length > 0;
+    const checkErrors = validateForm();
 
-    if (checkError) return;
+    if (Object.keys(checkErrors).length > 0) {
+      setErrors(checkErrors);
+      return;
+    }
 
-    const response = await addInvoices(selectedData);
+    setErrors({});
 
-    console.log(response);
+    await addInvoices(selectedData);
+  };
 
-    if (response.ok) {
-      navigate("/invoice", { replace: true });
+  useEffect(() => {
+    if (success) {
+      toast.success(
+        typeof success === "string" ? success : "Invoices Berhasil Dibuat",
+        {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        }
+      );
+
+      setTimeout(() => {
+        navigate("/invoice", { replace: true });
+      }, 3000);
 
       setSelectedData([]);
       setSelected([]);
       setErrors([]);
     }
-  };
+
+    if (error) {
+      toast.error(
+        typeof error === "string"
+          ? "Terjadi Kesalahan Saat Membuat Invoices"
+          : "Terjadi kesalahan",
+        {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        }
+      );
+    }
+  }, [success, error]);
 
   return (
     <div className="p-4 sm:p-6 lg:p-10">
+      <ToastContainer />
       <div className="flex flex-col gap-3">
         <SimpleInput
           name="customer_name"
           type="text"
-          label="Nama Customer"
+          label="Nama Customer *"
           value={selectedData.customer_name}
           errors={errors.customer_name}
           handleChange={handleChange}
         />
         <CustomSelectBox
-          label="Pilih produk"
+          label="Pilih produk *"
           name="products"
           value={selected}
           selectBoxData={dataBarang}
@@ -138,7 +204,7 @@ const AddInvoice = () => {
         <SimpleInput
           name="invoice_date"
           type="date"
-          label="Tanggal Penagihan"
+          label="Tanggal Penagihan *"
           value={selectedData.invoice_date}
           errors={errors.invoice_date}
           handleChange={handleChange}
@@ -146,7 +212,7 @@ const AddInvoice = () => {
         <SimpleInput
           name="invoice_due_date"
           type="date"
-          label="Tenggat Waktu Pembayaran"
+          label="Tenggat Waktu Pembayaran *"
           value={selectedData.invoice_due_date}
           errors={errors.invoice_due_date}
           handleChange={handleChange}
@@ -154,7 +220,7 @@ const AddInvoice = () => {
         <SimpleInput
           name="bill_address"
           type="text"
-          label="Alamat Penagihan"
+          label="Alamat Penagihan *"
           value={selectedData.bill_address}
           errors={errors.bill_address}
           handleChange={handleChange}
