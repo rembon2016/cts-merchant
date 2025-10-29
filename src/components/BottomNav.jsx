@@ -9,7 +9,8 @@ const BottomNav = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
   const { saveOrder, selectPaymentMethod } = useCheckoutStore();
-  const { selectedCart, cart, setSelectedCart } = useCartStore();
+  const { selectedCart, cart, setSelectedCart, clearDiscountData } =
+    useCartStore();
   const navigation = useNavigate();
   const pathname = location.pathname;
   const getCart = sessionStorage.getItem("cart");
@@ -18,14 +19,12 @@ const BottomNav = () => {
   const [pendingPath, setPendingPath] = useState(null);
 
   const taxPrice = sessionStorage.getItem("tax");
-  const discountPrice = JSON.parse(sessionStorage.getItem("discount"));
+  const discountPrice = sessionStorage.getItem("discount");
 
   const totalPrice = selectedCart?.reduce(
     (a, b) => a + Number.parseFloat(b.subtotal),
     0
   );
-
-  const TOTAL_PAYMENT = 0;
 
   const showButtonFromPath = ["/cart", "/checkout"];
 
@@ -151,6 +150,7 @@ const BottomNav = () => {
       setLoading(false);
     }, 1000);
   };
+
   const processCheckout = () => {
     if (!getCart) return;
 
@@ -160,8 +160,8 @@ const BottomNav = () => {
       branch_id: sessionStorage.getItem("branchActive"),
       user_id: sessionStorage.getItem("userId"),
       sub_total: Math.ceil(totalPrice),
-      tax_amount: Math.ceil(taxPrice),
-      discount_amount: 0,
+      tax_amount: Math.ceil(Number(taxPrice)),
+      discount_amount: Math.ceil(Number(discountPrice)),
       payment_method_id: selectPaymentMethod,
       payment_amount: JSON.parse(sessionStorage.getItem("totalPayment")),
       discount_id: null,
@@ -184,6 +184,8 @@ const BottomNav = () => {
         sessionStorage.removeItem("cart");
         sessionStorage.removeItem("tax");
         sessionStorage.removeItem("discount");
+        sessionStorage.removeItem("totalPayment");
+        clearDiscountData();
       }
 
       setLoading(false);
@@ -315,6 +317,7 @@ const BottomNav = () => {
     sessionStorage.removeItem("cart");
     sessionStorage.removeItem("discount");
     sessionStorage.removeItem("tax");
+    sessionStorage.removeItem("totalPayment");
     setSelectedCart([]);
     setShowExitModal(false);
     if (pendingPath) navigation(pendingPath);

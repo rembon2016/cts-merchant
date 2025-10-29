@@ -1,148 +1,59 @@
-import { useParams, useSearchParams } from "react-router-dom";
-import { formatCurrency } from "../helper/currency";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useInvoiceStore } from "../store/invoiceStore";
+import { useEffect, useMemo } from "react";
 import { formatDate } from "../helper/format-date";
+import { formatCurrency } from "../helper/currency";
+import CustomLoading from "./CustomLoading";
 
 const statusBadge = (status) => {
-  if (status.toLowerCase() === "paid") return "Sudah Bayar";
-  if (status.toLowerCase() === "unpaid") return "Belum Bayar";
-  if (status.toLowerCase() === "overdue") return "Terlambat";
+  if (status?.toLowerCase() === "paid") return "Sudah Bayar";
+  if (status?.toLowerCase() === "pending") return "Belum Bayar";
+  if (status?.toLowerCase() === "overdue") return "Terlambat";
   return "-";
 };
 
 const DetailInvoice = () => {
-  const [searchParams] = useSearchParams();
-  const params = useParams();
+  const { invoices, getDetailInvoices, isLoading } = useInvoiceStore();
 
-  const sampleData = [
-    {
-      invoiceNumber: "INV-20251020-001",
-      fullName: "John Doe",
-      date: "2025-10-20",
-      dueDate: "2025-11-03",
-      amount: 125000,
-      status: "Paid",
-      paymentAddress: "Jl. Jend. Sudirman No. 20, Jakarta Pusat, Indonesia",
-      goods: [
-        {
-          name: "Kopi Susu",
-          amount: 15000,
-          quantity: 2,
-        },
-        {
-          name: "Kopi Liong",
-          amount: 12000,
-          quantity: 1,
-        },
-      ],
-    },
-    {
-      invoiceNumber: "INV-20251020-002",
-      name: "John Doe",
-      date: "2025-10-21",
-      dueDate: "2025-11-03",
-      amount: 250000,
-      status: "Unpaid",
-      paymentAddress: "Jl. Jend. Sudirman No. 20, Jakarta Pusat, Indonesia",
-      goods: [
-        {
-          name: "Teh Kotak",
-          amount: 12000,
-          quantity: 4,
-        },
-        {
-          name: "Susu Kotak Ultramilk",
-          amount: 8000,
-          quantity: 1,
-        },
-      ],
-    },
-    {
-      invoiceNumber: "INV-20251020-003",
-      name: "John Doe",
-      date: "2025-10-22",
-      dueDate: "2025-11-03",
-      amount: 75000,
-      status: "Unpaid",
-      paymentAddress: "Jl. Jend. Sudirman No. 20, Jakarta Pusat, Indonesia",
-      goods: [
-        {
-          name: "Sayur Bayem",
-          amount: 24000,
-          quantity: 2,
-        },
-      ],
-    },
-    {
-      invoiceNumber: "INV-20251020-004",
-      name: "John Doe",
-      date: "2025-10-23",
-      dueDate: "2025-11-03",
-      amount: 425000,
-      status: "Paid",
-      paymentAddress: "Jl. Jend. Sudirman No. 20, Jakarta Pusat, Indonesia",
-      goods: [
-        {
-          name: "Buah Jeruk",
-          amout: 32000,
-          quantity: 2,
-        },
-        {
-          name: "Sayur Kangkung",
-          amount: 12000,
-          quantity: 11,
-        },
-      ],
-    },
-    {
-      invoiceNumber: "INV-20251020-005",
-      name: "John Doe",
-      date: "2025-10-24",
-      dueDate: "2025-11-03",
-      amount: 50000,
-      status: "Overdue",
-      paymentAddress: "Jl. Jend. Sudirman No. 20, Jakarta Pusat, Indonesia",
-      goods: [
-        {
-          name: "Ikan Asin",
-          amount: 12000,
-          quantity: 2,
-        },
-        {
-          name: "Ikan Tongkol",
-          amount: 16000,
-          quantity: 1,
-        },
-        {
-          name: "Wafer Nabati",
-          amount: 7000,
-          quantity: 14,
-        },
-      ],
-    },
-  ];
-  // Accept either query param ?invoiceNumber=... or route param /invoice/detail/:id
-  const invoiceNumber = searchParams.get("invoiceNumber") || params.id;
+  const location = useLocation();
+  const navigate = useNavigate();
+  const invoicePath = location.pathname.includes(`/invoice/detail`);
 
-  const invoice = sampleData.find((i) => i.invoiceNumber === invoiceNumber);
+  const invoiceId = globalThis?.location?.pathname?.split("/").pop();
 
-  return (
-    <div className="p-4 sm:p-6 lg:p-10">
+  useEffect(() => {
+    if (!invoicePath && !invoiceId) return;
+    getDetailInvoices(invoiceId);
+  }, [invoicePath, invoiceId]);
+
+  const renderElements = useMemo(() => {
+    if (isLoading) {
+      return <CustomLoading />;
+    }
+
+    return (
       <div className="w-full mx-auto bg-white dark:bg-slate-800 p-6 rounded-lg shadow">
-        <div className="flex w-full justify-end">
-          <button className="py-4 px-6 rounded-lg bg-[var(--c-primary)] hover:bg-blue-700 transition-colors ease-linear duration-300 ml-auto text-white mb-4">
+        <div className="flex w-full  justify-end gap-2 mb-2">
+          <button
+            onClick={() => navigate("/invoice", { replace: true })}
+            className="py-4 px-6 rounded-lg bg-[var(--c-accent)] hover:bg-yellow-300 transition-colors ease-linear duration-300 ml-auto text-gray-700 mb-4"
+          >
+            Kembali
+          </button>
+          <button className="py-4 px-6 rounded-lg bg-[var(--c-primary)] hover:bg-blue-700 transition-colors ease-linear duration-300 text-white mb-4">
             Cetak
           </button>
         </div>
         <div className="flex items-start justify-between">
           <div>
             <div className="text-xl font-semibold">
-              {invoice ? invoice.invoiceNumber : invoiceNumber || "-"}
+              {invoices ? invoices.code : "-"}
             </div>
             <div className="text-sm text-gray-700 mt-1">
-              {invoice ? invoice.name || invoice.fullName || "-" : "-"}
+              {invoices ? invoices.customer_name : "-"}
             </div>
             <div className="text-sm text-gray-500 mt-1">
-              {statusBadge(invoice?.status)}
+              {statusBadge(invoices?.status)}
             </div>
           </div>
         </div>
@@ -151,37 +62,37 @@ const DetailInvoice = () => {
           <div>
             <div className="text-xs text-gray-500">Tanggal Penagihan</div>
             <div className="mt-1">
-              {invoice ? formatDate(invoice.date) : "-"}
+              {invoices ? formatDate(invoices.invoice_date) : "-"}
             </div>
           </div>
           <div>
             <div className="text-xs text-gray-500">Tenggat Waktu</div>
             <div className="mt-1">
-              {invoice ? formatDate(invoice.dueDate) : "-"}
+              {invoices ? formatDate(invoices.invoice_due_date) : "-"}
             </div>
           </div>
         </div>
 
         <div className="mt-4">
           <div className="text-xs text-gray-500">Alamat Penagihan</div>
-          <div className="mt-1 text-sm">{invoice?.paymentAddress || "-"}</div>
+          <div className="mt-1 text-sm">{invoices?.bill_address || "-"}</div>
         </div>
 
         <div className="mt-8">
           <div className="text-sm font-medium mb-2">Daftar Barang</div>
-          {invoice?.goods?.length > 0 ? (
+          {invoices?.products?.length > 0 ? (
             <ul className="divide-y">
-              {invoice.goods.map((g, idx) => (
+              {invoices?.products.map((g) => (
                 <li
-                  key={idx}
+                  key={g.id}
                   className="py-2 flex justify-between items-center"
                 >
                   <div className="flex items-center gap-1">
-                    <div className="truncate">{g.name}</div>
+                    <div className="truncate">{g.product_name}</div>
                     <div className="text-sm text-gray-600">x{g.quantity}</div>
                   </div>
                   <div className="text-sm font-medium">
-                    {formatCurrency(g.amount * g.quantity)}
+                    {formatCurrency(g.price)}
                   </div>
                 </li>
               ))}
@@ -194,18 +105,20 @@ const DetailInvoice = () => {
         <div className="text-right mt-4 border-t pt-4">
           <div className="text-xs text-gray-500">Total Pembayaran</div>
           <div className="text-lg font-medium mt-1">
-            {invoice ? formatCurrency(invoice.amount) : "-"}
+            {invoices ? formatCurrency(invoices?.invoice_amount) : "-"}
           </div>
         </div>
 
-        {!invoice && (
+        {!invoices && (
           <div className="mt-4 text-sm text-red-600">
-            Invoice tidak ditemukan untuk "{invoiceNumber}"
+            Invoice tidak ditemukan untuk "{invoices?.code}"
           </div>
         )}
       </div>
-    </div>
-  );
+    );
+  }, [isLoading]);
+
+  return <div className="p-4 sm:p-6 lg:p-10">{renderElements}</div>;
 };
 
 export default DetailInvoice;

@@ -1,59 +1,46 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { formatCurrency } from "../helper/currency";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { formatDate } from "../helper/format-date";
-
-const sampleData = [
-  {
-    invoiceNumber: "INV-20251020-001",
-    date: "2025-10-20",
-    dueDate: "2025-11-03",
-    amount: 125000,
-    status: "Paid",
-  },
-  {
-    invoiceNumber: "INV-20251020-002",
-    date: "2025-10-21",
-    dueDate: "2025-11-03",
-    amount: 250000,
-    status: "Unpaid",
-  },
-  {
-    invoiceNumber: "INV-20251020-003",
-    date: "2025-10-22",
-    dueDate: "2025-11-03",
-    amount: 75000,
-    status: "Unpaid",
-  },
-  {
-    invoiceNumber: "INV-20251020-004",
-    date: "2025-10-23",
-    dueDate: "2025-11-03",
-    amount: 425000,
-    status: "Paid",
-  },
-  {
-    invoiceNumber: "INV-20251020-005",
-    date: "2025-10-24",
-    dueDate: "2025-11-03",
-    amount: 50000,
-    status: "Overdue",
-  },
-];
+import { useInvoiceStore } from "../store/invoiceStore";
+import CustomLoading from "./CustomLoading";
 
 const Invoice = () => {
   const navigate = useNavigate();
 
-  const summary = useMemo(() => {
-    const total = sampleData.length;
-    const paid = sampleData.filter((s) => s.status === "Paid").length;
-    const unpaid = sampleData.filter((s) => s.status === "Unpaid").length;
-    const overdue = sampleData.filter((s) => s.status === "Overdue").length;
-    return { total, paid, unpaid, overdue };
-  }, []);
+  const { invoices, getInvoices, isLoading } = useInvoiceStore();
 
-  return (
-    <div className="p-4 sm:p-6 lg:p-10">
+  const location = useLocation();
+  const invoicePath = location.pathname.includes("/invoice");
+
+  useEffect(() => {
+    if (!invoicePath) return;
+    getInvoices();
+  }, [invoicePath]);
+
+  const summary = useMemo(() => {
+    const total = invoices?.length;
+    const paid =
+      Array.isArray(invoices) &&
+      invoices?.filter((s) => s.status === "paid").length;
+    const unpaid =
+      Array.isArray(invoices) &&
+      invoices?.filter((s) => s.status === "pending").length;
+    return { total, paid, unpaid };
+  }, [invoices]);
+
+  const renderElements = useMemo(() => {
+    if (isLoading) {
+      return <CustomLoading />;
+    }
+
+    if (invoices?.length === 0) {
+      <div className="w-full text-center">
+        <p className="text-gray-800">Data Invoice Kosong</p>
+      </div>;
+    }
+
+    return (
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -86,129 +73,81 @@ const Invoice = () => {
               <div className="w-full flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
                 <div className="text-xs text-gray-500">Total Invoice</div>
                 <div className="mt-2 text-xl font-medium text-gray-900">
-                  {summary.total}
+                  {summary.total || 0}
                 </div>
               </div>
               <div className="w-full flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
                 <div className="text-xs text-gray-500">Belum Bayar</div>
                 <div className="mt-2 text-xl font-medium text-gray-900">
-                  {summary.unpaid}
+                  {summary.unpaid || 0}
                 </div>
               </div>
               <div className="w-full flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
+                <div className="text-xs text-gray-500">Sudah Lunas</div>
+                <div className="mt-2 text-xl font-medium text-gray-900">
+                  {summary.paid || 0}
+                </div>
+              </div>
+              {/* <div className="w-full flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
                 <div className="text-xs text-gray-500">Terlambat</div>
                 <div className="mt-2 text-xl font-medium text-gray-900">
                   {summary.overdue}
                 </div>
-              </div>
+              </div> */}
             </div>
 
             <div className="p-2">
               <div className="divide-y flex flex-col gap-3">
-                {sampleData.map((inv) => (
-                  <button
-                    key={inv.invoiceNumber}
-                    onClick={() =>
-                      navigate(`/invoice/detail/${inv.invoiceNumber}`, {
-                        replace: true,
-                      })
-                    }
-                    className={`bg-white dark:bg-slate-700 rounded-lg p-4 shadow-soft border border-slate-100 dark:border-slate-600`}
-                  >
-                    <div className="flex flex-col gap-1 items-start">
-                      <div className="text-sm font-medium text-gray-900 truncate">
-                        {inv.invoiceNumber}
+                {Array.isArray(invoices) &&
+                  invoices?.map((inv) => (
+                    <button
+                      key={inv.id}
+                      onClick={() =>
+                        navigate(`/invoice/detail/${inv.id}`, {
+                          replace: true,
+                        })
+                      }
+                      className={`bg-white dark:bg-slate-700 rounded-lg p-4 shadow-soft border border-slate-100 dark:border-slate-600`}
+                    >
+                      <div className="flex flex-col gap-1 items-start">
+                        <div className="text-sm font-medium text-gray-900 truncate">
+                          {inv.code}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          Mulai: {formatDate(inv.invoice_date)} • Jatuh tempo:{" "}
+                          {formatDate(inv.invoice_due_date)}
+                        </div>
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">
-                        Mulai: {formatDate(inv.date)} • Jatuh tempo:{" "}
-                        {formatDate(inv.dueDate)}
-                      </div>
-                    </div>
 
-                    <div className="text-sm font-medium text-gray-900 flex items-center gap-1 justify-end mt-3">
-                      {formatCurrency(inv.amount)}
-                      <span
-                        className={`inline-block px-2 py-1 rounded-full text-xs ${
-                          inv.status === "Paid"
-                            ? "bg-green-100 text-green-800"
-                            : inv.status === "Overdue"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-yellow-100 text-yellow-800"
-                        }`}
-                      >
-                        {inv.status.toLocaleLowerCase() === "paid"
-                          ? "Lunas"
-                          : inv.status.toLocaleLowerCase() === "overdue"
-                          ? "Terlambat"
-                          : "Belum Bayar"}
-                      </span>
-                    </div>
-                  </button>
-                ))}
+                      <div className="text-sm font-medium text-gray-900 flex items-center gap-1 justify-end mt-3">
+                        {formatCurrency(inv.invoice_amount)}
+                        <span
+                          className={`inline-block px-2 py-1 rounded-full text-xs ${
+                            inv.status === "paid"
+                              ? "bg-green-100 text-green-800"
+                              : inv.status === "pending"
+                              ? "bg-red-100 text-yellow-800"
+                              : "bg-yellow-100 text-red-800"
+                          }`}
+                        >
+                          {inv.status.toLocaleLowerCase() === "paid"
+                            ? "Lunas"
+                            : inv.status.toLocaleLowerCase() === "overdue"
+                            ? "Terlambat"
+                            : "Belum Bayar"}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
               </div>
             </div>
           </div>
-
-          {/* Detail panel */}
-          {/* <aside className="lg:col-span-1">
-            <div className="sticky top-6 p-4 bg-white border rounded-lg shadow-sm">
-              <h3 className="text-sm font-medium text-gray-900">
-                Detail Invoice
-              </h3>
-              {selected ? (
-                <div className="mt-3 text-sm text-gray-700 space-y-2">
-                  <div>
-                    <div className="text-xs text-gray-500">Nomor</div>
-                    <div className="font-medium">{selected.invoiceNumber}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-500">Tanggal</div>
-                    <div>{selected.date}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-500">Jatuh Tempo</div>
-                    <div>{selected.dueDate}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-500">Jumlah</div>
-                    <div className="text-lg font-semibold">
-                      {formatCurrency(selected.amount)}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-500">Status</div>
-                    <div>
-                      <span
-                        className={`inline-block mt-1 px-3 py-1 rounded-full text-xs ${
-                          selected.status === "Paid"
-                            ? "bg-green-100 text-green-800"
-                            : selected.status === "Overdue"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-yellow-100 text-yellow-800"
-                        }`}
-                      >
-                        {selected.status}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="pt-3 border-t">
-                    <button className="w-full px-4 py-2 bg-indigo-600 text-white rounded-md text-sm">
-                      Cetak
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="mt-3 text-sm text-gray-500">
-                  Pilih invoice untuk melihat detail
-                </div>
-              )}
-            </div>
-          </aside> */}
         </div>
       </div>
-    </div>
-  );
+    );
+  }, [isLoading, invoices]);
+
+  return <div className="p-4 sm:p-6 lg:p-10">{renderElements}</div>;
 };
 
 export default Invoice;
