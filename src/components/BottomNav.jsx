@@ -18,9 +18,6 @@ const BottomNav = () => {
   const [showExitModal, setShowExitModal] = useState(false);
   const [pendingPath, setPendingPath] = useState(null);
 
-  const taxPrice = sessionStorage.getItem("tax");
-  const discountPrice = sessionStorage.getItem("discount");
-
   const totalPrice = selectedCart?.reduce(
     (a, b) => a + Number.parseFloat(b.subtotal),
     0
@@ -156,12 +153,22 @@ const BottomNav = () => {
 
     setLoading(true);
 
+    // Read tax and discount directly from sessionStorage here to avoid using
+    // possibly-stale values captured earlier in the component lifecycle.
+    const currentTax = sessionStorage.getItem("tax");
+    const currentDiscount = sessionStorage.getItem("discount");
+
+    const taxAmount = Math.ceil(Number(currentTax ?? 0));
+    // If discount exists in sessionStorage use its numeric value, otherwise 0
+    const discountAmount =
+      currentDiscount !== null ? Math.ceil(Number(currentDiscount)) : 0;
+
     const checkoutValue = {
       branch_id: sessionStorage.getItem("branchActive"),
       user_id: sessionStorage.getItem("userId"),
       sub_total: Math.ceil(totalPrice),
-      tax_amount: Math.ceil(Number(taxPrice)),
-      discount_amount: Math.ceil(Number(discountPrice)),
+      tax_amount: taxAmount,
+      discount_amount: discountAmount,
       payment_method_id: selectPaymentMethod,
       payment_amount: JSON.parse(sessionStorage.getItem("totalPayment")),
       discount_id: null,

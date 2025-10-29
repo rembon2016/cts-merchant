@@ -71,7 +71,9 @@ const AddInvoice = () => {
 
     const response = await addInvoices(selectedData);
 
-    if (response.success) {
+    console.log(response);
+
+    if (response.ok) {
       navigate("/invoice", { replace: true });
 
       setSelectedData([]);

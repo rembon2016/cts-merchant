@@ -208,7 +208,7 @@ export default function POS() {
     }
 
     return (
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-2">
         {products.map((product, index) => {
           const isLastProduct = products.length === index + 1;
           const productPrice = getProductPrice(product);
@@ -255,18 +255,20 @@ export default function POS() {
                   </div>
                 )}
               </div>
-              <div className="p-4 w-full">
-                <div className="font-bold text-lg">
-                  {product.name.length > 10
-                    ? `${product.name.slice(0, 10)}...`
+              <div className="p-2 w-full">
+                <div className="font-bold text-md">
+                  {product.name.length > 12
+                    ? `${product.name.slice(0, 12)}...`
                     : product.name}
                 </div>
                 <div className="font-normal text-sm mb-2 text-gray-600 dark:text-gray-400">
-                  {product.description}
+                  {product.description?.length > 25
+                    ? `${product.description.slice(0, 25)}...`
+                    : product.description}
                 </div>
                 <div className="text-slate-600 dark:text-slate-300">
                   {/* <span>Rp.</span> */}
-                  <span className="font-bold text-2xl">
+                  <span className="font-bold text-lg">
                     {formatCurrency(productPrice)}
                   </span>
                 </div>
@@ -278,7 +280,7 @@ export default function POS() {
                     isOutOfStock
                       ? "bg-gray-400 text-gray-600 cursor-not-allowed"
                       : "bg-[var(--c-primary)] text-white hover:bg-blue-700"
-                  } text-[1rem]`}
+                  } text-[0.9rem]`}
                   onClick={(e) => {
                     e.stopPropagation();
                     if (!isOutOfStock) {
@@ -292,7 +294,7 @@ export default function POS() {
                   <img
                     src={`/icons/cart-white.svg`}
                     alt="Add to cart"
-                    className="w-6 h-6"
+                    className="w-5 h-5"
                   />
                 </button>
               </div>
