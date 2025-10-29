@@ -52,8 +52,6 @@ export default function Checkout() {
     return Number(price);
   };
 
-  console.log(getPriceWithDiscount());
-
   const getPriceWithTax = () => {
     return (checkoutPrice * posSettingsData?.tax) / 100;
   };

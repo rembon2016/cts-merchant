@@ -52,18 +52,31 @@ const useInvoiceStore = create((set) => ({
       });
 
       if (!response.ok) {
-        set({ isLoading: false, error: response?.message });
+        set({ error: true, isLoading: false });
+        setTimeout(() => {
+          set({ error: null });
+        }, 3000);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result = await response.json();
+      set({
+        isLoading: false,
+        error: false,
+        success: true,
+      });
 
-      if (result.success && result) {
-        set({ isLoading: false });
+      if (response.ok) {
+        setTimeout(() => {
+          set({ success: null, isLoading: false });
+        }, 3000);
+        return () => clearTimeout();
       }
     } catch (error) {
-      console.log(error);
-      set({ isLoading: false, error: error?.message });
+      console.log("Error: ", error.message);
+      setTimeout(() => {
+        set({ error: null });
+      }, 3000);
+      set({ error: error.message, isLoading: false });
     }
   },
   getDetailInvoices: async (invoiceId) => {

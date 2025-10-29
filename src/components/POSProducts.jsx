@@ -116,8 +116,24 @@ export default function POSProducts() {
 
     return (
       <div className="flex flex-col gap-3">
-        <div className="w-full h-full p-4 bg-white rounded-lg">
+        <div className="w-full h-full p-4 flex justify-between items-center bg-white rounded-lg">
           <h3 className="text-lg font-bold ">Daftar Product</h3>
+          <div className="flex gap-2">
+            <button
+              onClick={() => navigate("/pos/tambah-produk", { replace: true })}
+              className="text-sm"
+            >
+              + Produk
+            </button>
+            <button
+              onClick={() =>
+                navigate("/pos/tambah-kategori", { replace: true })
+              }
+              className="text-sm"
+            >
+              + Kategori
+            </button>
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-2">
           <div className="w-full p-4 bg-white flex flex-col gap-2">
