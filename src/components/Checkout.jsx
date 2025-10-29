@@ -45,11 +45,14 @@ export default function Checkout() {
 
     if (discountData?.discount_type === "nominal") {
       price = discountData?.discount_value || 0;
+    } else {
+      price = (checkoutPrice * discountData?.discount_value) / 100 || 0;
     }
-    price = (checkoutPrice * discountData?.discount_value) / 100 || 0;
 
     return Number(price);
   };
+
+  console.log(getPriceWithDiscount());
 
   const getPriceWithTax = () => {
     return (checkoutPrice * posSettingsData?.tax) / 100;
@@ -63,7 +66,7 @@ export default function Checkout() {
   };
 
   const getTotalPrice = () => {
-    const total = checkoutPrice + TOTAL()?.taxPrice - TOTAL()?.discountPrice;
+    const total = checkoutPrice + TOTAL()?.taxPrice - getPriceWithDiscount();
     sessionStorage.setItem("totalPayment", Math.ceil(total));
     return Math.ceil(total);
   };
