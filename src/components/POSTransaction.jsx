@@ -3,8 +3,8 @@ import SearchInput from "./SearchInput";
 import { formatCurrency } from "../helper/currency";
 import { useTransactionStore } from "../store/transactionStore";
 import { useEffect, useMemo } from "react";
-import CustomLoading from "./CustomLoading";
 import { useNavigate } from "react-router-dom";
+import CustomLoading from "./CustomLoading";
 
 export default function POSTransaction() {
   const { transactions, isLoading, getListTransactions } =

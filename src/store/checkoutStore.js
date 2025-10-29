@@ -8,8 +8,8 @@ export const useCheckoutStore = create((set) => ({
   isLoading: false,
   cartItems: [],
   paymentData: [],
-  posSettingsData: [],
   pendingOrder: [],
+  posSettingsData: [],
   transactionData: [],
   error: null,
   success: null,
@@ -107,8 +107,6 @@ export const useCheckoutStore = create((set) => ({
         success: true,
         response,
       });
-
-      sessionStorage.removeItem("tax");
 
       if (response) {
         setTimeout(() => {

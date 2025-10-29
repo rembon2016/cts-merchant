@@ -6,8 +6,8 @@ const ROOT_API = import.meta.env.VITE_API_POS_ROUTES;
 const useCartStore = create((set, get) => ({
   cart: [],
   selectedCart: [],
+  discountData: [],
   isLoading: false,
-  discountCode: "",
   tokenPos: sessionStorage.getItem("authPosToken") || null,
   activeBranch: sessionStorage.getItem("branchActive") || null,
   error: null,
@@ -246,7 +246,7 @@ const useCartStore = create((set, get) => ({
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${get().tokenPos}`,
+          Authorization: `Bearer ${sessionStorage.getItem("authPosToken")}`,
         },
         body: JSON.stringify({
           cart_id: cartId,
@@ -283,6 +283,7 @@ const useCartStore = create((set, get) => ({
       set({ error: error.message, isLoading: false });
     }
   },
+  clearDiscountData: () => set({ discountData: [] }),
   checkVoucherDiscount: async (discount) => {
     try {
       set({ isLoading: true, error: null });
@@ -291,11 +292,11 @@ const useCartStore = create((set, get) => ({
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          Authorization: `Bearer ${get().tokenPos}`,
+          Authorization: `Bearer ${sessionStorage.getItem("authPosToken")}`,
         },
         body: JSON.stringify({
           discount_code: discount,
-          branch_id: get().activeBranch,
+          branch_id: sessionStorage.getItem("branchActive"),
         }),
       });
 
@@ -306,9 +307,7 @@ const useCartStore = create((set, get) => ({
 
       const result = await response.json();
 
-      sessionStorage.setItem("discount", JSON.stringify(result?.data));
-
-      set({ discountCode: result?.data, isLoading: false });
+      set({ discountData: result?.data, isLoading: false });
       return result?.data;
     } catch (error) {
       console.log(error.message);
