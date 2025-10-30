@@ -8,6 +8,9 @@ import { toast, ToastContainer } from "react-toastify";
 import CustomSelectBox from "./form/CustomSelectBox";
 
 export default function POSAddProducts() {
+  const getToday = new Date().toISOString().split("T")[0];
+  const activeBranch = sessionStorage.getItem("branchActive");
+
   const [formData, setFormData] = useState({
     code: "",
     name: "",
@@ -42,14 +45,14 @@ export default function POSAddProducts() {
     ],
     stocks: [
       {
-        branch_id: "",
+        branch_id: activeBranch,
         qty: "",
         reason: "",
       },
     ],
     prices: [
       {
-        branch_id: "",
+        branch_id: activeBranch,
         cost: "",
         price: "",
         effective_from: "",
@@ -112,9 +115,6 @@ export default function POSAddProducts() {
     });
   };
 
-  const getToday = new Date().toISOString().split("T")[0];
-  const activeBranch = sessionStorage.getItem("branchActive");
-
   const handleSubmit = async () => {
     const dataToSubmit = {
       ...formData,
@@ -131,14 +131,10 @@ export default function POSAddProducts() {
           effective_until: "01-01-2026",
         },
       ],
-      stocks: [
-        {
-          branch_id: activeBranch,
-          qty: 1000,
-          reason: "Add Products",
-        },
-      ],
     };
+
+    console.log(dataToSubmit);
+
     await addProducts(dataToSubmit);
   };
 
@@ -314,6 +310,28 @@ export default function POSAddProducts() {
           handleChange={handleChange}
           // disabled={true}
         />
+        {formData?.stocks?.map((item, index) => (
+          <div className="flex flex-col gap-2" key={index}>
+            <SimpleInput
+              name="stocks.qty"
+              type="number"
+              label="Stocks / Quantity"
+              value={item?.qty}
+              handleChange={(e) =>
+                handleNestedChange("stocks", index, "qty", e.target.value)
+              }
+            />
+            <SimpleInput
+              name="stocks.reason"
+              type="text"
+              label="Reason"
+              value={item?.reason}
+              handleChange={(e) =>
+                handleNestedChange("stocks", index, "reason", e.target.value)
+              }
+            />
+          </div>
+        ))}
 
         <div className="py-4 flex justify-between">
           <div className="flex items-center gap-2">
