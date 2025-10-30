@@ -49,7 +49,8 @@ export default function POSProducts() {
   );
 
   // Navigate to product detail page
-  const goToProductDetail = (productId) => navigate(`/product/${productId}`);
+  const goToProductDetail = (productId) =>
+    navigate(`/pos/products/${productId}`);
 
   // Compute total stocks across all products
   const totalStocks = useMemo(() => {

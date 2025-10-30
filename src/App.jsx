@@ -13,7 +13,9 @@ import Pos from "./pages/POS";
 import PosTransaction from "./pages/POS/transaction";
 import PosTransactionDetail from "./pages/POS/detail";
 import PosProducts from "./pages/POS/products";
+import PosProductsDetail from "./pages/POS/products-detail";
 import PosAddProducts from "./pages/POS/add-products";
+import PosEditProducts from "./pages/POS/edit-products";
 import PosAddCategories from "./pages/POS/add-categories";
 import AccountInformation from "./pages/AccountInformation";
 import Login from "./pages/Login";
@@ -27,7 +29,6 @@ import DetailProduct from "./pages/ProductDetail";
 import Invoice from "./pages/Invoice";
 import DetailInvoice from "./pages/Invoice/detail";
 import AddInvoice from "./pages/Invoice/add";
-import Order from "./pages/Order";
 import CustomerSupport from "./pages/CustomerSupport";
 import EmailSupportPage from "./pages/EmailSupportPage";
 import LiveChatPage from "./pages/LiveChatPage";
@@ -160,10 +161,26 @@ function App() {
               }
             />
             <Route
+              path="pos/products/:id"
+              element={
+                <ProtectedRoute>
+                  <PosProductsDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="pos/tambah-produk"
               element={
                 <ProtectedRoute>
                   <PosAddProducts />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="pos/edit-produk/:id"
+              element={
+                <ProtectedRoute>
+                  <PosEditProducts />
                 </ProtectedRoute>
               }
             />
