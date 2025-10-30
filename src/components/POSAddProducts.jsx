@@ -5,6 +5,7 @@ import CustomInputFile from "./form/CustomInputFile";
 import CustomCheckbox from "./form/CustomCheckbox";
 import { useProductStore } from "../store/productStore";
 import { toast, ToastContainer } from "react-toastify";
+import CustomSelectBox from "./form/CustomSelectBox";
 
 export default function POSAddProducts() {
   const [formData, setFormData] = useState({
@@ -22,8 +23,8 @@ export default function POSAddProducts() {
     is_bundle: false,
     sku: "",
     barcode: "",
-    category_ids: "",
-    brand_ids: "",
+    category_ids: [],
+    brand_ids: [],
     skus: [
       {
         sku: "",
@@ -111,7 +112,35 @@ export default function POSAddProducts() {
     });
   };
 
-  const handleSubmit = async () => await addProducts(formData);
+  const getToday = new Date().toISOString().split("T")[0];
+  const activeBranch = sessionStorage.getItem("branchActive");
+
+  const handleSubmit = async () => {
+    const dataToSubmit = {
+      ...formData,
+      is_variant: formData.is_variant ? 1 : 0,
+      is_bundle: formData.is_variant ? 1 : 0,
+      bundle_items: formData.is_bundle ? formData.bundle_items : [],
+      skus: formData.is_variant ? formData.skus : [],
+      prices: [
+        {
+          branch_id: activeBranch,
+          cost: formData.cost_product,
+          price: formData.price_product,
+          effective_from: getToday,
+          effective_until: "01-01-2026",
+        },
+      ],
+      stocks: [
+        {
+          branch_id: activeBranch,
+          qty: 1000,
+          reason: "Add Products",
+        },
+      ],
+    };
+    await addProducts(dataToSubmit);
+  };
 
   useEffect(() => {
     Promise.all([
@@ -172,25 +201,37 @@ export default function POSAddProducts() {
           handleChange={handleChange}
           // disabled={true}
         />
-        <SimpleInput
+        <CustomSelectBox
+          label="Pilih Brands"
           name="brand_ids"
-          type="text"
-          label="Nama Brand"
           value={formData?.brand_ids}
-          isSelectBox={true}
           selectBoxData={brands}
-          handleChange={handleChange}
-          // disabled={true}
+          onChange={(items) => {
+            // Map selected items into the products shape expected by selectedData
+            const selectedData = items.map((item) => item.id);
+            setFormData((prev) => ({
+              ...prev,
+              brand_ids: selectedData,
+            }));
+          }}
+          placeholder="Cari atau pilih..."
+          multiple={true}
         />
-        <SimpleInput
+        <CustomSelectBox
+          label="Pilih Category"
           name="category_ids"
-          type="text"
-          label="Pilih Kategori"
           value={formData?.category_ids}
-          isSelectBox={true}
           selectBoxData={categories}
-          handleChange={handleChange}
-          // disabled={true}
+          onChange={(items) => {
+            // Map selected items into the products shape expected by selectedData
+            const selectedData = items.map((item) => item.id);
+            setFormData((prev) => ({
+              ...prev,
+              category_ids: selectedData,
+            }));
+          }}
+          placeholder="Cari atau pilih..."
+          multiple={true}
         />
         <div className="flex gap-2">
           <SimpleInput
@@ -274,18 +315,33 @@ export default function POSAddProducts() {
           // disabled={true}
         />
 
-        <div className="p-4 flex items-center gap-2">
-          <CustomCheckbox
-            id="is_bundle"
-            name="is_bundle"
-            checked={formData?.is_bundle}
-            onChange={() =>
-              setFormData((prev) => ({ ...prev, is_bundle: !prev.is_bundle }))
-            }
-            size="md"
-          />
-          <div className="mt-2 text-sm">
-            Is Bundle?: {formData?.is_bundle ? "Yes" : "No"}
+        <div className="py-4 flex justify-between">
+          <div className="flex items-center gap-2">
+            <CustomCheckbox
+              id="is_bundle"
+              name="is_bundle"
+              checked={formData?.is_bundle}
+              onChange={() =>
+                setFormData((prev) => ({ ...prev, is_bundle: !prev.is_bundle }))
+              }
+              size="md"
+            />
+            <div className="mt-2 text-sm">Is Bundle?</div>
+          </div>
+          <div className="flex items-center gap-2">
+            <CustomCheckbox
+              id="is_variant"
+              name="is_variant"
+              checked={formData?.is_variant}
+              onChange={() =>
+                setFormData((prev) => ({
+                  ...prev,
+                  is_variant: !prev.is_variant,
+                }))
+              }
+              size="md"
+            />
+            <div className="mt-2 text-sm">Is Variant?</div>
           </div>
         </div>
         {formData?.is_bundle && (
@@ -363,20 +419,6 @@ export default function POSAddProducts() {
             ))}
           </div>
         )}
-        <div className="p-4 flex items-center gap-2">
-          <CustomCheckbox
-            id="is_variant"
-            name="is_variant"
-            checked={formData?.is_variant}
-            onChange={() =>
-              setFormData((prev) => ({ ...prev, is_variant: !prev.is_variant }))
-            }
-            size="md"
-          />
-          <div className="mt-2 text-sm">
-            Is Variant?: {formData?.is_variant ? "Yes" : "No"}
-          </div>
-        </div>
         {formData?.is_variant && (
           <div className="flex flex-col gap-2 items-end">
             <button
@@ -468,7 +510,7 @@ export default function POSAddProducts() {
           onClick={handleSubmit}
           className="bg-[var(--c-primary)] text-white py-4 w-full rounded-lg font-semibold"
         >
-          {isLoading ? "Memproses" : "Tambah Produk"}
+          {isLoading ? "Memproses..." : "Tambah Produk"}
         </button>
       </div>
     );
@@ -514,8 +556,6 @@ export default function POSAddProducts() {
       );
     }
   }, [success, error]);
-
-  console.log(formData);
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
