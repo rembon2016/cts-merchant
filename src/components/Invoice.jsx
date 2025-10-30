@@ -5,6 +5,7 @@ import { formatDate } from "../helper/format-date";
 import { useInvoiceStore } from "../store/invoiceStore";
 import CustomLoading from "./CustomLoading";
 import SimpleInput from "./form/SimpleInput";
+import { Plus } from "lucide-react";
 
 const Invoice = () => {
   const navigate = useNavigate();
@@ -22,24 +23,19 @@ const Invoice = () => {
   }, [invoicePath]);
 
   const dataStatus = [
-    { id: "paid", name: "Paid" },
-    { id: "pending", name: "Pending" },
+    { id: "paid", name: "Dibayar", color: "bg-green-300 text-green-800" },
+    { id: "pending", name: "Belum Bayar", color: "bg-yellow-300 text-yellow-800" },
+    { id: "canceled", name: "Dibatalkan", color: "bg-red-300 text-red-800" },
+    { id: "expired", name: "Kadaluarsa", color: "bg-orange-300 text-orange-800" },
   ];
 
   const summary = useMemo(() => {
     const total = invoices?.length;
-    const paid =
+    const [paid, unpaid, canceled, expired] = dataStatus.map((s) =>
       Array.isArray(invoices) &&
-      invoices?.filter((s) => s.status === "paid").length;
-    const unpaid =
-      Array.isArray(invoices) &&
-      invoices?.filter((s) => s.status === "pending").length;
-    const canceled =
-      Array.isArray(invoices) &&
-      invoices?.filter((s) => s.status === "canceled").length;
-    const expired =
-      Array.isArray(invoices) &&
-      invoices?.filter((s) => s.status === "expired").length;
+      invoices?.filter((inv) => inv.status === s.id).length
+    );
+
     return { total, paid, unpaid, canceled, expired };
   }, [invoices]);
 
@@ -67,16 +63,16 @@ const Invoice = () => {
           </div>
           <div className="flex items-center gap-3">
             <button
-              className="p-4 bg-[var(--c-primary)] text-white rounded-md text-sm hover:bg-indigo-700"
+              className="p-3 bg-[var(--c-primary)] text-white rounded-md text-sm hover:bg-indigo-700"
               onClick={() => navigate("/invoice/add", { replace: true })}
             >
-              Buat Invoice
+              <Plus />
             </button>
-            <input
+            {/* <input
               type="search"
               placeholder="Cari invoice..."
               className="hidden sm:block border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
-            />
+            /> */}
           </div>
         </div>
 
@@ -90,6 +86,13 @@ const Invoice = () => {
                   {summary.total || 0}
                 </div>
               </div> */}
+
+
+            <div className="col-span-2 w-full mb-2">
+              <span>Jumlah Invoice:</span>
+              <span className="inline-block font-bold ms-2">{summary.total || 0}</span>
+            </div>
+
               <div className="w-full flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
                 <div className="text-xs text-gray-500">Sudah Lunas</div>
                 <div className="mt-2 text-xl font-medium text-gray-900">
@@ -114,18 +117,6 @@ const Invoice = () => {
                   {summary.expired || 0}
                 </div>
               </div>
-
-              {/* <div className="w-full flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
-                <div className="text-xs text-gray-500">Terlambat</div>
-                <div className="mt-2 text-xl font-medium text-gray-900">
-                  {summary.overdue}
-                </div>
-              </div> */}
-            </div>
-
-            <div className="w-full text-end">
-              Jumlah Invoices:{" "}
-              <span className="font-bold">{summary.total || 0}</span>
             </div>
 
             {/* <div className="w-full p-4 bg-white flex gap-2">
@@ -156,32 +147,22 @@ const Invoice = () => {
                     className={`bg-white dark:bg-slate-700 rounded-lg p-4 shadow-soft border border-slate-100 dark:border-slate-600`}
                   >
                     <div className="flex flex-col gap-1 items-start">
-                      <div className="text-sm font-medium text-gray-900 truncate">
-                        {inv.code}
-                      </div>
-                      <div className="text-xs text-gray-500 mt-1">
-                        Mulai: {formatDate(inv.invoice_date)} • Jatuh tempo:{" "}
-                        {formatDate(inv.invoice_due_date)}
-                      </div>
+                        <div className="text-sm font-medium text-gray-900 truncate">
+                            {inv.code}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                            Mulai: {formatDate(inv.invoice_date)} • Jatuh tempo:{" "}
+                            {formatDate(inv.invoice_due_date)}
+                        </div>
                     </div>
 
-                    <div className="text-sm font-medium text-gray-900 flex items-center gap-1 justify-end mt-3">
-                      {formatCurrency(inv.invoice_amount)}
-                      <span
-                        className={`inline-block px-2 py-1 rounded-full text-xs ${
-                          inv.status === "paid"
-                            ? "bg-green-100 text-green-800"
-                            : inv.status === "pending"
-                            ? "bg-red-100 text-yellow-800"
-                            : "bg-yellow-100 text-red-800"
-                        }`}
-                      >
-                        {inv.status.toLocaleLowerCase() === "paid"
-                          ? "Lunas"
-                          : inv.status.toLocaleLowerCase() === "overdue"
-                          ? "Terlambat"
-                          : "Belum Bayar"}
-                      </span>
+                    <div className="text-sm font-medium text-gray-900 flex items-center gap-3 justify-between mt-3">
+                        <span className={dataStatus.find((item) => item.id === inv.status)?.color + " inline-block px-2 py-1 rounded-full text-xs"}>
+                            {dataStatus.find((item) => item.id === inv.status)?.name}
+                        </span>
+                        <span className="font-semibold text-lg text-[var(--c-primary)]">
+                            {formatCurrency(inv.invoice_amount)}
+                        </span>
                     </div>
                   </button>
                 ))}
