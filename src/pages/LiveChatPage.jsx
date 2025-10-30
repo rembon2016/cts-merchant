@@ -113,13 +113,13 @@ const LiveChatPage = () => {
           {/* Action Buttons */}
           <div className="flex items-center gap-2">
             <button
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors hidden"
               title="Voice call"
             >
               <Phone size={20} className="text-gray-600 dark:text-gray-400" />
             </button>
             <button
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors hidden"
               title="Video call"
             >
               <Video size={20} className="text-gray-600 dark:text-gray-400" />

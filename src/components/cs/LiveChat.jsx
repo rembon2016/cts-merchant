@@ -180,7 +180,7 @@ const LiveChat = () => {
           <div
             className={`rounded-2xl px-4 py-2 ${
               isUser
-                ? 'Laporan text-white rounded-br-none'
+                ? 'bg-blue-500 text-white rounded-br-none'
                 : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-bl-none'
             }`}
           >
