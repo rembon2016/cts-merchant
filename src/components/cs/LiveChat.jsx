@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Send, Paperclip, Loader2, AlertCircle } from 'lucide-react';
-import useChatStore from '../../store/chatStore';
-import { useUserStore } from '../../store/userStore';
+import React, { useEffect, useRef, useState } from "react";
+import { Send, Paperclip, Loader2, AlertCircle } from "lucide-react";
+import useChatStore from "../../store/chatStore";
+import { useUserStore } from "../../store/userStore";
 
 const LiveChat = () => {
   const {
@@ -12,13 +12,13 @@ const LiveChat = () => {
     uploadFile,
     demoStep,
     isAgentMode,
-    demoComplete
+    demoComplete,
   } = useChatStore();
 
   const { user } = useUserStore();
-  const [inputMessage, setInputMessage] = useState('');
+  const [inputMessage, setInputMessage] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadError, setUploadError] = useState('');
+  const [uploadError, setUploadError] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(true);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -26,35 +26,31 @@ const LiveChat = () => {
   // Quick reply suggestions based on demo step
   const getSuggestions = () => {
     if (demoComplete) return [];
-    
+
     if (demoStep === 0) {
       // Initial suggestions
       return [
-        'Saya ingin bertanya tentang transaksi',
-        'Ada masalah dengan POS saya',
-        'Bagaimana cara menggunakan fitur ini?'
+        "Saya ingin bertanya tentang transaksi",
+        "Ada masalah dengan POS saya",
+        "Bagaimana cara menggunakan fitur ini?",
       ];
     } else if (demoStep === 1) {
       // After first bot response
       return [
-        'Tolong hubungkan dengan agent',
-        'Saya perlu bantuan lebih lanjut',
-        'Ya, hubungkan saya dengan agent'
+        "Tolong hubungkan dengan agent",
+        "Saya perlu bantuan lebih lanjut",
+        "Ya, hubungkan saya dengan agent",
       ];
     } else if (demoStep === 2) {
       // After connected to agent
       return [
-        'Saya butuh bantuan refund',
-        'Transaksi saya bermasalah',
-        'POS tidak berfungsi dengan baik'
+        "Saya butuh bantuan refund",
+        "Transaksi saya bermasalah",
+        "POS tidak berfungsi dengan baik",
       ];
     } else if (demoStep === 3) {
       // After agent response
-      return [
-        'Terima kasih',
-        'Saya mengerti',
-        'Oke, saya tunggu'
-      ];
+      return ["Terima kasih", "Saya mengerti", "Oke, saya tunggu"];
     }
     return [];
   };
@@ -74,7 +70,11 @@ const LiveChat = () => {
   }, [messages, isTyping]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "nearest",
+    });
   };
 
   const handleSendMessage = async () => {
@@ -82,10 +82,10 @@ const LiveChat = () => {
 
     try {
       sendMessage(inputMessage.trim(), true);
-      setInputMessage('');
+      setInputMessage("");
       setShowSuggestions(false);
     } catch (error) {
-      console.error('Failed to send message:', error);
+      console.error("Failed to send message:", error);
     }
   };
 
@@ -94,12 +94,12 @@ const LiveChat = () => {
       sendMessage(suggestionText, true);
       setShowSuggestions(false);
     } catch (error) {
-      console.error('Failed to send message:', error);
+      console.error("Failed to send message:", error);
     }
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
@@ -111,49 +111,61 @@ const LiveChat = () => {
 
     // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
-      setUploadError('File size must be less than 10MB');
+      setUploadError("File size must be less than 10MB");
       return;
     }
 
     // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ];
     if (!allowedTypes.includes(file.type)) {
-      setUploadError('File type not supported. Please upload images, PDF, or Word documents.');
+      setUploadError(
+        "File type not supported. Please upload images, PDF, or Word documents."
+      );
       return;
     }
 
     setIsUploading(true);
-    setUploadError('');
+    setUploadError("");
 
     try {
       const fileUrl = await uploadFile(file);
       await sendMessage({
         text: file.name,
-        type: 'file',
-        fileUrl
+        type: "file",
+        fileUrl,
       });
     } catch (error) {
-      setUploadError('Failed to upload file. Please try again.');
-      console.error('File upload error:', error);
+      setUploadError("Failed to upload file. Please try again.");
+      console.error("File upload error:", error);
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+        fileInputRef.current.value = "";
       }
     }
   };
 
   const formatTime = (timestamp) => {
-    if (!timestamp) return '';
+    if (!timestamp) return "";
     const date = new Date(timestamp);
-    if (isNaN(date.getTime())) return '';
-    return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    if (isNaN(date.getTime())) return "";
+    return date.toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   const renderMessage = (message, index) => {
-    const isUser = message.sender === 'user';
-    const isFile = message.type === 'file';
-    const isSystem = message.sender === 'system' || message.type === 'system';
+    const isUser = message.sender === "user";
+    const isFile = message.type === "file";
+    const isSystem = message.sender === "system" || message.type === "system";
 
     // Render system messages differently (centered)
     if (isSystem) {
@@ -169,19 +181,19 @@ const LiveChat = () => {
     return (
       <div
         key={message.id || index}
-        className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}
+        className={`flex ${isUser ? "justify-end" : "justify-start"} mb-4`}
       >
-        <div className={`max-w-[70%] ${isUser ? 'order-2' : 'order-1'}`}>
+        <div className={`max-w-[70%] ${isUser ? "order-2" : "order-1"}`}>
           {!isUser && (
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 px-1">
-              {message.senderName || 'Agent'}
+              {message.senderName || "Agent"}
             </p>
           )}
           <div
             className={`rounded-2xl px-4 py-2 ${
               isUser
-                ? 'Laporan text-white rounded-br-none'
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-bl-none'
+                ? "bg-blue-500 text-white rounded-br-none"
+                : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-bl-none"
             }`}
           >
             {isFile ? (
@@ -200,7 +212,11 @@ const LiveChat = () => {
               </p>
             )}
           </div>
-          <p className={`text-xs text-gray-400 mt-1 px-1 ${isUser ? 'text-right' : 'text-left'}`}>
+          <p
+            className={`text-xs text-gray-400 mt-1 px-1 ${
+              isUser ? "text-right" : "text-left"
+            }`}
+          >
             {formatTime(message.createdAt)}
           </p>
         </div>
@@ -226,20 +242,32 @@ const LiveChat = () => {
               <Send size={32} className="text-blue-500" />
             </div>
             <p className="text-lg font-medium mb-2">Mulai Percakapan</p>
-            <p className="text-sm px-4">Kirim pesan atau pilih salah satu saran di bawah untuk memulai chat dengan customer support kami</p>
+            <p className="text-sm px-4">
+              Kirim pesan atau pilih salah satu saran di bawah untuk memulai
+              chat dengan customer support kami
+            </p>
           </div>
         ) : (
           <>
             {messages.map((message, index) => renderMessage(message, index))}
-            
+
             {/* Typing Indicator */}
             {isTyping && (
               <div className="flex justify-start mb-4">
                 <div className="bg-gray-200 dark:bg-gray-700 rounded-2xl rounded-bl-none px-4 py-3">
                   <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    <div
+                      className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                      style={{ animationDelay: "0ms" }}
+                    ></div>
+                    <div
+                      className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                      style={{ animationDelay: "150ms" }}
+                    ></div>
+                    <div
+                      className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                      style={{ animationDelay: "300ms" }}
+                    ></div>
                   </div>
                 </div>
               </div>
@@ -252,7 +280,9 @@ const LiveChat = () => {
       {/* Quick Reply Suggestions */}
       {suggestions.length > 0 && showSuggestions && (
         <div className="px-4 py-2 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Saran Balasan:</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+            Saran Balasan:
+          </p>
           <div className="flex flex-wrap gap-2">
             {suggestions.map((suggestion, index) => (
               <button
@@ -309,7 +339,7 @@ const LiveChat = () => {
               disabled={!isConnected}
               rows={1}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ minHeight: '44px', maxHeight: '120px' }}
+              style={{ minHeight: "44px", maxHeight: "120px" }}
             />
           </div>
 
@@ -318,7 +348,7 @@ const LiveChat = () => {
             onClick={handleSendMessage}
             disabled={!inputMessage.trim() || !isConnected}
             className="p-2 bg-[var(--c-primary)] text-white rounded-full hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
-            style={{ minWidth: '44px', minHeight: '44px' }}
+            style={{ minWidth: "44px", minHeight: "44px" }}
           >
             <Send size={20} />
           </button>
