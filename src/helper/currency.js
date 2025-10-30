@@ -19,7 +19,10 @@ export const formatCurrency = (amount) => {
         normalized = cleaned.replace(",", ".");
       } else if (hasDot) {
         // only dot present -> assume dot is thousands separator (local format)
-        normalized = cleaned.replaceAll(/\./g, "");
+        // normalized = cleaned.replaceAll(/\./g, "");
+        // Remove trailing zeros after dot if any, keep dot only if non-zero digits follow
+        normalized = normalized.replace(/(\d)\.0+$/, "$1");
+        normalized = normalized.replace(/(\d\.\d*?[1-9])0+$/, "$1");
       }
 
       num = Number.parseFloat(normalized) || 0;
@@ -37,8 +40,8 @@ export const formatCurrency = (amount) => {
 
   // Use explicit "Rp." prefix (with dot) and keep localized number formatting.
   if (truncated < 0) {
-    return `-Rp. ${formatter.format(Math.abs(truncated))}`;
+    return `-Rp ${formatter.format(Math.abs(truncated))}`;
   }
 
-  return `Rp. ${formatter.format(truncated)}`;
+  return `Rp ${formatter.format(truncated)}`;
 };
