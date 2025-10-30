@@ -8,6 +8,7 @@ import CustomLoading from "./CustomLoading";
 import { useNavigate } from "react-router-dom";
 import { formatCurrency } from "../helper/currency";
 import SearchInput from "./SearchInput";
+import { AlertCircle, ShoppingCart, XCircle } from "lucide-react";
 
 const MENU = [
   {
@@ -133,40 +134,45 @@ export default function POS() {
   const renderCategories = useMemo(() => {
     if (isLoading) {
       return (
-        <div className="mb-6">
-          <div className="text-center text-gray-500 mb-4">
-            Memuat kategori...
+        <div className="mb-3">
+          <div className="flex gap-1 overflow-x-auto invisible-scrollbar pb-2">
+            {[...Array(4)].map((_, idx) => (
+              <div
+                key={idx}
+                className="w-32 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"
+              />
+            ))}
           </div>
         </div>
       );
     }
 
     if (error) {
-      return (
-        <div className="mb-6">
-          <div className="text-center text-red-500 mb-4 p-3 bg-red-50 rounded-lg">
-            Error: {error}
-          </div>
-        </div>
-      );
+        return (
+            <div className="mb-3">
+                <div className="text-center text-red-500 mb-4 p-3 bg-red-50 rounded-lg">
+                    Error: {error}
+                </div>
+            </div>
+        );
     }
 
     return (
-      <div className="mb-6">
-        <div className="flex gap-2 overflow-x-auto pb-2">
+      <div className="mb-3">
+        <div className="flex gap-1 overflow-x-auto invisible-scrollbar pb-2">
           {subCategories.map((sub) => (
             <button
               key={sub.id}
-              className={`w-full flex flex-nowrap px-4 py-2 rounded border ${
+              className={`w-full flex flex-nowrap px-4 py-2 border ${
                 selectedSub?.toLowerCase() === sub?.name?.toLowerCase()
                   ? "bg-[var(--c-accent)] text-slate-600"
-                  : "bg-gray-100 text-gray-700"
-              } hover:bg-[var(--c-accent)] hover:text-slate-600 transition slate-600 space-nowrap rounded-full dark:text-slate-100 dark:hover:text-slate-600`}
+                  : "bg-white text-gray-700"
+              } hover:bg-[var(--c-accent)] hover:text-slate-600 transition slate-600 space-nowrap rounded-lg dark:text-slate-100 dark:hover:text-slate-600`}
               onClick={() =>
                 setSelectedSub(sub?.name === selectedSub ? "" : sub?.name)
               }
             >
-              <span className="w-full flex justify-center items-center">
+              <span className={(selectedSub?.toLowerCase() === sub?.name?.toLowerCase() ? "font-semibold" : "") + " w-full flex justify-center items-center text-nowrap whitespace-nowrap text-sm"}>
                 {sub.name}
               </span>
             </button>
@@ -179,26 +185,45 @@ export default function POS() {
   const renderProducts = useMemo(() => {
     if (productsLoading) {
       return (
-        <div className="w-full text-center">
-          {/* Loading indicator for infinite scroll */}
-          <CustomLoading />
+        <div className="grid grid-cols-2 gap-2">
+            {[...Array(4)].map((_, idx) => (
+                <div
+                    key={idx}
+                    className="w-full h-[220px] bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"
+                >
+                    <div className="w-full h-[80px] bg-gray-400 dark:bg-gray-600 rounded-t-[10px] p-2"></div>
+                    <div className="flex h-full flex-col gap-6 p-3">
+                        <div className="w-full">
+                            <div className="w-[90%] h-[20px] bg-gray-300 dark:bg-gray-500 rounded-sm mb-3"></div>
+                            <div className="flex flex-col gap-1">
+                                <div className="w-full h-[10px] bg-gray-300 dark:bg-gray-500 rounded-sm"></div>
+                                <div className="w-[30%] h-[10px] bg-gray-300 dark:bg-gray-500 rounded-sm"></div>
+                            </div>
+                        </div>
+
+                        <div className="w-full h-[35px] bg-gray-400 dark:bg-gray-500 rounded-lg p-2"></div>
+                    </div>
+                </div>
+            ))}
         </div>
       );
     }
 
     if (productsError) {
       return (
-        <div className="col-span-2 text-center text-red-500 p-4 bg-red-50 rounded-lg">
-          Error: {productsError}
-        </div>
+            <div className="col-span-2 flex flex-col items-center justify-center text-gray-500 p-4 bg-gray-100 rounded-lg h-[250px]">
+                <AlertCircle className="w-16 h-16 mb-2 text-gray-400" />
+                <span className="text-sm">Error: {productsError}</span>
+            </div>
       );
     }
 
     if (!productsLoading && !productsError && products?.length === 0) {
       return (
-        <div className="col-span-2 text-center text-gray-500">
-          Produk tidak ditemukan.
-        </div>
+            <div className="col-span-2 flex flex-col items-center justify-center text-gray-500 p-4 bg-gray-100 rounded-lg h-[250px]">
+                <XCircle className="w-16 h-16 mb-2 text-gray-400" />
+                <span className="text-sm">Produk tidak ditemukan</span>
+            </div>
       );
     }
 
@@ -219,7 +244,7 @@ export default function POS() {
             <div
               key={product.id}
               ref={isLastProduct ? lastProductElementRef : null}
-              className={`border rounded-lg shadow hover:shadow-lg transition flex flex-col items-start ${
+              className={`border rounded-lg shadow hover:shadow-lg transition flex flex-col items-start overflow-hidden ${
                 isOutOfStock ? "opacity-50" : "cursor-pointer"
               }`}
               onClick={() => !isOutOfStock && goToProductDetail(product.id)}
@@ -232,7 +257,7 @@ export default function POS() {
                       : "/images/placeholder.jpg"
                   }
                   alt={product.name || "Product Image"}
-                  className="w-full h-[100px] object-cover rounded-t-[10px]"
+                  className="w-full h-[100px] object-cover"
                   onError={(e) => {
                     e.target.src = "/images/placeholder.jpg";
                   }}
@@ -250,32 +275,28 @@ export default function POS() {
                   </div>
                 )}
               </div>
-              <div className="p-2 w-full">
-                <div className="font-bold text-md">
-                  {product.name.length > 12
-                    ? `${product.name.slice(0, 12)}...`
-                    : product.name}
-                </div>
-                <div className="font-normal text-sm mb-2 text-gray-600 dark:text-gray-400">
-                  {product.description?.length > 25
-                    ? `${product.description.slice(0, 25)}...`
-                    : product.description}
-                </div>
-                <div className="text-slate-600 dark:text-slate-300">
-                  {/* <span>Rp.</span> */}
-                  <span className="font-bold text-lg">
-                    {formatCurrency(productPrice)}
-                  </span>
-                </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-                  Stok: {productStock}
+              <div className="p-2 w-full h-full flex flex-col justify-between">
+                <div>
+                    <div className="text-slate-600 dark:text-slate-300">
+                    <span className="font-bold text-md">
+                        {formatCurrency(productPrice)}
+                    </span>
+                    </div>
+                    <div className="mt-2 mb-4">
+                        <div className="font-semibold text-md line-clamp-2 leading-5 mb-1">
+                            {product.name}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                            Stok: {productStock}
+                        </div>
+                    </div>
                 </div>
                 <button
-                  className={`w-full flex justify-center items-center gap-1 h-12 py-2 rounded-full transition-colors ${
+                  className={`w-full flex justify-center items-center gap-2 h-10 py-2 rounded-lg transition-colors ${
                     isOutOfStock
                       ? "bg-gray-400 text-gray-600 cursor-not-allowed"
                       : "bg-[var(--c-primary)] text-white hover:bg-blue-700"
-                  } text-[0.9rem]`}
+                  } text-xs`}
                   onClick={(e) => {
                     e.stopPropagation();
                     if (!isOutOfStock) {
@@ -284,13 +305,10 @@ export default function POS() {
                   }}
                   disabled={isOutOfStock}
                 >
-                  {isOutOfStock ? "Habis" : "Keranjang"}
-
-                  <img
-                    src={`/icons/cart-white.svg`}
-                    alt="Add to cart"
-                    className="w-5 h-5"
-                  />
+                    <span className="inline-block">
+                        <ShoppingCart className="w-4 h-4" />
+                    </span>
+                    {isOutOfStock ? "Habis" : "Tambahkan"}
                 </button>
               </div>
             </div>

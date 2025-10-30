@@ -293,6 +293,15 @@ img {
   animation: wobble2 var(--uib-speed) infinite ease-in-out;
 }
 
+.invisible-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.invisible-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 @keyframes spin78236 {
   0% {
     transform: rotate(0deg);
