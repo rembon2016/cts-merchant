@@ -22,11 +22,6 @@ const MENU = [
     iconDark: "/icons/product-white.svg",
     path: "/pos/products",
   },
-  {
-    name: "MENU",
-    iconLight: "/icons/menu.svg",
-    iconDark: "/icons/menu-white.svg",
-  },
 ];
 
 export default function POS() {

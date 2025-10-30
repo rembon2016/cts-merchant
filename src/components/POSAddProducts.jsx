@@ -515,6 +515,8 @@ export default function POSAddProducts() {
     }
   }, [success, error]);
 
+  console.log(formData);
+
   return (
     <div className="p-6 max-w-3xl mx-auto">
       <ToastContainer />
