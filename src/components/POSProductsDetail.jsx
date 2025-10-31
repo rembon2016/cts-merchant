@@ -4,6 +4,7 @@ import { useProductStore } from "../store/productStore";
 import { useThemeStore } from "../store/themeStore";
 import { formatCurrency } from "../helper/currency";
 import CustomLoading from "./CustomLoading";
+import BackButton from "./BackButton";
 
 export default function POSProductsDetail() {
   const { getDetailProduct, isLoading, products, error } = useProductStore();
@@ -45,9 +46,7 @@ export default function POSProductsDetail() {
     return (
       <div className="w-full h-full mt-3">
         <div className="flex justify-between items-center w-full mb-4">
-          <button className="bg-white text-gray-700 font-semibold w-[100px] py-2 rounded-sm hover:bg-slate-100 transition-colors duration-200">
-            Kembali
-          </button>
+          <BackButton to="/pos/products" />
           <div className="flex gap-1">
             <button className="bg-white w-[100px] py-2 text-gray-700 font-semibold rounded-sm hover:bg-slate-100 transition-colors duration-200">
               Hapus
