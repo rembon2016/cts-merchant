@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { useUserDataStore } from "./userDataStore";
+import { toast } from "react-toastify";
 
 // custom hooks for checking authentication
 const TOKEN_KEY = "authToken";
@@ -264,7 +265,7 @@ export const useAuthStore = create((set, get) => ({
     }, 3000);
 
     // Optional: Show notification
-    alert("Sesi Anda telah berakhir. Silakan login kembali.");
+    toast.warning("Sesi Anda telah berakhir. Silakan login kembali.");
   },
 
   logout: async () => {
