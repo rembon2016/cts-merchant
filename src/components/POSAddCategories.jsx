@@ -12,7 +12,7 @@ export default function POSAddProducts() {
     image: "",
   });
 
-  const { addCategories, isLoading, success, error } = useProductStore();
+  const { addCategories, isLoading, success, error, clearError } = useProductStore();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,6 +23,13 @@ export default function POSAddProducts() {
   };
 
   const handleSubmit = async () => await addCategories(formData);
+
+  useEffect(() => {
+    clearError();
+    return () => {
+      clearError();
+    };
+  }, []);
 
   useEffect(() => {
     if (success) {
