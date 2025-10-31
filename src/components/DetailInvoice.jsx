@@ -13,13 +13,16 @@ const statusBadge = (status) => {
 };
 
 const DetailInvoice = () => {
-  const { invoices, getDetailInvoices, isLoading } = useInvoiceStore();
+  const { invoices, getDetailInvoices, printInvoices, isLoading } =
+    useInvoiceStore();
 
   const location = useLocation();
   const navigate = useNavigate();
   const invoicePath = location.pathname.includes(`/invoice/detail`);
 
   const invoiceId = globalThis?.location?.pathname?.split("/").pop();
+
+  const handlePrintInvoices = async () => await printInvoices(invoiceId);
 
   useEffect(() => {
     if (!invoicePath && !invoiceId) return;
@@ -40,7 +43,10 @@ const DetailInvoice = () => {
           >
             Kembali
           </button>
-          <button className="py-4 px-6 rounded-lg bg-[var(--c-primary)] hover:bg-blue-700 transition-colors ease-linear duration-300 text-white mb-4">
+          <button
+            onClick={handlePrintInvoices}
+            className="py-4 px-6 rounded-lg bg-[var(--c-primary)] hover:bg-blue-700 transition-colors ease-linear duration-300 text-white mb-4"
+          >
             Cetak
           </button>
         </div>

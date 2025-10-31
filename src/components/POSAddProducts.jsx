@@ -7,6 +7,7 @@ import { useProductStore } from "../store/productStore";
 import { toast, ToastContainer } from "react-toastify";
 import CustomSelectBox from "./form/CustomSelectBox";
 import { useNavigate } from "react-router-dom";
+import BackButton from "./BackButton";
 
 export default function POSAddProducts() {
   const getToday = new Date().toISOString().split("T")[0];
@@ -119,12 +120,19 @@ export default function POSAddProducts() {
   };
 
   const handleSubmit = async () => {
+    const skuForm = formData.skus.map((sku) => ({
+      sku: sku.sku,
+      barcode: sku.barcode,
+      variant_name: sku.variant_name,
+      is_active: sku.is_active ? 1 : 0,
+    }));
+
     const dataToSubmit = {
       ...formData,
       is_variant: formData.is_variant ? 1 : 0,
       is_bundle: formData.is_variant ? 1 : 0,
       bundle_items: formData.is_bundle ? formData.bundle_items : [],
-      skus: formData.is_variant ? formData.skus : [],
+      skus: formData.is_variant ? skuForm : [],
       prices: [
         {
           branch_id: activeBranch,
@@ -576,6 +584,7 @@ export default function POSAddProducts() {
   return (
     <div className="p-6 max-w-3xl mx-auto">
       <ToastContainer />
+      <BackButton to="/pos/products" />
       {renderElements}
     </div>
   );

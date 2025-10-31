@@ -2,8 +2,8 @@ import { useMemo, useState, useEffect } from "react";
 import SimpleInput from "./form/SimpleInput";
 import CustomInputFile from "./form/CustomInputFile";
 import { useProductStore } from "../store/productStore";
-import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
+import BackButton from "./BackButton";
 
 export default function POSAddProducts() {
   const [formData, setFormData] = useState({
@@ -12,9 +12,7 @@ export default function POSAddProducts() {
     image: "",
   });
 
-  const { addCategories, isLoading, success, error } = useProductStore();
-
-  const navigate = useNavigate();
+  const { addCategories, isLoading, success, error, clearError } = useProductStore();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,6 +23,13 @@ export default function POSAddProducts() {
   };
 
   const handleSubmit = async () => await addCategories(formData);
+
+  useEffect(() => {
+    clearError();
+    return () => {
+      clearError();
+    };
+  }, []);
 
   useEffect(() => {
     if (success) {
@@ -41,9 +46,6 @@ export default function POSAddProducts() {
           theme: "light",
         }
       );
-      setTimeout(() => {
-        navigate("/pos/products");
-      }, 3000);
 
       return () => clearTimeout();
     }
@@ -106,6 +108,7 @@ export default function POSAddProducts() {
   return (
     <div className="p-6 max-w-3xl mx-auto">
       <ToastContainer />
+      <BackButton to="/pos/products" />
       {renderElements}
     </div>
   );

@@ -124,10 +124,25 @@ export default function POSEditProducts() {
   };
 
   const handleSubmit = async () => {
+    // Extract IDs as numbers from category_ids and brand_ids
+    const categoryIds = Array.isArray(formData.category_ids)
+      ? formData.category_ids.map((item) =>
+          typeof item === "object" && item?.id ? Number(item.id) : Number(item)
+        )
+      : [];
+
+    const brandIds = Array.isArray(formData.brand_ids)
+      ? formData.brand_ids.map((item) =>
+          typeof item === "object" && item?.id ? Number(item.id) : Number(item)
+        )
+      : [];
+
     const dataToSubmit = {
       ...formData,
+      category_ids: categoryIds,
+      brand_ids: brandIds,
       is_variant: formData.is_variant ? 1 : 0,
-      is_bundle: formData.is_variant ? 1 : 0,
+      is_bundle: formData.is_bundle ? 1 : 0,
       bundle_items: formData.is_bundle ? formData.bundle_items : [],
       skus: formData.is_variant ? formData.skus : [],
       prices: [
@@ -183,8 +198,102 @@ export default function POSEditProducts() {
 
   const getDetailProductsForEdited = async () => {
     await getDetailProduct(productId);
-    setFormData({ ...products });
   };
+
+  // Effect untuk mapping data dari products ke formData
+  useEffect(() => {
+    if (products && products.id) {
+      // Map data dari API ke format yang dibutuhkan form
+      const mappedData = {
+        code: products.code || "",
+        name: products.name || "",
+        description: products.description || "",
+        image: products.image || "",
+        type_product_id: products.type_product?.id || "",
+        unit_id: products.unit?.id || "",
+        cost_product: products.cost_product || "",
+        price_product: products.price_product || "",
+        minimum_sales_quantity: products.minimum_sales_quantity || "",
+        stok_alert: products.stok_alert || "",
+        is_variant: products.is_variant || false,
+        is_bundle: products.is_bundle || false,
+        sku: products.sku || "",
+        barcode: products.barcode || "",
+        // Map categories dari array objek ke array ID, tapi simpan objek untuk CustomSelectBox
+        category_ids: products.categories || [],
+        // Map brands dari array objek ke array ID, tapi simpan objek untuk CustomSelectBox
+        brand_ids: products.brands || [],
+        // Map skus dari API
+        skus:
+          products.skus && products.skus.length > 0
+            ? products.skus.map((sku) => ({
+                sku: sku.sku || "",
+                barcode: sku.barcode || "",
+                variant_name: sku.variant_name || "",
+                is_active: sku.is_active || false,
+              }))
+            : [
+                {
+                  sku: "",
+                  barcode: "",
+                  variant_name: "",
+                  is_active: false,
+                },
+              ],
+        // Map bundle_items dari API
+        bundle_items:
+          products.bundle_items && products.bundle_items.length > 0
+            ? products.bundle_items.map((item) => ({
+                product_id: item.product?.id || "",
+                qty: item.qty || "",
+                price: item.price || "",
+              }))
+            : [
+                {
+                  product_id: "",
+                  qty: "",
+                  price: "",
+                },
+              ],
+        // Map stocks dari API
+        stocks:
+          products.stocks && products.stocks.length > 0
+            ? products.stocks.map((stock) => ({
+                branch_id: stock.branch_id || activeBranch,
+                qty: stock.qty || "",
+                reason: stock.reason || "",
+              }))
+            : [
+                {
+                  branch_id: activeBranch,
+                  qty: "",
+                  reason: "",
+                },
+              ],
+        // Map prices dari API
+        prices:
+          products.prices && products.prices.length > 0
+            ? products.prices.map((price) => ({
+                branch_id: price.branch_id || activeBranch,
+                cost: price.cost || "",
+                price: price.price || "",
+                effective_from: price.effective_from || "",
+                effective_until: price.effective_until || "",
+              }))
+            : [
+                {
+                  branch_id: activeBranch,
+                  cost: "",
+                  price: "",
+                  effective_from: "",
+                  effective_until: "",
+                },
+              ],
+      };
+
+      setFormData(mappedData);
+    }
+  }, [products, activeBranch]);
 
   useEffect(() => {
     if (pathname.includes("/pos/edit-produk")) {
@@ -255,11 +364,10 @@ export default function POSEditProducts() {
           value={formData?.brand_ids}
           selectBoxData={brands}
           onChange={(items) => {
-            // Map selected items into the products shape expected by selectedData
-            const selectedData = items.map((item) => item.id);
+            // Simpan array objek untuk CustomSelectBox
             setFormData((prev) => ({
               ...prev,
-              brand_ids: selectedData,
+              brand_ids: items,
             }));
           }}
           placeholder="Cari atau pilih..."
@@ -271,11 +379,10 @@ export default function POSEditProducts() {
           value={formData?.category_ids}
           selectBoxData={categories}
           onChange={(items) => {
-            // Map selected items into the products shape expected by selectedData
-            const selectedData = items.map((item) => item.id);
+            // Simpan array objek untuk CustomSelectBox
             setFormData((prev) => ({
               ...prev,
-              category_ids: selectedData,
+              category_ids: items,
             }));
           }}
           placeholder="Cari atau pilih..."

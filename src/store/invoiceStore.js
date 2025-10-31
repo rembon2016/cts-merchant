@@ -8,6 +8,10 @@ const useInvoiceStore = create((set) => ({
   error: null,
   success: null,
   response: null,
+
+  /**
+   * Mengambil daftar invoice dari API
+   */
   getInvoices: async () => {
     const AUTH_TOKEN = sessionStorage.getItem("authToken");
 
@@ -29,11 +33,17 @@ const useInvoiceStore = create((set) => ({
       const result = await response.json();
 
       if (result.success && result) {
-        set({ invoices: result?.data?.invoices, isLoading: false });
+        set({
+          invoices: result?.data?.invoices || [],
+          isLoading: false,
+        });
       }
     } catch (error) {
       console.error("Error: ", error.message);
-      set({ invoices: [], isLoading: false });
+      set({
+        invoices: [],
+        isLoading: false,
+      });
     }
   },
   addInvoices: async (invoicesData) => {
@@ -59,18 +69,15 @@ const useInvoiceStore = create((set) => ({
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
+      const result = await response.json();
+
       set({
         isLoading: false,
         error: false,
         success: true,
       });
 
-      if (response.ok) {
-        setTimeout(() => {
-          set({ success: null, isLoading: false });
-        }, 3000);
-        return () => clearTimeout();
-      }
+      return result;
     } catch (error) {
       console.log("Error: ", error.message);
       setTimeout(() => {
@@ -112,17 +119,21 @@ const useInvoiceStore = create((set) => ({
       set({ invoices: [], isLoading: false });
     }
   },
-  printInvoices: async () => {
+  printInvoices: async (invoiceId) => {
+    const AUTH_TOKEN = sessionStorage.getItem("authToken");
     try {
       set({ isLoading: true, error: null });
 
-      const response = await fetch(`${ROOT_API}/pos/invoices`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${AUTH_TOKEN}`,
-        },
-      });
+      const response = await fetch(
+        `${ROOT_API}/v1/merchant/invoice/${invoiceId}/print`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${AUTH_TOKEN}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
