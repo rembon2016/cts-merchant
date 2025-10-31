@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Phone, Video, MoreVertical, Circle } from 'lucide-react';
-import LiveChat from '../components/cs/LiveChat';
-import useChatStore from '../store/chatStore';
-import { useUserStore } from '../store/userStore';
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft, Phone, Video, MoreVertical, Circle } from "lucide-react";
+import LiveChat from "../components/cs/LiveChat";
+import useChatStore from "../store/chatStore";
+import { useUserStore } from "../store/userStore";
 
 const LiveChatPage = () => {
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ const LiveChatPage = () => {
     disconnectChat,
     markAsRead,
     fetchChatHistory,
-    clearMessages
+    clearMessages,
   } = useChatStore();
 
   const { user } = useUserStore();
@@ -24,7 +24,7 @@ const LiveChatPage = () => {
     // Clear previous chat and start fresh demo
     clearMessages();
     // Connect to chat (demo mode)
-    connectChat('demo-user');
+    connectChat("demo-user");
     // Mark messages as read when entering chat
     markAsRead();
 
@@ -42,22 +42,22 @@ const LiveChatPage = () => {
       }
     };
 
-    document.addEventListener('visibilitychange', handleVisibility);
+    document.addEventListener("visibilitychange", handleVisibility);
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibility);
+      document.removeEventListener("visibilitychange", handleVisibility);
     };
   }, []);
 
   const getAgentStatus = () => {
-    if (!isConnected) return 'Offline';
-    if (currentAgent?.status === 'online') return 'Online';
-    return 'Away';
+    if (!isConnected) return "Offline";
+    if (currentAgent?.status === "online") return "Online";
+    return "Away";
   };
 
   const getStatusColor = () => {
-    if (!isConnected) return 'text-gray-400';
-    if (currentAgent?.status === 'online') return 'text-green-500';
-    return 'text-yellow-500';
+    if (!isConnected) return "text-gray-400";
+    if (currentAgent?.status === "online") return "text-green-500";
+    return "text-yellow-500";
   };
 
   return (
@@ -71,7 +71,10 @@ const LiveChatPage = () => {
               onClick={() => navigate(-1)}
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
             >
-              <ArrowLeft size={20} className="text-gray-700 dark:text-gray-300" />
+              <ArrowLeft
+                size={20}
+                className="text-gray-700 dark:text-gray-300"
+              />
             </button>
 
             {/* Agent Info */}
@@ -101,7 +104,7 @@ const LiveChatPage = () => {
               {/* Agent Name & Status */}
               <div className="flex-1">
                 <h1 className="text-base font-semibold text-gray-800 dark:text-gray-200">
-                  {currentAgent?.name || 'Customer Support'}
+                  {currentAgent?.name || "Customer Support"}
                 </h1>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                   {getAgentStatus()}
@@ -128,7 +131,10 @@ const LiveChatPage = () => {
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
               title="More options"
             >
-              <MoreVertical size={20} className="text-gray-600 dark:text-gray-400" />
+              <MoreVertical
+                size={20}
+                className="text-gray-600 dark:text-gray-400"
+              />
             </button>
           </div>
         </div>
