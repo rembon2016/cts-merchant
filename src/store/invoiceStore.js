@@ -8,6 +8,10 @@ const useInvoiceStore = create((set) => ({
   error: null,
   success: null,
   response: null,
+  
+  /**
+   * Mengambil daftar invoice dari API
+   */
   getInvoices: async () => {
     const AUTH_TOKEN = sessionStorage.getItem("authToken");
 
@@ -29,11 +33,17 @@ const useInvoiceStore = create((set) => ({
       const result = await response.json();
 
       if (result.success && result) {
-        set({ invoices: result?.data?.invoices, isLoading: false });
+        set({ 
+          invoices: result?.data?.invoices || [], 
+          isLoading: false
+        });
       }
     } catch (error) {
       console.error("Error: ", error.message);
-      set({ invoices: [], isLoading: false });
+      set({ 
+        invoices: [], 
+        isLoading: false
+      });
     }
   },
   addInvoices: async (invoicesData) => {
