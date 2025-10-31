@@ -157,34 +157,7 @@ const AddInvoice = () => {
 
     setErrors({});
     await addInvoices(selectedData);
-  };
 
-  const handleRemoveItem = (index) => {
-    setSelectedData((prev) => {
-      const newProducts = prev.products.filter((_, i) => i !== index);
-      return { ...prev, products: newProducts };
-    });
-  };
-
-  const handleAddProduct = () => {
-    setSelectedData((prev) => ({
-      ...prev,
-      products: [
-        ...prev.products,
-        { product_name: "", quantity: "", price: "" },
-      ],
-    }));
-  };
-
-  const calculateTotal = () => {
-    return selectedData.products.reduce((total, product) => {
-      const quantity = parseFloat(product.quantity) || 0;
-      const price = parseFloat(product.price) || 0;
-      return total + quantity * price;
-    }, 0);
-  };
-
-  useEffect(() => {
     if (success) {
       toast.success(
         typeof success === "string" ? success : "Invoices Berhasil Dibuat",
@@ -232,7 +205,32 @@ const AddInvoice = () => {
         }
       );
     }
-  }, [success, error, navigate]);
+  };
+
+  const handleRemoveItem = (index) => {
+    setSelectedData((prev) => {
+      const newProducts = prev.products.filter((_, i) => i !== index);
+      return { ...prev, products: newProducts };
+    });
+  };
+
+  const handleAddProduct = () => {
+    setSelectedData((prev) => ({
+      ...prev,
+      products: [
+        ...prev.products,
+        { product_name: "", quantity: "", price: "" },
+      ],
+    }));
+  };
+
+  const calculateTotal = () => {
+    return selectedData.products.reduce((total, product) => {
+      const quantity = parseFloat(product.quantity) || 0;
+      const price = parseFloat(product.price) || 0;
+      return total + quantity * price;
+    }, 0);
+  };
 
   // Step Indicator Component
   const StepIndicator = () => (

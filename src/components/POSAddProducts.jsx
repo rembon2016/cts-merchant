@@ -133,7 +133,9 @@ export default function POSAddProducts() {
       ],
     };
 
-    await addProducts(dataToSubmit);
+    const response = await addProducts(dataToSubmit);
+
+    console.log(response);
 
     if (success) {
       toast.success(

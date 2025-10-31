@@ -399,6 +399,8 @@ const useProductStore = create((set, get) => ({
         products: [...get().products, result?.data],
         error: null,
       });
+
+      // return await response;
     } catch (error) {
       console.log("Error", error);
       set({ error: error.message, isLoading: false });
