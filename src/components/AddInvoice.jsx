@@ -242,8 +242,8 @@ const AddInvoice = () => {
         { num: 2, label: "Produk" },
         { num: 3, label: "Preview" },
       ].map((step, idx) => (
-        <div key={step.num} className="flex items-center flex-1">
-          <div className="flex flex-col items-center flex-1">
+        <div key={step.num} className="flex items-center">
+          <div className="flex flex-col items-center">
             <div
               className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-colors ${
                 currentStep >= step.num

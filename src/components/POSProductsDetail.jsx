@@ -10,6 +10,8 @@ export default function POSProductsDetail() {
 
   const { isDark } = useThemeStore();
 
+  console.log(products);
+
   const productStock = products?.stocks?.reduce((a, b) => a + b.qty, 0);
 
   const navigate = useNavigate();
@@ -89,16 +91,36 @@ export default function POSProductsDetail() {
             </div>
           </div>
           <div className="flex flex-col gap-1">
-            <div className="flex gap-1">
-              <h3 className="font-medium text-lg">Stok: </h3>
-              <h3 className="font-bold text-lg">{productStock}</h3>
+            <div className="flex justify-between bg-white p-4 rounded-md">
+              <h3 className="font-medium text-md">Kode Produk </h3>
+              <h3 className="font-bold text-md">{products?.code}</h3>
             </div>
-            <div className="flex gap-1">
-              <h3 className="font-medium text-lg">Minimum Pembelian: </h3>
-              <h3 className="font-bold text-lg">
+            <div className="flex justify-between bg-white p-4 rounded-md">
+              <h3 className="font-medium text-md">SKU</h3>
+              <h3 className="font-bold text-md">{products?.sku || "-"}</h3>
+            </div>
+            <div className="flex justify-between bg-white p-4 rounded-md">
+              <h3 className="font-medium text-md">Stok </h3>
+              <h3 className="font-bold text-md">{productStock}</h3>
+            </div>
+            <div className="flex justify-between bg-white p-4 rounded-md">
+              <h3 className="font-medium text-md">Minimum Pembelian </h3>
+              <h3 className="font-bold text-md">
                 {products?.minimum_sales_quantity}
               </h3>
             </div>
+            <div className="flex justify-between bg-white p-4 rounded-md">
+              <h3 className="font-medium text-md">Unit </h3>
+              <h3 className="font-bold text-md">{products?.unit?.name}</h3>
+            </div>
+            {/* {products?.bundle_items?.length > 0 && (
+              <div className="flex justify-between bg-white p-4 rounded-md">
+                <h3 className="font-medium text-md">Paket </h3>
+                <h3 className="font-bold text-md">
+                  {products?.bundle_items?.length}
+                </h3>
+              </div>
+            )} */}
           </div>
         </div>
       </div>
