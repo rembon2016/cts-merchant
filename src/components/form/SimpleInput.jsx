@@ -34,9 +34,13 @@ export default function SimpleInput({
   } dark:text-slate-100 font-semibold`;
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <label
-        className="block text-sm font-semibold text-gray-700 mb-2"
+        className={`${
+          label !== ""
+            ? "block text-sm font-semibold text-gray-700 mb-2"
+            : "hidden"
+        }`}
         htmlFor="name"
       >
         {label}
@@ -64,6 +68,7 @@ export default function SimpleInput({
           disabled={disabled}
           placeholder={placeholder || "Pilih..."}
         >
+          <option disabled>Select Items</option>
           {selectBoxData?.map((item) => (
             <option key={item?.id} value={item?.id}>
               {item.name}

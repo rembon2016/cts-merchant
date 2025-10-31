@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useCartStore } from "../store/cartStore";
 import { useCheckoutStore } from "../store/checkoutStore";
 import { formatCurrency } from "../helper/currency";
-import SimpleInput from "./form/SimpleInput";
 import { isEmpty } from "../helper/is-empty";
+import SimpleInput from "./form/SimpleInput";
 
 export default function Checkout() {
   const getCart = JSON.parse(sessionStorage.getItem("cart"));
@@ -15,7 +15,8 @@ export default function Checkout() {
     selectPaymentMethod,
     setSelectPaymentMethod,
   } = useCheckoutStore();
-  const { checkVoucherDiscount, isLoading, error } = useCartStore();
+  const { checkVoucherDiscount, discountData, isLoading, error } =
+    useCartStore();
   const { getPosSettings, posSettingsData } = useCheckoutStore();
 
   const checkTax = async () => await getPosSettings();
@@ -24,14 +25,13 @@ export default function Checkout() {
     (a, b) => a + Number.parseInt(b.subtotal),
     0
   );
-  const DISCOUNT_AMOUNT = JSON.parse(sessionStorage.getItem("discount"));
 
   const TOTAL = () => {
     if (!checkoutPrice) return 0;
 
     let taxPrice, discountPrice;
 
-    if (!isEmpty(DISCOUNT_AMOUNT)) getPriceWithDiscount();
+    if (!isEmpty(discountData)) getPriceWithDiscount();
     if (posSettingsData?.tax !== 0) getPriceWithTax();
 
     taxPrice = getPriceWithTax();
@@ -41,7 +41,15 @@ export default function Checkout() {
   };
 
   const getPriceWithDiscount = () => {
-    return (checkoutPrice * DISCOUNT_AMOUNT?.amount) / 100 || 0;
+    let price;
+
+    if (discountData?.discount_type === "nominal") {
+      price = discountData?.discount_value || 0;
+    } else {
+      price = (checkoutPrice * discountData?.discount_value) / 100 || 0;
+    }
+
+    return Number(price);
   };
 
   const getPriceWithTax = () => {
@@ -56,7 +64,7 @@ export default function Checkout() {
   };
 
   const getTotalPrice = () => {
-    const total = checkoutPrice + TOTAL()?.taxPrice - TOTAL()?.discountPrice;
+    const total = checkoutPrice + TOTAL()?.taxPrice - getPriceWithDiscount();
     sessionStorage.setItem("totalPayment", Math.ceil(total));
     return Math.ceil(total);
   };
@@ -105,13 +113,13 @@ export default function Checkout() {
           <div className="flex justify-between items-center">
             <h4 className="font-semibold text-gray-500 text-md">Diskon</h4>
             <h4 className="font-bold text-gray-700 text-md">
-              {formatCurrency(Math.ceil(TOTAL()?.discountPrice) || 0)}
+              -{formatCurrency(Math.ceil(getPriceWithDiscount() || 0))}
             </h4>
           </div>
           <div className="flex justify-between items-center">
             <h4 className="font-semibold text-gray-500 text-md">Pajak</h4>
             <h4 className="font-bold text-gray-700 text-md">
-              {formatCurrency(Math.ceil(TOTAL()?.taxPrice) || 0)} (
+              +{formatCurrency(Math.ceil(TOTAL()?.taxPrice) || 0)} (
               {getAndFormatTax()}
               %)
             </h4>
@@ -129,6 +137,15 @@ export default function Checkout() {
     );
   }, [{ ...TOTAL() }, checkoutPrice, getCart?.items?.length]);
 
+  useEffect(() => {
+    if (discountData) {
+      sessionStorage.setItem(
+        "discount",
+        JSON.stringify(getPriceWithDiscount())
+      );
+    }
+  }, [discountData]);
+
   const inputClassName =
     "w-full p-4 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ring-1 ring-slate-600 dark:text-slate-200";
 
@@ -137,7 +154,7 @@ export default function Checkout() {
       {getCart?.items?.map((data) => (
         <div
           className="flex items-center justify-between gap-2 w-full"
-          key={data?.id}
+          key={data?.product_id}
         >
           <div className="flex gap-2 items-center bg-white w-full p-4 rounded-xl">
             <img
@@ -176,7 +193,7 @@ export default function Checkout() {
                   name="email"
                   className={inputClassName}
                   placeholder="Masukkan kode voucher"
-                  value={discountCode}
+                  value={discountCode?.toUpperCase()}
                   onChange={(e) => setDiscountCode(e.target.value)}
                 />
                 <button
