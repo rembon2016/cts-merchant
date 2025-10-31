@@ -594,7 +594,7 @@ const useProductStore = create((set, get) => ({
   },
 
   // Clear error
-  clearError: () => set({ error: null }),
+  clearError: () => set({ error: null, success: null }),
 
   // Clear categories
   clearCategories: () => set({ categories: [], error: null }),

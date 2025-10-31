@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Star, Upload, X } from 'lucide-react';
 import useFeedbackStore from '../../store/feedbackStore';
+import { toast } from 'react-toastify';
 
 const categories = [
   { value: 'feature', label: 'Fitur Baru' },
@@ -24,13 +25,13 @@ const FeedbackForm = ({ onSuccess }) => {
     if (file) {
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        alert('Ukuran file maksimal 5MB');
+        toast.error('Ukuran file maksimal 5MB');
         return;
       }
       
       // Validate file type
       if (!file.type.startsWith('image/')) {
-        alert('File harus berupa gambar');
+        toast.error('File harus berupa gambar');
         return;
       }
 
@@ -54,17 +55,17 @@ const FeedbackForm = ({ onSuccess }) => {
     e.preventDefault();
     
     if (!rating) {
-      alert('Silakan berikan rating');
+      toast.error('Silakan berikan rating');
       return;
     }
     
     if (!category) {
-      alert('Silakan pilih kategori');
+      toast.error('Silakan pilih kategori');
       return;
     }
     
     if (!message.trim()) {
-      alert('Silakan isi saran/masukan');
+      toast.error('Silakan isi saran/masukan');
       return;
     }
 

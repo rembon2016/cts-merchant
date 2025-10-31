@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useThemeStore } from "../store/themeStore";
 import { usePosStore } from "../store/posStore";
+import { toast } from "react-toastify";
 
 const VariantModal = ({ isOpen, onClose, product, onSelectVariant }) => {
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -19,7 +20,7 @@ const VariantModal = ({ isOpen, onClose, product, onSelectVariant }) => {
 
     const stock = getProductStock(product, selectedVariant.id);
     if (stock < quantity) {
-      alert(`Stok tidak mencukupi. Stok tersedia: ${stock}`);
+      toast.warning(`Stok tidak mencukupi. Stok tersedia: ${stock}`);
       return;
     }
 

@@ -6,6 +6,7 @@ import { formatCurrency } from "../helper/currency";
 import { toast, ToastContainer } from "react-toastify";
 import CustomLoading from "./CustomLoading";
 import SimpleModal from "./modal/SimpleModal";
+import BackButton from "./BackButton";
 
 export default function POSProductsDetail() {
   const { getDetailProduct, removeProducts, isLoading, products, error } =
@@ -100,9 +101,7 @@ export default function POSProductsDetail() {
           />
         )}
         <div className="flex justify-between items-center w-full mb-4">
-          <button className="bg-white text-gray-700 font-semibold w-[100px] py-2 rounded-sm hover:bg-slate-100 transition-colors duration-200">
-            Kembali
-          </button>
+          <BackButton to="/pos/products" />
           <div className="flex gap-1">
             <button
               onClick={handleOpenModal}
