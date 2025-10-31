@@ -5,6 +5,7 @@ const ROOT_API = import.meta.env.VITE_API_ROUTES;
 const useInvoiceStore = create((set) => ({
   invoices: [],
   isLoading: false,
+  downloading: false,
   error: null,
   success: null,
   response: null,
@@ -119,34 +120,39 @@ const useInvoiceStore = create((set) => ({
       set({ invoices: [], isLoading: false });
     }
   },
-  printInvoices: async (invoiceId) => {
+  printInvoices: async (invoiceId, invoiceCode, invoiceName) => {
     const AUTH_TOKEN = sessionStorage.getItem("authToken");
+
     try {
-      set({ isLoading: true, error: null });
+      set({ downloading: true, error: null });
 
-      const response = await fetch(
-        `${ROOT_API}/v1/merchant/invoice/${invoiceId}/print`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${AUTH_TOKEN}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-
-      if (result.success && result) {
-        set({ invoices: result, isLoading: false });
-      }
+      fetch(`${ROOT_API}/v1/merchant/invoice/${invoiceId}/print`, {
+        method: "GET",
+        headers: {
+          "Content-Type":
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          Authorization: `Bearer ${AUTH_TOKEN}`,
+        },
+      })
+        .then((response) => {
+          response.headers.get("filename");
+          return response.blob();
+        })
+        .then((response) => {
+          let myURL = globalThis.URL || globalThis.webkitURL;
+          let csvUrl = myURL.createObjectURL(response);
+          let tempLink = document.createElement("a");
+          tempLink.href = csvUrl;
+          tempLink.setAttribute(
+            "download",
+            `${invoiceCode}-${invoiceName}.pdf`
+          );
+          tempLink.click();
+          set({ downloading: false, error: null });
+        });
     } catch (error) {
-      console.error("Error: ", error.message);
-      set({ invoices: [], isLoading: false });
+      console.log(error);
+      set({ downloading: false, error: error.message });
     }
   },
 }));
