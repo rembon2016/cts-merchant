@@ -6,10 +6,17 @@ import CustomCheckbox from "./form/CustomCheckbox";
 import { useProductStore } from "../store/productStore";
 import { toast, ToastContainer } from "react-toastify";
 import CustomSelectBox from "./form/CustomSelectBox";
+import { useLocation } from "react-router-dom";
+import CustomLoading from "./CustomLoading";
 
-export default function POSAddProducts() {
+export default function POSEditProducts() {
   const getToday = new Date().toISOString().split("T")[0];
   const activeBranch = sessionStorage.getItem("branchActive");
+
+  const location = useLocation();
+  const pathname = location.pathname;
+
+  const productId = pathname.split("/pos/edit-produk/")[1];
 
   const [formData, setFormData] = useState({
     code: "",
@@ -64,7 +71,6 @@ export default function POSAddProducts() {
   const {
     brands,
     getBrands,
-    getProducts,
     products,
     getTypeProducts,
     typeProducts,
@@ -73,6 +79,7 @@ export default function POSAddProducts() {
     categories,
     getCategories,
     addProducts,
+    getDetailProduct,
     success,
     error,
     isLoading,
@@ -156,7 +163,7 @@ export default function POSAddProducts() {
       return () => clearTimeout();
     }
 
-    if (error) {
+    if (error !== null) {
       toast.error(
         typeof error === "string"
           ? "Gagal Menambahkan Produk"
@@ -175,15 +182,24 @@ export default function POSAddProducts() {
     }
   };
 
+  const getDetailProductsForEdited = async () => {
+    await getDetailProduct(productId);
+    setFormData({ ...products });
+  };
+
   useEffect(() => {
+    if (pathname.includes("/pos/edit-produk")) {
+      if (!productId) return;
+      getDetailProductsForEdited();
+    }
     Promise.all([
       getBrands(),
       getTypeProducts(),
       getUnits(),
       getCategories(),
-      getProducts(),
+      // getProducts(),
     ]);
-  }, []);
+  }, [pathname, productId]);
 
   const getTrashIcon = useMemo(() => {
     return (
@@ -206,6 +222,15 @@ export default function POSAddProducts() {
   }, []);
 
   const renderElements = useMemo(() => {
+    if (isLoading) {
+      return (
+        <div className="w-full text-center">
+          {/* Loading indicator for infinite scroll */}
+          <CustomLoading />
+        </div>
+      );
+    }
+
     return (
       <div className="flex flex-col gap-3">
         <div className="flex gap-2">
@@ -569,7 +594,7 @@ export default function POSAddProducts() {
         </button>
       </div>
     );
-  }, [formData, handleChange]);
+  }, [formData, handleChange, isLoading]);
 
   return (
     <div className="p-6 max-w-3xl mx-auto">

@@ -63,7 +63,8 @@ export default function POSProducts() {
   );
 
   // Navigate to product detail page
-  const goToProductDetail = (productId) => navigate(`/product/${productId}`);
+  const goToProductDetail = (productId) =>
+    navigate(`/pos/products/${productId}`);
 
   // Compute total stocks across all products
   const totalStocks = useMemo(() => {
@@ -130,25 +131,10 @@ export default function POSProducts() {
 
     return (
       <div className="flex flex-col gap-3">
-        <div className="w-full h-full p-4 flex justify-between items-center bg-white rounded-lg">
-          <h3 className="text-lg font-bold ">Daftar Product</h3>
-          <div className="flex gap-2">
-            <button
-              onClick={() => navigate("/pos/tambah-produk", { replace: true })}
-              className="text-sm"
-            >
-              + Produk
-            </button>
-            <button
-              onClick={() =>
-                navigate("/pos/tambah-kategori", { replace: true })
-              }
-              className="text-sm"
-            >
-              + Kategori
-            </button>
-          </div>
-        </div>
+        {/* <div className="w-full h-full p-4 flex justify-between items-center bg-white rounded-lg">
+          <h3 className="text-lg font-bold ">Daftar Produk</h3>
+        </div> */}
+
         <div className="grid grid-cols-2 gap-2">
           <div className="w-full p-4 bg-white flex flex-col gap-2">
             <h3 className="font-normal">Jumlah Product</h3>
@@ -162,6 +148,20 @@ export default function POSProducts() {
               }).format(totalStocks)}
             </h1>
           </div>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => navigate("/pos/tambah-produk", { replace: true })}
+            className="text-md w-full bg-white rounded-md py-4 font-semibold hover:bg-[var(--c-accent)] transition-colors duration-200"
+          >
+            + Produk
+          </button>
+          <button
+            onClick={() => navigate("/pos/tambah-kategori", { replace: true })}
+            className="text-md w-full bg-white rounded-md py-4 font-semibold hover:bg-[var(--c-accent)] transition-colors duration-200"
+          >
+            + Kategori
+          </button>
         </div>
         <div className="grid grid-cols-2 gap-2">
           {products.map((product, index) => {
