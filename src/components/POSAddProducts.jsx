@@ -133,9 +133,46 @@ export default function POSAddProducts() {
       ],
     };
 
-    console.log(dataToSubmit);
-
     await addProducts(dataToSubmit);
+
+    if (success) {
+      toast.success(
+        typeof success === "string" ? success : "Berhasil menambahkan Produk",
+        {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        }
+      );
+      setTimeout(() => {
+        navigate("/pos/products");
+      }, 3000);
+
+      return () => clearTimeout();
+    }
+
+    if (error) {
+      toast.error(
+        typeof error === "string"
+          ? "Gagal Menambahkan Produk"
+          : "Terjadi kesalahan",
+        {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        }
+      );
+    }
   };
 
   useEffect(() => {
@@ -533,47 +570,6 @@ export default function POSAddProducts() {
       </div>
     );
   }, [formData, handleChange]);
-
-  useEffect(() => {
-    if (success) {
-      toast.success(
-        typeof success === "string" ? success : "Berhasil menambahkan Produk",
-        {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        }
-      );
-      setTimeout(() => {
-        navigate("/pos/products");
-      }, 3000);
-
-      return () => clearTimeout();
-    }
-
-    if (error) {
-      toast.error(
-        typeof error === "string"
-          ? "Gagal Menambahkan Produk"
-          : "Terjadi kesalahan",
-        {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        }
-      );
-    }
-  }, [success, error]);
 
   return (
     <div className="p-6 max-w-3xl mx-auto">

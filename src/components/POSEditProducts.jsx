@@ -7,6 +7,7 @@ import { useProductStore } from "../store/productStore";
 import { toast, ToastContainer } from "react-toastify";
 import CustomSelectBox from "./form/CustomSelectBox";
 import { useLocation } from "react-router-dom";
+import CustomLoading from "./CustomLoading";
 
 export default function POSEditProducts() {
   const getToday = new Date().toISOString().split("T")[0];
@@ -14,6 +15,8 @@ export default function POSEditProducts() {
 
   const location = useLocation();
   const pathname = location.pathname;
+
+  const productId = pathname.split("/pos/edit-produk/")[1];
 
   const [formData, setFormData] = useState({
     code: "",
@@ -68,7 +71,6 @@ export default function POSEditProducts() {
   const {
     brands,
     getBrands,
-    getProducts,
     products,
     getTypeProducts,
     typeProducts,
@@ -77,7 +79,7 @@ export default function POSEditProducts() {
     categories,
     getCategories,
     addProducts,
-    getProductsById,
+    getDetailProduct,
     success,
     error,
     isLoading,
@@ -138,26 +140,64 @@ export default function POSEditProducts() {
       ],
     };
 
-    console.log(dataToSubmit);
-
     await addProducts(dataToSubmit);
+
+    if (success) {
+      toast.success(
+        typeof success === "string" ? success : "Berhasil menambahkan Produk",
+        {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        }
+      );
+      setTimeout(() => {
+        navigate("/pos/products");
+      }, 3000);
+
+      return () => clearTimeout();
+    }
+
+    if (error !== null) {
+      toast.error(
+        typeof error === "string"
+          ? "Gagal Menambahkan Produk"
+          : "Terjadi kesalahan",
+        {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        }
+      );
+    }
+  };
+
+  const getDetailProductsForEdited = async () => {
+    await getDetailProduct(productId);
+    setFormData({ ...products });
   };
 
   useEffect(() => {
-    const productId = pathname.split("/pos/edit-produk/")[1];
     if (pathname.includes("/pos/edit-produk")) {
-      const productId = pathname.split("/pos/edit-produk/")[1];
-
       if (!productId) return;
-
-      getProductsById(productId);
+      getDetailProductsForEdited();
     }
     Promise.all([
       getBrands(),
       getTypeProducts(),
       getUnits(),
       getCategories(),
-      getProducts(),
+      // getProducts(),
     ]);
   }, [pathname, productId]);
 
@@ -182,6 +222,15 @@ export default function POSEditProducts() {
   }, []);
 
   const renderElements = useMemo(() => {
+    if (isLoading) {
+      return (
+        <div className="w-full text-center">
+          {/* Loading indicator for infinite scroll */}
+          <CustomLoading />
+        </div>
+      );
+    }
+
     return (
       <div className="flex flex-col gap-3">
         <div className="flex gap-2">
@@ -545,48 +594,7 @@ export default function POSEditProducts() {
         </button>
       </div>
     );
-  }, [formData, handleChange]);
-
-  useEffect(() => {
-    if (success) {
-      toast.success(
-        typeof success === "string" ? success : "Berhasil menambahkan Produk",
-        {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        }
-      );
-      setTimeout(() => {
-        navigate("/pos/products");
-      }, 3000);
-
-      return () => clearTimeout();
-    }
-
-    if (error) {
-      toast.error(
-        typeof error === "string"
-          ? "Gagal Menambahkan Produk"
-          : "Terjadi kesalahan",
-        {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        }
-      );
-    }
-  }, [success, error]);
+  }, [formData, handleChange, isLoading]);
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
