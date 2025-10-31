@@ -16,7 +16,7 @@ const QuickMenus = () => {
     {
       id: "soundbox",
       label: "Soundbox",
-      url: "http://src.ctsolution.id/",
+      url: "https://src.ctsolution.id/",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
