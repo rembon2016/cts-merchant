@@ -6,6 +6,7 @@ import CustomCheckbox from "./form/CustomCheckbox";
 import { useProductStore } from "../store/productStore";
 import { toast, ToastContainer } from "react-toastify";
 import CustomSelectBox from "./form/CustomSelectBox";
+import BackButton from "./BackButton";
 
 export default function POSAddProducts() {
   const getToday = new Date().toISOString().split("T")[0];
@@ -149,9 +150,6 @@ export default function POSAddProducts() {
           theme: "light",
         }
       );
-      setTimeout(() => {
-        navigate("/pos/products");
-      }, 3000);
 
       return () => clearTimeout();
     }
@@ -574,6 +572,7 @@ export default function POSAddProducts() {
   return (
     <div className="p-6 max-w-3xl mx-auto">
       <ToastContainer />
+      <BackButton to="/pos/products" />
       {renderElements}
     </div>
   );

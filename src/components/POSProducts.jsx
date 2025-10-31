@@ -152,13 +152,13 @@ export default function POSProducts() {
         <div className="flex gap-2">
           <button
             onClick={() => navigate("/pos/tambah-produk", { replace: true })}
-            className="text-md w-full bg-white rounded-md py-4 font-semibold hover:bg-[var(--c-accent)] transition-colors duration-200"
+            className="text-md w-full bg-[var(--c-primary)] text-white rounded-md py-4 font-semibold hover:bg-blue-700 transition-colors duration-200"
           >
             + Produk
           </button>
           <button
             onClick={() => navigate("/pos/tambah-kategori", { replace: true })}
-            className="text-md w-full bg-white rounded-md py-4 font-semibold hover:bg-[var(--c-accent)] transition-colors duration-200"
+            className="text-md w-full bg-[var(--c-primary)] text-white rounded-md py-4 font-semibold hover:bg-blue-700 transition-colors duration-200"
           >
             + Kategori
           </button>
