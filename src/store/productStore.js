@@ -6,6 +6,7 @@ const useProductStore = create((set, get) => ({
   isLoading: false,
   hasMoreProducts: true,
   error: null,
+  success: null,
   products: [],
   brands: [],
   typeProducts: [],
@@ -66,8 +67,8 @@ const useProductStore = create((set, get) => ({
 
       const result = await response.json();
 
-      if (result.success && result.data) {
-        const newProducts = result.data.products || [];
+      if (result.success && result?.data) {
+        const newProducts = result?.data.products || [];
         const currentProducts = reset ? [] : get().products;
 
         set({
@@ -385,6 +386,9 @@ const useProductStore = create((set, get) => ({
 
       if (!response.ok) {
         set({ isLoading: false, error: `Gagal menambahkan produk` });
+        setTimeout(() => {
+          set({ error: null });
+        }, 2000);
         throw new Error(`HTTP error! status: ${response?.status}`);
       }
 
