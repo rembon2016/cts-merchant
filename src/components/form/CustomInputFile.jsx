@@ -36,26 +36,50 @@ export default function CustomInputFile({
   const [dragActive, setDragActive] = useState(false);
 
   // create previews for image files
+  // useEffect(() => {
+  //   if (initialPreview && files.length === 0) {
+  //     setFiles([
+  //       { preview: initialPreview, name: "preview", size: 0, isRemote: true },
+  //     ]);
+  //   }
+  //   return () => {
+  //     // revoke object URLs created below
+  //     // files.forEach((f) => {
+  //     //   if (f.preview && f.objectUrl) URL.revokeObjectURL(f.preview);
+  //     // });
+
+  //     for (fileData of files) {
+  //       if (fileData.preview && fileData.objectUrl) {
+  //         URL.revokeObjectURL(fileData.preview);
+  //       }
+  //     }
+  //   };
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
+
   useEffect(() => {
+    // set initial preview only when initialPreview provided and no files selected yet
     if (initialPreview && files.length === 0) {
       setFiles([
         { preview: initialPreview, name: "preview", size: 0, isRemote: true },
       ]);
     }
-    return () => {
-      // revoke object URLs created below
-      // files.forEach((f) => {
-      //   if (f.preview && f.objectUrl) URL.revokeObjectURL(f.preview);
-      // });
+    // we intentionally only depend on initialPreview here to set initial preview once
+    // cleanup for object URLs when files change or on unmount
+    // use a separate effect for cleanup to avoid re-triggering initialPreview logic
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialPreview]);
 
-      for (fileData of files) {
-        if (fileData.preview && fileData.objectUrl) {
+  useEffect(() => {
+    return () => {
+      // revoke object URLs created by createObjectURL
+      for (const fileData of files) {
+        if (fileData?.preview && fileData?.objectUrl) {
           URL.revokeObjectURL(fileData.preview);
         }
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [files]);
 
   const handleFiles = (fileList) => {
     let arr = Array.from(fileList || []);

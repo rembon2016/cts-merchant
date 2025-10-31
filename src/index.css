@@ -302,6 +302,30 @@ img {
   display: none;
 }
 
+.step-box {
+    position: relative;
+}
+
+.step-box:not(:last-child)::after {
+    @apply bg-gray-300 transition-all;
+    content: "";
+    position: absolute;
+    top: calc(50% - 10px);
+    right: calc(-40% + 5px);
+    transform: translateY(-50%) translateX(-40%);
+    width: 40%;
+    height: 4px;
+    -webkit-transform: translateY(-50%) translateX(-40%);
+    -moz-transform: translateY(-50%) translateX(-40%);
+    -ms-transform: translateY(-50%) translateX(-40%);
+    -o-transform: translateY(-50%) translateX(-40%);
+}
+
+
+.step-box.active:not(:last-child)::after {
+    @apply bg-[var(--c-primary)];
+}
+
 @keyframes spin78236 {
   0% {
     transform: rotate(0deg);
@@ -398,4 +422,3 @@ img {
 .dark .card-hover:hover {
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
 }
-

@@ -4,6 +4,8 @@ import { ProtectedRoute, PublicRoute } from "./components/ProtectedRoute";
 import { useAuthStore } from "./store/authStore";
 import { useEffect } from "react";
 import { useRegisterSW } from "virtual:pwa-register/react";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import MainLayout from "./layouts/MainLayout";
 import Home from "./pages/Home";
 import Transaction from "./pages/Transaction";
@@ -85,6 +87,18 @@ function App() {
           <button onClick={() => updateServiceWorker(true)}>Reload</button>
         </div>
       )}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme={isDark ? "dark" : "light"}
+      />
       <Router>
         <Routes>
           <Route path="/" element={<MainLayout />}>

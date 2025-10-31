@@ -1,0 +1,90 @@
+{
+  "id": 57,
+  "code": "KLFJDLKF",
+  "name": "Es Teler",
+  "description": "Testing",
+  "image": "https://pos.ctsolution.id/storage/products/liYtOP3ieqpyfoZovEEhQbkXdN7QFyoi95ZSvkvJ.jpg",
+  "cost_product": "1000",
+  "price_product": "1500",
+  "minimum_sales_quantity": 1,
+  "stok_alert": 10,
+  "is_variant": true,
+  "is_bundle": true,
+  "sku": "LFJDLFJLJF",
+  "barcode": null,
+  "type_product": {
+    "id": 1,
+    "name": "Standard Product"
+  },
+  "unit": {
+    "id": 2,
+    "name": "CM"
+  },
+  "categories": [
+    {
+      "id": 16,
+      "name": "Gelas",
+      "image": null
+    },
+    {
+      "id": 19,
+      "name": "Electronics Baru",
+      "image": null
+    }
+  ],
+  "brands": [
+    {
+      "id": 1,
+      "name": "Aqua",
+      "image": null
+    },
+    {
+      "id": 3,
+      "name": "Indofood",
+      "image": null
+    }
+  ],
+  "skus": [
+    {
+      "id": 10,
+      "sku": "KJFLDJFLD",
+      "barcode": null,
+      "variant_name": "V1",
+      "is_active": true
+    }
+  ],
+  "bundle_items": [
+    {
+      "id": 4,
+      "product": {
+        "id": 19,
+        "name": "Puding Coklat",
+        "code": "113"
+      },
+      "qty": 100,
+      "price": "10000"
+    }
+  ],
+  "created_at": "2025-10-31T09:36:56.000000Z",
+  "updated_at": "2025-10-31T09:36:56.000000Z",
+  "created_by": "Asep Admin",
+  "updated_by": "Asep Admin",
+  "stocks": [
+    {
+      "branch_id": 77,
+      "branch_name": "Main Branch",
+      "qty": 10000,
+      "updated_at": "2025-10-31T09:36:57.000000Z"
+    }
+  ],
+  "prices": [
+    {
+      "branch_id": 77,
+      "branch_name": "Main Branch",
+      "cost": "1000.00",
+      "price": "1500.00",
+      "effective_from": "2025-10-30T17:00:00.000000Z",
+      "effective_until": "2025-12-31T17:00:00.000000Z"
+    }
+  ]
+}

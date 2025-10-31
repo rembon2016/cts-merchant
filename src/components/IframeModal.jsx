@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { toast } from 'react-toastify'
 
 const IframeModal = ({ isOpen, url, title, onClose }) => {
   const [isLoading, setIsLoading] = useState(true)
@@ -54,10 +55,10 @@ const IframeModal = ({ isOpen, url, title, onClose }) => {
       if (iframe && iframe.contentWindow) {
         iframe.contentWindow.history.back()
       } else {
-        alert('Tidak dapat kembali (konten tidak mengizinkan).')
+        toast.warning('Tidak dapat kembali (konten tidak mengizinkan).')
       }
     } catch (err) {
-      alert('Tidak dapat kembali karena pembatasan cross-origin. Buka di tab baru untuk navigasi.')
+      toast.warning('Tidak dapat kembali karena pembatasan cross-origin. Buka di tab baru untuk navigasi.')
     }
   }
 
