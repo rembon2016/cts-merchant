@@ -4,6 +4,7 @@ import CustomInputFile from "./form/CustomInputFile";
 import { useProductStore } from "../store/productStore";
 import { toast, ToastContainer } from "react-toastify";
 import BackButton from "./BackButton";
+import { useNavigate } from "react-router-dom";
 
 export default function POSAddProducts() {
   const [formData, setFormData] = useState({
@@ -12,7 +13,10 @@ export default function POSAddProducts() {
     image: "",
   });
 
-  const { addCategories, isLoading, success, error, clearError } = useProductStore();
+  const { addCategories, isLoading, success, error, clearError } =
+    useProductStore();
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,17 +26,10 @@ export default function POSAddProducts() {
     }));
   };
 
-  const handleSubmit = async () => await addCategories(formData);
+  const handleSubmit = async () => {
+    const response = await addCategories(formData);
 
-  useEffect(() => {
-    clearError();
-    return () => {
-      clearError();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (success) {
+    if (response?.success) {
       toast.success(
         typeof success === "string" ? success : "Berhasil menambahkan kategori",
         {
@@ -47,10 +44,16 @@ export default function POSAddProducts() {
         }
       );
 
-      return () => clearTimeout();
-    }
+      setTimeout(() => {
+        navigate("/pos/products", { replace: true });
+      }, 3000);
 
-    if (error) {
+      setFormData({
+        name: "",
+        description: "",
+        image: "",
+      });
+    } else {
       toast.error(
         typeof error === "string"
           ? "Gagal Menambahkan Kategori"
@@ -67,7 +70,14 @@ export default function POSAddProducts() {
         }
       );
     }
-  }, [success, error]);
+  };
+
+  useEffect(() => {
+    clearError();
+    return () => {
+      clearError();
+    };
+  }, []);
 
   const renderElements = useMemo(() => {
     return (

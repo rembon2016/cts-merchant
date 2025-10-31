@@ -211,9 +211,9 @@ export default function POSProductsDetail() {
   }, [products, isLoading, isDark, error, showModal]);
 
   return (
-    <>
+    <div className="px-4">
       <ToastContainer />
       {renderElements}
-    </>
+    </div>
   );
 }

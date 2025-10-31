@@ -86,20 +86,42 @@ export default function POSEditProducts() {
     isLoading,
   } = useProductStore();
 
+  const listFormatToNumber = [
+    "cost_product",
+    "price_product",
+    "minimum_sales_quantity",
+    "stok_alert",
+  ];
+
+  const formatToNumber = (value) => value?.replaceAll(/\D/g, "");
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: !listFormatToNumber?.includes(name)
+        ? value
+        : formatToNumber(value),
     }));
   };
 
-  const handleNestedChange = (arrayName, index, fieldName, value) => {
+  const handleNestedChange = (
+    arrayName,
+    index,
+    fieldName,
+    value,
+    isFormatToNumber
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [arrayName]: prev[arrayName].map((item, i) =>
-        i === index ? { ...item, [fieldName]: value } : item
+        i === index
+          ? {
+              ...item,
+              [fieldName]: !isFormatToNumber ? value : formatToNumber(value),
+            }
+          : item
       ),
     }));
   };
@@ -200,9 +222,23 @@ export default function POSEditProducts() {
     await getDetailProduct(productId);
   };
 
+  useEffect(() => {
+    if (pathname.includes("/pos/edit-produk")) {
+      if (!productId) return;
+      getDetailProductsForEdited();
+    }
+    Promise.all([
+      getBrands(),
+      getTypeProducts(),
+      getUnits(),
+      getCategories(),
+      // getProducts(),
+    ]);
+  }, [pathname, productId]);
+
   // Effect untuk mapping data dari products ke formData
   useEffect(() => {
-    if (products && products.id) {
+    if (products?.id) {
       // Map data dari API ke format yang dibutuhkan form
       const mappedData = {
         code: products.code || "",
@@ -294,20 +330,6 @@ export default function POSEditProducts() {
       setFormData(mappedData);
     }
   }, [products, activeBranch]);
-
-  useEffect(() => {
-    if (pathname.includes("/pos/edit-produk")) {
-      if (!productId) return;
-      getDetailProductsForEdited();
-    }
-    Promise.all([
-      getBrands(),
-      getTypeProducts(),
-      getUnits(),
-      getCategories(),
-      // getProducts(),
-    ]);
-  }, [pathname, productId]);
 
   const getTrashIcon = useMemo(() => {
     return (
@@ -439,14 +461,14 @@ export default function POSEditProducts() {
         <div className="flex gap-2">
           <SimpleInput
             name="cost_product"
-            type="number"
+            type="text"
             label="Cost"
             value={formData?.cost_product}
             handleChange={handleChange}
           />
           <SimpleInput
             name="price_product"
-            type="number"
+            type="text"
             label="Price"
             value={formData?.price_product}
             handleChange={handleChange}
@@ -455,7 +477,7 @@ export default function POSEditProducts() {
 
         <SimpleInput
           name="minimum_sales_quantity"
-          type="number"
+          type="text"
           label="Minimum Sales Quantity"
           value={formData?.minimum_sales_quantity}
           handleChange={handleChange}
@@ -463,7 +485,7 @@ export default function POSEditProducts() {
         />
         <SimpleInput
           name="stok_alert"
-          type="number"
+          type="text"
           label="Stock Alert"
           value={formData?.stok_alert}
           handleChange={handleChange}
@@ -473,11 +495,11 @@ export default function POSEditProducts() {
           <div className="flex flex-col gap-2" key={index}>
             <SimpleInput
               name="stocks.qty"
-              type="number"
+              type="text"
               label="Stocks / Quantity"
               value={item?.qty}
               handleChange={(e) =>
-                handleNestedChange("stocks", index, "qty", e.target.value)
+                handleNestedChange("stocks", index, "qty", e.target.value, true)
               }
             />
             <SimpleInput
@@ -573,7 +595,7 @@ export default function POSEditProducts() {
                 />
                 <SimpleInput
                   name="bundle_items.price"
-                  type="number"
+                  type="text"
                   label="Price"
                   value={item?.price}
                   handleChange={(e) =>
@@ -581,7 +603,8 @@ export default function POSEditProducts() {
                       "bundle_items",
                       index,
                       "price",
-                      e.target.value
+                      e.target.value,
+                      true
                     )
                   }
                   // disabled={true}

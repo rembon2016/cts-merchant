@@ -399,7 +399,7 @@ const useProductStore = create((set, get) => ({
 
       set({
         isLoading: false,
-        products: [...get().products, result?.data],
+        products: result?.data,
         error: null,
         success: true,
       });
@@ -568,7 +568,7 @@ const useProductStore = create((set, get) => ({
 
       set({
         isLoading: false,
-        categories: [...get().categories, result?.data],
+        categories: result?.data,
         error: null,
         success: true,
       });
@@ -578,6 +578,8 @@ const useProductStore = create((set, get) => ({
           set({ success: null });
         }, 2000);
       }
+
+      return result;
     } catch (error) {
       console.log("Error", error);
       set({ error: error.message, isLoading: false });

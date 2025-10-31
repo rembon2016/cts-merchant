@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import SimpleInput from "./form/SimpleInput";
 import ButtonQuantity from "./ButtonQuantity";
 import PropTypes from "prop-types";
+import { ShoppingCart } from "lucide-react";
 
 BottomModal.propTypes = {
   isOpen: PropTypes.bool,
@@ -258,15 +259,16 @@ export default function BottomModal(props) {
                 />
               </div>
               <div className="w-full gap-2">
-                <div className="mt-3 flex gap-2 justify-between items-center">
+                <div className="mt-3">
                   <button
-                    className={`w-full h-16 py-2 rounded-lg transition-colors bg-[var(--c-primary)] text-white hover:bg-blue-700`}
+                    className={`w-full flex gap-2 justify-center items-center h-16 py-2 rounded-lg transition-colors bg-[var(--c-primary)] text-white hover:bg-blue-700`}
                     onClick={() => handleAddToCart(data, null, quantity, true)}
                     disabled={isLoading}
                   >
-                    {!isLoading ? "Beli Sekarang" : "Memproses..."}
+                    <ShoppingCart className="w-5 h-5" />
+                    {!isLoading ? "Masukkan Keranjang" : "Memproses..."}
                   </button>
-                  <button
+                  {/* <button
                     className={`w-20 h-16 rounded-full border-2 border-gray-500 flex justify-center items-center transition-colors gap-2`}
                     onClick={() => handleAddToCart(data, null, quantity, true)}
                     disabled={true}
@@ -278,7 +280,7 @@ export default function BottomModal(props) {
                       alt="Add to cart"
                       className="w-8 h-8"
                     />
-                  </button>
+                  </button> */}
                 </div>
               </div>
             </div>

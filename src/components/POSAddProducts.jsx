@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import SimpleInput from "./form/SimpleInput";
 import CustomTextarea from "./form/CustomTextarea";
 import CustomInputFile from "./form/CustomInputFile";
@@ -12,6 +12,7 @@ import BackButton from "./BackButton";
 export default function POSAddProducts() {
   const getToday = new Date().toISOString().split("T")[0];
   const activeBranch = sessionStorage.getItem("branchActive");
+  const generateId = useId();
 
   const navigate = useNavigate();
 
@@ -82,20 +83,42 @@ export default function POSAddProducts() {
     isLoading,
   } = useProductStore();
 
+  const listFormatToNumber = [
+    "cost_product",
+    "price_product",
+    "minimum_sales_quantity",
+    "stok_alert",
+  ];
+
+  const formatToNumber = (value) => value?.replaceAll(/\D/g, "");
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: !listFormatToNumber?.includes(name)
+        ? value
+        : formatToNumber(value),
     }));
   };
 
-  const handleNestedChange = (arrayName, index, fieldName, value) => {
+  const handleNestedChange = (
+    arrayName,
+    index,
+    fieldName,
+    value,
+    isFormatToNumber = false
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [arrayName]: prev[arrayName].map((item, i) =>
-        i === index ? { ...item, [fieldName]: value } : item
+        i === index
+          ? {
+              ...item,
+              [fieldName]: !isFormatToNumber ? value : formatToNumber(value),
+            }
+          : item
       ),
     }));
   };
@@ -326,14 +349,14 @@ export default function POSAddProducts() {
         <div className="flex gap-2">
           <SimpleInput
             name="cost_product"
-            type="number"
+            type="text"
             label="Cost"
             value={formData?.cost_product}
             handleChange={handleChange}
           />
           <SimpleInput
             name="price_product"
-            type="number"
+            type="text"
             label="Price"
             value={formData?.price_product}
             handleChange={handleChange}
@@ -342,7 +365,7 @@ export default function POSAddProducts() {
 
         <SimpleInput
           name="minimum_sales_quantity"
-          type="number"
+          type="text"
           label="Minimum Sales Quantity"
           value={formData?.minimum_sales_quantity}
           handleChange={handleChange}
@@ -350,21 +373,21 @@ export default function POSAddProducts() {
         />
         <SimpleInput
           name="stok_alert"
-          type="number"
+          type="text"
           label="Stock Alert"
           value={formData?.stok_alert}
           handleChange={handleChange}
           // disabled={true}
         />
         {formData?.stocks?.map((item, index) => (
-          <div className="flex flex-col gap-2" key={index}>
+          <div className="flex flex-col gap-2" key={generateId}>
             <SimpleInput
               name="stocks.qty"
-              type="number"
+              type="text"
               label="Stocks / Quantity"
               value={item?.qty}
               handleChange={(e) =>
-                handleNestedChange("stocks", index, "qty", e.target.value)
+                handleNestedChange("stocks", index, "qty", e.target.value, true)
               }
             />
             <SimpleInput
@@ -425,7 +448,7 @@ export default function POSAddProducts() {
               + Tambah Bundle
             </button>
             {formData?.bundle_items?.map((item, index) => (
-              <div className="flex flex-col gap-2 w-full" key={index}>
+              <div className="flex flex-col gap-2 w-full" key={generateId}>
                 <SimpleInput
                   name="bundle_items.product_id"
                   type="text"
@@ -445,7 +468,7 @@ export default function POSAddProducts() {
                 />
                 <SimpleInput
                   name="bundle_items.qty"
-                  type="number"
+                  type="text"
                   label="Quantity"
                   value={item?.qty}
                   handleChange={(e) =>
@@ -453,14 +476,15 @@ export default function POSAddProducts() {
                       "bundle_items",
                       index,
                       "qty",
-                      e.target.value
+                      e.target.value,
+                      true
                     )
                   }
                   // disabled={true}
                 />
                 <SimpleInput
                   name="bundle_items.price"
-                  type="number"
+                  type="text"
                   label="Price"
                   value={item?.price}
                   handleChange={(e) =>
@@ -468,7 +492,8 @@ export default function POSAddProducts() {
                       "bundle_items",
                       index,
                       "price",
-                      e.target.value
+                      e.target.value,
+                      true
                     )
                   }
                   // disabled={true}
@@ -505,7 +530,7 @@ export default function POSAddProducts() {
               + Tambah Variant
             </button>
             {formData?.skus?.map((item, index) => (
-              <div className="flex flex-col gap-2 w-full" key={index}>
+              <div className="flex flex-col gap-2 w-full" key={generateId}>
                 <SimpleInput
                   name="skus.variant_name"
                   type="text"

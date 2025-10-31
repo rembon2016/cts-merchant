@@ -135,6 +135,22 @@ export default function POSProducts() {
           <h3 className="text-lg font-bold ">Daftar Produk</h3>
         </div> */}
 
+        {/* <div className="grid grid-cols-3 gap-2">
+          {subCategories.map((sub) => (
+            <button
+              key={sub.id}
+              onClick={() => setSelectedSub(sub.name)}
+              className={`w-full h-full p-4 flex justify-center items-center bg-white rounded-lg cursor-pointer ${
+                selectedSub === sub.name
+                  ? "bg-[var(--c-primary)] text-white"
+                  : ""
+              }`}
+            >
+              <h3 className="text-sm font-bold ">{sub?.name}</h3>
+            </button>
+          ))}
+        </div> */}
+
         <div className="grid grid-cols-2 gap-2">
           <div className="w-full p-4 bg-white flex flex-col gap-2">
             <h3 className="font-normal">Jumlah Product</h3>

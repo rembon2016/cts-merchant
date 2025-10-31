@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useProductStore } from "../store/productStore";
 import { useThemeStore } from "../store/themeStore";
 import { formatCurrency } from "../helper/currency";
+import { ShoppingCart } from "lucide-react";
 import CustomLoading from "./CustomLoading";
 import BottomModal from "./BottomModal";
 
@@ -39,11 +40,11 @@ export default function DetailProduct() {
 
     return (
       <div className="w-full h-full mt-3">
-        <button
+        {/* <button
           // key={item.id}
           onClick={() => handleMenuClick(item)}
           className="bg-white dark:bg-slate-700 rounded-2xl p-3 flex flex-col items-center gap-2 shadow-soft"
-        />
+        /> */}
 
         <div className="w-full h-full flex flex-col gap-3">
           <img
@@ -81,15 +82,16 @@ export default function DetailProduct() {
               </h3>
             </div>
           </div>
-          <div className="mt-3 flex gap-2 justify-between items-center">
+          <div className="mt-3">
             <button
-              className={`w-full h-16 py-2 rounded-lg transition-colors bg-[var(--c-primary)] text-white hover:bg-blue-700`}
+              className={`w-full flex gap-2 justify-center items-center h-16 py-2 rounded-lg transition-colors bg-[var(--c-primary)] text-white hover:bg-blue-700`}
               onClick={() => setIsSheetOpen(true)}
               disabled={isLoading}
             >
-              Beli Sekarang
+              <ShoppingCart className="w-5 h-5" />
+              Masukka Keranjang
             </button>
-            <button
+            {/* <button
               className={`w-20 h-16 rounded-full border-2 border-gray-500 flex justify-center items-center transition-colors gap-2`}
               onClick={() => setIsSheetOpen(true)}
               disabled={isLoading}
@@ -99,7 +101,7 @@ export default function DetailProduct() {
                 alt="Add to cart"
                 className="w-8 h-8"
               />
-            </button>
+            </button> */}
           </div>
         </div>
 
@@ -121,5 +123,5 @@ export default function DetailProduct() {
     }
   }, [pathname]);
 
-  return <>{renderElements}</>;
+  return <div className="px-4">{renderElements}</div>;
 }

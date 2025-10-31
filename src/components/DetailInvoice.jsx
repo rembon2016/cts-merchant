@@ -13,7 +13,7 @@ const statusBadge = (status) => {
 };
 
 const DetailInvoice = () => {
-  const { invoices, getDetailInvoices, printInvoices, isLoading } =
+  const { invoices, getDetailInvoices, printInvoices, isLoading, downloading } =
     useInvoiceStore();
 
   const location = useLocation();
@@ -22,7 +22,8 @@ const DetailInvoice = () => {
 
   const invoiceId = globalThis?.location?.pathname?.split("/").pop();
 
-  const handlePrintInvoices = async () => await printInvoices(invoiceId);
+  const handlePrintInvoices = async () =>
+    await printInvoices(invoiceId, invoices?.code, invoices?.customer_name);
 
   useEffect(() => {
     if (!invoicePath && !invoiceId) return;
@@ -45,18 +46,19 @@ const DetailInvoice = () => {
           </button>
           <button
             onClick={handlePrintInvoices}
+            disabled={downloading}
             className="py-4 px-6 rounded-lg bg-[var(--c-primary)] hover:bg-blue-700 transition-colors ease-linear duration-300 text-white mb-4"
           >
-            Cetak
+            {downloading ? "..." : "Cetak"}
           </button>
         </div>
         <div className="flex items-start justify-between">
           <div>
             <div className="text-xl font-semibold">
-              {invoices ? invoices.code : "-"}
+              {invoices ? invoices?.code : "-"}
             </div>
             <div className="text-sm text-gray-700 mt-1">
-              {invoices ? invoices.customer_name : "-"}
+              {invoices ? invoices?.customer_name : "-"}
             </div>
             <div className="text-sm text-gray-500 mt-1">
               {statusBadge(invoices?.status)}
@@ -122,7 +124,7 @@ const DetailInvoice = () => {
         )}
       </div>
     );
-  }, [isLoading]);
+  }, [isLoading, downloading]);
 
   return <div className="p-4 sm:p-6 lg:p-10">{renderElements}</div>;
 };
