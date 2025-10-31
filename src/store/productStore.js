@@ -351,24 +351,27 @@ const useProductStore = create((set, get) => ({
         body = new FormData();
 
         Object.entries(formData || {}).forEach(([key, value]) => {
-          if (value instanceof File) {
-            body.append(key, value, value.name);
-          } else if (Array.isArray(value)) {
-            // append arrays; files inside arrays are appended as key[]
-            value.forEach((item) => {
-              if (item instanceof File)
-                body.append(`${key}[]`, item, item.name);
-              else if (item && typeof item === "object")
-                body.append(`${key}[]`, JSON.stringify(item));
-              else body.append(`${key}[]`, item);
-            });
-          } else if (value && typeof value === "object") {
-            // for nested objects, stringify them
-            body.append(key, JSON.stringify(value));
-          } else if (value !== undefined && value !== null) {
-            body.append(key, String(value));
-          }
+    if (value instanceof File) {
+      body.append(key, value, value.name);
+    } else if (Array.isArray(value)) {
+      // 🔥 kirim array sesuai jenis isinya
+      if (typeof value[0] === "object") {
+        // kirim array of object dengan indeks
+        value.forEach((obj, i) => {
+          Object.entries(obj).forEach(([k, v]) => {
+            body.append(`${key}[${i}][${k}]`, v);
+          });
         });
+      } else {
+        // array biasa (seperti category_ids[])
+        value.forEach((v) => body.append(`${key}[]`, v));
+      }
+    } else if (value && typeof value === "object") {
+      body.append(key, JSON.stringify(value));
+    } else if (value !== undefined && value !== null) {
+      body.append(key, String(value));
+    }
+  });
         // NOTE: do NOT set Content-Type header for FormData — browser will set boundary
       } else {
         headers["Content-Type"] = "application/json";
