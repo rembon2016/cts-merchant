@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from "react-router-dom";
 import BottomNav from "../components/BottomNav";
 import Header from "../components/Header";
+import ChatBubble from "../components/cs/ChatBubble";
 import { useAuthStore } from "../store/authStore";
 import { useEffect } from "react";
 import { useCartStore } from "../store/cartStore";
@@ -11,6 +12,11 @@ const MainLayout = () => {
   const { setSelectedCart } = useCartStore();
 
   useEffect(() => {}, [isLoggedIn]);
+
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   useEffect(() => {
     // Clear selectedCart when user navigates away from cart or checkout
@@ -28,6 +34,7 @@ const MainLayout = () => {
         <Outlet />
         <div className="h-28" />
         {isLoggedIn && <BottomNav />}
+        {isLoggedIn && <ChatBubble />}
       </main>
     </div>
   );

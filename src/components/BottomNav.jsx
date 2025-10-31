@@ -9,7 +9,8 @@ const BottomNav = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
   const { saveOrder, selectPaymentMethod } = useCheckoutStore();
-  const { selectedCart, cart, setSelectedCart } = useCartStore();
+  const { selectedCart, cart, setSelectedCart, clearDiscountData } =
+    useCartStore();
   const navigation = useNavigate();
   const pathname = location.pathname;
   const getCart = sessionStorage.getItem("cart");
@@ -17,15 +18,10 @@ const BottomNav = () => {
   const [showExitModal, setShowExitModal] = useState(false);
   const [pendingPath, setPendingPath] = useState(null);
 
-  const taxPrice = sessionStorage.getItem("tax");
-  const discountPrice = JSON.parse(sessionStorage.getItem("discount"));
-
   const totalPrice = selectedCart?.reduce(
     (a, b) => a + Number.parseFloat(b.subtotal),
     0
   );
-
-  const TOTAL_PAYMENT = 0;
 
   const showButtonFromPath = ["/cart", "/checkout"];
 
@@ -151,17 +147,28 @@ const BottomNav = () => {
       setLoading(false);
     }, 1000);
   };
+
   const processCheckout = () => {
     if (!getCart) return;
 
     setLoading(true);
 
+    // Read tax and discount directly from sessionStorage here to avoid using
+    // possibly-stale values captured earlier in the component lifecycle.
+    const currentTax = sessionStorage.getItem("tax");
+    const currentDiscount = sessionStorage.getItem("discount");
+
+    const taxAmount = Math.ceil(Number(currentTax ?? 0));
+    // If discount exists in sessionStorage use its numeric value, otherwise 0
+    const discountAmount =
+      currentDiscount !== null ? Math.ceil(Number(currentDiscount)) : 0;
+
     const checkoutValue = {
       branch_id: sessionStorage.getItem("branchActive"),
       user_id: sessionStorage.getItem("userId"),
       sub_total: Math.ceil(totalPrice),
-      tax_amount: Math.ceil(taxPrice),
-      discount_amount: 0,
+      tax_amount: taxAmount,
+      discount_amount: discountAmount,
       payment_method_id: selectPaymentMethod,
       payment_amount: JSON.parse(sessionStorage.getItem("totalPayment")),
       discount_id: null,
@@ -178,12 +185,14 @@ const BottomNav = () => {
       const response = await saveOrder(dataCheckout);
 
       if (response?.success) {
-        navigation(`/order/${response?.data?.id}`, {
+        navigation(`/pos/transaction/${response?.data?.id}`, {
           replace: true,
         });
         sessionStorage.removeItem("cart");
         sessionStorage.removeItem("tax");
         sessionStorage.removeItem("discount");
+        sessionStorage.removeItem("totalPayment");
+        clearDiscountData();
       }
 
       setLoading(false);
@@ -192,8 +201,6 @@ const BottomNav = () => {
       setLoading(false);
     }
   };
-
-  console.log(import.meta.env.VITE_API_ROUTES);
 
   const renderElements = useMemo(() => {
     const renderElementCart = () => {
@@ -317,6 +324,7 @@ const BottomNav = () => {
     sessionStorage.removeItem("cart");
     sessionStorage.removeItem("discount");
     sessionStorage.removeItem("tax");
+    sessionStorage.removeItem("totalPayment");
     setSelectedCart([]);
     setShowExitModal(false);
     if (pendingPath) navigation(pendingPath);

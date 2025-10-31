@@ -10,7 +10,7 @@ const BottomSheet = ({ isOpen, onClose, onItemClick }) => {
     {
       id: "soundbox",
       label: "Soundbox",
-      url: "http://soundbox.ctsolution.id/",
+      url: "http://src.ctsolution.id/",
       target: "_blank",
       icon: (
         <svg
@@ -101,7 +101,7 @@ const BottomSheet = ({ isOpen, onClose, onItemClick }) => {
     {
       id: "cs",
       label: "CS",
-      url: "#",
+      url: "/customer-support",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -122,7 +122,7 @@ const BottomSheet = ({ isOpen, onClose, onItemClick }) => {
     {
       id: "ppob",
       label: "PPOB",
-      url: "#",
+      url: "/ppob",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -192,6 +192,16 @@ const BottomSheet = ({ isOpen, onClose, onItemClick }) => {
     }
 
     if (item.url === "/invoice") {
+      navigate(item.url, { replace: true });
+      return;
+    }
+
+    if (item.url === "/customer-support") {
+      navigate(item.url, { replace: true });
+      return;
+    }
+
+    if (item.url === "/ppob") {
       navigate(item.url, { replace: true });
       return;
     }
