@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState, useRef } from "react";
+import { useMemo, useCallback, useState, useRef, useEffect } from "react";
 import { usePosStore } from "../store/posStore";
 import { formatCurrency } from "../helper/currency";
 import { useNavigate } from "react-router-dom";
@@ -12,6 +12,8 @@ export default function POSProducts() {
     productsError,
     hasMoreProducts,
     loadMoreProducts,
+    getProducts,
+    resetProducts,
     getProductPrice,
     getProductStock,
     getTotalVariantStock,
@@ -22,6 +24,18 @@ export default function POSProducts() {
   const observerRef = useRef();
 
   const navigate = useNavigate();
+
+  // Reset and fetch all products when component mounts
+  useEffect(() => {
+    resetProducts();
+    getProducts({
+      category_id: "",
+      search: "",
+      page: 1,
+      per_page: 20,
+      reset: true,
+    });
+  }, [getProducts, resetProducts]);
 
   const lastProductElementRef = useCallback(
     (node) => {
