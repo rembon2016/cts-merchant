@@ -68,12 +68,13 @@ export default function SimpleInput({
           disabled={disabled}
           placeholder={placeholder || "Pilih..."}
         >
-          <option disabled>Select Items</option>
-          {selectBoxData?.map((item) => (
-            <option key={item?.id} value={item?.id}>
-              {item.name}
-            </option>
-          ))}
+          <option selected>Select Items</option>
+          {Array?.isArray(selectBoxData) &&
+            selectBoxData?.map((item) => (
+              <option key={item?.id} value={item?.id}>
+                {item?.name}
+              </option>
+            ))}
         </select>
       )}
       {errors && <p className="mt-1 text-sm text-red-600">{errors}</p>}

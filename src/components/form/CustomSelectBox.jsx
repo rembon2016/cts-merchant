@@ -44,12 +44,12 @@ export default function CustomSelectBox({
       const areObjects = first && typeof first === "object" && "id" in first;
       if (areObjects) return value;
       return value
-        .map((id) => selectBoxData.find((d) => d.id === id))
+        .map((id) => selectBoxData?.find((d) => d.id === id))
         .filter(Boolean);
     }
     if (!value) return [];
     if (typeof value === "object" && "id" in value) return [value];
-    const found = selectBoxData.find((d) => d.id === value);
+    const found = selectBoxData?.find((d) => d.id === value);
     return found ? [found] : [];
   };
   const selectedObjects = getSelectedObjects();
@@ -70,13 +70,13 @@ export default function CustomSelectBox({
     disabled ? "bg-gray-200 dark:bg-slate-600" : "bg-white dark:bg-slate-600"
   } dark:text-slate-100 font-semibold`;
 
-  const filtered = selectBoxData.filter((item) =>
+  const filtered = selectBoxData?.filter((item) =>
     (item?.name || "").toString().toLowerCase().includes(search.toLowerCase())
   );
 
   function toggleOption(itemId) {
     if (disabled) return;
-    const item = selectBoxData.find((d) => d.id === itemId);
+    const item = selectBoxData?.find((d) => d.id === itemId);
     if (!item) return;
 
     if (multiple) {

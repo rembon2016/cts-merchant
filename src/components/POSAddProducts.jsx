@@ -6,10 +6,13 @@ import CustomCheckbox from "./form/CustomCheckbox";
 import { useProductStore } from "../store/productStore";
 import { toast, ToastContainer } from "react-toastify";
 import CustomSelectBox from "./form/CustomSelectBox";
+import { useNavigate } from "react-router-dom";
 
 export default function POSAddProducts() {
   const getToday = new Date().toISOString().split("T")[0];
   const activeBranch = sessionStorage.getItem("branchActive");
+
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     code: "",
@@ -135,9 +138,7 @@ export default function POSAddProducts() {
 
     const response = await addProducts(dataToSubmit);
 
-    console.log(response);
-
-    if (success) {
+    if (response?.success) {
       toast.success(
         typeof success === "string" ? success : "Berhasil menambahkan Produk",
         {
@@ -152,13 +153,11 @@ export default function POSAddProducts() {
         }
       );
       setTimeout(() => {
-        navigate("/pos/products");
+        navigate("/pos/products", { replace: true });
       }, 3000);
 
       return () => clearTimeout();
-    }
-
-    if (error) {
+    } else {
       toast.error(
         typeof error === "string"
           ? "Gagal Menambahkan Produk"
@@ -565,13 +564,14 @@ export default function POSAddProducts() {
         )}
         <button
           onClick={handleSubmit}
+          disabled={isLoading}
           className="bg-[var(--c-primary)] text-white py-4 w-full rounded-lg font-semibold"
         >
           {isLoading ? "Memproses..." : "Tambah Produk"}
         </button>
       </div>
     );
-  }, [formData, handleChange]);
+  }, [formData, handleChange, isLoading]);
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
