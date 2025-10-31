@@ -165,16 +165,21 @@ export default function FaQ() {
           onChange={(value) =>
             dispatch({ type: SET_SEARCH_QUERY, payload: value })
           }
-          placeholder="Cari transaksi..."
+          placeholder="Cari pertanyaan..."
         />
       </div>
       {renderElement}
-      <LoadMoreButton
-        data={accumulatedData}
-        totalData={totalData}
-        loading={loading}
-        handleLoadMore={handleLoadMore}
-      />
+      {accumulatedData.length > 0 &&
+        accumulatedData.length < totalData &&
+        !loading &&
+        !error && (
+          <LoadMoreButton
+            data={accumulatedData}
+            totalData={totalData}
+            loading={loading}
+            handleLoadMore={handleLoadMore}
+          />
+        )}
     </div>
   );
 }

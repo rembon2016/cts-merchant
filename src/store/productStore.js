@@ -351,27 +351,27 @@ const useProductStore = create((set, get) => ({
         body = new FormData();
 
         Object.entries(formData || {}).forEach(([key, value]) => {
-    if (value instanceof File) {
-      body.append(key, value, value.name);
-    } else if (Array.isArray(value)) {
-      // 🔥 kirim array sesuai jenis isinya
-      if (typeof value[0] === "object") {
-        // kirim array of object dengan indeks
-        value.forEach((obj, i) => {
-          Object.entries(obj).forEach(([k, v]) => {
-            body.append(`${key}[${i}][${k}]`, v);
-          });
+          if (value instanceof File) {
+            body.append(key, value, value.name);
+          } else if (Array.isArray(value)) {
+            // 🔥 kirim array sesuai jenis isinya
+            if (typeof value[0] === "object") {
+              // kirim array of object dengan indeks
+              value.forEach((obj, i) => {
+                Object.entries(obj).forEach(([k, v]) => {
+                  body.append(`${key}[${i}][${k}]`, v);
+                });
+              });
+            } else {
+              // array biasa (seperti category_ids[])
+              value.forEach((v) => body.append(`${key}[]`, v));
+            }
+          } else if (value && typeof value === "object") {
+            body.append(key, JSON.stringify(value));
+          } else if (value !== undefined && value !== null) {
+            body.append(key, String(value));
+          }
         });
-      } else {
-        // array biasa (seperti category_ids[])
-        value.forEach((v) => body.append(`${key}[]`, v));
-      }
-    } else if (value && typeof value === "object") {
-      body.append(key, JSON.stringify(value));
-    } else if (value !== undefined && value !== null) {
-      body.append(key, String(value));
-    }
-  });
         // NOTE: do NOT set Content-Type header for FormData — browser will set boundary
       } else {
         headers["Content-Type"] = "application/json";
@@ -401,9 +401,138 @@ const useProductStore = create((set, get) => ({
         isLoading: false,
         products: [...get().products, result?.data],
         error: null,
+        success: true,
       });
 
-      // return await response;
+      return result;
+    } catch (error) {
+      console.log("Error", error);
+      set({ error: error.message, isLoading: false });
+    }
+  },
+
+  // Edit products
+  editProducts: async (formData, productId) => {
+    const token = sessionStorage.getItem("authPosToken");
+
+    try {
+      set({ isLoading: true, error: null });
+
+      // Detect if there is any File in the formData values
+      const hasFile = Object.values(formData || {}).some(
+        (v) =>
+          v instanceof File ||
+          (Array.isArray(v) && v.some((i) => i instanceof File))
+      );
+
+      let body;
+      const headers = {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+
+      if (hasFile) {
+        // Use FormData for file upload
+        body = new FormData();
+
+        Object.entries(formData || {}).forEach(([key, value]) => {
+          if (value instanceof File) {
+            body.append(key, value, value.name);
+          } else if (Array.isArray(value)) {
+            // 🔥 kirim array sesuai jenis isinya
+            if (typeof value[0] === "object") {
+              // kirim array of object dengan indeks
+              value.forEach((obj, i) => {
+                Object.entries(obj).forEach(([k, v]) => {
+                  body.append(`${key}[${i}][${k}]`, v);
+                });
+              });
+            } else {
+              // array biasa (seperti category_ids[])
+              value.forEach((v) => body.append(`${key}[]`, v));
+            }
+          } else if (value && typeof value === "object") {
+            body.append(key, JSON.stringify(value));
+          } else if (value !== undefined && value !== null) {
+            body.append(key, String(value));
+          }
+        });
+        // NOTE: do NOT set Content-Type header for FormData — browser will set boundary
+      } else {
+        headers["Content-Type"] = "application/json";
+        body = JSON.stringify(formData);
+      }
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_POS_ROUTES}/products/${productId}`,
+        {
+          method: "PUT",
+          headers,
+          body,
+        }
+      );
+
+      if (!response.ok) {
+        set({ isLoading: false, error: `Gagal mengubah produk` });
+        setTimeout(() => {
+          set({ error: null });
+        }, 2000);
+        throw new Error(`HTTP error! status: ${response?.status}`);
+      }
+
+      const result = await response.json();
+
+      set({
+        isLoading: false,
+        products: result?.data,
+        error: null,
+        success: true,
+      });
+
+      return result;
+    } catch (error) {
+      console.log("Error", error);
+      set({ error: error.message, isLoading: false });
+    }
+  },
+
+  // Remove Products
+  removeProducts: async (productId) => {
+    const token = sessionStorage.getItem("authPosToken");
+
+    try {
+      set({ isLoading: true, error: null });
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_POS_ROUTES}/products/${productId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        set({ isLoading: false, error: `Gagal menghapus produk` });
+        setTimeout(() => {
+          set({ error: null });
+        }, 2000);
+        throw new Error(`HTTP error! status: ${response?.status}`);
+      }
+
+      const result = await response.json();
+
+      set({
+        isLoading: false,
+        products: result?.data,
+        error: null,
+        success: true,
+      });
+
+      return result;
     } catch (error) {
       console.log("Error", error);
       set({ error: error.message, isLoading: false });

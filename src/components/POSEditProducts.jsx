@@ -6,8 +6,7 @@ import CustomCheckbox from "./form/CustomCheckbox";
 import { useProductStore } from "../store/productStore";
 import { toast, ToastContainer } from "react-toastify";
 import CustomSelectBox from "./form/CustomSelectBox";
-import { useLocation } from "react-router-dom";
-import CustomLoading from "./CustomLoading";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function POSEditProducts() {
   const getToday = new Date().toISOString().split("T")[0];
@@ -15,6 +14,8 @@ export default function POSEditProducts() {
 
   const location = useLocation();
   const pathname = location.pathname;
+
+  const navigate = useNavigate();
 
   const productId = pathname.split("/pos/edit-produk/")[1];
 
@@ -78,7 +79,7 @@ export default function POSEditProducts() {
     getUnits,
     categories,
     getCategories,
-    addProducts,
+    editProducts,
     getDetailProduct,
     success,
     error,
@@ -140,11 +141,11 @@ export default function POSEditProducts() {
       ],
     };
 
-    await addProducts(dataToSubmit);
+    const response = await editProducts(dataToSubmit, products?.id);
 
-    if (success) {
+    if (response?.success) {
       toast.success(
-        typeof success === "string" ? success : "Berhasil menambahkan Produk",
+        typeof success === "string" ? success : "Berhasil mengubah Produk",
         {
           position: "top-center",
           autoClose: 3000,
@@ -161,9 +162,7 @@ export default function POSEditProducts() {
       }, 3000);
 
       return () => clearTimeout();
-    }
-
-    if (error !== null) {
+    } else {
       toast.error(
         typeof error === "string"
           ? "Gagal Menambahkan Produk"
@@ -222,15 +221,6 @@ export default function POSEditProducts() {
   }, []);
 
   const renderElements = useMemo(() => {
-    if (isLoading) {
-      return (
-        <div className="w-full text-center">
-          {/* Loading indicator for infinite scroll */}
-          <CustomLoading />
-        </div>
-      );
-    }
-
     return (
       <div className="flex flex-col gap-3">
         <div className="flex gap-2">
@@ -588,9 +578,10 @@ export default function POSEditProducts() {
         )}
         <button
           onClick={handleSubmit}
+          disabled={isLoading}
           className="bg-[var(--c-primary)] text-white py-4 w-full rounded-lg font-semibold"
         >
-          {isLoading ? "Memproses..." : "Tambah Produk"}
+          {isLoading ? "Memproses..." : "Edit Produk"}
         </button>
       </div>
     );

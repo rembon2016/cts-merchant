@@ -263,12 +263,17 @@ export default function Transaction() {
       {renderElement}
 
       {/* Load More Button */}
-      <LoadMoreButton
-        data={accumulatedData}
-        totalData={totalData}
-        loading={loading}
-        handleLoadMore={handleLoadMore}
-      />
+      {accumulatedData.length > 0 &&
+        accumulatedData.length < totalData &&
+        !loading &&
+        !error && (
+          <LoadMoreButton
+            data={accumulatedData}
+            totalData={totalData}
+            loading={loading}
+            handleLoadMore={handleLoadMore}
+          />
+        )}
     </div>
   );
 }
