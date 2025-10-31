@@ -236,13 +236,13 @@ const AddInvoice = () => {
 
   // Step Indicator Component
   const StepIndicator = () => (
-    <div className="flex items-center justify-between mb-6 px-2">
+    <div className="flex items-center justify-between mb-6 px-2 step-box-group">
       {[
         { num: 1, label: "Customer" },
         { num: 2, label: "Produk" },
         { num: 3, label: "Preview" },
       ].map((step, idx) => (
-        <div key={step.num} className="flex items-center flex-1">
+        <div key={step.num} className={"flex items-center flex-1 step-box" + (currentStep >= step.num ? " active" : "")}>
           <div className="flex flex-col items-center flex-1">
             <div
               className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-colors ${
@@ -263,13 +263,13 @@ const AddInvoice = () => {
               {step.label}
             </span>
           </div>
-          {idx < 2 && (
+          {/* {idx < 2 && (
             <div
               className={`h-1 flex-1 mx-2 transition-colors ${
                 currentStep > step.num ? "bg-[var(--c-primary)]" : "bg-gray-300"
               }`}
             />
-          )}
+          )} */}
         </div>
       ))}
     </div>
