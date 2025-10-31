@@ -11,7 +11,6 @@ const BottomSheet = ({ isOpen, onClose, onItemClick }) => {
       id: "soundbox",
       label: "Soundbox",
       url: "http://src.ctsolution.id/",
-      target: "_blank",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -59,7 +58,6 @@ const BottomSheet = ({ isOpen, onClose, onItemClick }) => {
       id: "nobank",
       label: "Uang Saku",
       url: "https://nobank.id/",
-      target: "_blank",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"

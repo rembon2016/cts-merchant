@@ -17,7 +17,6 @@ const QuickMenus = () => {
       id: "soundbox",
       label: "Soundbox",
       url: "http://src.ctsolution.id/",
-      target: "_blank",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -38,7 +37,6 @@ const QuickMenus = () => {
     {
       id: "nobank",
       label: "Uang Saku",
-      target: "_blank",
       url: "https://nobank.id/",
       icon: (
         <svg
