@@ -8,6 +8,7 @@ import CustomLoading from "./CustomLoading";
 import { useNavigate } from "react-router-dom";
 import { formatCurrency } from "../helper/currency";
 import SearchInput from "./SearchInput";
+import { toast } from "react-toastify";
 import { AlertCircle, ShoppingCart, XCircle } from "lucide-react";
 
 const MENU = [
@@ -108,7 +109,7 @@ export default function POS() {
   const handleProductClick = (product) => {
     // Check if product has any available stock
     if (!hasAvailableStock(product)) {
-      alert("Produk ini sedang habis stok");
+      toast.warning("Produk ini sedang habis stok");
       return;
     }
 
