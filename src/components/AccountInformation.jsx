@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
+import { toast } from "react-toastify";
 
 export default function AccountInformation() {
   const { user: userInfo } = useAuthStore();
@@ -52,7 +53,8 @@ export default function AccountInformation() {
 
   const handleClickEdit = (editMerchant) => {
     if (editMerchant) {
-      return alert("Fitur segera hadir");
+      toast.info("Fitur segera hadir");
+      return;
     }
 
     return navigate(
