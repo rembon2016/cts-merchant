@@ -13,13 +13,21 @@ const useInvoiceStore = create((set) => ({
   /**
    * Mengambil daftar invoice dari API
    */
-  getInvoices: async () => {
+  getInvoices: async (params = {}) => {
     const AUTH_TOKEN = sessionStorage.getItem("authToken");
+    const { status, end_date } = params || {};
 
     try {
       set({ isLoading: true, error: null });
+      const qs = new URLSearchParams();
+      if (status) qs.append("status", status);
+      if (end_date) qs.append("end_date", end_date);
 
-      const response = await fetch(`${ROOT_API}/v1/merchant/invoice`, {
+      const url = qs.toString()
+        ? `${ROOT_API}/v1/merchant/invoice?${qs.toString()}`
+        : `${ROOT_API}/v1/merchant/invoice`;
+
+      const response = await fetch(url, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
