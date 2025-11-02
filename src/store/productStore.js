@@ -586,6 +586,144 @@ const useProductStore = create((set, get) => ({
     }
   },
 
+  // Get detail category
+  getDetailCategory: async (categoryId) => {
+    const token = sessionStorage.getItem("authPosToken");
+
+    try {
+      set({ isLoading: true, error: null });
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_POS_ROUTES}/categories/${categoryId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        set({ isLoading: false, error: `Gagal mendapatkan kategori` });
+        throw new Error(`HTTP error! status: ${response?.status}`);
+      }
+
+      const result = await response.json();
+
+      set({ isLoading: false, error: null, categories: result?.data });
+      return result?.data;
+    } catch (error) {
+      console.log("Error", error);
+      set({ error: error.message, isLoading: false });
+      return null;
+    }
+  },
+
+  // Edit categories
+  editCategories: async (formData, categoryId) => {
+    const token = sessionStorage.getItem("authPosToken");
+
+    try {
+      set({ isLoading: true, error: null });
+
+      // Detect if there is any File in the formData values
+      const hasFile = Object.values(formData || {}).some(
+        (v) =>
+          v instanceof File ||
+          (Array.isArray(v) && v.some((i) => i instanceof File))
+      );
+
+      let body;
+      const headers = {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+
+      if (hasFile) {
+        body = new FormData();
+        Object.entries(formData || {}).forEach(([key, value]) => {
+          if (value instanceof File) {
+            body.append(key, value, value.name);
+          } else if (Array.isArray(value)) {
+            value.forEach((v) => body.append(`${key}[]`, v));
+          } else if (value && typeof value === "object") {
+            body.append(key, JSON.stringify(value));
+          } else if (value !== undefined && value !== null) {
+            body.append(key, String(value));
+          }
+        });
+      } else {
+        headers["Content-Type"] = "application/json";
+        body = JSON.stringify(formData);
+      }
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_POS_ROUTES}/categories/${categoryId}`,
+        {
+          method: "PUT",
+          headers,
+          body,
+        }
+      );
+
+      if (!response.ok) {
+        set({ isLoading: false, error: `Gagal mengubah kategori` });
+        setTimeout(() => {
+          set({ error: null });
+        }, 2000);
+        throw new Error(`HTTP error! status: ${response?.status}`);
+      }
+
+      const result = await response.json();
+
+      set({ isLoading: false, error: null, success: true });
+
+      return result;
+    } catch (error) {
+      console.log("Error", error);
+      set({ error: error.message, isLoading: false });
+    }
+  },
+
+  // Remove categories
+  removeCategories: async (categoryId) => {
+    const token = sessionStorage.getItem("authPosToken");
+
+    try {
+      set({ isLoading: true, error: null });
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_POS_ROUTES}/categories/${categoryId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        set({ isLoading: false, error: `Gagal menghapus kategori` });
+        setTimeout(() => {
+          set({ error: null });
+        }, 2000);
+        throw new Error(`HTTP error! status: ${response?.status}`);
+      }
+
+      const result = await response.json();
+
+      set({ isLoading: false, error: null, success: true });
+      return result;
+    } catch (error) {
+      console.log("Error", error);
+      set({ error: error.message, isLoading: false });
+    }
+  },
+
   // Check if product has any stock available (for variant products)
   hasAvailableStock: (product) => {
     if (!product.is_variant) {

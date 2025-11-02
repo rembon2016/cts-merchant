@@ -19,6 +19,7 @@ import PosProductsDetail from "./pages/POS/products-detail";
 import PosAddProducts from "./pages/POS/add-products";
 import PosEditProducts from "./pages/POS/edit-products";
 import PosAddCategories from "./pages/POS/add-categories";
+import PosEditCategories from "./pages/POS/edit-categories";
 import AccountInformation from "./pages/AccountInformation";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -203,6 +204,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <PosAddCategories />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="pos/edit-kategori/:id"
+              element={
+                <ProtectedRoute>
+                  <PosEditCategories />
                 </ProtectedRoute>
               }
             />
