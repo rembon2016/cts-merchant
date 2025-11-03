@@ -206,7 +206,7 @@ const TicketCreate = () => {
         </div>
 
         {/* Order ID */}
-        <div>
+        {/* <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Order ID (Opsional)
           </label>
@@ -218,7 +218,7 @@ const TicketCreate = () => {
             placeholder="Contoh: ORD-2025-001"
             className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-        </div>
+        </div> */}
 
         {/* Attachments */}
         <div>
