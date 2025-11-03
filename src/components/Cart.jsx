@@ -40,6 +40,7 @@ const Cart = () => {
     const price = Number(checkbox.dataset.price);
     const subtotal = Number(checkbox.dataset.subtotal);
     const itemId = Number(checkbox.id);
+    const cartId = checkbox.dataset.cartid;
     const itemName = checkbox.dataset.name;
     const itemImage = checkbox.dataset.image;
     const itemQuantity = checkbox.dataset.quantity;
@@ -48,6 +49,7 @@ const Cart = () => {
     if (isChecked) {
       const newItem = {
         product_id: itemId,
+        cart_id: cartId,
         name: itemName,
         image: itemImage,
         product_sku_id: Number.parseInt(itemSku),
@@ -237,6 +239,7 @@ const Cart = () => {
                   name={cartItem?.product?.name}
                   id={cartItem?.product?.id}
                   data-price={cartItem?.price}
+                  data-cartid={cart?.data?.id}
                   data-subtotal={cartItem?.subtotal}
                   data-name={cartItem?.product?.name}
                   data-image={cartItem?.product?.image}
