@@ -396,7 +396,7 @@ export default function POSEditProducts() {
           multiple={true}
         />
         <CustomSelectBox
-          label="Pilih Category"
+          label="Pilih Kategori"
           name="category_ids"
           value={formData?.category_ids}
           selectBoxData={categories}
