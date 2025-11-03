@@ -41,7 +41,8 @@ const Cart = () => {
     const price = Number(checkbox.dataset.price);
     const subtotal = Number(checkbox.dataset.subtotal);
     const itemId = Number(checkbox.id);
-    const cartId = checkbox.dataset.cartid;
+    const cartId = checkbox.dataset.cartid; // Main cart ID
+    const itemCartId = checkbox.dataset.itemid; // Cart item ID
     const itemName = checkbox.dataset.name;
     const itemImage = checkbox.dataset.image;
     const itemQuantity = checkbox.dataset.quantity;
@@ -49,7 +50,8 @@ const Cart = () => {
 
     if (isChecked) {
       const newItem = {
-        cart_id: cartId,
+        cart_id: cartId, // Main cart ID for clearing
+        item_id: itemCartId, // Cart item ID for reference
         product_id: itemId,
         name: itemName,
         image: itemImage,
@@ -95,12 +97,14 @@ const Cart = () => {
 
     if (isChecked) {
       const allItems = cart?.data?.items?.map((item) => ({
+        cart_id: item.cart_id, // Use the main cart ID, not item ID
+        item_id: item.id, // Store the item ID separately
         product_id: item.product?.id ?? String(item.id),
         name: item.product.name,
         price: item.price,
         subtotal: item.subtotal,
         image: item.product.image,
-        sku: Number.parseInt(item.product.sku),
+        product_sku_id: Number.parseInt(item.product.sku),
         quantity: item.quantity,
       }));
       setSelectedCart(allItems);
@@ -241,7 +245,8 @@ const Cart = () => {
                   name={cartItem?.product?.name}
                   id={cartItem?.product?.id}
                   data-price={cartItem?.price}
-                  data-cartid={cart?.data?.id}
+                  data-cartid={cartItem?.cart_id}
+                  data-itemid={cartItem?.id}
                   data-subtotal={cartItem?.subtotal}
                   data-name={cartItem?.product?.name}
                   data-image={cartItem?.product?.image}

@@ -9,7 +9,7 @@ const BottomNav = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
   const { saveOrder, selectPaymentMethod } = useCheckoutStore();
-  const { selectedCart, cart, setSelectedCart, clearDiscountData, clearCart } =
+  const { selectedCart, cart, setSelectedCart, clearDiscountData, clearCart, clearMultipleCarts } =
     useCartStore();
   const navigation = useNavigate();
   const pathname = location.pathname;
@@ -183,13 +183,21 @@ const BottomNav = () => {
     try {
       setLoading(true);
 
-      const CART_ID = dataCheckout?.items[0]?.cart_id;
-
-      // console.log(CART_ID);
+      // Extract unique cart_ids from selected items
+      // Since all items in the same cart share the same cart_id,
+      // we only need unique cart_ids
+      const cartIds = [...new Set(
+        dataCheckout?.items?.map(item => item.cart_id).filter(Boolean)
+      )];
 
       const response = await saveOrder(dataCheckout);
 
       if (response?.success) {
+        // Clear carts based on unique cart_ids
+        if (cartIds && cartIds.length > 0) {
+          await clearMultipleCarts(cartIds);
+        }
+        
         navigation(`/pos/transaction/${response?.data?.id}`, {
           replace: true,
         });
@@ -198,7 +206,6 @@ const BottomNav = () => {
         sessionStorage.removeItem("discount");
         sessionStorage.removeItem("totalPayment");
         clearDiscountData();
-        clearCart(CART_ID);
       }
 
       setLoading(false);
