@@ -111,9 +111,10 @@ const TicketDetailPage = () => {
   const canReply = selectedTicket.status !== 'closed';
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 p-4 shadow-sm flex-shrink-0 z-10">
+    <div className="fixed inset-0 flex justify-center bg-gray-100 dark:bg-slate-900">
+      <div className="w-full max-w-sm flex flex-col bg-gray-50 dark:bg-gray-900">
+        {/* Header */}
+        <div className="bg-white dark:bg-gray-800 p-4 shadow-sm flex-shrink-0 z-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button onClick={() => navigate(-1)}>
@@ -265,6 +266,7 @@ const TicketDetailPage = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };
