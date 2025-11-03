@@ -273,7 +273,7 @@ export default function POSAddProducts() {
           multiple={true}
         />
         <CustomSelectBox
-          label="Pilih Category"
+          label="Pilih Kategori"
           name="category_ids"
           value={formData?.category_ids}
           selectBoxData={categories}
