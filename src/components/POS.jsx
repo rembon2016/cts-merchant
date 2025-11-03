@@ -9,6 +9,7 @@ import { formatCurrency } from "../helper/currency";
 import SearchInput from "./SearchInput";
 import { toast } from "react-toastify";
 import { AlertCircle, ShoppingCart, XCircle } from "lucide-react";
+import BottomModal from "./BottomModal";
 
 const MENU = [
   {
@@ -33,7 +34,7 @@ export default function POS() {
   const observerRef = useRef();
 
   const { isDark } = useThemeStore();
-  const { addToCart, loadingCart, success, error } = useCartStore();
+  const { addToCart, success, error } = useCartStore();
   const {
     categories: subCategories,
     isLoading,
@@ -56,6 +57,8 @@ export default function POS() {
 
   const navigate = useNavigate();
 
+  const productStock = products?.stocks?.reduce((a, b) => a + b.qty, 0);
+
   // Fetch categories on component mount
   useEffect(() => {
     getCategories();
@@ -65,14 +68,14 @@ export default function POS() {
   useEffect(() => {
     if (success) {
       toast.success("Berhasil ditambahkan ke keranjang", {
-        position: "top-right",
+        position: "top-center",
         autoClose: 3000,
       });
     }
 
     if (error) {
       toast.error("Terjadi kesalahan saat menambahkan ke keranjang", {
-        position: "top-right",
+        position: "top-center",
         autoClose: 3000,
       });
     }
@@ -373,15 +376,31 @@ export default function POS() {
       {renderProducts}
 
       {/* Variant Modal */}
-      <VariantModal
-        isOpen={showVariantModal}
-        onClose={() => {
-          setShowVariantModal(false);
-          setSelectedProduct(null);
-        }}
-        product={selectedProduct}
-        onSelectVariant={handleVariantSelect}
-      />
+      {selectedProduct && (
+        <BottomModal
+          isOpen={showVariantModal}
+          onClose={() => {
+            setShowVariantModal(false);
+            setSelectedProduct(null);
+          }}
+          // Pastikan data yang dikirim adalah produk yang dipilih
+          data={{
+            ...selectedProduct,
+            // Normalisasi image agar konsisten ditampilkan seperti di daftar produk
+            image: selectedProduct?.image
+              ? `${import.meta.env.VITE_API_IMAGE}${selectedProduct.image}`
+              : selectedProduct?.image,
+          }}
+          // Hitung stok sesuai tipe produk (varian vs non-varian)
+          stocks={
+            selectedProduct?.is_variant
+              ? getTotalVariantStock(selectedProduct)
+              : getProductStock(selectedProduct)
+          }
+          onItemClick={() => setShowVariantModal(false)}
+          isFromDetail={false}
+        />
+      )}
     </div>
   );
 }
