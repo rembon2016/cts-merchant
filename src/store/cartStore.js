@@ -60,16 +60,18 @@ const useCartStore = create((set, get) => ({
         }),
       });
 
-      if (!response.ok && response.status === 400) {
-        // Jika API mengembalikan 400 (item sudah ada), update quantity berdasarkan cart item id
-        const cartItemId = get().getCartItemIdByProductId?.(PRODUCT_ID);
-        if (cartItemId) {
-          await get().updateCartItem?.(cartItemId, quantity);
+      if (!response.ok) {
+        if (response.status === 400) {
+          // Jika API mengembalikan 400 (item sudah ada), update quantity berdasarkan cart item id
+          const cartItemId = get().getCartItemIdByProductId?.(PRODUCT_ID);
+          if (cartItemId) {
+            await get().updateCartItem?.(cartItemId, quantity);
+          } else {
+            throw new Error("Cart item untuk produk ini tidak ditemukan");
+          }
         } else {
-          throw new Error("Cart item untuk produk ini tidak ditemukan");
+          throw new Error(`Failed add to cart`);
         }
-      } else {
-        throw new Error(`Failed add to cart`);
       }
 
       set({
@@ -87,6 +89,8 @@ const useCartStore = create((set, get) => ({
           set({ success: null, triggerCartFetch: false, response: null });
         }, 3000);
       }
+
+      return response;
     } catch (error) {
       console.error("Error: ", error.message);
       set({

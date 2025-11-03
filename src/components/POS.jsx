@@ -34,7 +34,7 @@ export default function POS() {
   const observerRef = useRef();
 
   const { isDark } = useThemeStore();
-  const { addToCart, success, error } = useCartStore();
+  const { success, error } = useCartStore();
   const {
     categories: subCategories,
     isLoading,
@@ -65,21 +65,21 @@ export default function POS() {
   }, [getCategories]);
 
   // Show toast when cart add/update succeeds or fails
-  useEffect(() => {
-    if (success) {
-      toast.success("Berhasil ditambahkan ke keranjang", {
-        position: "top-center",
-        autoClose: 3000,
-      });
-    }
+  // useEffect(() => {
+  //   if (success) {
+  //     toast.success("Berhasil ditambahkan ke keranjang", {
+  //       position: "top-center",
+  //       autoClose: 3000,
+  //     });
+  //   }
 
-    if (error) {
-      toast.error("Terjadi kesalahan saat menambahkan ke keranjang", {
-        position: "top-center",
-        autoClose: 3000,
-      });
-    }
-  }, [success, error]);
+  //   if (error) {
+  //     toast.error("Terjadi kesalahan saat menambahkan ke keranjang", {
+  //       position: "top-center",
+  //       autoClose: 3000,
+  //     });
+  //   }
+  // }, [success, error]);
 
   // Fetch products when filters change
   useEffect(() => {
@@ -143,11 +143,6 @@ export default function POS() {
   // Navigate to product detail page
   const goToProductDetail = (productId) => {
     navigate(`/product/${productId}`);
-  };
-
-  // Handle variant selection
-  const handleVariantSelect = ({ product, variant, quantity }) => {
-    addToCart(product, variant, quantity);
   };
 
   const renderCategories = useMemo(() => {
