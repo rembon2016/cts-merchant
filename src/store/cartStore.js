@@ -288,6 +288,56 @@ const useCartStore = create((set, get) => ({
       set({ error: error.message, isLoading: false });
     }
   },
+  clearMultipleCarts: async (cartIds) => {
+    try {
+      set({ isLoading: true, error: null });
+      
+      const tokenPos = sessionStorage.getItem("authPosToken");
+      
+      // Loop through each cart_id and call the clear API
+      const clearPromises = cartIds.map(cartId =>
+        fetch(`${ROOT_API}/pos/cart/clear?cart_id=${cartId}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${tokenPos}`,
+          },
+        })
+      );
+
+      const responses = await Promise.all(clearPromises);
+      
+      // Check if all requests were successful
+      const allSuccessful = responses.every(response => response.ok);
+      
+      if (!allSuccessful) {
+        throw new Error("Failed to clear some cart items");
+      }
+
+      set({
+        cart: [],
+        selectedCart: [],
+        isLoading: false,
+        error: false,
+        success: true,
+      });
+
+      get().getCart();
+
+      setTimeout(() => {
+        set({ success: null });
+      }, 3000);
+      
+      return true;
+    } catch (error) {
+      console.log("Error clearing carts: ", error.message);
+      set({ error: error.message, isLoading: false });
+      setTimeout(() => {
+        set({ error: null });
+      }, 3000);
+      return false;
+    }
+  },
   clearDiscountData: () => set({ discountData: [] }),
   checkVoucherDiscount: async (discount) => {
     try {
