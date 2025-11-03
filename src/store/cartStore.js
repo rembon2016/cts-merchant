@@ -35,44 +35,14 @@ const useCartStore = create((set, get) => ({
     const activeBranch = sessionStorage.getItem("branchActive");
     const stock = getProductStock(product, variant?.id, isFromDetail);
 
+    const PRODUCT_ID = product?.id;
+
     if (stock < quantity) {
       toast.warning(`Stok tidak mencukupi. Stok tersedia: ${stock}`);
       return;
     }
 
     set({ isLoading: true, error: null, success: null });
-
-    // const price = getProductPrice(product, variant?.id);
-    // const cartItem = {
-    //   id: variant ? `${product.id}-${variant.id}` : product.id.toString(),
-    //   productId: product.id,
-    //   variantId: variant?.id || null,
-    //   name: variant
-    //     ? `${product.name} - ${variant.variant_name}`
-    //     : product.name,
-    //   price,
-    //   quantity,
-    //   stock,
-    //   image: product.image,
-    // };
-
-    // const existingItem = get().cart.find((item) => item.id === cartItem.id);
-
-    // if (existingItem) {
-    //   const newQuantity = existingItem.quantity + quantity;
-
-    //   if (newQuantity > stock) {
-    //     alert(`Stok tidak mencukupi. Stok tersedia: ${stock}`);
-    //     return;
-    //   }
-
-    //   set((state) => ({
-    //     cart: state.cart.map((item) =>
-    //       item.id === cartItem.id ? { ...item, quantity: newQuantity } : item
-    //     ),
-    //   }));
-    //   return;
-    // }
 
     try {
       const response = await fetch(`${ROOT_API}/pos/cart/add`, {
@@ -90,7 +60,15 @@ const useCartStore = create((set, get) => ({
         }),
       });
 
-      if (!response.ok) {
+      if (!response.ok && response.status === 400) {
+        // Jika API mengembalikan 400 (item sudah ada), update quantity berdasarkan cart item id
+        const cartItemId = get().getCartItemIdByProductId?.(PRODUCT_ID);
+        if (cartItemId) {
+          await get().updateCartItem?.(cartItemId, quantity);
+        } else {
+          throw new Error("Cart item untuk produk ini tidak ditemukan");
+        }
+      } else {
         throw new Error(`Failed add to cart`);
       }
 
@@ -117,6 +95,20 @@ const useCartStore = create((set, get) => ({
         error: error.message,
         response: null,
       });
+    }
+  },
+  // Dapatkan cart item id (id pada items) berdasarkan product_id dari state cart
+  getCartItemIdByProductId: (productId) => {
+    try {
+      const cart = get().cart;
+      const items = cart?.data?.items || [];
+      const found = items.find(
+        (it) => String(it?.product_id) === String(productId)
+      );
+      return found?.id ?? null;
+    } catch (error) {
+      console.error("getCartItemIdByProductId error:", error?.message);
+      return null;
     }
   },
   getCart: async () => {
@@ -191,7 +183,7 @@ const useCartStore = create((set, get) => ({
       set({ isLoading: true, error: null });
 
       const response = await fetch(`${ROOT_API}/pos/cart/item/${cartItemId}`, {
-        method: "PATCH",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${tokenPos}`,
