@@ -37,7 +37,7 @@ export default function POSTransaction() {
     }
 
     return (
-      <div className="p-4 bg-white min-h-[70vh]">
+      <div className="p-4 min-h-[70vh]">
         <div className="w-full space-y-4">
           {/* Header / Search / Filters */}
           <div className="bg-white border border-gray-100 rounded-lg p-4 shadow-sm">
