@@ -195,10 +195,9 @@ export const useAuthStore = create((set, get) => ({
     // Clear existing timers
     get().clearAutoLogoutTimer();
 
-    // Jika sudah expired, logout langsung
+    // Jika sudah expired, coba refresh token terlebih dahulu
     if (timeUntilExpiry <= 0) {
-      console.log("Session expired, logging out...");
-      get().handleAutoLogout();
+      get().refreshToken();
       return;
     }
 
@@ -213,7 +212,7 @@ export const useAuthStore = create((set, get) => ({
       const expired = Number.parseInt(sessionStorage.getItem(EXPIRED_KEY), 10);
 
       if (now >= expired) {
-        get().handleAutoLogout();
+        get().refreshToken();
       }
     }, 1000);
 
@@ -333,7 +332,73 @@ export const useAuthStore = create((set, get) => ({
     sessionStorage.setItem(EXPIRED_KEY, expireTimestamp);
     get().setupAutoLogout();
   },
+
+  // Refresh token ketika sesi habis
+  refreshToken: async () => {
+    try {
+      const currentToken = sessionStorage.getItem(TOKEN_KEY);
+      if (!currentToken) {
+        throw new Error("No authentication token found");
+      }
+
+      set({ isLoading: true, error: null });
+
+      const response = await fetch(`${ROOT_API}/auth/refresh-token`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${currentToken}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        set({
+          isLoading: false,
+          error: result?.message || "Refresh token failed",
+        });
+        // Jika gagal refresh, lakukan auto logout
+        get().handleAutoLogout();
+        return { success: false, error: result?.message };
+      }
+
+      const newToken =
+        result?.access_token || result?.token || result?.data?.access_token;
+      const expiresIn = result?.expires_in || result?.data?.expires_in;
+
+      if (!newToken || !expiresIn) {
+        set({ isLoading: false, error: "Invalid refresh response" });
+        get().handleAutoLogout();
+        return { success: false, error: "Invalid refresh response" };
+      }
+
+      const newExpiry = Date.now() + Number(expiresIn) * 1000;
+
+      sessionStorage.setItem(TOKEN_KEY, newToken);
+      sessionStorage.setItem(EXPIRED_KEY, newExpiry.toString());
+
+      set({ token: newToken, isLoggedIn: true, isLoading: false, error: null });
+
+      // Reset auto logout timer berdasarkan expiry terbaru
+      get().setupAutoLogout();
+
+      return { success: true };
+    } catch (error) {
+      console.error("Refresh token error:", error?.message || error);
+      set({ isLoading: false, error: error?.message });
+      get().handleAutoLogout();
+      return { success: false, error: error?.message };
+    }
+  },
 }));
 
 // Helper for checking auth status outside React
 export const isAuthenticated = () => !!sessionStorage.getItem(TOKEN_KEY);
+
+// Ekspor fungsi utilitas untuk memicu refresh token dari luar
+export const authStore = async () => {
+  const { refreshToken } = useAuthStore.getState();
+  return await refreshToken();
+};
