@@ -4,6 +4,7 @@ import { formatCurrency } from "../helper/currency";
 import { useCartStore } from "../store/cartStore";
 import { usePosStore } from "../store/posStore";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 import SimpleInput from "./form/SimpleInput";
 import ButtonQuantity from "./ButtonQuantity";
 import PropTypes from "prop-types";
@@ -23,13 +24,7 @@ export default function BottomModal(props) {
   const sheetRef = useRef(null);
   const { isDark } = useThemeStore();
   const { getProductPrice, getProductStock } = usePosStore();
-  const {
-    addToCart,
-    getCart,
-    success,
-    isLoading,
-    response: responseApi,
-  } = useCartStore();
+  const { addToCart, getCart, success, isLoading } = useCartStore();
 
   const navigation = useNavigate();
 
@@ -92,7 +87,31 @@ export default function BottomModal(props) {
   const handleVariantSelect = (variant) => setSelectedVariant(variant);
 
   const handleAddToCart = async (data, variant, quantity, isFromDetail) => {
-    await addToCart(data, variant, quantity, isFromDetail);
+    const response = await addToCart(data, variant, quantity, isFromDetail);
+
+    if (response?.ok || response?.status === 200) {
+      toast.success("Berhasil Dimasukkan ke keranjang", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    } else {
+      toast.error("Gagal Dimasukkan ke keranjang", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    }
   };
 
   const getVariantPrice = (variant) => {
@@ -181,18 +200,14 @@ export default function BottomModal(props) {
 
   const totalPrice = formatCurrency(formData?.harga * quantity);
 
-  useEffect(() => {
-    if (responseApi?.ok || responseApi?.status === 200) {
-      navigation("/cart", { replace: true });
-    }
-  }, [responseApi]);
-
   if (!isOpen) return null;
 
   return (
     <>
       {/* Overlay */}
       {/* <button className="fixed inset-0 z-40" onClick={handleClose} /> */}
+
+      <ToastContainer />
 
       {/* Bottom Sheet */}
       <div className="fixed inset-x-0 bottom-[1.5rem] pointer-events-none z-10">
