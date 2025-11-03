@@ -279,9 +279,9 @@ export default function POS() {
               <div className="p-2 w-full h-full flex flex-col justify-between">
                 <div>
                     <div className="text-slate-600 dark:text-slate-300">
-                    <span className="font-bold text-md">
-                        {formatCurrency(productPrice)}
-                    </span>
+                        <span className="font-bold text-md">
+                            {formatCurrency(productPrice)}
+                        </span>
                     </div>
                     <div className="mt-2 mb-4">
                         <div className="font-semibold text-md line-clamp-2 leading-5 mb-1">
