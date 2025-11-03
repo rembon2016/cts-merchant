@@ -1,5 +1,5 @@
 import { useMemo, useCallback, useState, useRef, useEffect } from "react";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, XCircle } from "lucide-react";
 import { usePosStore } from "../store/posStore";
 import { useProductStore } from "../store/productStore";
 import { formatCurrency } from "../helper/currency";
@@ -145,8 +145,9 @@ export default function POSProducts() {
 
     if (productsError) {
       return (
-        <div className="col-span-2 text-center text-red-500 p-4 bg-red-50 rounded-lg">
-          Error: {productsError}
+        <div className="col-span-2 flex flex-col items-center justify-center text-gray-500 p-4 bg-gray-100 rounded-lg h-[250px]">
+          <AlertCircle className="w-16 h-16 mb-2 text-gray-400" />
+          <span className="text-sm">Error: {productsError}</span>
         </div>
       );
     }
@@ -206,8 +207,9 @@ export default function POSProducts() {
             </div>
 
             {!productsLoading && !productsError && products?.length === 0 && (
-              <div className="col-span-2 text-center text-gray-500">
-                Produk tidak ditemukan.
+              <div className="col-span-2 flex flex-col items-center justify-center text-gray-500 p-4 bg-gray-100 rounded-lg h-[250px]">
+                <XCircle className="w-16 h-16 mb-2 text-gray-400" />
+                <span className="text-sm">Produk tidak ditemukan</span>
               </div>
             )}
 
@@ -259,24 +261,21 @@ export default function POSProducts() {
                         </div>
                       )}
                     </div>
-                    <div className="p-2 w-full">
-                      <div className="font-bold text-md">
-                        {product.name.length > 12
-                          ? `${product.name.slice(0, 12)}...`
-                          : product.name}
-                      </div>
-                      <div className="font-normal text-sm mb-2 text-gray-600 dark:text-gray-400">
-                        {product.description?.length > 25
-                          ? `${product.description.slice(0, 25)}...`
-                          : product.description}
-                      </div>
-                      <div className="text-slate-600 dark:text-slate-300">
-                        <span className="font-bold text-lg">
-                          {formatCurrency(productPrice)}
-                        </span>
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-                        Stok: {productStock}
+                    <div className="p-2 w-full h-full flex flex-col justify-between">
+                      <div>
+                        <div className="text-slate-600 dark:text-slate-300">
+                          <span className="font-bold text-md">
+                            {formatCurrency(productPrice)}
+                          </span>
+                        </div>
+                        <div className="mt-2 mb-4">
+                          <div className="font-semibold text-md line-clamp-2 leading-5 mb-1">
+                            {product.name}
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            Stok: {productStock}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </button>
@@ -306,14 +305,14 @@ export default function POSProducts() {
                 >
                   <button
                     className="text-left flex-1"
-                    onClick={() => {
-                      setSelectedSub((prev) =>
-                        prev?.toLowerCase() === sub?.name?.toLowerCase()
-                          ? ""
-                          : sub?.name
-                      );
-                      setActiveTab("Produk");
-                    }}
+                    // onClick={() => {
+                    //   // setSelectedSub((prev) =>
+                    //   //   prev?.toLowerCase() === sub?.name?.toLowerCase()
+                    //   //     ? ""
+                    //   //     : sub?.name
+                    //   // );
+                    //   setActiveTab("Produk");
+                    // }}
                   >
                     <span className="text-sm font-medium text-gray-900 dark:text-white">
                       {sub?.name}
