@@ -51,7 +51,6 @@ const Cart = () => {
       const newItem = {
         cart_id: cartId,
         product_id: itemId,
-        cart_id: cartId,
         name: itemName,
         image: itemImage,
         product_sku_id: Number.parseInt(itemSku),
