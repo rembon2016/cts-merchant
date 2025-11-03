@@ -34,11 +34,10 @@ export default function POS() {
   const observerRef = useRef();
 
   const { isDark } = useThemeStore();
-  const { addToCart } = useCartStore();
+  const { addToCart, loadingCart, success, error } = useCartStore();
   const {
     categories: subCategories,
     isLoading,
-    error,
     getCategories,
     products,
     productsLoading,
@@ -62,6 +61,23 @@ export default function POS() {
   useEffect(() => {
     getCategories();
   }, [getCategories]);
+
+  // Show toast when cart add/update succeeds or fails
+  useEffect(() => {
+    if (success) {
+      toast.success("Berhasil ditambahkan ke keranjang", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
+
+    if (error) {
+      toast.error("Terjadi kesalahan saat menambahkan ke keranjang", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
+  }, [success, error]);
 
   // Fetch products when filters change
   useEffect(() => {
@@ -113,13 +129,13 @@ export default function POS() {
       return;
     }
 
-    if (product.is_variant && product.skus?.length > 0) {
-      setSelectedProduct(product);
-      setShowVariantModal(true);
-    } else {
-      // Add to cart directly for non-variant products
-      addToCart(product);
-    }
+    setSelectedProduct(product);
+    setShowVariantModal(true);
+    // addToCart(product);
+    // if (product.is_variant && product.skus?.length > 0) {
+    // } else {
+    //   // Add to cart directly for non-variant products
+    // }
   };
 
   // Navigate to product detail page
@@ -149,13 +165,13 @@ export default function POS() {
     }
 
     if (error) {
-        return (
-            <div className="mb-3">
-                <div className="text-center text-red-500 mb-4 p-3 bg-red-50 rounded-lg">
-                    Error: {error}
-                </div>
-            </div>
-        );
+      return (
+        <div className="mb-3">
+          <div className="text-center text-red-500 mb-4 p-3 bg-red-50 rounded-lg">
+            Error: {error}
+          </div>
+        </div>
+      );
     }
 
     return (
@@ -173,7 +189,14 @@ export default function POS() {
                 setSelectedSub(sub?.name === selectedSub ? "" : sub?.name)
               }
             >
-              <span className={(selectedSub?.toLowerCase() === sub?.name?.toLowerCase() ? "font-semibold" : "") + " w-full flex justify-center items-center text-nowrap whitespace-nowrap text-sm"}>
+              <span
+                className={
+                  (selectedSub?.toLowerCase() === sub?.name?.toLowerCase()
+                    ? "font-semibold"
+                    : "") +
+                  " w-full flex justify-center items-center text-nowrap whitespace-nowrap text-sm"
+                }
+              >
                 {sub.name}
               </span>
             </button>
@@ -187,44 +210,44 @@ export default function POS() {
     if (productsLoading) {
       return (
         <div className="grid grid-cols-2 gap-2">
-            {[...Array(4)].map((_, idx) => (
-                <div
-                    key={idx}
-                    className="w-full h-[220px] bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"
-                >
-                    <div className="w-full h-[80px] bg-gray-400 dark:bg-gray-600 rounded-t-[10px] p-2"></div>
-                    <div className="flex h-full flex-col gap-6 p-3">
-                        <div className="w-full">
-                            <div className="w-[90%] h-[20px] bg-gray-300 dark:bg-gray-500 rounded-sm mb-3"></div>
-                            <div className="flex flex-col gap-1">
-                                <div className="w-full h-[10px] bg-gray-300 dark:bg-gray-500 rounded-sm"></div>
-                                <div className="w-[30%] h-[10px] bg-gray-300 dark:bg-gray-500 rounded-sm"></div>
-                            </div>
-                        </div>
-
-                        <div className="w-full h-[35px] bg-gray-400 dark:bg-gray-500 rounded-lg p-2"></div>
-                    </div>
+          {[...Array(4)].map((_, idx) => (
+            <div
+              key={idx}
+              className="w-full h-[220px] bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"
+            >
+              <div className="w-full h-[80px] bg-gray-400 dark:bg-gray-600 rounded-t-[10px] p-2"></div>
+              <div className="flex h-full flex-col gap-6 p-3">
+                <div className="w-full">
+                  <div className="w-[90%] h-[20px] bg-gray-300 dark:bg-gray-500 rounded-sm mb-3"></div>
+                  <div className="flex flex-col gap-1">
+                    <div className="w-full h-[10px] bg-gray-300 dark:bg-gray-500 rounded-sm"></div>
+                    <div className="w-[30%] h-[10px] bg-gray-300 dark:bg-gray-500 rounded-sm"></div>
+                  </div>
                 </div>
-            ))}
+
+                <div className="w-full h-[35px] bg-gray-400 dark:bg-gray-500 rounded-lg p-2"></div>
+              </div>
+            </div>
+          ))}
         </div>
       );
     }
 
     if (productsError) {
       return (
-            <div className="col-span-2 flex flex-col items-center justify-center text-gray-500 p-4 bg-gray-100 rounded-lg h-[250px]">
-                <AlertCircle className="w-16 h-16 mb-2 text-gray-400" />
-                <span className="text-sm">Error: {productsError}</span>
-            </div>
+        <div className="col-span-2 flex flex-col items-center justify-center text-gray-500 p-4 bg-gray-100 rounded-lg h-[250px]">
+          <AlertCircle className="w-16 h-16 mb-2 text-gray-400" />
+          <span className="text-sm">Error: {productsError}</span>
+        </div>
       );
     }
 
     if (!productsLoading && !productsError && products?.length === 0) {
       return (
-            <div className="col-span-2 flex flex-col items-center justify-center text-gray-500 p-4 bg-gray-100 rounded-lg h-[250px]">
-                <XCircle className="w-16 h-16 mb-2 text-gray-400" />
-                <span className="text-sm">Produk tidak ditemukan</span>
-            </div>
+        <div className="col-span-2 flex flex-col items-center justify-center text-gray-500 p-4 bg-gray-100 rounded-lg h-[250px]">
+          <XCircle className="w-16 h-16 mb-2 text-gray-400" />
+          <span className="text-sm">Produk tidak ditemukan</span>
+        </div>
       );
     }
 
@@ -278,19 +301,19 @@ export default function POS() {
               </div>
               <div className="p-2 w-full h-full flex flex-col justify-between">
                 <div>
-                    <div className="text-slate-600 dark:text-slate-300">
+                  <div className="text-slate-600 dark:text-slate-300">
                     <span className="font-bold text-md">
-                        {formatCurrency(productPrice)}
+                      {formatCurrency(productPrice)}
                     </span>
+                  </div>
+                  <div className="mt-2 mb-4">
+                    <div className="font-semibold text-md line-clamp-2 leading-5 mb-1">
+                      {product.name}
                     </div>
-                    <div className="mt-2 mb-4">
-                        <div className="font-semibold text-md line-clamp-2 leading-5 mb-1">
-                            {product.name}
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">
-                            Stok: {productStock}
-                        </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      Stok: {productStock}
                     </div>
+                  </div>
                 </div>
                 <button
                   className={`w-full flex justify-center items-center gap-2 h-10 py-2 rounded-lg transition-colors ${
@@ -306,10 +329,10 @@ export default function POS() {
                   }}
                   disabled={isOutOfStock}
                 >
-                    <span className="inline-block">
-                        <ShoppingCart className="w-4 h-4" />
-                    </span>
-                    {isOutOfStock ? "Habis" : "Tambahkan"}
+                  <span className="inline-block">
+                    <ShoppingCart className="w-4 h-4" />
+                  </span>
+                  {isOutOfStock ? "Habis" : "Tambahkan"}
                 </button>
               </div>
             </div>

@@ -1,5 +1,5 @@
 import { useMemo, useCallback, useState, useRef, useEffect } from "react";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, XCircle } from "lucide-react";
 import { usePosStore } from "../store/posStore";
 import { useProductStore } from "../store/productStore";
 import { formatCurrency } from "../helper/currency";
@@ -206,8 +206,9 @@ export default function POSProducts() {
             </div>
 
             {!productsLoading && !productsError && products?.length === 0 && (
-              <div className="col-span-2 text-center text-gray-500">
-                Produk tidak ditemukan.
+              <div className="col-span-2 flex flex-col items-center justify-center text-gray-500 p-4 bg-gray-100 rounded-lg h-[250px]">
+                <XCircle className="w-16 h-16 mb-2 text-gray-400" />
+                <span className="text-sm">Produk tidak ditemukan</span>
               </div>
             )}
 
@@ -306,14 +307,14 @@ export default function POSProducts() {
                 >
                   <button
                     className="text-left flex-1"
-                    onClick={() => {
-                      setSelectedSub((prev) =>
-                        prev?.toLowerCase() === sub?.name?.toLowerCase()
-                          ? ""
-                          : sub?.name
-                      );
-                      setActiveTab("Produk");
-                    }}
+                    // onClick={() => {
+                    //   // setSelectedSub((prev) =>
+                    //   //   prev?.toLowerCase() === sub?.name?.toLowerCase()
+                    //   //     ? ""
+                    //   //     : sub?.name
+                    //   // );
+                    //   setActiveTab("Produk");
+                    // }}
                   >
                     <span className="text-sm font-medium text-gray-900 dark:text-white">
                       {sub?.name}

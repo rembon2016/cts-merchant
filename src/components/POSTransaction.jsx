@@ -5,6 +5,7 @@ import { useTransactionStore } from "../store/transactionStore";
 import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import CustomLoading from "./CustomLoading";
+import { XCircle } from "lucide-react";
 
 export default function POSTransaction() {
   const { transactions, isLoading, getListTransactions } =
@@ -24,6 +25,15 @@ export default function POSTransaction() {
   const renderElements = useMemo(() => {
     if (isLoading) {
       return <CustomLoading />;
+    }
+
+    if (!isLoading && transactions.length === 0) {
+      return (
+        <div className="col-span-2 flex flex-col items-center justify-center text-gray-500 p-4 bg-gray-100 rounded-lg h-[250px]">
+          <XCircle className="w-16 h-16 mb-2 text-gray-400" />
+          <span className="text-sm">Tidak ada Transaksi</span>
+        </div>
+      );
     }
 
     return (

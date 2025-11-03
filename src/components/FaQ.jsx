@@ -4,6 +4,7 @@ import { useDebounce } from "../hooks/useDebounce";
 import SearchInput from "./SearchInput";
 import LoadMoreButton from "./LoadMoreButton";
 import CustomLoading from "./CustomLoading";
+import { XCircle } from "lucide-react";
 
 const ROOT_API = import.meta.env.VITE_API_ROUTES;
 
@@ -107,10 +108,11 @@ export default function FaQ() {
     }
     if (!accumulatedData.length) {
       return (
-        <div className="text-center py-4">
+        <div className="flex flex-col items-center text-center py-4">
+          <XCircle className="w-16 h-16 mb-2 text-gray-400" />
           {state.searchQuery
             ? "Tidak ada FAQ yang sesuai dengan pencarian Anda."
-            : "Tidak ada FAQ tersedia."}
+            : "FAQ tidak tersedia."}
         </div>
       );
     }
