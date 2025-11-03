@@ -102,6 +102,8 @@ const useCartStore = create((set, get) => ({
         response,
       });
 
+      get().getCart();
+
       if (response) {
         setTimeout(() => {
           set({ success: null, triggerCartFetch: false, response: null });
@@ -269,6 +271,8 @@ const useCartStore = create((set, get) => ({
         error: false,
         success: true,
       });
+
+      get().getCart();
 
       if (response.ok) {
         setTimeout(() => {

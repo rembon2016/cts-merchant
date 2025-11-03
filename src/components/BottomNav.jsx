@@ -9,7 +9,7 @@ const BottomNav = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
   const { saveOrder, selectPaymentMethod } = useCheckoutStore();
-  const { selectedCart, cart, setSelectedCart, clearDiscountData } =
+  const { selectedCart, cart, setSelectedCart, clearDiscountData, clearCart } =
     useCartStore();
   const navigation = useNavigate();
   const pathname = location.pathname;
@@ -182,6 +182,11 @@ const BottomNav = () => {
   const proccessOrder = async (dataCheckout) => {
     try {
       setLoading(true);
+
+      const CART_ID = dataCheckout?.items[0]?.cart_id;
+
+      // console.log(CART_ID);
+
       const response = await saveOrder(dataCheckout);
 
       if (response?.success) {
@@ -193,6 +198,7 @@ const BottomNav = () => {
         sessionStorage.removeItem("discount");
         sessionStorage.removeItem("totalPayment");
         clearDiscountData();
+        clearCart(CART_ID);
       }
 
       setLoading(false);
