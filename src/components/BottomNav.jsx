@@ -183,22 +183,18 @@ const BottomNav = () => {
     try {
       setLoading(true);
 
-      const CART_ID = dataCheckout?.items[0]?.cart_id;
-
-      // console.log(CART_ID);
-
       const response = await saveOrder(dataCheckout);
 
       if (response?.success) {
         navigation(`/pos/transaction/${response?.data?.id}`, {
           replace: true,
         });
+        await clearCart(dataCheckout?.items[0]?.cart_id);
         sessionStorage.removeItem("cart");
         sessionStorage.removeItem("tax");
         sessionStorage.removeItem("discount");
         sessionStorage.removeItem("totalPayment");
         clearDiscountData();
-        clearCart(CART_ID);
       }
 
       setLoading(false);
