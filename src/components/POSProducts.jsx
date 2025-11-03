@@ -298,53 +298,48 @@ export default function POSProducts() {
               </button>
             </div>
             <div className="space-y-2">
-              {subCategories.map((sub) => (
-                <div
-                  key={sub.id}
-                  className="bg-white dark:bg-slate-700 rounded-lg p-4 shadow-sm border border-slate-100 dark:border-slate-600 flex items-center justify-between"
-                >
-                  <button
-                    className="text-left flex-1"
-                    // onClick={() => {
-                    //   // setSelectedSub((prev) =>
-                    //   //   prev?.toLowerCase() === sub?.name?.toLowerCase()
-                    //   //     ? ""
-                    //   //     : sub?.name
-                    //   // );
-                    //   setActiveTab("Produk");
-                    // }}
+              {subCategories.map((sub) => {
+                return (
+                  <div
+                    key={sub.id}
+                    className="bg-white dark:bg-slate-700 rounded-lg p-4 shadow-sm border border-slate-100 dark:border-slate-600 flex items-center justify-between"
                   >
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">
-                      {sub?.name}
-                    </span>
-                  </button>
-                  <div className="flex items-center gap-2 ml-4">
                     <button
-                      type="button"
-                      className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-slate-600 dark:hover:bg-slate-500 text-gray-700 dark:text-white"
-                      onClick={() =>
-                        navigate(`/pos/edit-kategori/${sub.id}`, {
-                          replace: true,
-                        })
-                      }
-                      aria-label="Edit kategori"
+                      className="text-left flex-1"
+                      onClick={() => setActiveTab("Kategori")}
                     >
-                      <Pencil className="w-4 h-4" />
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        {sub?.name}
+                      </span>
                     </button>
-                    <button
-                      type="button"
-                      className="p-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/30 dark:hover:bg-red-900/40"
-                      onClick={() => {
-                        setSelectedCategory(sub);
-                        setShowDeleteModal(true);
-                      }}
-                      aria-label="Hapus kategori"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-2 ml-4">
+                      <button
+                        type="button"
+                        className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-slate-600 dark:hover:bg-slate-500 text-gray-700 dark:text-white"
+                        onClick={() =>
+                          navigate(`/pos/edit-kategori/${sub.id}`, {
+                            replace: true,
+                          })
+                        }
+                        aria-label="Edit kategori"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        className="p-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/30 dark:hover:bg-red-900/40"
+                        onClick={() => {
+                          setSelectedCategory(sub);
+                          setShowDeleteModal(true);
+                        }}
+                        aria-label="Hapus kategori"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             {showDeleteModal && selectedCategory && (
               <SimpleModal

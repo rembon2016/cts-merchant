@@ -201,6 +201,7 @@ const BottomNav = () => {
         navigation(`/pos/transaction/${response?.data?.id}`, {
           replace: true,
         });
+        await clearCart(dataCheckout?.items[0]?.cart_id);
         sessionStorage.removeItem("cart");
         sessionStorage.removeItem("tax");
         sessionStorage.removeItem("discount");

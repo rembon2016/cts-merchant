@@ -291,11 +291,11 @@ const useCartStore = create((set, get) => ({
   clearMultipleCarts: async (cartIds) => {
     try {
       set({ isLoading: true, error: null });
-      
+
       const tokenPos = sessionStorage.getItem("authPosToken");
-      
+
       // Loop through each cart_id and call the clear API
-      const clearPromises = cartIds.map(cartId =>
+      const clearPromises = cartIds.map((cartId) =>
         fetch(`${ROOT_API}/pos/cart/clear?cart_id=${cartId}`, {
           method: "DELETE",
           headers: {
@@ -306,10 +306,10 @@ const useCartStore = create((set, get) => ({
       );
 
       const responses = await Promise.all(clearPromises);
-      
+
       // Check if all requests were successful
-      const allSuccessful = responses.every(response => response.ok);
-      
+      const allSuccessful = responses.every((response) => response.ok);
+
       if (!allSuccessful) {
         throw new Error("Failed to clear some cart items");
       }
@@ -327,7 +327,7 @@ const useCartStore = create((set, get) => ({
       setTimeout(() => {
         set({ success: null });
       }, 3000);
-      
+
       return true;
     } catch (error) {
       console.log("Error clearing carts: ", error.message);

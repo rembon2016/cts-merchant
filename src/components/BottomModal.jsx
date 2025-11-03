@@ -14,10 +14,11 @@ BottomModal.propTypes = {
   onClose: PropTypes.func,
   stocks: PropTypes.number,
   data: PropTypes.object,
+  isFromDetail: PropTypes.bool,
 };
 
 export default function BottomModal(props) {
-  const { isOpen, onClose, stocks, data } = props;
+  const { isOpen, onClose, stocks, data, isFromDetail = true } = props;
 
   const sheetRef = useRef(null);
   const { isDark } = useThemeStore();
@@ -262,7 +263,9 @@ export default function BottomModal(props) {
                 <div className="mt-3">
                   <button
                     className={`w-full flex gap-2 justify-center items-center h-16 py-2 rounded-lg transition-colors bg-[var(--c-primary)] text-white hover:bg-blue-700`}
-                    onClick={() => handleAddToCart(data, null, quantity, true)}
+                    onClick={() =>
+                      handleAddToCart(data, null, quantity, isFromDetail)
+                    }
                     disabled={isLoading}
                   >
                     <ShoppingCart className="w-5 h-5" />
