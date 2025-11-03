@@ -2,12 +2,14 @@ import { useState } from "react";
 import { useThemeStore } from "../store/themeStore";
 import { usePosStore } from "../store/posStore";
 import { toast } from "react-toastify";
+import { useCartStore } from "../store/cartStore";
 
 const VariantModal = ({ isOpen, onClose, product, onSelectVariant }) => {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const { isDark } = useThemeStore();
   const { getProductPrice, getProductStock } = usePosStore();
+  const { addToCart, updateCartItem } = useCartStore();
 
   if (!isOpen || !product) return null;
 
@@ -16,9 +18,9 @@ const VariantModal = ({ isOpen, onClose, product, onSelectVariant }) => {
   };
 
   const handleAddToCart = () => {
-    if (!selectedVariant) return;
-
-    const stock = getProductStock(product, selectedVariant.id);
+    // Support both variant and non-variant products
+    const variantId = selectedVariant?.id || null;
+    const stock = getProductStock(product, variantId);
     if (stock < quantity) {
       toast.warning(`Stok tidak mencukupi. Stok tersedia: ${stock}`);
       return;
@@ -26,9 +28,9 @@ const VariantModal = ({ isOpen, onClose, product, onSelectVariant }) => {
 
     onSelectVariant({
       product,
-      variant: selectedVariant,
+      variant: selectedVariant || null,
       quantity,
-      price: getProductPrice(product, selectedVariant.id),
+      price: getProductPrice(product, variantId),
       stock,
     });
 
@@ -174,7 +176,7 @@ const VariantModal = ({ isOpen, onClose, product, onSelectVariant }) => {
         </div>
 
         {/* Quantity and Actions */}
-        {selectedVariant && (
+        {/* {selectedVariant && (
           <div className="p-4 border-t dark:border-gray-700">
             <div className="flex items-center justify-between mb-4">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -241,7 +243,75 @@ const VariantModal = ({ isOpen, onClose, product, onSelectVariant }) => {
               </button>
             </div>
           </div>
-        )}
+        )} */}
+        <div className="p-4 border-t dark:border-gray-700">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Jumlah:
+            </span>
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M20 12H4"
+                  />
+                </svg>
+              </button>
+              <span className="w-12 text-center font-medium text-gray-900 dark:text-white">
+                {quantity}
+              </span>
+              <button
+                onClick={() => {
+                  const maxStock = selectedVariant
+                    ? getVariantStock(selectedVariant)
+                    : getProductStock(product, null);
+                  setQuantity(Math.min(maxStock, quantity + 1));
+                }}
+                className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div className="flex space-x-3">
+            <button
+              onClick={onClose}
+              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              Batal
+            </button>
+            <button
+              onClick={handleAddToCart}
+              className="flex-1 px-4 py-2 bg-[var(--c-primary)] text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Tambah ke Keranjang
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

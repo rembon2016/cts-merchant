@@ -33,11 +33,10 @@ export default function POS() {
   const observerRef = useRef();
 
   const { isDark } = useThemeStore();
-  const { addToCart } = useCartStore();
+  const { addToCart, loadingCart, success, error } = useCartStore();
   const {
     categories: subCategories,
     isLoading,
-    error,
     getCategories,
     products,
     productsLoading,
@@ -61,6 +60,23 @@ export default function POS() {
   useEffect(() => {
     getCategories();
   }, [getCategories]);
+
+  // Show toast when cart add/update succeeds or fails
+  useEffect(() => {
+    if (success) {
+      toast.success("Berhasil ditambahkan ke keranjang", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
+
+    if (error) {
+      toast.error("Terjadi kesalahan saat menambahkan ke keranjang", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
+  }, [success, error]);
 
   // Fetch products when filters change
   useEffect(() => {
@@ -112,13 +128,13 @@ export default function POS() {
       return;
     }
 
-    if (product.is_variant && product.skus?.length > 0) {
-      setSelectedProduct(product);
-      setShowVariantModal(true);
-    } else {
-      // Add to cart directly for non-variant products
-      addToCart(product);
-    }
+    setSelectedProduct(product);
+    setShowVariantModal(true);
+    // addToCart(product);
+    // if (product.is_variant && product.skus?.length > 0) {
+    // } else {
+    //   // Add to cart directly for non-variant products
+    // }
   };
 
   // Navigate to product detail page
