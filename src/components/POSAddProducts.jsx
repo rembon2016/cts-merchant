@@ -34,19 +34,21 @@ export default function POSAddProducts() {
     category_ids: [],
     brand_ids: [],
     skus: [
-      {
-        sku: "",
-        barcode: "",
-        variant_name: "",
-        is_active: false,
-      },
+      // Template for variant items
+      // {
+      //   sku: "",
+      //   barcode: "",
+      //   variant_name: "",
+      //   is_active: true,
+      // },
     ],
     bundle_items: [
-      {
-        product_id: "",
-        qty: "",
-        price: "",
-      },
+      // Template for bundle items
+      // {
+      //   product_id: "",
+      //   qty: "",
+      //   price: "",
+      // },
     ],
     stocks: [
       {
@@ -126,19 +128,7 @@ export default function POSAddProducts() {
   const handleRemoveItem = (arrayName, index) => {
     setFormData((prev) => {
       const newArray = prev[arrayName].filter((_, i) => i !== index);
-      const updates = { [arrayName]: newArray };
-
-      // Auto set is_bundle to false if all bundle_items are removed
-      if (arrayName === "bundle_items" && newArray.length === 0) {
-        updates.is_bundle = false;
-      }
-
-      // Auto set is_variant to false if all skus are removed
-      if (arrayName === "skus" && newArray.length === 0) {
-        updates.is_variant = false;
-      }
-
-      return { ...prev, ...updates };
+      return { ...prev, [arrayName]: newArray };
     });
   };
 
@@ -350,14 +340,14 @@ export default function POSAddProducts() {
           <SimpleInput
             name="cost_product"
             type="text"
-            label="Cost"
+            label="Biaya"
             value={formData?.cost_product}
             handleChange={handleChange}
           />
           <SimpleInput
             name="price_product"
             type="text"
-            label="Price"
+            label="Harga"
             value={formData?.price_product}
             handleChange={handleChange}
           />
@@ -366,7 +356,7 @@ export default function POSAddProducts() {
         <SimpleInput
           name="minimum_sales_quantity"
           type="text"
-          label="Minimum Sales Quantity"
+          label="Jumlah Minimum Penjualan"
           value={formData?.minimum_sales_quantity}
           handleChange={handleChange}
           // disabled={true}
@@ -374,7 +364,7 @@ export default function POSAddProducts() {
         <SimpleInput
           name="stok_alert"
           type="text"
-          label="Stock Alert"
+          label="Peringatan Stok"
           value={formData?.stok_alert}
           handleChange={handleChange}
           // disabled={true}
@@ -384,7 +374,7 @@ export default function POSAddProducts() {
             <SimpleInput
               name="stocks.qty"
               type="text"
-              label="Stocks / Quantity"
+              label="Stok / Kuantitas"
               value={item?.qty}
               handleChange={(e) =>
                 handleNestedChange("stocks", index, "qty", e.target.value, true)
@@ -393,7 +383,7 @@ export default function POSAddProducts() {
             <SimpleInput
               name="stocks.reason"
               type="text"
-              label="Reason"
+              label="Alasan"
               value={item?.reason}
               handleChange={(e) =>
                 handleNestedChange("stocks", index, "reason", e.target.value)
@@ -402,199 +392,248 @@ export default function POSAddProducts() {
           </div>
         ))}
 
-        <div className="py-4 flex justify-between">
-          <div className="flex items-center gap-2">
-            <CustomCheckbox
-              id="is_bundle"
-              name="is_bundle"
-              checked={formData?.is_bundle}
-              onChange={() =>
-                setFormData((prev) => ({ ...prev, is_bundle: !prev.is_bundle }))
-              }
-              size="md"
-            />
-            <div className="mt-2 text-sm">Is Bundle?</div>
+        {/* Variant Section */}
+        <div className="mt-6 p-4 border border-gray-200 rounded-lg">
+          <h3 className="text-lg font-semibold mb-4">Produk ini punya varian?</h3>
+          <div className="flex gap-6 mb-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="has_variant"
+                value="yes"
+                checked={formData?.is_variant}
+                onChange={() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    is_variant: true,
+                    skus: prev.skus.length === 0 ? [
+                      {
+                        variant_name: "",
+                        sku: "",
+                        barcode: "",
+                        is_active: true,
+                      },
+                    ] : prev.skus,
+                  }));
+                }}
+                className="w-4 h-4"
+              />
+              <span className="text-sm">Ya, memiliki varian</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="has_variant"
+                value="no"
+                checked={!formData?.is_variant}
+                onChange={() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    is_variant: false,
+                    skus: [],
+                  }));
+                }}
+                className="w-4 h-4"
+              />
+              <span className="text-sm">Tidak</span>
+            </label>
           </div>
-          <div className="flex items-center gap-2">
-            <CustomCheckbox
-              id="is_variant"
-              name="is_variant"
-              checked={formData?.is_variant}
-              onChange={() =>
-                setFormData((prev) => ({
-                  ...prev,
-                  is_variant: !prev.is_variant,
-                }))
-              }
-              size="md"
-            />
-            <div className="mt-2 text-sm">Is Variant?</div>
-          </div>
-        </div>
-        {formData?.is_bundle && (
-          <div className="flex flex-col gap-2 items-end">
-            <button
-              className="text-white font-semibold bg-[var(--c-primary)] py-4 px-6 rounded-lg"
-              onClick={() => {
-                setFormData((prev) => ({
-                  ...prev,
-                  bundle_items: [
-                    ...prev.bundle_items,
-                    { product_id: "", qty: "", price: "" },
-                  ],
-                }));
-              }}
-            >
-              + Tambah Bundle
-            </button>
-            {formData?.bundle_items?.map((item, index) => (
-              <div className="flex flex-col gap-2 w-full" key={generateId}>
-                <SimpleInput
-                  name="bundle_items.product_id"
-                  type="text"
-                  label="Product"
-                  value={item?.product_id}
-                  handleChange={(e) =>
-                    handleNestedChange(
-                      "bundle_items",
-                      index,
-                      "product_id",
-                      e.target.value
-                    )
-                  }
-                  isSelectBox={true}
-                  selectBoxData={products}
-                  // disabled={true}
-                />
-                <SimpleInput
-                  name="bundle_items.qty"
-                  type="text"
-                  label="Quantity"
-                  value={item?.qty}
-                  handleChange={(e) =>
-                    handleNestedChange(
-                      "bundle_items",
-                      index,
-                      "qty",
-                      e.target.value,
-                      true
-                    )
-                  }
-                  // disabled={true}
-                />
-                <SimpleInput
-                  name="bundle_items.price"
-                  type="text"
-                  label="Price"
-                  value={item?.price}
-                  handleChange={(e) =>
-                    handleNestedChange(
-                      "bundle_items",
-                      index,
-                      "price",
-                      e.target.value,
-                      true
-                    )
-                  }
-                  // disabled={true}
-                />
-                <button
-                  className="font-semibold bg-red-500 p-4 rounded-lg w-fit ml-auto mt-2"
-                  onClick={() => handleRemoveItem("bundle_items", index)}
-                >
-                  {getTrashIcon}
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-        {formData?.is_variant && (
-          <div className="flex flex-col gap-2 items-end">
-            <button
-              className="text-white font-semibold bg-[var(--c-primary)] py-4 px-6 rounded-lg"
-              onClick={() => {
-                setFormData((prev) => ({
-                  ...prev,
-                  skus: [
-                    ...prev.skus,
-                    {
-                      variant_name: "",
-                      sku: "",
-                      barcode: "",
-                      is_active: false,
-                    },
-                  ],
-                }));
-              }}
-            >
-              + Tambah Variant
-            </button>
-            {formData?.skus?.map((item, index) => (
-              <div className="flex flex-col gap-2 w-full" key={generateId}>
-                <SimpleInput
-                  name="skus.variant_name"
-                  type="text"
-                  label="Variant Name"
-                  value={item?.variant_name}
-                  handleChange={(e) =>
-                    handleNestedChange(
-                      "skus",
-                      index,
-                      "variant_name",
-                      e.target.value
-                    )
-                  }
-                  // disabled={true}
-                />
-                <SimpleInput
-                  name="skus.sku"
-                  type="text"
-                  label="SKU"
-                  value={item?.sku}
-                  handleChange={(e) =>
-                    handleNestedChange("skus", index, "sku", e.target.value)
-                  }
-                  // disabled={true}
-                />
-                <SimpleInput
-                  name="skus.barcode"
-                  type="text"
-                  label="Barcode"
-                  value={item?.barcode}
-                  handleChange={(e) =>
-                    handleNestedChange("skus", index, "barcode", e.target.value)
-                  }
-                  // disabled={true}
-                />
-                <div className="p-4 flex items-center gap-2">
-                  <CustomCheckbox
-                    id={`skus.is_active.${index}`}
-                    name="skus.is_active"
-                    checked={item?.is_active}
-                    onChange={() =>
+
+          {formData?.is_variant && (
+            <div className="flex flex-col gap-2 mt-4">
+              {formData?.skus?.map((item, index) => (
+                <div className="flex flex-col gap-2 w-full" key={generateId}>
+                  <SimpleInput
+                    name="skus.variant_name"
+                    type="text"
+                    label="Nama Varian"
+                    value={item?.variant_name}
+                    handleChange={(e) =>
                       handleNestedChange(
                         "skus",
                         index,
-                        "is_active",
-                        !item.is_active
+                        "variant_name",
+                        e.target.value
                       )
                     }
-                    size="md"
+                    // disabled={true}
                   />
-                  <div className="mt-2 text-sm">
-                    Is Active?: {item?.is_active ? "Yes" : "No"}
-                  </div>
+                  <SimpleInput
+                    name="skus.sku"
+                    type="text"
+                    label="SKU"
+                    value={item?.sku}
+                    handleChange={(e) =>
+                      handleNestedChange("skus", index, "sku", e.target.value)
+                    }
+                    // disabled={true}
+                  />
+                  <SimpleInput
+                    name="skus.barcode"
+                    type="text"
+                    label="Barcode"
+                    value={item?.barcode}
+                    handleChange={(e) =>
+                      handleNestedChange("skus", index, "barcode", e.target.value)
+                    }
+                    // disabled={true}
+                  />
+                  <button
+                    className="font-semibold bg-red-500 p-4 rounded-lg w-fit ml-auto mt-2"
+                    onClick={() => handleRemoveItem("skus", index)}
+                  >
+                    {getTrashIcon}
+                  </button>
                 </div>
-                <button
-                  className="font-semibold bg-red-500 p-4 rounded-lg w-fit ml-auto mt-2"
-                  onClick={() => handleRemoveItem("skus", index)}
-                >
-                  {getTrashIcon}
-                </button>
-              </div>
-            ))}
+              ))}
+              <button
+                className="text-white font-semibold bg-[var(--c-primary)] py-4 px-6 rounded-lg w-fit ml-auto mt-4"
+                onClick={() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    skus: [
+                      ...prev.skus,
+                      {
+                        variant_name: "",
+                        sku: "",
+                        barcode: "",
+                        is_active: true,
+                      },
+                    ],
+                  }));
+                }}
+              >
+                + Tambah Varian
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Bundle Section */}
+        <div className="mt-6 p-4 border border-gray-200 rounded-lg">
+          <h3 className="text-lg font-semibold mb-4">Produk ini punya bundle?</h3>
+          <div className="flex gap-6 mb-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="has_bundle"
+                value="yes"
+                checked={formData?.is_bundle}
+                onChange={() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    is_bundle: true,
+                    bundle_items: prev.bundle_items.length === 0 ? [
+                      {
+                        product_id: "",
+                        qty: "",
+                        price: "",
+                      },
+                    ] : prev.bundle_items,
+                  }));
+                }}
+                className="w-4 h-4"
+              />
+              <span className="text-sm">Ya, memiliki bundle</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="has_bundle"
+                value="no"
+                checked={!formData?.is_bundle}
+                onChange={() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    is_bundle: false,
+                    bundle_items: [],
+                  }));
+                }}
+                className="w-4 h-4"
+              />
+              <span className="text-sm">Tidak</span>
+            </label>
           </div>
-        )}
+
+          {formData?.is_bundle && (
+            <div className="flex flex-col gap-2 mt-4">
+              {formData?.bundle_items?.map((item, index) => (
+                <div className="flex flex-col gap-2 w-full" key={generateId}>
+                  <SimpleInput
+                    name="bundle_items.product_id"
+                    type="text"
+                    label="Produk"
+                    value={item?.product_id}
+                    handleChange={(e) =>
+                      handleNestedChange(
+                        "bundle_items",
+                        index,
+                        "product_id",
+                        e.target.value
+                      )
+                    }
+                    isSelectBox={true}
+                    selectBoxData={products}
+                    // disabled={true}
+                  />
+                  <SimpleInput
+                    name="bundle_items.qty"
+                    type="text"
+                    label="Kuantitas"
+                    value={item?.qty}
+                    handleChange={(e) =>
+                      handleNestedChange(
+                        "bundle_items",
+                        index,
+                        "qty",
+                        e.target.value,
+                        true
+                      )
+                    }
+                    // disabled={true}
+                  />
+                  <SimpleInput
+                    name="bundle_items.price"
+                    type="text"
+                    label="Harga"
+                    value={item?.price}
+                    handleChange={(e) =>
+                      handleNestedChange(
+                        "bundle_items",
+                        index,
+                        "price",
+                        e.target.value,
+                        true
+                      )
+                    }
+                    // disabled={true}
+                  />
+                  <button
+                    className="font-semibold bg-red-500 p-4 rounded-lg w-fit ml-auto mt-2"
+                    onClick={() => handleRemoveItem("bundle_items", index)}
+                  >
+                    {getTrashIcon}
+                  </button>
+                </div>
+              ))}
+              <button
+                className="text-white font-semibold bg-[var(--c-primary)] py-4 px-6 rounded-lg w-fit ml-auto mt-4"
+                onClick={() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    bundle_items: [
+                      ...prev.bundle_items,
+                      { product_id: "", qty: "", price: "" },
+                    ],
+                  }));
+                }}
+              >
+                + Tambah Bundle
+              </button>
+            </div>
+          )}
+        </div>
+
         <button
           onClick={handleSubmit}
           disabled={isLoading}
