@@ -9,6 +9,7 @@ const useCartStore = create((set, get) => ({
   selectedCart: [],
   discountData: [],
   isLoading: false,
+  loadingCart: false,
   tokenPos: sessionStorage.getItem("authPosToken") || null,
   activeBranch: sessionStorage.getItem("branchActive") || null,
   error: null,
@@ -29,6 +30,8 @@ const useCartStore = create((set, get) => ({
     quantity = 1,
     isFromDetail = false
   ) => {
+    set({ loadingCart: true });
+
     const { getProductStock } = usePosStore.getState();
     const userId = sessionStorage.getItem("userId");
     const tokenPos = sessionStorage.getItem("authPosToken");
@@ -37,6 +40,7 @@ const useCartStore = create((set, get) => ({
 
     if (stock < quantity) {
       toast.warning(`Stok tidak mencukupi. Stok tersedia: ${stock}`);
+      set({ loadingCart: false, isLoading: false });
       return;
     }
 
@@ -75,38 +79,100 @@ const useCartStore = create((set, get) => ({
     // }
 
     try {
-      const response = await fetch(`${ROOT_API}/pos/cart/add`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenPos}`,
-        },
-        body: JSON.stringify({
-          branch_id: activeBranch,
-          user_id: userId,
-          product_id: product?.id,
-          product_sku_id: product?.skus?.id,
-          quantity,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed add to cart`);
+      // If the item already exists in cart, update its quantity instead of adding a duplicate
+      const currentItems = get()?.cart?.data?.items || [];
+      let existingItem = null;
+      if (Array.isArray(currentItems) && currentItems.length > 0) {
+        existingItem = currentItems.find((it) => {
+          const matchProduct = String(it?.product?.id) === String(product?.id);
+          if (variant?.id) {
+            const itemSku = Number.parseInt(it?.product?.sku);
+            return matchProduct && String(itemSku) === String(variant.id);
+          }
+          return matchProduct;
+        });
       }
 
-      set({
-        success: true,
-        isLoading: false,
-        error: null,
-        triggerCartFetch: true,
-        response,
-      });
+      if (existingItem) {
+        const newQty =
+          Number(existingItem.quantity || 0) + Number(quantity || 0);
+        await get().updateCartItem(existingItem.id, newQty, "");
 
-      if (response) {
-        setTimeout(() => {
-          set({ success: null, triggerCartFetch: false, response: null });
-        }, 3000);
+        set({
+          loadingCart: false,
+          success: true,
+          isLoading: false,
+          error: null,
+          triggerCartFetch: true,
+          response: { ok: true },
+        });
+      } else {
+        const response = await fetch(`${ROOT_API}/pos/cart/add`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${tokenPos}`,
+          },
+          body: JSON.stringify({
+            branch_id: activeBranch,
+            user_id: userId,
+            product_id: product?.id,
+            product_sku_id: variant?.id || null,
+            quantity,
+          }),
+        });
+
+        if (!response.ok) {
+          // Fallback: fetch cart and try to update if item exists
+          await get().getCart();
+          const freshItems = get()?.cart?.data?.items || [];
+          const item = freshItems.find((it) => {
+            const matchProduct =
+              String(it?.product?.id) === String(product?.id);
+            if (variant?.id) {
+              const itemSku = Number.parseInt(it?.product?.sku);
+              return matchProduct && String(itemSku) === String(variant.id);
+            }
+            return matchProduct;
+          });
+
+          if (item) {
+            const newQty = Number(item.quantity || 0) + Number(quantity || 0);
+            await get().updateCartItem(item.id, newQty, "");
+          } else {
+            set({ loadingCart: false });
+            throw new Error(`Failed add to cart`);
+          }
+
+          set({
+            loadingCart: false,
+            success: true,
+            isLoading: false,
+            error: null,
+            triggerCartFetch: true,
+            response,
+          });
+        } else {
+          set({
+            loadingCart: false,
+            success: true,
+            isLoading: false,
+            error: null,
+            triggerCartFetch: true,
+            response,
+          });
+        }
       }
+
+      // Refresh cart immediately so Header shows latest item count
+      try {
+        await get().getCart();
+      } catch (e) {
+        console.error("Failed to refresh cart after add:", e?.message || e);
+      }
+      setTimeout(() => {
+        set({ success: null, triggerCartFetch: false, response: null });
+      }, 3000);
     } catch (error) {
       console.error("Error: ", error.message);
       set({
@@ -182,19 +248,21 @@ const useCartStore = create((set, get) => ({
       set({ error: true, isLoading: false });
     }
   },
-  updateCartItem: async (cartItemId, quantity) => {
+  updateCartItem: async (cartItemId, quantity, notes) => {
     try {
       const tokenPos = sessionStorage.getItem("authPosToken");
 
       set({ isLoading: true, error: null });
 
       const response = await fetch(`${ROOT_API}/pos/cart/item/${cartItemId}`, {
-        method: "PATCH",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${tokenPos}`,
         },
-        body: JSON.stringify({ quantity }),
+        body: JSON.stringify(
+          notes !== undefined ? { quantity, notes } : { quantity }
+        ),
       });
 
       if (!response.ok) {

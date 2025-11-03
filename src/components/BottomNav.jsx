@@ -9,8 +9,13 @@ const BottomNav = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
   const { saveOrder, selectPaymentMethod } = useCheckoutStore();
-  const { selectedCart, cart, setSelectedCart, clearDiscountData } =
-    useCartStore();
+  const {
+    selectedCart,
+    cart,
+    setSelectedCart,
+    clearDiscountData,
+    deleteCartItems,
+  } = useCartStore();
   const navigation = useNavigate();
   const pathname = location.pathname;
   const getCart = sessionStorage.getItem("cart");
@@ -193,6 +198,7 @@ const BottomNav = () => {
         sessionStorage.removeItem("discount");
         sessionStorage.removeItem("totalPayment");
         clearDiscountData();
+        deleteCartItems(dataCheckout?.items[0]?.cart_id);
       }
 
       setLoading(false);

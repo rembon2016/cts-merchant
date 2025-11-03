@@ -13,6 +13,7 @@ const Cart = () => {
     getCart,
     deleteCartItems,
     clearCart,
+    selectedCart,
     setSelectedCart,
     isLoading,
     error,
@@ -39,6 +40,7 @@ const Cart = () => {
     const isChecked = checkbox.checked;
     const price = Number(checkbox.dataset.price);
     const subtotal = Number(checkbox.dataset.subtotal);
+    const cartId = Number(checkbox.dataset.cartid);
     const itemId = Number(checkbox.id);
     const itemName = checkbox.dataset.name;
     const itemImage = checkbox.dataset.image;
@@ -47,6 +49,7 @@ const Cart = () => {
 
     if (isChecked) {
       const newItem = {
+        cart_id: cartId,
         product_id: itemId,
         name: itemName,
         image: itemImage,
@@ -55,6 +58,7 @@ const Cart = () => {
         price,
         subtotal,
       };
+      console.log(newItem);
       setSelectedCart((prevItems) => [...prevItems, newItem]);
     } else {
       // Remove by product_id (store uses product_id for selected items)
@@ -236,6 +240,7 @@ const Cart = () => {
                   type="checkbox"
                   name={cartItem?.product?.name}
                   id={cartItem?.product?.id}
+                  data-cartid={cartItem?.id}
                   data-price={cartItem?.price}
                   data-subtotal={cartItem?.subtotal}
                   data-name={cartItem?.product?.name}
