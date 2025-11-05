@@ -151,7 +151,7 @@ const Profile = () => {
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="w-full mb-6">
           <div className="bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600">
             <div className="text-center">
               <p className="text-2xl font-bold text-[var(--c-primary)] dark:text-slate-200">
@@ -162,7 +162,7 @@ const Profile = () => {
               </p>
             </div>
           </div>
-          <div className="bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600">
+          {/* <div className="bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600">
             <div className="text-center">
               <p className="text-2xl font-bold text-[var(--c-primary)] dark:text-slate-200">
                 4.8
@@ -171,7 +171,7 @@ const Profile = () => {
                 Rating Merchant
               </p>
             </div>
-          </div>
+          </div> */}
         </div>
         <div className="bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600 mb-4">
           <div className="flex items-center justify-between">
