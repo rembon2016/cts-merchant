@@ -5,6 +5,7 @@ import SearchInput from "./SearchInput";
 import LoadMoreButton from "./LoadMoreButton";
 import CustomLoading from "./CustomLoading";
 import { XCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const ROOT_API = import.meta.env.VITE_API_ROUTES;
 
@@ -55,6 +56,8 @@ export default function FaQ() {
 
   // Debounce search query with 500ms delay
   const debouncedSearch = useDebounce(state.searchQuery, 500);
+
+  const navigate = useNavigate();
 
   const headersApi = {
     "Content-Type": "application/json",
@@ -110,9 +113,23 @@ export default function FaQ() {
       return (
         <div className="flex flex-col items-center text-center py-4">
           <XCircle className="w-16 h-16 mb-2 text-gray-400" />
-          {state.searchQuery
-            ? "Tidak ada FAQ yang sesuai dengan pencarian Anda."
-            : "FAQ tidak tersedia."}
+          <div className="flex gap-2">
+            {state.searchQuery ? (
+              <div className="flex flex-col items-center gap-2">
+                FAQ tidak ditemukan{" "}
+                <button
+                  className="bg-gray-200 px-4 py-2 rounded-md"
+                  onClick={() =>
+                    navigate("/customer-support", { replace: true })
+                  }
+                >
+                  Hubungi Customer Support
+                </button>
+              </div>
+            ) : (
+              "FAQ tidak tersedia."
+            )}
+          </div>
         </div>
       );
     }

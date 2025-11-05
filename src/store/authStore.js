@@ -3,17 +3,18 @@ import { useUserDataStore } from "./userDataStore";
 import { toast } from "react-toastify";
 
 // custom hooks for checking authentication
+const TAX = "tax";
+const CART = "cart";
+const USER_ID = "userId";
+const DISCOUNT = "discount";
 const TOKEN_KEY = "authToken";
 const SESSION_KEY = "authUser";
 const EXPIRED_KEY = "authExpireAt";
 const TOKEN_POS_KEY = "authPosToken";
 const BRANCH_ACTIVE = "branchActive";
-const USER_ID = "userId";
-const CART = "cart";
-const DISCOUNT = "discount";
-const TAX = "tax";
 const TOTAL_PAYMENT = "totalPayment";
 const ROOT_API = import.meta.env.VITE_API_ROUTES;
+const ROOT_API_POS = import.meta.env.VITE_API_POS_ROUTES;
 
 export const useAuthStore = create((set, get) => ({
   user: JSON.parse(sessionStorage.getItem(SESSION_KEY)),
@@ -27,6 +28,7 @@ export const useAuthStore = create((set, get) => ({
   error: null,
   autoLogoutTimer: null,
   checkInterval: null,
+  refreshTimer: null,
 
   login: async (credentials) => {
     try {
@@ -74,6 +76,9 @@ export const useAuthStore = create((set, get) => ({
         isLogout: false,
         error: null,
       });
+
+      // Mulai penjadwalan auto-refresh dan auto-logout berdasarkan expiry
+      get().setupAutoLogout();
 
       return { success: true };
     } catch (error) {
@@ -137,6 +142,9 @@ export const useAuthStore = create((set, get) => ({
         error: null,
       });
 
+      // Mulai penjadwalan auto-refresh dan auto-logout berdasarkan expiry
+      get().setupAutoLogout();
+
       return { success: true };
     } catch (error) {
       set({
@@ -191,6 +199,8 @@ export const useAuthStore = create((set, get) => ({
     const expiredTimestamp = Number.parseInt(expiredAt, 10);
     const currentTime = Date.now();
     const timeUntilExpiry = expiredTimestamp - currentTime;
+    const FIVE_MINUTES = 5 * 60 * 1000;
+    const timeUntilRefresh = timeUntilExpiry - FIVE_MINUTES;
 
     // Clear existing timers
     get().clearAutoLogoutTimer();
@@ -199,6 +209,16 @@ export const useAuthStore = create((set, get) => ({
     if (timeUntilExpiry <= 0) {
       get().refreshToken();
       return;
+    }
+
+    // Jika waktu menuju refresh sudah lewat atau tepat, lakukan refresh segera
+    if (timeUntilRefresh <= 0) {
+      get().refreshToken();
+    } else {
+      const refreshTimer = setTimeout(() => {
+        get().refreshToken();
+      }, timeUntilRefresh);
+      set({ refreshTimer });
     }
 
     // Set timeout untuk auto logout
@@ -210,8 +230,8 @@ export const useAuthStore = create((set, get) => ({
     const interval = setInterval(() => {
       const now = Date.now();
       const expired = Number.parseInt(sessionStorage.getItem(EXPIRED_KEY), 10);
-
-      if (now >= expired) {
+      // Backup trigger: refresh 5 menit sebelum expired
+      if (now >= expired - FIVE_MINUTES) {
         get().refreshToken();
       }
     }, 1000);
@@ -221,7 +241,7 @@ export const useAuthStore = create((set, get) => ({
 
   // Clear auto logout timer
   clearAutoLogoutTimer: () => {
-    const { autoLogoutTimer, checkInterval } = get();
+    const { autoLogoutTimer, checkInterval, refreshTimer } = get();
 
     if (autoLogoutTimer) {
       clearTimeout(autoLogoutTimer);
@@ -229,8 +249,11 @@ export const useAuthStore = create((set, get) => ({
     if (checkInterval) {
       clearInterval(checkInterval);
     }
+    if (refreshTimer) {
+      clearTimeout(refreshTimer);
+    }
 
-    set({ autoLogoutTimer: null, checkInterval: null });
+    set({ autoLogoutTimer: null, checkInterval: null, refreshTimer: null });
   },
 
   // Handle auto logout (tanpa API call)
@@ -337,13 +360,15 @@ export const useAuthStore = create((set, get) => ({
   refreshToken: async () => {
     try {
       const currentToken = sessionStorage.getItem(TOKEN_KEY);
+      console.log("Token Lama: ", currentToken);
+
       if (!currentToken) {
         throw new Error("No authentication token found");
       }
 
       set({ isLoading: true, error: null });
 
-      const response = await fetch(`${ROOT_API}/auth/refresh-token`, {
+      const response = await fetch(`${ROOT_API_POS}/auth/refresh-token`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${currentToken}`,
@@ -367,6 +392,10 @@ export const useAuthStore = create((set, get) => ({
       const newToken =
         result?.access_token || result?.token || result?.data?.access_token;
       const expiresIn = result?.expires_in || result?.data?.expires_in;
+      const newPosToken =
+        result?.pos?.token || result?.data?.pos?.auth?.token || null;
+
+      console.log("Token Baru: ", newToken);
 
       if (!newToken || !expiresIn) {
         set({ isLoading: false, error: "Invalid refresh response" });
@@ -378,6 +407,10 @@ export const useAuthStore = create((set, get) => ({
 
       sessionStorage.setItem(TOKEN_KEY, newToken);
       sessionStorage.setItem(EXPIRED_KEY, newExpiry.toString());
+      if (newPosToken) {
+        sessionStorage.setItem(TOKEN_POS_KEY, newPosToken);
+        set({ tokenPos: newPosToken });
+      }
 
       set({ token: newToken, isLoggedIn: true, isLoading: false, error: null });
 

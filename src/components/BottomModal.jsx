@@ -3,7 +3,6 @@ import { useThemeStore } from "../store/themeStore";
 import { formatCurrency } from "../helper/currency";
 import { useCartStore } from "../store/cartStore";
 import { usePosStore } from "../store/posStore";
-import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import SimpleInput from "./form/SimpleInput";
 import ButtonQuantity from "./ButtonQuantity";
@@ -25,8 +24,6 @@ export default function BottomModal(props) {
   const { isDark } = useThemeStore();
   const { getProductPrice, getProductStock } = usePosStore();
   const { addToCart, getCart, success, isLoading } = useCartStore();
-
-  const navigation = useNavigate();
 
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [formData, setFormData] = useState({

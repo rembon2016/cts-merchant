@@ -13,7 +13,6 @@ const Cart = () => {
     getCart,
     deleteCartItems,
     clearCart,
-    selectedCart,
     setSelectedCart,
     isLoading,
     error,

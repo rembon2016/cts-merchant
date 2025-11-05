@@ -1,7 +1,37 @@
 import { useState } from "react";
+import CryptoJS from "crypto-js";
 import IframeModal from "./IframeModal";
 import BottomSheet from "./BottomSheet";
 import { useNavigate } from "react-router-dom";
+
+const generateToken = (value) => {
+  try {
+    const timestamp = Math.floor(Date.now() / 1000);
+    const payload = `${value}:${timestamp}:${import.meta.env.VITE_APP_SALT}`;
+
+    // Generate HMAC-SHA256 signature
+    const signature = CryptoJS.HmacSHA256(
+      payload,
+      import.meta.env.VITE_APP_SECRET
+    ).toString(CryptoJS.enc.Hex);
+
+    // Create full payload with signature
+    const fullPayload = `${payload}:${signature}`;
+
+    // Base64 encode
+    const base64Token = btoa(fullPayload);
+
+    // URL-safe base64 (replace +/ with -_ and remove =)
+    const urlSafeToken = base64Token
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/g, "");
+
+    return urlSafeToken;
+  } catch (err) {
+    throw new Error(err.message);
+  }
+};
 
 const QuickMenus = () => {
   const [modalData, setModalData] = useState({
@@ -16,7 +46,9 @@ const QuickMenus = () => {
     {
       id: "soundbox",
       label: "Soundbox",
-      url: "https://src.ctsolution.id/",
+      url: `https://src.ctsolution.id/?user_token=${generateToken(
+        sessionStorage.getItem("userId")
+      )}`,
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -163,6 +195,7 @@ const QuickMenus = () => {
             setModalData({ isOpen: true, url, title });
           }, 320);
         }}
+        token={generateToken(sessionStorage.getItem("userId"))}
       />
     </>
   );
