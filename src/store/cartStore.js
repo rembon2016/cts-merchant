@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { usePosStore } from "./posStore";
+import { useAuthStore } from "./authStore";
 import { toast } from "react-toastify";
 
 const ROOT_API = import.meta.env.VITE_API_POS_ROUTES;
@@ -45,20 +46,48 @@ const useCartStore = create((set, get) => ({
     set({ isLoading: true, error: null, success: null });
 
     try {
-      const response = await fetch(`${ROOT_API}/pos/cart/add`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenPos}`,
-        },
-        body: JSON.stringify({
-          branch_id: activeBranch,
-          user_id: userId,
-          product_id: product?.id,
-          product_sku_id: product?.skus?.id,
-          quantity,
-        }),
-      });
+      const attemptAdd = async (bearerToken) =>
+        await fetch(`${ROOT_API}/pos/cart/add`, {
+          method: "POST",
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${bearerToken}`,
+          },
+          body: JSON.stringify({
+            branch_id: activeBranch,
+            user_id: userId,
+            product_id: product?.id,
+            product_sku_id: product?.skus?.id,
+            quantity,
+          }),
+          redirect: "follow",
+        });
+
+      // First attempt
+      let response = await attemptAdd(tokenPos);
+
+      // Handle redirect/CORS/unauthorized by refreshing token and retrying once
+      const isRedirect =
+        response?.status === 302 || response?.type === "opaqueredirect";
+      const isUnauthorized =
+        response?.status === 401 || response?.status === 403;
+      if (isRedirect || isUnauthorized) {
+        try {
+          const { refreshToken } = useAuthStore.getState();
+          await refreshToken();
+        } catch (e) {
+          console.error(
+            "Failed to refresh token before retry:",
+            e?.message || e
+          );
+        }
+
+        const refreshedPosToken =
+          sessionStorage.getItem("authPosToken") || tokenPos;
+        response = await attemptAdd(refreshedPosToken);
+      }
 
       if (!response.ok) {
         if (response.status === 400) {
@@ -69,6 +98,10 @@ const useCartStore = create((set, get) => ({
           } else {
             throw new Error("Cart item untuk produk ini tidak ditemukan");
           }
+        } else if (response.status === 302) {
+          throw new Error(
+            "Ada redirect dari server (302). Periksa konfigurasi CORS/Token POS."
+          );
         } else {
           throw new Error(`Failed add to cart`);
         }
@@ -92,11 +125,63 @@ const useCartStore = create((set, get) => ({
 
       return response;
     } catch (error) {
-      console.error("Error: ", error.message);
+      console.error("Error: ", error.message || error);
+
+      // Coba sekali lagi jika error jaringan/CORS terdeteksi
+      const maybeNetworkError = /Failed to fetch|NetworkError|TypeError/i.test(
+        error?.message || ""
+      );
+      if (maybeNetworkError) {
+        try {
+          const { refreshToken } = useAuthStore.getState();
+          await refreshToken();
+        } catch (e) {
+          console.warn(
+            "Token refresh attempt failed during network error.",
+            e?.message || e
+          );
+        }
+
+        try {
+          const refreshedPosToken =
+            sessionStorage.getItem("authPosToken") || tokenPos;
+          const retryResponse = await fetch(`${ROOT_API}/pos/cart/add`, {
+            method: "POST",
+            mode: "cors",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              Authorization: `Bearer ${refreshedPosToken}`,
+            },
+            body: JSON.stringify({
+              branch_id: activeBranch,
+              user_id: userId,
+              product_id: product?.id,
+              product_sku_id: product?.skus?.id,
+              quantity,
+            }),
+            redirect: "follow",
+          });
+
+          if (retryResponse?.ok) {
+            set({
+              success: true,
+              isLoading: false,
+              error: null,
+              response: retryResponse,
+            });
+            get().getCart();
+            return retryResponse;
+          }
+        } catch (e2) {
+          console.error("Retry after network error failed:", e2?.message || e2);
+        }
+      }
+
       set({
         success: false,
         isLoading: false,
-        error: error.message,
+        error: error?.message || "Gagal menambahkan ke keranjang",
         response: null,
       });
     }

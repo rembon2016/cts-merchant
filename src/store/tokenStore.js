@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import CryptoJS from "crypto-js";
-import { useEffect } from "react";
 
 // Zustand Store
 const useTokenStore = create((set) => ({
@@ -21,8 +20,6 @@ function useGenerateToken() {
   const generateToken = (value) => {
     setLoading(true);
     setError(null);
-
-    console.log("Value: ", value);
 
     try {
       const timestamp = Math.floor(Date.now() / 1000);

@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 
-const BottomSheet = ({ isOpen, onClose, onItemClick }) => {
+const BottomSheet = ({ isOpen, onClose, onItemClick, token = null }) => {
   const sheetRef = useRef(null);
   const navigate = useNavigate();
 
@@ -10,7 +10,7 @@ const BottomSheet = ({ isOpen, onClose, onItemClick }) => {
     {
       id: "soundbox",
       label: "Soundbox",
-      url: "https://src.ctsolution.id/",
+      url: `https://src.ctsolution.id/?user_token=${token}`,
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
