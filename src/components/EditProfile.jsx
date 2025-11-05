@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
+import { toast, ToastContainer } from "react-toastify";
 import useFetchDataStore from "../store/fetchDataStore";
-import SimpleAlert from "./alert/SimpleAlert";
 import SimpleInput from "./form/SimpleInput";
 
 const ROOT_API = import.meta.env.VITE_API_ROUTES;
@@ -69,6 +69,8 @@ export default function EditProfile() {
 
     if (!validateForm()) return;
 
+    setDisabledButton(true);
+
     const updateData = {
       name: formData.name,
       email: formData.email,
@@ -89,9 +91,34 @@ export default function EditProfile() {
 
   useEffect(() => {
     if (success) {
-      setTimeout(() => logout(), [1000]);
+      toast.success("Profil berhasil diubah", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      setTimeout(() => logout(), [3000]);
+      setDisabledButton(false);
     }
-  }, [success]);
+
+    if (error) {
+      toast.error(typeof error === "string" ? error : "Terjadi kesalahan", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      setDisabledButton(false);
+    }
+  }, [success, error]);
 
   useEffect(() => {
     const hasChanged =
@@ -103,16 +130,7 @@ export default function EditProfile() {
 
   return (
     <div className="max-w-md mx-auto p-6 rounded-lg bg-white shadow mt-5">
-      <SimpleAlert
-        type={success ? "success" : error ? "error" : null}
-        textContent={
-          success
-            ? "Profil berhasil diubah"
-            : error
-            ? "Profil gagal diubah"
-            : null
-        }
-      />
+      <ToastContainer />
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold dark:text-slate-400">
           Edit Profil
@@ -176,7 +194,7 @@ export default function EditProfile() {
         <div className="pt-4">
           <button
             type="submit"
-            className="w-full bg-[var(--c-primary)] text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors"
+            className="w-full bg-[var(--c-primary)] font-semibold text-white p-4 rounded-lg hover:bg-blue-600 transition-colors"
             disabled={disabledButton}
           >
             {loading ? "Tunggu..." : " Simpan Perubahan"}
