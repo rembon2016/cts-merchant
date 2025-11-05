@@ -83,30 +83,27 @@ export default function BottomModal(props) {
 
   const handleVariantSelect = (variant) => setSelectedVariant(variant);
 
+  const toastConfig = {
+    position: "top-center",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: false,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
+  };
+
   const handleAddToCart = async (data, variant, quantity, isFromDetail) => {
     const response = await addToCart(data, variant, quantity, isFromDetail);
 
     if (response?.ok || response?.status === 200) {
       toast.success("Berhasil Dimasukkan ke keranjang", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
+        ...toastConfig,
       });
     } else {
       toast.error("Gagal Dimasukkan ke keranjang", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
+        ...toastConfig,
       });
     }
   };

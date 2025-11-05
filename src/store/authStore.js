@@ -13,8 +13,8 @@ const EXPIRED_KEY = "authExpireAt";
 const TOKEN_POS_KEY = "authPosToken";
 const BRANCH_ACTIVE = "branchActive";
 const TOTAL_PAYMENT = "totalPayment";
-const ROOT_API = import.meta.env.VITE_API_ROUTES;
-const ROOT_API_POS = import.meta.env.VITE_API_POS_ROUTES;
+const ROOT_API = import.meta.env?.VITE_API_ROUTES;
+const ROOT_API_POS = import.meta.env?.VITE_API_POS_ROUTES;
 
 export const useAuthStore = create((set, get) => ({
   user: JSON.parse(sessionStorage.getItem(SESSION_KEY)),
@@ -34,18 +34,32 @@ export const useAuthStore = create((set, get) => ({
     try {
       set({ isLoading: true, error: null });
 
-      const response = await fetch(`${ROOT_API}/v1/auth/token/user`, {
+      const methodAndHeadersApi = {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
-        body: JSON.stringify(credentials),
-      });
+      };
+
+      const [response, responseApiPOS] = await Promise.all([
+        fetch(`${ROOT_API}/v1/auth/token/user`, {
+          ...methodAndHeadersApi,
+          body: JSON.stringify(credentials),
+        }),
+        fetch(`${ROOT_API_POS}/auth/login`, {
+          ...methodAndHeadersApi,
+          body: JSON.stringify({
+            email: `api_${credentials?.email}`,
+            password: credentials?.password,
+          }),
+        }),
+      ]);
 
       const result = await response.json();
+      const resultPOS = await responseApiPOS.json();
 
-      if (!response?.ok) {
+      if (!response?.ok || !responseApiPOS?.ok) {
         set({ error: result?.message, isLoading: false });
         throw new Error(result?.message || "Login failed");
       }
@@ -59,7 +73,7 @@ export const useAuthStore = create((set, get) => ({
       const expiryTimestamp = Date.now() + EXPIRED_IN * 1000;
 
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(userData?.data));
-      sessionStorage.setItem(USER_ID, JSON.stringify(userData?.data?.id));
+      sessionStorage.setItem(USER_ID, resultPOS?.data?.user?.id);
       sessionStorage.setItem(TOKEN_KEY, TOKEN);
       sessionStorage.setItem(EXPIRED_KEY, expiryTimestamp.toString());
       sessionStorage.setItem(TOKEN_POS_KEY, result?.pos?.token);
@@ -293,7 +307,8 @@ export const useAuthStore = create((set, get) => ({
   logout: async () => {
     try {
       set({ isLoading: true });
-      const token = get().token;
+      const token = sessionStorage.getItem(TOKEN_KEY);
+      const tokenPos = sessionStorage.getItem(TOKEN_POS_KEY);
 
       // Clear auto logout timer saat logout manual
       get().clearAutoLogoutTimer();
@@ -301,19 +316,32 @@ export const useAuthStore = create((set, get) => ({
       if (!token) {
         throw new Error("No authentication token found");
       }
+      if (!tokenPos) {
+        throw new Error("No authentication token POS found");
+      }
 
-      const response = await fetch(`${ROOT_API}/v1/auth/token/revoke`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      });
+      const [response, responseApiPOS] = await Promise.all([
+        fetch(`${ROOT_API}/v1/auth/token/revoke`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }),
+        fetch(`${ROOT_API_POS}/auth/logout`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${tokenPos}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }),
+      ]);
 
       const result = await response?.json();
 
-      if (!response.ok) {
+      if (!response.ok || !responseApiPOS.ok) {
         set({ error: result?.message, isLoading: false });
         throw new Error("Logout failed");
       }
@@ -327,13 +355,14 @@ export const useAuthStore = create((set, get) => ({
         user: null,
         userId: null,
         token: null,
+        tokenPos: null,
         error: null,
         isLoggedIn: false,
         isLoading: false,
         isLogout: true,
       });
 
-      if (response.ok) {
+      if (response.ok && responseApiPOS.ok) {
         setTimeout(() => {
           set({ isLogout: false });
         }, 3000);
@@ -360,7 +389,6 @@ export const useAuthStore = create((set, get) => ({
   refreshToken: async () => {
     try {
       const currentToken = sessionStorage.getItem(TOKEN_KEY);
-      console.log("Token Lama: ", currentToken);
 
       if (!currentToken) {
         throw new Error("No authentication token found");
@@ -394,8 +422,6 @@ export const useAuthStore = create((set, get) => ({
       const expiresIn = result?.expires_in || result?.data?.expires_in;
       const newPosToken =
         result?.pos?.token || result?.data?.pos?.auth?.token || null;
-
-      console.log("Token Baru: ", newToken);
 
       if (!newToken || !expiresIn) {
         set({ isLoading: false, error: "Invalid refresh response" });

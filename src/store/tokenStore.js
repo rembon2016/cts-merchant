@@ -17,13 +17,17 @@ function useGenerateToken() {
   const { token, loading, error, setToken, setLoading, setError, clearToken } =
     useTokenStore();
 
-  const generateToken = (value) => {
+  const USER_ID = sessionStorage.getItem("userId");
+
+  const generateToken = () => {
     setLoading(true);
     setError(null);
 
     try {
       const timestamp = Math.floor(Date.now() / 1000);
-      const payload = `${value}:${timestamp}:${import.meta.env.VITE_APP_SALT}`;
+      const payload = `${USER_ID}:${timestamp}:${
+        import.meta.env.VITE_APP_SALT
+      }`;
 
       // Generate HMAC-SHA256 signature
       const signature = CryptoJS.HmacSHA256(
