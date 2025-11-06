@@ -3,7 +3,7 @@ import { formatCurrency } from "../helper/currency";
 import SimpleInput from "./form/SimpleInput";
 import { useInvoiceStore } from "../store/invoiceStore";
 import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 
 const AddInvoice = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -446,7 +446,6 @@ const AddInvoice = () => {
 
   return (
     <div className="p-4 sm:p-6 lg:p-10">
-      <ToastContainer />
       <div className="flex flex-col gap-4">
         <StepIndicator />
 
