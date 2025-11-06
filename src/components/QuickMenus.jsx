@@ -3,6 +3,7 @@ import IframeModal from "./IframeModal";
 import BottomSheet from "./BottomSheet";
 import { useNavigate } from "react-router-dom";
 import { useGenerateToken } from "../store/tokenStore";
+import { useAuthStore } from "../store/authStore";
 
 const QuickMenus = () => {
   const [modalData, setModalData] = useState({
@@ -14,16 +15,17 @@ const QuickMenus = () => {
   const navigate = useNavigate();
 
   const { token, generateToken } = useGenerateToken();
+  const { user } = useAuthStore();
 
   useEffect(() => {
     generateToken();
-  }, [token]);
+  }, [token, modalData]);
 
   const menuItems = [
     {
       id: "soundbox",
       label: "Soundbox",
-      url: `https://dev-soundbox.ctsolution.id/?user_token=${token}`,
+      url: `${import.meta.env.VITE_BASE_URL_DEV}?user_token=${token}`,
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -97,10 +99,16 @@ const QuickMenus = () => {
       navigate(item.url, { replace: true });
     }
 
-    if (item.target === "_blank") {
-      window.open(item.url, "_blank");
+    if (item?.target !== "_blank") {
+      if (item?.id === "soundbox" && user?.business_account === null) {
+        setModalData({ isOpen: true, url: item.url, title: item.label });
+      } else if (item?.id === "soundbox" && user?.business_account !== null) {
+        setModalData({ isOpen: false, url: item.url, title: item.label });
+      } else if (item?.id !== "soundbox") {
+        setModalData({ isOpen: true, url: item.url, title: item.label });
+      }
     } else {
-      setModalData({ isOpen: true, url: item.url, title: item.label });
+      window.open(item.url, "_blank");
     }
   };
 

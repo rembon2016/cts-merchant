@@ -374,6 +374,7 @@ export default function POS() {
       {selectedProduct && (
         <BottomModal
           isOpen={showVariantModal}
+          setIsOpen={setShowVariantModal}
           onClose={() => {
             setShowVariantModal(false);
             setSelectedProduct(null);
