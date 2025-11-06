@@ -34,25 +34,21 @@ export const useAuthStore = create((set, get) => ({
     try {
       set({ isLoading: true, error: null });
 
-      const methodAndHeadersApi = {
+      const apiProperties = {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
+        body: JSON.stringify(credentials),
       };
 
       const [response, responseApiPOS] = await Promise.all([
         fetch(`${ROOT_API}/v1/auth/token/user`, {
-          ...methodAndHeadersApi,
-          body: JSON.stringify(credentials),
+          ...apiProperties,
         }),
         fetch(`${ROOT_API_POS}/auth/login`, {
-          ...methodAndHeadersApi,
-          body: JSON.stringify({
-            email: `api_${credentials?.email}`,
-            password: credentials?.password,
-          }),
+          ...apiProperties,
         }),
       ]);
 
