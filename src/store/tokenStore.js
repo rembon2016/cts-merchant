@@ -6,15 +6,20 @@ const useTokenStore = create((set) => ({
   token: "",
   loading: false,
   error: null,
+  refreshIntervalId: null,
   setToken: (token) => set({ token }),
   setLoading: (loading) => set({ loading }),
   setError: (error) => set({ error }),
   clearToken: () => set({ token: "", error: null }),
+  setRefreshIntervalId: (id) => set({ refreshIntervalId: id }),
+  clearRefreshInterval: () => set({ refreshIntervalId: null }),
 }));
 
 // Custom Hook: useGenerateToken
 function useGenerateToken() {
   const { token, loading, error, setToken, setLoading, setError, clearToken } =
+    useTokenStore();
+  const { refreshIntervalId, setRefreshIntervalId, clearRefreshInterval } =
     useTokenStore();
 
   const USER_ID = sessionStorage.getItem("userId");
@@ -63,6 +68,35 @@ function useGenerateToken() {
     error,
     generateToken,
     clearToken,
+    startAutoRefresh: () => {
+      try {
+        // Clear existing interval if any
+        if (refreshIntervalId) {
+          clearInterval(refreshIntervalId);
+        }
+        // Generate immediately, then schedule next regenerations
+        generateToken();
+        const ms = Number(import.meta.env.VITE_REFRESH_USER_TOKEN_TIMER) * 1000;
+        const id = setInterval(() => {
+          try {
+            generateToken();
+          } catch (_) {}
+        }, ms);
+        setRefreshIntervalId(id);
+        return id;
+      } catch (e) {
+        setError(e?.message || "Failed to start token auto refresh");
+        return null;
+      }
+    },
+    stopAutoRefresh: () => {
+      try {
+        if (refreshIntervalId) {
+          clearInterval(refreshIntervalId);
+        }
+        clearRefreshInterval();
+      } catch (_) {}
+    },
   };
 }
 

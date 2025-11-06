@@ -1,16 +1,18 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
+import { useAuthStore } from "../store/authStore";
 
 const BottomSheet = ({ isOpen, onClose, onItemClick, token = null }) => {
   const sheetRef = useRef(null);
   const navigate = useNavigate();
+  const { user } = useAuthStore();
 
   const menuItems = [
     {
       id: "soundbox",
       label: "Soundbox",
-      url: `https://src.ctsolution.id/?user_token=${token}`,
+      url: `${import.meta.env.VITE_BASE_URL_DEV}?user_token=${token}`,
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -206,7 +208,12 @@ const BottomSheet = ({ isOpen, onClose, onItemClick, token = null }) => {
 
     if (item.target === "_blank") {
       window.open(item.url, "_blank");
-    } else {
+    }
+
+    if (item.target !== "_blank") {
+      if (item.id === "soundbox" && user?.business_account !== null) {
+        return;
+      }
       onItemClick(item.url, item.label);
     }
   };

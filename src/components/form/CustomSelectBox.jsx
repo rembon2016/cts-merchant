@@ -70,9 +70,11 @@ export default function CustomSelectBox({
     disabled ? "bg-gray-200 dark:bg-slate-600" : "bg-white dark:bg-slate-600"
   } dark:text-slate-100 font-semibold`;
 
-  const filtered = selectBoxData?.filter((item) =>
-    (item?.name || "").toString().toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered =
+    Array.isArray(selectBoxData) &&
+    selectBoxData?.filter((item) =>
+      (item?.name || "").toString().toLowerCase().includes(search.toLowerCase())
+    );
 
   function toggleOption(itemId) {
     if (disabled) return;
