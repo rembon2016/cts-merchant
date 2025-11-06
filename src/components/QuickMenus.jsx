@@ -23,7 +23,7 @@ const QuickMenus = () => {
     {
       id: "soundbox",
       label: "Soundbox",
-      url: `https://dev-soundbox.ctsolution.id/?user_token=${token}`,
+      url: `${import.meta.env.VITE_BASE_URL_DEV}?user_token=${token}`,
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"

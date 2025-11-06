@@ -225,6 +225,11 @@ const useCartStore = create((set, get) => ({
 
       const result = await response.json();
 
+      sessionStorage.setItem(
+        "cartItemId",
+        JSON.stringify(result?.data?.items?.map((cartItem) => cartItem.id))
+      );
+
       if (result.success && result) {
         set({ cart: result, isLoading: false });
       }
