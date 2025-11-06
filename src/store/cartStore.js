@@ -4,6 +4,7 @@ import { useAuthStore } from "./authStore";
 import { toast } from "react-toastify";
 
 const ROOT_API = import.meta.env.VITE_API_POS_ROUTES;
+const CART_ITEM_ID = "cartItemId";
 
 const useCartStore = create((set, get) => ({
   cart: [],
@@ -31,12 +32,10 @@ const useCartStore = create((set, get) => ({
     isFromDetail = false
   ) => {
     const { getProductStock } = usePosStore.getState();
-    const userId = sessionStorage.getItem("userId");
+    const userPosId = sessionStorage.getItem("userPosId");
     const tokenPos = sessionStorage.getItem("authPosToken");
     const activeBranch = sessionStorage.getItem("branchActive");
     const stock = getProductStock(product, variant?.id, isFromDetail);
-
-    const PRODUCT_ID = product?.id;
 
     if (stock < quantity) {
       toast.warning(`Stok tidak mencukupi. Stok tersedia: ${stock}`);
@@ -57,7 +56,7 @@ const useCartStore = create((set, get) => ({
           },
           body: JSON.stringify({
             branch_id: Number(activeBranch),
-            user_id: Number(userId),
+            user_id: Number(userPosId),
             product_id: Number(product?.id),
             product_sku_id: Number(product?.skus?.id),
             quantity,
@@ -90,18 +89,10 @@ const useCartStore = create((set, get) => ({
       }
 
       if (!response.ok) {
-        if (response.status === 400) {
-          // Jika API mengembalikan 400 (item sudah ada), update quantity berdasarkan cart item id
-          const cartItemId = get().getCartItemIdByProductId?.(PRODUCT_ID);
-          if (cartItemId) {
-            await get().updateCartItem?.(cartItemId, quantity);
-          } else {
-            throw new Error("Cart item untuk produk ini tidak ditemukan");
-          }
-        } else if (response.status === 302) {
-          throw new Error(
-            "Ada redirect dari server (302). Periksa konfigurasi CORS/Token POS."
-          );
+        if (response.status === 302) {
+          const message =
+            "Ada redirect dari server (302). Periksa konfigurasi CORS/Token POS.";
+          throw new Error(message);
         } else {
           throw new Error(`Failed add to cart`);
         }
@@ -112,21 +103,18 @@ const useCartStore = create((set, get) => ({
         isLoading: false,
         error: null,
         triggerCartFetch: true,
-        response,
       });
 
       get().getCart();
 
       if (response) {
         setTimeout(() => {
-          set({ success: null, triggerCartFetch: false, response: null });
+          set({ success: null, triggerCartFetch: false });
         }, 3000);
       }
 
-      return response;
+      return response.json();
     } catch (error) {
-      console.error("Error: ", error.message || error);
-
       // Coba sekali lagi jika error jaringan/CORS terdeteksi
       const maybeNetworkError = /Failed to fetch|NetworkError|TypeError/i.test(
         error?.message || ""
@@ -155,7 +143,7 @@ const useCartStore = create((set, get) => ({
             },
             body: JSON.stringify({
               branch_id: activeBranch,
-              user_id: userId,
+              user_id: userPosId,
               product_id: product?.id,
               product_sku_id: product?.skus?.id,
               quantity,
@@ -182,7 +170,6 @@ const useCartStore = create((set, get) => ({
         success: false,
         isLoading: false,
         error: error?.message || "Gagal menambahkan ke keranjang",
-        response: null,
       });
     }
   },
@@ -202,14 +189,14 @@ const useCartStore = create((set, get) => ({
   },
   getCart: async () => {
     try {
-      const userId = sessionStorage.getItem("userId");
+      const userPosId = sessionStorage.getItem("userPosId");
       const tokenPos = sessionStorage.getItem("authPosToken");
       const activeBranch = sessionStorage.getItem("branchActive");
 
       set({ isLoading: true, error: null });
 
       const response = await fetch(
-        `${ROOT_API}/pos/cart?branch_id=${activeBranch}&user_id=${userId}`,
+        `${ROOT_API}/pos/cart?branch_id=${activeBranch}&user_id=${userPosId}`,
         {
           method: "GET",
           headers: {
@@ -232,6 +219,15 @@ const useCartStore = create((set, get) => ({
 
       if (result.success && result) {
         set({ cart: result, isLoading: false });
+        sessionStorage.setItem(
+          CART_ITEM_ID,
+          JSON.stringify(
+            result?.data?.items?.map((cartItem) => ({
+              cart_id: cartItem?.id,
+              product_id: cartItem?.product_id,
+            }))
+          )
+        );
       }
     } catch (error) {
       console.error("Error: ", error.message);
@@ -264,6 +260,15 @@ const useCartStore = create((set, get) => ({
 
       if (result.success && result) {
         set({ cart: result, isLoading: false, error: false });
+        sessionStorage.setItem(
+          CART_ITEM_ID,
+          JSON.stringify(
+            result?.data?.items?.map((cartItem) => ({
+              cart_id: cartItem?.id,
+              product_id: cartItem?.product_id,
+            }))
+          )
+        );
       }
     } catch (error) {
       console.log("Error: ", error.message);
@@ -296,13 +301,15 @@ const useCartStore = create((set, get) => ({
       const result = await response.json();
 
       // If API returns updated cart, use it. Otherwise, trigger a fresh fetch.
-      if (result && result.success) {
+      if (result?.success) {
         set({ cart: result, isLoading: false, error: false });
       } else {
         // fallback: refetch cart
         await get().getCart?.();
         set({ isLoading: false });
       }
+
+      return result;
     } catch (error) {
       console.log("Error: ", error.message);
       set({ error: error.message, isLoading: false });
@@ -361,6 +368,7 @@ const useCartStore = create((set, get) => ({
       get().getCart();
 
       if (response.ok) {
+        sessionStorage.removeItem(CART_ITEM_ID);
         setTimeout(() => {
           set({ success: null });
         }, 3000);
