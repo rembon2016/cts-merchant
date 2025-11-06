@@ -124,36 +124,24 @@ export default function BottomModal(props) {
 
         if (response?.success === true) {
           setIsOpen(false);
-          return toast.success("Produk Berhasil Di Update", {
-            ...toastConfig,
-          });
+          alert("Produk Berhasil Diperbarui");
+        } else {
+          alert("Produk Gagal Diperbarui");
         }
-        // else {
-        //   toast.error("Produk Gagal Di Update", {
-        //     ...toastConfig,
-        //   });
-        // }
       } else {
         const response = await addToCart(data, variant, quantity, isFromDetail);
 
         if (response?.success === true) {
           setIsOpen(false);
-          return toast.success("Produk Berhasil Di Tambahkan", {
-            ...toastConfig,
-          });
+          alert("Produk Berhasil Ditambahkan");
+        } else {
+          alert("Produk Gagal Ditambahkan");
         }
-        // else {
-        //   toast.error("Produk Gagal Di Tambahkan", {
-        //     ...toastConfig,
-        //   });
-        // }
       }
     } catch (error) {
       console.log(error);
     }
   };
-
-  const renderToast = (params) => {};
 
   const getVariantPrice = (variant) => {
     return getProductPrice(data, variant?.id);
