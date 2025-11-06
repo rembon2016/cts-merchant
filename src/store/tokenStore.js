@@ -68,7 +68,7 @@ function useGenerateToken() {
     error,
     generateToken,
     clearToken,
-    startAutoRefresh: (intervalSeconds = 3500) => {
+    startAutoRefresh: () => {
       try {
         // Clear existing interval if any
         if (refreshIntervalId) {
@@ -76,7 +76,7 @@ function useGenerateToken() {
         }
         // Generate immediately, then schedule next regenerations
         generateToken();
-        const ms = Number(intervalSeconds) * 1000;
+        const ms = Number(import.meta.env.VITE_REFRESH_USER_TOKEN_TIMER) * 1000;
         const id = setInterval(() => {
           try {
             generateToken();

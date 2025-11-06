@@ -11,6 +11,7 @@ import { ShoppingCart } from "lucide-react";
 
 BottomModal.propTypes = {
   isOpen: PropTypes.bool,
+  setIsOpen: PropTypes.func,
   onClose: PropTypes.func,
   stocks: PropTypes.number,
   data: PropTypes.object,
@@ -18,12 +19,20 @@ BottomModal.propTypes = {
 };
 
 export default function BottomModal(props) {
-  const { isOpen, onClose, stocks, data, isFromDetail = true } = props;
+  const {
+    isOpen,
+    setIsOpen,
+    onClose,
+    stocks,
+    data,
+    isFromDetail = true,
+  } = props;
 
   const sheetRef = useRef(null);
   const { isDark } = useThemeStore();
   const { getProductPrice, getProductStock } = usePosStore();
-  const { addToCart, getCart, success, isLoading } = useCartStore();
+  const { addToCart, getCart, updateCartItem, success, isLoading } =
+    useCartStore();
 
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [formData, setFormData] = useState({
@@ -32,6 +41,19 @@ export default function BottomModal(props) {
   });
 
   const [quantity, setQuantity] = useState(1);
+
+  const cartItemIds = (() => {
+    try {
+      const raw = sessionStorage.getItem("cartItemId");
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  })();
+
+  const filterLocalCartByProductId = cartItemIds.filter(
+    (cartItem) => cartItem?.product_id === data?.id
+  );
 
   useEffect(() => {
     if (isOpen) {
@@ -83,6 +105,27 @@ export default function BottomModal(props) {
 
   const handleVariantSelect = (variant) => setSelectedVariant(variant);
 
+  const handleAddToCart = async (data, variant, quantity, isFromDetail) => {
+    try {
+      if (filterLocalCartByProductId?.length > 0) {
+        const cartItemId = filterLocalCartByProductId[0]?.cart_id;
+        const response = await updateCartItem(cartItemId, quantity);
+
+        if (response.success) {
+          setIsOpen(false);
+        }
+      } else {
+        const response = await addToCart(data, variant, quantity, isFromDetail);
+
+        if (response.success) {
+          setIsOpen(false);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const toastConfig = {
     position: "top-center",
     autoClose: 3000,
@@ -94,18 +137,10 @@ export default function BottomModal(props) {
     theme: "light",
   };
 
-  const handleAddToCart = async (data, variant, quantity, isFromDetail) => {
-    const response = await addToCart(data, variant, quantity, isFromDetail);
-
-    if (response?.ok || response?.status === 200) {
-      toast.success("Berhasil Dimasukkan ke keranjang", {
-        ...toastConfig,
-      });
-    } else {
-      toast.error("Gagal Dimasukkan ke keranjang", {
-        ...toastConfig,
-      });
-    }
+  const renderToast = (params) => {
+    toast[params.type](params.message, {
+      ...toastConfig,
+    });
   };
 
   const getVariantPrice = (variant) => {

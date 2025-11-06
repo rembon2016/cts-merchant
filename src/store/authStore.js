@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 const TAX = "tax";
 const CART = "cart";
 const USER_ID = "userId";
+const USER_POS_ID = "userPosId";
 const DISCOUNT = "discount";
 const TOKEN_KEY = "authToken";
 const SESSION_KEY = "authUser";
@@ -55,7 +56,7 @@ export const useAuthStore = create((set, get) => ({
       const result = await response.json();
       const resultPOS = await responseApiPOS.json();
 
-      if (!response?.ok || !responseApiPOS?.ok) {
+      if (!response?.ok && !responseApiPOS?.ok) {
         set({ error: result?.message, isLoading: false });
         throw new Error(result?.message || "Login failed");
       }
@@ -69,7 +70,8 @@ export const useAuthStore = create((set, get) => ({
       const expiryTimestamp = Date.now() + EXPIRED_IN * 1000;
 
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(userData?.data));
-      sessionStorage.setItem(USER_ID, resultPOS?.data?.user?.id);
+      sessionStorage.setItem(USER_ID, result?.data?.id);
+      sessionStorage.setItem(USER_POS_ID, resultPOS?.data?.user?.id);
       sessionStorage.setItem(TOKEN_KEY, TOKEN);
       sessionStorage.setItem(EXPIRED_KEY, expiryTimestamp.toString());
       sessionStorage.setItem(TOKEN_POS_KEY, result?.pos?.token);
