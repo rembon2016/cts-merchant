@@ -5,7 +5,7 @@ import { formatCurrency } from "../helper/currency";
 import { toast } from "react-toastify";
 import CustomLoading from "./CustomLoading";
 import ButtonQuantity from "./ButtonQuantity";
-import CustomConfirmationModal from "./modal/CustomConfirmationModal";
+import SimpleModal from "./modal/SimpleModal";
 
 const Cart = () => {
   const {
@@ -34,8 +34,6 @@ const Cart = () => {
     if (!activeBranch) return;
     getCart();
   }, [cartPath, activeBranch]);
-
-  const handleDeleteItems = async (cartId) => await deleteCartItems(cartId);
 
   const handleChecked = (event) => {
     const checkbox = event.target;
@@ -117,11 +115,19 @@ const Cart = () => {
 
   const handleCloseModal = () => setShowModal(false);
 
-  const handleDelete = () => {
+  const handleConfirmDelete = () => {
+    // Close modal immediately to prevent reappearing due to store updates
+    setShowModal(false);
+    // Reset modal state
+    setConfirmMode(null);
+    setPendingItemId(null);
+    setPendingItemName("");
+    // Proceed with deletion
     if (confirmMode === "item" && pendingItemId) {
-      return deleteCartItems(pendingItemId);
+      deleteCartItems(pendingItemId);
+    } else {
+      clearCart(cart?.data?.id);
     }
-    return clearCart(cart?.data?.id);
   };
 
   const handleOpenItemModal = (itemId, itemName) => {
@@ -147,16 +153,19 @@ const Cart = () => {
   // Show toast notifications when success/error changes
   useEffect(() => {
     if (success) {
-      toast.success(typeof success === "string" ? success : "Berhasil", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      toast.success(
+        typeof success === "string" ? success : "Berhasil Dihapus",
+        {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        }
+      );
     }
 
     if (error) {
@@ -199,34 +208,16 @@ const Cart = () => {
     return (
       <div className="mt-4 p-4 bg-white dark:bg-slate-700 rounded-lg">
         {showModal && (
-          // <SimpleModal
-          //   onClose={handleCloseModal}
-          //   handleClick={handleDelete}
-          //   title="Hapus Data"
-          //   content="Kosongkan Keranjang?"
-          //   showButton={true}
-          // />
-
-          <CustomConfirmationModal
-            isOpen={showModal}
+          <SimpleModal
             onClose={handleCloseModal}
-            onConfirm={handleDelete}
-            title={
-              confirmMode === "item" && pendingItemName
-                ? `Hapus \"${pendingItemName}\" dari keranjang?`
-                : confirmMode === "item"
-                ? "Hapus item ini dari keranjang?"
-                : "Kosongkan Keranjang?"
+            handleClick={handleConfirmDelete}
+            title="Hapus Data"
+            content={
+              confirmMode === "clear"
+                ? "Kosongkan Keranjang?"
+                : "Hapus Produk Ini?"
             }
-            // data={{
-            //   productName: selectedProduct.name,
-            //   target: phoneNumber,
-            //   targetLabel: "Nomor HP",
-            //   customerName: customerInfo?.name || "-",
-            //   amount: selectedProduct.price,
-            //   total: selectedProduct.price,
-            //   commission: selectedProduct.commission,
-            // }}
+            showButton={true}
           />
         )}
         {/* toasts are triggered in useEffect when success/error change */}
@@ -300,8 +291,8 @@ const Cart = () => {
                   </div>
                   <div className="text-gray-700 dark:text-gray-200 text-md">
                     <h3 className="font-medium">
-                      Harga:{" "}
-                      <span className="text-[var(--c-primary)] font-extrabold">
+                      {/* Harga:{" "} */}
+                      <span className="text-gray-500 font-extrabold">
                         {formatCurrency(cartItem?.price)}
                       </span>
                     </h3>

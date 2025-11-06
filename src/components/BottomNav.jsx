@@ -366,7 +366,7 @@ const BottomNav = () => {
           onClose={handleCloseExitModal}
           handleClick={handleConfirmExit}
           title="Keluar dari Checkout"
-          content="Anda yakin ingin meninggalkan halaman checkout? Semua data keranjang akan dihapus."
+          content="Anda yakin ingin meninggalkan halaman checkout? Data pembelian akan dihapus."
           showButton={true}
         />
       )}
