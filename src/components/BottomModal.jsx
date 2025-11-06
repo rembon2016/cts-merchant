@@ -105,27 +105,6 @@ export default function BottomModal(props) {
 
   const handleVariantSelect = (variant) => setSelectedVariant(variant);
 
-  const handleAddToCart = async (data, variant, quantity, isFromDetail) => {
-    try {
-      if (filterLocalCartByProductId?.length > 0) {
-        const cartItemId = filterLocalCartByProductId[0]?.cart_id;
-        const response = await updateCartItem(cartItemId, quantity);
-
-        if (response.success) {
-          setIsOpen(false);
-        }
-      } else {
-        const response = await addToCart(data, variant, quantity, isFromDetail);
-
-        if (response.success) {
-          setIsOpen(false);
-        }
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const toastConfig = {
     position: "top-center",
     autoClose: 3000,
@@ -137,11 +116,44 @@ export default function BottomModal(props) {
     theme: "light",
   };
 
-  const renderToast = (params) => {
-    toast[params.type](params.message, {
-      ...toastConfig,
-    });
+  const handleAddToCart = async (data, variant, quantity, isFromDetail) => {
+    try {
+      if (filterLocalCartByProductId?.length > 0) {
+        const cartItemId = filterLocalCartByProductId[0]?.cart_id;
+        const response = await updateCartItem(cartItemId, quantity);
+
+        if (response?.success === true) {
+          setIsOpen(false);
+          return toast.success("Produk Berhasil Di Update", {
+            ...toastConfig,
+          });
+        }
+        // else {
+        //   toast.error("Produk Gagal Di Update", {
+        //     ...toastConfig,
+        //   });
+        // }
+      } else {
+        const response = await addToCart(data, variant, quantity, isFromDetail);
+
+        if (response?.success === true) {
+          setIsOpen(false);
+          return toast.success("Produk Berhasil Di Tambahkan", {
+            ...toastConfig,
+          });
+        }
+        // else {
+        //   toast.error("Produk Gagal Di Tambahkan", {
+        //     ...toastConfig,
+        //   });
+        // }
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  const renderToast = (params) => {};
 
   const getVariantPrice = (variant) => {
     return getProductPrice(data, variant?.id);
