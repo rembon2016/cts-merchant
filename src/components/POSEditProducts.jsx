@@ -4,7 +4,7 @@ import CustomTextarea from "./form/CustomTextarea";
 import CustomInputFile from "./form/CustomInputFile";
 import CustomCheckbox from "./form/CustomCheckbox";
 import { useProductStore } from "../store/productStore";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import CustomSelectBox from "./form/CustomSelectBox";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -717,10 +717,5 @@ export default function POSEditProducts() {
     );
   }, [formData, handleChange, isLoading]);
 
-  return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <ToastContainer />
-      {renderElements}
-    </div>
-  );
+  return <div className="p-6 max-w-3xl mx-auto">{renderElements}</div>;
 }

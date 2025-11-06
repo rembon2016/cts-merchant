@@ -24,7 +24,7 @@ function useGenerateToken() {
 
   const USER_ID = sessionStorage.getItem("userId");
 
-  const generateToken = () => {
+const generateToken = () => {
     setLoading(true);
     setError(null);
 

@@ -2,10 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useCartStore } from "../store/cartStore";
 import { useLocation } from "react-router-dom";
 import { formatCurrency } from "../helper/currency";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import CustomLoading from "./CustomLoading";
-import SimpleModal from "./modal/SimpleModal";
 import ButtonQuantity from "./ButtonQuantity";
+import CustomConfirmationModal from "./modal/CustomConfirmationModal";
 
 const Cart = () => {
   const {
@@ -21,6 +21,9 @@ const Cart = () => {
   } = useCartStore();
 
   const [showModal, setShowModal] = useState(false);
+  const [confirmMode, setConfirmMode] = useState(null); // 'clear' | 'item'
+  const [pendingItemId, setPendingItemId] = useState(null);
+  const [pendingItemName, setPendingItemName] = useState("");
 
   const location = useLocation();
   const cartPath = location.pathname.includes("/cart");
@@ -59,7 +62,6 @@ const Cart = () => {
         price,
         subtotal,
       };
-      console.log(newItem);
       setSelectedCart((prevItems) => [...prevItems, newItem]);
     } else {
       // Remove by product_id (store uses product_id for selected items)
@@ -86,10 +88,6 @@ const Cart = () => {
     const isChecked = checkbox.checked;
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
 
-    // checkboxes.forEach((checkbox) => {
-    //   checkbox.checked = isChecked;
-    // });
-
     for (const checkbox of checkboxes) {
       checkbox.checked = isChecked;
     }
@@ -112,11 +110,26 @@ const Cart = () => {
     }
   };
 
-  const handleOpenModal = () => setShowModal(true);
+  const handleOpenModal = () => {
+    setConfirmMode("clear");
+    setShowModal(true);
+  };
 
   const handleCloseModal = () => setShowModal(false);
 
-  const handleDelete = () => clearCart(cart?.data?.id);
+  const handleDelete = () => {
+    if (confirmMode === "item" && pendingItemId) {
+      return deleteCartItems(pendingItemId);
+    }
+    return clearCart(cart?.data?.id);
+  };
+
+  const handleOpenItemModal = (itemId, itemName) => {
+    setPendingItemId(itemId);
+    setPendingItemName(itemName || "");
+    setConfirmMode("item");
+    setShowModal(true);
+  };
 
   // Tambahkan base URL untuk gambar
   const getImageUrl = (imagePath) => {
@@ -186,12 +199,34 @@ const Cart = () => {
     return (
       <div className="mt-4 p-4 bg-white dark:bg-slate-700 rounded-lg">
         {showModal && (
-          <SimpleModal
+          // <SimpleModal
+          //   onClose={handleCloseModal}
+          //   handleClick={handleDelete}
+          //   title="Hapus Data"
+          //   content="Kosongkan Keranjang?"
+          //   showButton={true}
+          // />
+
+          <CustomConfirmationModal
+            isOpen={showModal}
             onClose={handleCloseModal}
-            handleClick={handleDelete}
-            title="Hapus Data"
-            content="Kosongkan Keranjang?"
-            showButton={true}
+            onConfirm={handleDelete}
+            title={
+              confirmMode === "item" && pendingItemName
+                ? `Hapus \"${pendingItemName}\" dari keranjang?`
+                : confirmMode === "item"
+                ? "Hapus item ini dari keranjang?"
+                : "Kosongkan Keranjang?"
+            }
+            // data={{
+            //   productName: selectedProduct.name,
+            //   target: phoneNumber,
+            //   targetLabel: "Nomor HP",
+            //   customerName: customerInfo?.name || "-",
+            //   amount: selectedProduct.price,
+            //   total: selectedProduct.price,
+            //   commission: selectedProduct.commission,
+            // }}
           />
         )}
         {/* toasts are triggered in useEffect when success/error change */}
@@ -347,7 +382,12 @@ const Cart = () => {
               </div>
               <button
                 className="shadow-lg hover:shadow-none transition-all ease-in"
-                onClick={() => handleDeleteItems(cartItem?.id)}
+                onClick={() =>
+                  handleOpenItemModal(
+                    cartItem?.id,
+                    cartItem?.product?.name || cartItem?.name
+                  )
+                }
               >
                 <svg
                   width="24"
@@ -373,12 +413,7 @@ const Cart = () => {
     );
   }, [cart, isLoading, error, success, showModal]);
 
-  return (
-    <div className="p-6">
-      <ToastContainer />
-      {renderElement}
-    </div>
-  );
+  return <div className="p-6">{renderElement}</div>;
 };
 
 export default Cart;

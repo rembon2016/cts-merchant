@@ -1,8 +1,7 @@
-import { ArrowLeft, CheckCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
-import { ToastContainer } from 'react-toastify';
-import FeedbackForm from '../components/cs/FeedbackForm';
+import { ArrowLeft, CheckCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import FeedbackForm from "../components/cs/FeedbackForm";
 
 const FeedbackPage = () => {
   const navigate = useNavigate();
@@ -11,7 +10,7 @@ const FeedbackPage = () => {
   const handleSuccess = () => {
     setShowSuccess(true);
     setTimeout(() => {
-      navigate('/customer-support');
+      navigate("/customer-support");
     }, 2000);
   };
 
@@ -36,8 +35,8 @@ const FeedbackPage = () => {
             {/* Info Card */}
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
               <p className="text-sm text-blue-800 dark:text-blue-200">
-                💡 Masukan Anda sangat berharga untuk membantu kami meningkatkan kualitas aplikasi. 
-                Terima kasih atas dukungan Anda!
+                💡 Masukan Anda sangat berharga untuk membantu kami meningkatkan
+                kualitas aplikasi. Terima kasih atas dukungan Anda!
               </p>
             </div>
 
@@ -61,7 +60,6 @@ const FeedbackPage = () => {
           </div>
         )}
       </div>
-      <ToastContainer />
     </div>
   );
 };

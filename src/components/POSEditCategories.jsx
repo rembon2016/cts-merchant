@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from "react";
 import SimpleInput from "./form/SimpleInput";
 import CustomInputFile from "./form/CustomInputFile";
 import { useProductStore } from "../store/productStore";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import BackButton from "./BackButton";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -96,8 +96,6 @@ export default function POSEditCategories() {
     };
   }, [categoryId]);
 
-  console.log("Category ID: ", categoryId);
-
   const renderElements = useMemo(() => {
     return (
       <div className="flex flex-col gap-3">
@@ -138,7 +136,6 @@ export default function POSEditCategories() {
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
-      <ToastContainer />
       <BackButton to="/pos/products" />
       {renderElements}
     </div>

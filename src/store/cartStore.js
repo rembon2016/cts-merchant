@@ -98,22 +98,27 @@ const useCartStore = create((set, get) => ({
         }
       }
 
+      const result = await response.json();
+      const normalized =
+        typeof result?.success === "boolean"
+          ? result
+          : { ...result, success: true };
+
       set({
         success: true,
         isLoading: false,
         error: null,
         triggerCartFetch: true,
+        response: normalized,
       });
 
       get().getCart();
 
-      if (response) {
-        setTimeout(() => {
-          set({ success: null, triggerCartFetch: false });
-        }, 3000);
-      }
+      setTimeout(() => {
+        set({ success: null, triggerCartFetch: false });
+      }, 3000);
 
-      return response.json();
+      return normalized;
     } catch (error) {
       // Coba sekali lagi jika error jaringan/CORS terdeteksi
       const maybeNetworkError = /Failed to fetch|NetworkError|TypeError/i.test(
@@ -152,14 +157,20 @@ const useCartStore = create((set, get) => ({
           });
 
           if (retryResponse?.ok) {
+            const retryResult = await retryResponse.json();
+            const normalizedRetry =
+              typeof retryResult?.success === "boolean"
+                ? retryResult
+                : { ...retryResult, success: true };
+
             set({
               success: true,
               isLoading: false,
               error: null,
-              response: retryResponse,
+              response: normalizedRetry,
             });
             get().getCart();
-            return retryResponse;
+            return normalizedRetry;
           }
         } catch (e2) {
           console.error("Retry after network error failed:", e2?.message || e2);
@@ -171,6 +182,8 @@ const useCartStore = create((set, get) => ({
         isLoading: false,
         error: error?.message || "Gagal menambahkan ke keranjang",
       });
+
+      return { success: false, error: error?.message };
     }
   },
   // Dapatkan cart item id (id pada items) berdasarkan product_id dari state cart
@@ -299,17 +312,21 @@ const useCartStore = create((set, get) => ({
       }
 
       const result = await response.json();
+      const normalized =
+        typeof result?.success === "boolean"
+          ? result
+          : { ...result, success: true };
 
       // If API returns updated cart, use it. Otherwise, trigger a fresh fetch.
-      if (result?.success) {
-        set({ cart: result, isLoading: false, error: false });
+      if (normalized?.success) {
+        set({ cart: normalized, isLoading: false, error: false });
       } else {
         // fallback: refetch cart
         await get().getCart?.();
         set({ isLoading: false });
       }
 
-      return result;
+      return normalized;
     } catch (error) {
       console.log("Error: ", error.message);
       set({ error: error.message, isLoading: false });

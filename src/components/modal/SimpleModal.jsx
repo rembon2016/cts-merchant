@@ -30,7 +30,7 @@ export default function SimpleModal({
       onClick={handleOutsideClick}
       className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4"
     >
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto relative p-4">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto relative p-4">
         <h3>{title}</h3>
         <h1 className="text-2xl font-bold mt-3">{content}</h1>
         <button
@@ -56,14 +56,14 @@ export default function SimpleModal({
           <div className="mt-4 flex justify-end gap-2 w-full">
             <button
               type="submit"
-              className="p-4 bg-[var(--c-accent)] text-gray-700 font-semibold rounded-xl hover:bg-yellow-300 transition mt-4"
+              className="py-4 px-6 bg-[var(--c-accent)] text-gray-700 font-semibold rounded-md hover:bg-yellow-300 transition mt-4"
               onClick={onClose}
             >
               Batal
             </button>
             <button
               type="submit"
-              className="p-4 bg-[var(--c-primary)] text-white font-semibold rounded-xl hover:bg-blue-700 transition mt-4"
+              className="py-4 px-6 bg-[var(--c-primary)] text-white font-semibold rounded-md hover:bg-blue-700 transition mt-4"
               onClick={handleClick}
             >
               Hapus
