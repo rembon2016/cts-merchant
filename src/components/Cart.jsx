@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useCartStore } from "../store/cartStore";
 import { useLocation } from "react-router-dom";
 import { formatCurrency } from "../helper/currency";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import CustomLoading from "./CustomLoading";
 import SimpleModal from "./modal/SimpleModal";
 import ButtonQuantity from "./ButtonQuantity";
@@ -59,7 +59,6 @@ const Cart = () => {
         price,
         subtotal,
       };
-      console.log(newItem);
       setSelectedCart((prevItems) => [...prevItems, newItem]);
     } else {
       // Remove by product_id (store uses product_id for selected items)
@@ -85,10 +84,6 @@ const Cart = () => {
     const checkbox = event.target;
     const isChecked = checkbox.checked;
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-
-    // checkboxes.forEach((checkbox) => {
-    //   checkbox.checked = isChecked;
-    // });
 
     for (const checkbox of checkboxes) {
       checkbox.checked = isChecked;
@@ -373,12 +368,7 @@ const Cart = () => {
     );
   }, [cart, isLoading, error, success, showModal]);
 
-  return (
-    <div className="p-6">
-      <ToastContainer />
-      {renderElement}
-    </div>
-  );
+  return <div className="p-6">{renderElement}</div>;
 };
 
 export default Cart;

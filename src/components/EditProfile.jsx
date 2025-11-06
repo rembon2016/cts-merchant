@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import useFetchDataStore from "../store/fetchDataStore";
 import SimpleInput from "./form/SimpleInput";
 
@@ -130,7 +130,6 @@ export default function EditProfile() {
 
   return (
     <div className="max-w-md mx-auto p-6 rounded-lg bg-white shadow mt-5">
-      <ToastContainer />
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold dark:text-slate-400">
           Edit Profil

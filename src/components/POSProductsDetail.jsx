@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useProductStore } from "../store/productStore";
 import { useThemeStore } from "../store/themeStore";
 import { formatCurrency } from "../helper/currency";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import CustomLoading from "./CustomLoading";
 import SimpleModal from "./modal/SimpleModal";
 import BackButton from "./BackButton";
@@ -210,10 +210,5 @@ export default function POSProductsDetail() {
     );
   }, [products, isLoading, isDark, error, showModal]);
 
-  return (
-    <div className="px-4">
-      <ToastContainer />
-      {renderElements}
-    </div>
-  );
+  return <div className="px-4">{renderElements}</div>;
 }

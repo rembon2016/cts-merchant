@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from "react";
 import SimpleInput from "./form/SimpleInput";
 import CustomInputFile from "./form/CustomInputFile";
 import { useProductStore } from "../store/productStore";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import BackButton from "./BackButton";
 import { useNavigate } from "react-router-dom";
 
@@ -117,7 +117,6 @@ export default function POSAddProducts() {
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
-      <ToastContainer />
       <BackButton to="/pos/products" />
       {renderElements}
     </div>
