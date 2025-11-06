@@ -2,9 +2,8 @@ import { useEffect, useId, useMemo, useState } from "react";
 import SimpleInput from "./form/SimpleInput";
 import CustomTextarea from "./form/CustomTextarea";
 import CustomInputFile from "./form/CustomInputFile";
-import CustomCheckbox from "./form/CustomCheckbox";
 import { useProductStore } from "../store/productStore";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import CustomSelectBox from "./form/CustomSelectBox";
 import { useNavigate } from "react-router-dom";
 import BackButton from "./BackButton";
@@ -394,7 +393,9 @@ export default function POSAddProducts() {
 
         {/* Variant Section */}
         <div className="mt-6 p-4 border border-gray-200 rounded-lg">
-          <h3 className="text-lg font-semibold mb-4">Produk ini punya varian?</h3>
+          <h3 className="text-lg font-semibold mb-4">
+            Produk ini punya varian?
+          </h3>
           <div className="flex gap-6 mb-4">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -406,14 +407,17 @@ export default function POSAddProducts() {
                   setFormData((prev) => ({
                     ...prev,
                     is_variant: true,
-                    skus: prev.skus.length === 0 ? [
-                      {
-                        variant_name: "",
-                        sku: "",
-                        barcode: "",
-                        is_active: true,
-                      },
-                    ] : prev.skus,
+                    skus:
+                      prev.skus.length === 0
+                        ? [
+                            {
+                              variant_name: "",
+                              sku: "",
+                              barcode: "",
+                              is_active: true,
+                            },
+                          ]
+                        : prev.skus,
                   }));
                 }}
                 className="w-4 h-4"
@@ -474,7 +478,12 @@ export default function POSAddProducts() {
                     label="Barcode"
                     value={item?.barcode}
                     handleChange={(e) =>
-                      handleNestedChange("skus", index, "barcode", e.target.value)
+                      handleNestedChange(
+                        "skus",
+                        index,
+                        "barcode",
+                        e.target.value
+                      )
                     }
                     // disabled={true}
                   />
@@ -511,7 +520,9 @@ export default function POSAddProducts() {
 
         {/* Bundle Section */}
         <div className="mt-6 p-4 border border-gray-200 rounded-lg">
-          <h3 className="text-lg font-semibold mb-4">Produk ini punya bundle?</h3>
+          <h3 className="text-lg font-semibold mb-4">
+            Produk ini punya bundle?
+          </h3>
           <div className="flex gap-6 mb-4">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -523,13 +534,16 @@ export default function POSAddProducts() {
                   setFormData((prev) => ({
                     ...prev,
                     is_bundle: true,
-                    bundle_items: prev.bundle_items.length === 0 ? [
-                      {
-                        product_id: "",
-                        qty: "",
-                        price: "",
-                      },
-                    ] : prev.bundle_items,
+                    bundle_items:
+                      prev.bundle_items.length === 0
+                        ? [
+                            {
+                              product_id: "",
+                              qty: "",
+                              price: "",
+                            },
+                          ]
+                        : prev.bundle_items,
                   }));
                 }}
                 className="w-4 h-4"
@@ -647,7 +661,6 @@ export default function POSAddProducts() {
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
-      <ToastContainer />
       <BackButton to="/pos/products" />
       {renderElements}
     </div>

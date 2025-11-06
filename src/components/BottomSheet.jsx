@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import { useAuthStore } from "../store/authStore";
 
 const BottomSheet = ({ isOpen, onClose, onItemClick, token = null }) => {
@@ -224,8 +224,6 @@ const BottomSheet = ({ isOpen, onClose, onItemClick, token = null }) => {
     <>
       {/* Overlay */}
       {/* <button className="fixed inset-0 z-40" onClick={handleClose} /> */}
-
-      <ToastContainer />
 
       {/* Bottom Sheet */}
       <div className="fixed inset-x-0 bottom-[3.2rem] pointer-events-none z-10">

@@ -3,7 +3,7 @@ import { useThemeStore } from "../store/themeStore";
 import { formatCurrency } from "../helper/currency";
 import { useCartStore } from "../store/cartStore";
 import { usePosStore } from "../store/posStore";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import SimpleInput from "./form/SimpleInput";
 import ButtonQuantity from "./ButtonQuantity";
 import PropTypes from "prop-types";
@@ -81,7 +81,6 @@ export default function BottomModal(props) {
         getCart();
         onClose();
       }, 1060);
-
       return () => clearTimeout();
     }
   }, [success]);
@@ -121,21 +120,19 @@ export default function BottomModal(props) {
       if (filterLocalCartByProductId?.length > 0) {
         const cartItemId = filterLocalCartByProductId[0]?.cart_id;
         const response = await updateCartItem(cartItemId, quantity);
-
         if (response?.success === true) {
-          setIsOpen(false);
-          alert("Produk Berhasil Diperbarui");
+          toast.success("Produk Berhasil DIperbarui", { ...toastConfig });
+          setTimeout(() => setIsOpen(false), 50);
         } else {
-          alert("Produk Gagal Diperbarui");
+          toast.error("Produk Gagal DIperbarui", { ...toastConfig });
         }
       } else {
         const response = await addToCart(data, variant, quantity, isFromDetail);
-
         if (response?.success === true) {
-          setIsOpen(false);
-          alert("Produk Berhasil Ditambahkan");
+          toast.success("Produk Berhasil Ditambahkan", { ...toastConfig });
+          setTimeout(() => setIsOpen(false), 50);
         } else {
-          alert("Produk Gagal Ditambahkan");
+          toast.error("Produk Gagal Ditambahkan", { ...toastConfig });
         }
       }
     } catch (error) {
@@ -233,11 +230,6 @@ export default function BottomModal(props) {
 
   return (
     <>
-      {/* Overlay */}
-      {/* <button className="fixed inset-0 z-40" onClick={handleClose} /> */}
-
-      <ToastContainer />
-
       {/* Bottom Sheet */}
       <div className="fixed inset-x-0 bottom-[1.5rem] pointer-events-none z-10">
         <div className="mx-auto max-w-sm w-full mb-4 px-4 pointer-events-auto scrollbar-hide">
