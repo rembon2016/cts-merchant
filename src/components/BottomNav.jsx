@@ -21,6 +21,8 @@ const BottomNav = () => {
   const pathname = location.pathname;
   const getCart = sessionStorage.getItem("cart");
 
+  // console.log("Session Cart: ", JSON.parse(getCart));
+
   const [showExitModal, setShowExitModal] = useState(false);
   const [pendingPath, setPendingPath] = useState(null);
 

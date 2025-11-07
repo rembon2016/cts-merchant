@@ -19,14 +19,7 @@ BottomModal.propTypes = {
 };
 
 export default function BottomModal(props) {
-  const {
-    isOpen,
-    setIsOpen,
-    onClose,
-    stocks,
-    data,
-    isFromDetail = true,
-  } = props;
+  const { isOpen, setIsOpen, onClose, stocks, data, isFromDetail } = props;
 
   const sheetRef = useRef(null);
   const { isDark } = useThemeStore();
@@ -145,7 +138,7 @@ export default function BottomModal(props) {
   };
 
   const getVariantStock = (variant) => {
-    return getProductStock(data, variant?.id, true);
+    return getProductStock(data, variant?.id, isFromDetail);
   };
 
   const renderVariants = useMemo(() => {
@@ -166,17 +159,18 @@ export default function BottomModal(props) {
               const stock = getVariantStock(variant);
               const isSelected = selectedVariant?.id === variant?.id;
               const isOutOfStock = stock <= 0;
+
               return (
-                <div
+                <button
                   key={variant.id}
-                  className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                  className={`p-3 w-full rounded-lg border cursor-pointer transition-colors ${
                     isSelected
                       ? "border-[var(--c-primary)] bg-blue-50 dark:bg-blue-900/20"
                       : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
                   } ${isOutOfStock ? "opacity-50 cursor-not-allowed" : ""}`}
                   onClick={() => !isOutOfStock && handleVariantSelect(variant)}
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between relative">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2">
                         <span className="font-medium text-gray-900 dark:text-white">
@@ -198,8 +192,8 @@ export default function BottomModal(props) {
                       </div>
                     </div>
                     {isSelected && (
-                      <div className="ml-3">
-                        <div className="w-5 h-5 bg-[var(--c-primary)] rounded-full flex items-center justify-center">
+                      <div className="">
+                        <div className="w-5 h-5 bg-[var(--c-primary)] rounded-full flex items-center justify-center absolute top-0 right-0">
                           <svg
                             className="w-3 h-3 text-white"
                             fill="currentColor"
@@ -215,7 +209,7 @@ export default function BottomModal(props) {
                       </div>
                     )}
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
@@ -225,6 +219,10 @@ export default function BottomModal(props) {
   }, [data, selectedVariant, quantity, isDark]);
 
   const totalPrice = formatCurrency(formData?.harga * quantity);
+
+  useEffect(() => {
+    if (!isOpen) setQuantity(1);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
