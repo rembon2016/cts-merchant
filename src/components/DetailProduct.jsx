@@ -89,7 +89,7 @@ export default function DetailProduct() {
               disabled={isLoading}
             >
               <ShoppingCart className="w-5 h-5" />
-              Masukka Keranjang
+              Masukkan Keranjang
             </button>
             {/* <button
               className={`w-20 h-16 rounded-full border-2 border-gray-500 flex justify-center items-center transition-colors gap-2`}
@@ -111,6 +111,7 @@ export default function DetailProduct() {
           data={products}
           stocks={productStock}
           onItemClick={() => setIsSheetOpen(false)}
+          isFromDetail={true}
         />
       </div>
     );
