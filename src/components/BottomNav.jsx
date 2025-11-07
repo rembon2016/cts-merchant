@@ -14,8 +14,8 @@ const BottomNav = () => {
     cart,
     setSelectedCart,
     clearDiscountData,
-    clearCart,
     clearMultipleCarts,
+    deleteCartItems,
   } = useCartStore();
   const navigation = useNavigate();
   const pathname = location.pathname;
@@ -187,14 +187,14 @@ const BottomNav = () => {
 
   const proccessOrder = async (dataCheckout) => {
     try {
-      setLoading(true);
+      // setLoading(true);
 
       // Extract unique cart_ids from selected items
       // Since all items in the same cart share the same cart_id,
       // we only need unique cart_ids
       const cartIds = [
         ...new Set(
-          dataCheckout?.items?.map((item) => item.cart_id).filter(Boolean)
+          dataCheckout?.items?.map((item) => item.item_id).filter(Boolean)
         ),
       ];
 
@@ -202,14 +202,14 @@ const BottomNav = () => {
 
       if (response?.success) {
         // Clear carts based on unique cart_ids
-        if (cartIds && cartIds.length > 0) {
-          await clearMultipleCarts(cartIds);
+        if (cartIds && cartIds?.length > 0) {
+          // await clearMultipleCarts(cartIds);
+          await Promise.all(cartIds.map((cartId) => deleteCartItems(cartId)));
         }
 
         navigation(`/pos/transaction/${response?.data?.id}`, {
           replace: true,
         });
-        await clearCart(dataCheckout?.items[0]?.cart_id);
         sessionStorage.removeItem("cart");
         sessionStorage.removeItem("tax");
         sessionStorage.removeItem("discount");

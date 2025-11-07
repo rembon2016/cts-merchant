@@ -7,6 +7,7 @@ import { useProductStore } from "../store/productStore";
 import { toast } from "react-toastify";
 import CustomSelectBox from "./form/CustomSelectBox";
 import { useLocation, useNavigate } from "react-router-dom";
+import BackButton from "./BackButton";
 
 export default function POSEditProducts() {
   const getToday = new Date().toISOString().split("T")[0];
@@ -717,5 +718,10 @@ export default function POSEditProducts() {
     );
   }, [formData, handleChange, isLoading]);
 
-  return <div className="p-6 max-w-3xl mx-auto">{renderElements}</div>;
+  return (
+    <div className="p-6 max-w-3xl mx-auto">
+      <BackButton to="/pos/products" />
+      {renderElements}
+    </div>
+  );
 }

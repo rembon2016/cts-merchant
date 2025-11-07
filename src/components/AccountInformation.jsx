@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import { toast } from "react-toastify";
+import BackButton from "./BackButton";
 
 export default function AccountInformation() {
   const { user: userInfo } = useAuthStore();
@@ -64,85 +65,95 @@ export default function AccountInformation() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6  rounded-lg bg-white shadow">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold mb-4 dark:text-slate-400">
-          Informasi Akun
-        </h2>
-        {renderIconEdit()}
+    <>
+      <BackButton to="/profile" />
+      <div className="max-w-md mx-auto p-6  rounded-lg bg-white shadow">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-semibold mb-4 dark:text-slate-400">
+            Informasi Akun
+          </h2>
+          {renderIconEdit()}
+        </div>
+        <div className="flex flex-col">
+          {renderElement("Nama Lengkap", userInfo?.name)}
+          {renderElement("Email", userInfo?.email)}
+        </div>
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-semibold my-4 dark:text-slate-400">
+            Merchant
+          </h2>
+          {renderIconEdit(true)}
+        </div>
+        <div className="flex flex-col">
+          {renderElement(
+            "Nama Bisnis",
+            userInfo?.business_account?.profile?.business_name
+          )}
+          {renderElement(
+            "Alamat",
+            userInfo?.business_account?.profile?.address
+          )}
+          {renderElement(
+            "Provinsi",
+            userInfo?.business_account?.profile?.province_name
+          )}
+          {renderElement(
+            "Nama Kota",
+            userInfo?.business_account?.profile?.city_name
+          )}
+          {renderElement(
+            "Nama Desa",
+            userInfo?.business_account?.profile?.village_name
+          )}
+          {renderElement(
+            "Distrik",
+            userInfo?.business_account?.profile?.subdistrict_name
+          )}
+          {renderElement(
+            "Skala Bisnis",
+            userInfo?.business_account?.profile?.business_scale
+          )}
+          {renderElement(
+            "Kode POS",
+            userInfo?.business_account?.profile?.postal_code
+          )}
+          {renderElement(
+            "Jenis Industri",
+            userInfo?.business_account?.profile?.industry_name
+          )}
+          {renderElement(
+            "Sub Industri",
+            userInfo?.business_account?.profile?.sub_industry_name
+          )}
+          {renderElement(
+            "Kode Industri",
+            userInfo?.business_account?.profile?.industry_code
+          )}
+          {renderElement(
+            "Status Akun",
+            userInfo?.business_account?.status,
+            true
+          )}
+        </div>
+        <div className="flex flex-col">
+          {renderElement(
+            "Akun Bank",
+            userInfo?.business_account?.bank_information?.account_name
+          )}
+          {renderElement(
+            "Nomor Akun",
+            userInfo?.business_account?.bank_information?.account_number
+          )}
+          {renderElement(
+            "Nama Bank",
+            userInfo?.business_account?.bank_information?.bank_name
+          )}
+          {renderElement(
+            "Kode Bank",
+            userInfo?.business_account?.bank_information?.bank_code
+          )}
+        </div>
       </div>
-      <div className="flex flex-col">
-        {renderElement("Nama Lengkap", userInfo?.name)}
-        {renderElement("Email", userInfo?.email)}
-      </div>
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold my-4 dark:text-slate-400">
-          Merchant
-        </h2>
-        {renderIconEdit(true)}
-      </div>
-      <div className="flex flex-col">
-        {renderElement(
-          "Nama Bisnis",
-          userInfo?.business_account?.profile?.business_name
-        )}
-        {renderElement("Alamat", userInfo?.business_account?.profile?.address)}
-        {renderElement(
-          "Provinsi",
-          userInfo?.business_account?.profile?.province_name
-        )}
-        {renderElement(
-          "Nama Kota",
-          userInfo?.business_account?.profile?.city_name
-        )}
-        {renderElement(
-          "Nama Desa",
-          userInfo?.business_account?.profile?.village_name
-        )}
-        {renderElement(
-          "Distrik",
-          userInfo?.business_account?.profile?.subdistrict_name
-        )}
-        {renderElement(
-          "Skala Bisnis",
-          userInfo?.business_account?.profile?.business_scale
-        )}
-        {renderElement(
-          "Kode POS",
-          userInfo?.business_account?.profile?.postal_code
-        )}
-        {renderElement(
-          "Jenis Industri",
-          userInfo?.business_account?.profile?.industry_name
-        )}
-        {renderElement(
-          "Sub Industri",
-          userInfo?.business_account?.profile?.sub_industry_name
-        )}
-        {renderElement(
-          "Kode Industri",
-          userInfo?.business_account?.profile?.industry_code
-        )}
-        {renderElement("Status Akun", userInfo?.business_account?.status, true)}
-      </div>
-      <div className="flex flex-col">
-        {renderElement(
-          "Akun Bank",
-          userInfo?.business_account?.bank_information?.account_name
-        )}
-        {renderElement(
-          "Nomor Akun",
-          userInfo?.business_account?.bank_information?.account_number
-        )}
-        {renderElement(
-          "Nama Bank",
-          userInfo?.business_account?.bank_information?.bank_name
-        )}
-        {renderElement(
-          "Kode Bank",
-          userInfo?.business_account?.bank_information?.bank_code
-        )}
-      </div>
-    </div>
+    </>
   );
 }
