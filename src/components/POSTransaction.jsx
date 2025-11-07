@@ -57,7 +57,7 @@ export default function POSTransaction() {
             <div className="mt-4 text-sm text-gray-600">
               <div className="flex items-center justify-between border-t pt-3">
                 <span>Total hari ini</span>
-                <span className="font-semibold">
+                <span className="font-semibold text-lg text-[var(--c-primary)]">
                   {formatCurrency(totalToday)}
                 </span>
               </div>
@@ -90,7 +90,7 @@ export default function POSTransaction() {
                             {trx.transaction_type === "sale" ? "S" : "T"}
                           </div>
 
-                          <div className="min-w-0 flex-1">
+                          <div className="min-w-0">
                             <div className="flex items-center gap-2">
                               <div className="text-sm font-medium text-gray-800 truncate">
                                 {trx.code}
@@ -99,20 +99,17 @@ export default function POSTransaction() {
                                 • {trx.time}
                               </div>
                             </div>
-                            <div className="text-xs text-gray-500 mt-1 truncate">
-                              {trx.branch?.name} • {trx.item_count} item
-                            </div>
-                            <div className="text-xs text-gray-400 truncate">
-                              oleh {trx.created_by}
+                            <div className="text-xs text-gray-500 mt-1 text-start truncate">
+                              oleh: {trx.created_by} • {trx.item_count} item
                             </div>
                           </div>
                         </div>
-
-                        <div className="flex items-center justify-between border-t pt-2">
+                        <div className="flex items-center justify-end gap-1 border-t pt-2">
                           <div className="text-xs text-gray-500">
                             {trx.payment_method?.name}
                           </div>
-                          <div className="text-sm font-semibold text-gray-800">
+                          •
+                          <div className="font-semibold text-lg text-[var(--c-primary)]">
                             {formatCurrency(trx.total)}
                           </div>
                         </div>
