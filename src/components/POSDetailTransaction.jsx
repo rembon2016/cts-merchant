@@ -2,6 +2,7 @@ import { useEffect, useMemo } from "react";
 import { useCheckoutStore } from "../store/checkoutStore";
 import { formatCurrency } from "../helper/currency";
 import CustomLoading from "./CustomLoading";
+import BackButton from "./BackButton";
 
 const POSDetailTransaction = () => {
   const date = (iso) =>
@@ -200,7 +201,12 @@ const POSDetailTransaction = () => {
     );
   }, [isLoading]);
 
-  return <div className="p-6">{renderElements}</div>;
+  return (
+    <div className="p-6">
+      <BackButton to="/pos/transaction" />
+      {renderElements}
+    </div>
+  );
 };
 
 export default POSDetailTransaction;

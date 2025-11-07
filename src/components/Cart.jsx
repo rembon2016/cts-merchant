@@ -12,7 +12,7 @@ const Cart = () => {
     cart,
     getCart,
     deleteCartItems,
-    clearCart,
+    clearMultipleCarts,
     setSelectedCart,
     isLoading,
     error,
@@ -122,11 +122,14 @@ const Cart = () => {
     setConfirmMode(null);
     setPendingItemId(null);
     setPendingItemName("");
+
+    const cartIds = [cart?.data?.id].filter(Boolean);
+
     // Proceed with deletion
     if (confirmMode === "item" && pendingItemId) {
       deleteCartItems(pendingItemId);
     } else {
-      clearCart(cart?.data?.id);
+      clearMultipleCarts(cartIds);
     }
   };
 
