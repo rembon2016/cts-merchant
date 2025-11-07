@@ -3,7 +3,6 @@ import { useThemeStore } from "../store/themeStore";
 import { usePosStore } from "../store/posStore";
 import { useDebounce } from "../hooks/useDebounce";
 import { useCartStore } from "../store/cartStore";
-import VariantModal from "./VariantModal";
 import { useNavigate } from "react-router-dom";
 import { formatCurrency } from "../helper/currency";
 import SearchInput from "./SearchInput";
@@ -56,8 +55,6 @@ export default function POS() {
   const debouncedSearch = useDebounce(search, 500);
 
   const navigate = useNavigate();
-
-  const productStock = products?.stocks?.reduce((a, b) => a + b.qty, 0);
 
   // Fetch categories on component mount
   useEffect(() => {
