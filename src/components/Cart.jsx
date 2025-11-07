@@ -275,7 +275,7 @@ const Cart = () => {
                   data-subtotal={cartItem?.subtotal}
                   data-name={cartItem?.product?.name}
                   data-image={cartItem?.product?.image}
-                  data-sku={cartItem?.product?.sku}
+                  data-sku={cartItem?.product?.product_sku_id}
                   data-quantity={cartItem?.quantity}
                   onChange={handleChecked}
                   className="cursor-pointer"
