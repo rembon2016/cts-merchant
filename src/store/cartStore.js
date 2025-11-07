@@ -400,6 +400,10 @@ const useCartStore = create((set, get) => ({
     }
   },
   clearMultipleCarts: async (cartIds) => {
+    console.log(cartIds);
+
+    // return;
+
     try {
       set({ isLoading: true, error: null });
 
