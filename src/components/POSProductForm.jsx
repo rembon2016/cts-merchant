@@ -57,6 +57,8 @@ export default function POSProductForm({
     ],
   });
 
+  const [adjustStocks, setAdjustStocks] = useState(!editMode ? true : false);
+
   const {
     brands,
     getBrands,
@@ -172,7 +174,7 @@ export default function POSProductForm({
               branch_id: stock?.branch_id || activeBranch,
               qty: stock?.qty || "",
               reason: stock?.reason || "",
-              type: stock?.tipe || stock?.type || "",
+              type: stock?.type || "",
             }))
           : [
               {
@@ -255,15 +257,15 @@ export default function POSProductForm({
       editMode && typeof formData.image === "string" ? "" : formData.image;
 
     // Validate required `type` for stock adjustments in edit mode
-    if (editMode) {
-      const missingType = (formData.stocks || []).some(
-        (s) => (s?.qty ?? "") !== "" && (s?.type ?? "").trim() === ""
-      );
-      if (missingType) {
-        toast.error("Tipe penyesuaian stok wajib diisi untuk setiap item.");
-        return;
-      }
-    }
+    // if (editMode) {
+    //   const missingType = (formData.stocks || []).some(
+    //     (s) => (s?.qty ?? "") !== "" && (s?.type ?? "").trim() === ""
+    //   );
+    //   if (missingType) {
+    //     toast.error("Tipe penyesuaian stok wajib diisi untuk setiap item.");
+    //     return;
+    //   }
+    // }
 
     const categoryIds = Array.isArray(formData.category_ids)
       ? formData.category_ids.map((item) =>
@@ -301,7 +303,7 @@ export default function POSProductForm({
       is_bundle: formData.is_bundle ? 1 : 0,
       bundle_items: formData.is_bundle ? formData.bundle_items : [],
       skus: formData.is_variant ? skuForm : [],
-      stocks: stocksPayload,
+      stocks: editMode && adjustStocks ? stocksPayload : formData?.stocks,
       prices: [
         {
           branch_id: activeBranch,
@@ -496,41 +498,120 @@ export default function POSProductForm({
           handleChange={handleChange}
         />
 
-        {formData?.stocks?.map((item, index) => (
-          <div className="flex flex-col gap-2" key={`stock-${index}`}>
-            <SimpleInput
-              name="stocks.qty"
-              type="text"
-              label="Stok / Kuantitas"
-              value={item?.qty}
-              handleChange={(e) =>
-                handleNestedChange("stocks", index, "qty", e.target.value, true)
-              }
-            />
-            {editMode && (
-              <SimpleInput
-                name="stocks.type"
-                type="text"
-                label="Tipe"
-                isSelectBox={true}
-                selectBoxData={tipeData}
-                value={item?.type}
-                handleChange={(e) =>
-                  handleNestedChange("stocks", index, "type", e.target.value)
-                }
-              />
-            )}
-            <SimpleInput
-              name="stocks.reason"
-              type="text"
-              label="Alasan"
-              value={item?.reason}
-              handleChange={(e) =>
-                handleNestedChange("stocks", index, "reason", e.target.value)
-              }
-            />
+        <div className="mt-6 p-4 border border-gray-200 rounded-lg">
+          {/* {editMode && (
+            <>
+              <h3 className="text-lg font-semibold mb-4">
+                Ingin menyesuaikan stok produk?
+              </h3>
+              <div className="flex gap-6 mb-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="adjust_stocks"
+                    value="yes"
+                    checked={!!adjustStocks}
+                    onChange={() => {
+                      setAdjustStocks(true);
+                      setFormData((prev) => ({
+                        ...prev,
+                        stocks:
+                          prev.stocks && prev.stocks.length > 0
+                            ? [
+                                {
+                                  branch_id:
+                                    prev.stocks[0]?.branch_id || activeBranch,
+                                  qty: prev.stocks[0]?.qty || "",
+                                  reason: prev.stocks[0]?.reason || "",
+                                  type: prev.stocks[0]?.type || "",
+                                },
+                              ]
+                            : [
+                                {
+                                  branch_id: activeBranch,
+                                  qty: "",
+                                  reason: "",
+                                  type: "",
+                                },
+                              ],
+                      }));
+                    }}
+                    className="w-4 h-4"
+                  />
+                  <span className="text-sm">Ya</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="adjust_stocks"
+                    value="no"
+                    checked={!adjustStocks}
+                    onChange={() => {
+                      setAdjustStocks(false);
+                    }}
+                    className="w-4 h-4"
+                  />
+                  <span className="text-sm">Tidak</span>
+                </label>
+              </div>
+            </>
+          )} */}
+
+          <div className="flex flex-col gap-2">
+            {formData?.stocks?.slice(0, 1).map((item, index) => (
+              <div className="flex flex-col gap-2" key={`stock-${index}`}>
+                <SimpleInput
+                  name="stocks.qty"
+                  type="text"
+                  label="Stok / Kuantitas"
+                  value={item?.qty}
+                  handleChange={(e) =>
+                    handleNestedChange(
+                      "stocks",
+                      index,
+                      "qty",
+                      e.target.value,
+                      true
+                    )
+                  }
+                />
+                {editMode && (
+                  <SimpleInput
+                    name="stocks.type"
+                    type="text"
+                    label="Tipe"
+                    isSelectBox={true}
+                    selectBoxData={tipeData}
+                    value={item?.type}
+                    handleChange={(e) =>
+                      handleNestedChange(
+                        "stocks",
+                        index,
+                        "type",
+                        e.target.value
+                      )
+                    }
+                  />
+                )}
+                <SimpleInput
+                  name="stocks.reason"
+                  type="text"
+                  label="Alasan"
+                  value={item?.reason}
+                  handleChange={(e) =>
+                    handleNestedChange(
+                      "stocks",
+                      index,
+                      "reason",
+                      e.target.value
+                    )
+                  }
+                />
+              </div>
+            ))}
+            {/* No add/remove buttons: enforce single row */}
           </div>
-        ))}
+        </div>
 
         {/* Variant Section */}
         <div className="mt-6 p-4 border border-gray-200 rounded-lg">
