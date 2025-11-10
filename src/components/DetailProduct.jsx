@@ -6,6 +6,7 @@ import { formatCurrency } from "../helper/currency";
 import { ShoppingCart } from "lucide-react";
 import CustomLoading from "./CustomLoading";
 import BottomModal from "./BottomModal";
+import BackButton from "./BackButton";
 
 export default function DetailProduct() {
   const { getDetailProduct, isLoading, products, error } = useProductStore();
@@ -124,5 +125,10 @@ export default function DetailProduct() {
     }
   }, [pathname]);
 
-  return <div className="px-4">{renderElements}</div>;
+  return (
+    <div className="px-4">
+      <BackButton to="/pos/products" />
+      {renderElements}
+    </div>
+  );
 }

@@ -3,6 +3,7 @@ import { useInvoiceStore } from "../store/invoiceStore";
 import { useEffect, useMemo } from "react";
 import { formatDate } from "../helper/format-date";
 import { formatCurrency } from "../helper/currency";
+import BackButton from "./BackButton";
 import CustomLoading from "./CustomLoading";
 
 const statusBadge = (status) => {
@@ -17,7 +18,6 @@ const DetailInvoice = () => {
     useInvoiceStore();
 
   const location = useLocation();
-  const navigate = useNavigate();
   const invoicePath = location.pathname.includes(`/invoice/detail`);
 
   const invoiceId = globalThis?.location?.pathname?.split("/").pop();
@@ -38,12 +38,6 @@ const DetailInvoice = () => {
     return (
       <div className="w-full mx-auto bg-white dark:bg-slate-800 p-6 rounded-lg shadow">
         <div className="flex w-full  justify-end gap-2 mb-2">
-          <button
-            onClick={() => navigate("/invoice", { replace: true })}
-            className="py-4 px-6 rounded-lg bg-[var(--c-accent)] hover:bg-yellow-300 transition-colors ease-linear duration-300 ml-auto text-gray-700 mb-4"
-          >
-            Kembali
-          </button>
           <button
             onClick={handlePrintInvoices}
             disabled={downloading}
@@ -126,7 +120,12 @@ const DetailInvoice = () => {
     );
   }, [isLoading, downloading]);
 
-  return <div className="p-4 sm:p-6 lg:p-10">{renderElements}</div>;
+  return (
+    <div className="p-4 sm:p-6 lg:p-10">
+      <BackButton to="/invoice" />
+      {renderElements}
+    </div>
+  );
 };
 
 export default DetailInvoice;
