@@ -57,6 +57,8 @@ export default function POSProductForm({
     ],
   });
 
+  const [adjustStocks, setAdjustStocks] = useState(false);
+
   const {
     brands,
     getBrands,
@@ -172,7 +174,7 @@ export default function POSProductForm({
               branch_id: stock?.branch_id || activeBranch,
               qty: stock?.qty || "",
               reason: stock?.reason || "",
-              type: stock?.tipe || stock?.type || "",
+              type: stock?.type || "",
             }))
           : [
               {
@@ -255,15 +257,15 @@ export default function POSProductForm({
       editMode && typeof formData.image === "string" ? "" : formData.image;
 
     // Validate required `type` for stock adjustments in edit mode
-    if (editMode) {
-      const missingType = (formData.stocks || []).some(
-        (s) => (s?.qty ?? "") !== "" && (s?.type ?? "").trim() === ""
-      );
-      if (missingType) {
-        toast.error("Tipe penyesuaian stok wajib diisi untuk setiap item.");
-        return;
-      }
-    }
+    // if (editMode) {
+    //   const missingType = (formData.stocks || []).some(
+    //     (s) => (s?.qty ?? "") !== "" && (s?.type ?? "").trim() === ""
+    //   );
+    //   if (missingType) {
+    //     toast.error("Tipe penyesuaian stok wajib diisi untuk setiap item.");
+    //     return;
+    //   }
+    // }
 
     const categoryIds = Array.isArray(formData.category_ids)
       ? formData.category_ids.map((item) =>
@@ -495,6 +497,144 @@ export default function POSProductForm({
           value={formData?.stok_alert}
           handleChange={handleChange}
         />
+
+        {/* Variant Section */}
+        {/* <div className="mt-6 p-4 border border-gray-200 rounded-lg">
+          <h3 className="text-lg font-semibold mb-4">
+            Ingin Menyesuaikan Stok Produk?
+          </h3>
+          <div className="flex gap-6 mb-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="adjust_stocks"
+                value="yes"
+                checked={!!adjustStocks}
+                onChange={() => {
+                  setAdjustStocks(true);
+                }}
+                className="w-4 h-4"
+              />
+              <span className="text-sm">Ya</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="adjust_stocks"
+                value="no"
+                checked={!adjustStocks}
+                onChange={() => {
+                  setAdjustStocks(false);
+                  setFormData((prev) => ({
+                    ...prev,
+                    is_variant: false,
+                    skus: [],
+                  }));
+                }}
+                className="w-4 h-4"
+              />
+              <span className="text-sm">Tidak</span>
+            </label>
+          </div>
+
+          {formData?.is_variant && (
+            <div className="flex flex-col gap-2 mt-4">
+              {formData?.skus?.map((item, index) => (
+                <div
+                  className="flex flex-col gap-2 w-full"
+                  key={`sku-${index}`}
+                >
+                  <SimpleInput
+                    name="skus.variant_name"
+                    type="text"
+                    label={editMode ? "Variant Name" : "Nama Varian"}
+                    value={item?.variant_name}
+                    handleChange={(e) =>
+                      handleNestedChange(
+                        "skus",
+                        index,
+                        "variant_name",
+                        e.target.value
+                      )
+                    }
+                  />
+                  <SimpleInput
+                    name="skus.sku"
+                    type="text"
+                    label="SKU"
+                    value={item?.sku}
+                    handleChange={(e) =>
+                      handleNestedChange("skus", index, "sku", e.target.value)
+                    }
+                  />
+                  <SimpleInput
+                    name="skus.barcode"
+                    type="text"
+                    label="Barcode"
+                    value={item?.barcode}
+                    handleChange={(e) =>
+                      handleNestedChange(
+                        "skus",
+                        index,
+                        "barcode",
+                        e.target.value
+                      )
+                    }
+                  />
+                  {editMode && (
+                    <div className="p-4 flex items-center gap-2">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={!!item?.is_active}
+                          onChange={() =>
+                            handleNestedChange(
+                              "skus",
+                              index,
+                              "is_active",
+                              !item?.is_active
+                            )
+                          }
+                          className="w-4 h-4"
+                        />
+                        <span className="text-sm">
+                          Is Active?: {item?.is_active ? "Yes" : "No"}
+                        </span>
+                      </label>
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    className="font-semibold bg-red-500 p-4 rounded-lg w-fit ml-auto mt-2 text-white"
+                    onClick={() => handleRemoveItem("skus", index)}
+                  >
+                    {getTrashIcon}
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                className="text-white font-semibold bg-[var(--c-primary)] py-4 px-6 rounded-lg w-fit ml-auto mt-4"
+                onClick={() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    skus: [
+                      ...prev.skus,
+                      {
+                        variant_name: "",
+                        sku: "",
+                        barcode: "",
+                        is_active: editMode ? false : true,
+                      },
+                    ],
+                  }));
+                }}
+              >
+                {editMode ? "+ Tambah Variant" : "+ Tambah Varian"}
+              </button>
+            </div>
+          )}
+        </div> */}
 
         {formData?.stocks?.map((item, index) => (
           <div className="flex flex-col gap-2" key={`stock-${index}`}>
