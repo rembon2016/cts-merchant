@@ -43,6 +43,7 @@ export default function POSProductForm({
         branch_id: activeBranch,
         qty: "",
         reason: "",
+        type: "",
       },
     ],
     prices: [
@@ -171,12 +172,14 @@ export default function POSProductForm({
               branch_id: stock?.branch_id || activeBranch,
               qty: stock?.qty || "",
               reason: stock?.reason || "",
+              type: stock?.tipe || stock?.type || "",
             }))
           : [
               {
                 branch_id: activeBranch,
                 qty: "",
                 reason: "",
+                type: "",
               },
             ],
       prices:
@@ -247,6 +250,21 @@ export default function POSProductForm({
   }, []);
 
   const handleSubmit = async () => {
+    // Normalize image: if editMode and user didn't change image (still a string URL/path), send empty string
+    const normalizedImage =
+      editMode && typeof formData.image === "string" ? "" : formData.image;
+
+    // Validate required `type` for stock adjustments in edit mode
+    if (editMode) {
+      const missingType = (formData.stocks || []).some(
+        (s) => (s?.qty ?? "") !== "" && (s?.type ?? "").trim() === ""
+      );
+      if (missingType) {
+        toast.error("Tipe penyesuaian stok wajib diisi untuk setiap item.");
+        return;
+      }
+    }
+
     const categoryIds = Array.isArray(formData.category_ids)
       ? formData.category_ids.map((item) =>
           typeof item === "object" && item?.id ? Number(item.id) : Number(item)
@@ -266,14 +284,24 @@ export default function POSProductForm({
       is_active: sku?.is_active ? 1 : 0,
     }));
 
+    // For add mode, exclude `type` from stocks payload
+    const stocksPayload = (formData.stocks || []).map((s) => ({
+      branch_id: s?.branch_id,
+      qty: s?.qty,
+      reason: s?.reason,
+      ...(editMode ? { type: s?.type } : {}),
+    }));
+
     const dataToSubmit = {
       ...formData,
+      image: normalizedImage,
       category_ids: categoryIds,
       brand_ids: brandIds,
       is_variant: formData.is_variant ? 1 : 0,
       is_bundle: formData.is_bundle ? 1 : 0,
       bundle_items: formData.is_bundle ? formData.bundle_items : [],
       skus: formData.is_variant ? skuForm : [],
+      stocks: stocksPayload,
       prices: [
         {
           branch_id: activeBranch,
@@ -311,6 +339,17 @@ export default function POSProductForm({
       );
     }
   };
+
+  const tipeData = [
+    {
+      id: "addition",
+      name: "Addition",
+    },
+    {
+      id: "reduction",
+      name: "Reduction",
+    },
+  ];
 
   const renderForm = useMemo(() => {
     return (
@@ -413,7 +452,13 @@ export default function POSProductForm({
           name="image"
           accept="image/*"
           onChange={(file) => setFormData((prev) => ({ ...prev, image: file }))}
-          initialPreview={formData?.image || null}
+          initialPreview={
+            typeof formData?.image === "string" && formData.image
+              ? /^https?:\/\//.test(formData.image)
+                ? formData.image
+                : `${import.meta.env.VITE_API_IMAGE}${formData.image}`
+              : null
+          }
         />
 
         <div className="flex gap-2">
@@ -456,16 +501,29 @@ export default function POSProductForm({
             <SimpleInput
               name="stocks.qty"
               type="text"
-              label={editMode ? "Stocks / Quantity" : "Stok / Kuantitas"}
+              label="Stok / Kuantitas"
               value={item?.qty}
               handleChange={(e) =>
                 handleNestedChange("stocks", index, "qty", e.target.value, true)
               }
             />
+            {editMode && (
+              <SimpleInput
+                name="stocks.type"
+                type="text"
+                label="Tipe"
+                isSelectBox={true}
+                selectBoxData={tipeData}
+                value={item?.type}
+                handleChange={(e) =>
+                  handleNestedChange("stocks", index, "type", e.target.value)
+                }
+              />
+            )}
             <SimpleInput
               name="stocks.reason"
               type="text"
-              label={editMode ? "Reason" : "Alasan"}
+              label="Alasan"
               value={item?.reason}
               handleChange={(e) =>
                 handleNestedChange("stocks", index, "reason", e.target.value)

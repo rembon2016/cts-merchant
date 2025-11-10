@@ -61,7 +61,14 @@ export default function CustomInputFile({
     // set initial preview only when initialPreview provided and no files selected yet
     if (initialPreview && files.length === 0) {
       setFiles([
-        { preview: initialPreview, name: "preview", size: 0, isRemote: true },
+        {
+          preview: initialPreview,
+          name: "preview",
+          size: 0,
+          isImage: true,
+          isRemote: true,
+          objectUrl: false,
+        },
       ]);
     }
     // we intentionally only depend on initialPreview here to set initial preview once

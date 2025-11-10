@@ -34,23 +34,23 @@ export default function Register() {
     const errors = {};
 
     if (!formData.name) {
-      errors.name = "Name is required";
+      errors.name = "Nama lengkap tidak boleh kosong";
     }
 
     if (!formData.email) {
-      errors.email = "Email is required";
+      errors.email = "Email tidak boleh kosong";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = "Please enter a valid email";
+      errors.email = "Email tidak valid";
     }
 
     if (!formData.password) {
-      errors.password = "Password is required";
+      errors.password = "Password tidak boleh kosong";
     } else if (formData.password.length < 6) {
-      errors.password = "Password must be at least 6 characters";
+      errors.password = "Password minimal 6 karakter";
     }
 
     if (formData.password !== formData.confirmPassword) {
-      errors.confirmPassword = "Passwords do not match";
+      errors.confirmPassword = "Password tidak cocok";
     }
 
     return errors;
