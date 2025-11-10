@@ -29,15 +29,15 @@ export default function Login() {
     const errors = {};
 
     if (!formData.email) {
-      errors.email = "Email is required";
+      errors.email = "Email tidak boleh kosong";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = "Please enter a valid email";
+      errors.email = "Email tidak valid";
     }
 
     if (!formData.password) {
-      errors.password = "Password is required";
+      errors.password = "Password tidak boleh kosong";
     } else if (formData.password.length < 6) {
-      errors.password = "Password must be at least 6 characters";
+      errors.password = "Password minimal 6 karakter";
     }
 
     return errors;
@@ -59,6 +59,12 @@ export default function Login() {
     }
   };
 
+  const handleOnKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSubmit(e);
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -74,7 +80,7 @@ export default function Login() {
       const result = await login(formData);
 
       if (!result.success) {
-        setError(result.error || "Login failed");
+        setError(result.error || "Gagal melakukan login");
       }
       // Navigation is handled by useEffect when isLoggedIn changes
     } catch (err) {
@@ -130,6 +136,7 @@ export default function Login() {
               placeholder="Masukkan username atau email"
               onChange={handleChange}
               value={formData?.email}
+              onKeyDown={handleOnKeyDown}
             />
             {validationErrors.email && (
               <p className="mt-1 text-sm text-red-600">
@@ -153,6 +160,7 @@ export default function Login() {
                 placeholder="Masukkan password"
                 onChange={handleChange}
                 value={formData?.password}
+                onKeyDown={handleOnKeyDown}
               />
               <button
                 className={showPasswordClassName}
