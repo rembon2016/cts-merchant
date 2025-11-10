@@ -445,6 +445,7 @@ const useProductStore = create((set, get) => ({
       );
 
       let body;
+      let httpMethod = "PUT";
       const headers = {
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
@@ -454,6 +455,10 @@ const useProductStore = create((set, get) => ({
       if (hasFile) {
         // Use FormData for file upload
         body = new FormData();
+        // Laravel and some backends may not parse multipart on PUT.
+        // Use POST with method override to ensure all fields are received.
+        body.append("_method", "PUT");
+        httpMethod = "POST";
 
         Object.entries(editedPayload || {}).forEach(([key, value]) => {
           if (value instanceof File) {
@@ -486,7 +491,7 @@ const useProductStore = create((set, get) => ({
       const response = await fetch(
         `${import.meta.env.VITE_API_POS_ROUTES}/products/${productId}`,
         {
-          method: "PUT",
+          method: httpMethod,
           headers,
           body,
         }
