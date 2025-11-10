@@ -424,7 +424,7 @@ const useProductStore = create((set, get) => ({
 
       // API key change for edit only: rename `stocks` to `stock_adjustments`
       const editedPayload = { ...formData };
-      if (Object.prototype.hasOwnProperty.call(editedPayload, "stocks")) {
+      if (Object.hasOwn(editedPayload, "stocks")) {
         // Map `stocks` to `stock_adjustments` and rename field `type` -> `tipe`
         const stockAdjustments = (editedPayload.stocks || []).map((s) => {
           const { type, ...rest } = s || {};
@@ -433,8 +433,8 @@ const useProductStore = create((set, get) => ({
             ...(type !== undefined ? { type } : {}),
           };
         });
-        editedPayload.stock_adjustments = stockAdjustments;
-        delete editedPayload.stocks;
+        editedPayload.stocks = stockAdjustments;
+        // delete editedPayload.stocks;
       }
 
       // Detect if there is any File in the payload values
