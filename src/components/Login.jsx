@@ -59,6 +59,12 @@ export default function Login() {
     }
   };
 
+  const handleOnKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSubmit(e);
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -130,11 +136,7 @@ export default function Login() {
               placeholder="Masukkan username atau email"
               onChange={handleChange}
               value={formData?.email}
-              onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    handleSubmit(e);
-                  }
-              }}
+              onKeyDown={handleOnKeyDown}
             />
             {validationErrors.email && (
               <p className="mt-1 text-sm text-red-600">
@@ -158,11 +160,7 @@ export default function Login() {
                 placeholder="Masukkan password"
                 onChange={handleChange}
                 value={formData?.password}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    handleSubmit(e);
-                  }
-                }}
+                onKeyDown={handleOnKeyDown}
               />
               <button
                 className={showPasswordClassName}
