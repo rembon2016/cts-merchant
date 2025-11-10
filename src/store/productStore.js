@@ -126,6 +126,8 @@ const useProductStore = create((set, get) => ({
       const result = await response.json();
 
       set({ error: null, isLoading: false, products: result?.data });
+
+      return result;
     } catch (error) {
       set({
         error: error.message || "Terjadi kesalahan saat mengambil produk",
@@ -341,6 +343,7 @@ const useProductStore = create((set, get) => ({
       );
 
       let body;
+
       const headers = {
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
@@ -372,6 +375,7 @@ const useProductStore = create((set, get) => ({
             body.append(key, String(value));
           }
         });
+        // headers["Content-Type"] = "multipart/form-data";
         // NOTE: do NOT set Content-Type header for FormData — browser will set boundary
       } else {
         headers["Content-Type"] = "application/json";
@@ -429,6 +433,7 @@ const useProductStore = create((set, get) => ({
       const headers = {
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
+        // "Content-Type": "application/json",
       };
 
       if (hasFile) {
