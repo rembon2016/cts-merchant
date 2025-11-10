@@ -386,7 +386,7 @@ export const useAuthStore = create((set, get) => ({
   // Refresh token ketika sesi habis
   refreshToken: async () => {
     try {
-      const currentToken = sessionStorage.getItem(TOKEN_KEY);
+      const currentToken = sessionStorage.getItem(TOKEN_POS_KEY);
 
       if (!currentToken) {
         throw new Error("No authentication token found");
@@ -440,6 +440,13 @@ export const useAuthStore = create((set, get) => ({
 
       // Reset auto logout timer berdasarkan expiry terbaru
       get().setupAutoLogout();
+
+      // Schedule next refresh in 5 minutes
+      const FIVE_MINUTES = 50 * 60 * 1000;
+      const nextRefreshTimer = setTimeout(() => {
+        get().refreshToken();
+      }, FIVE_MINUTES);
+      set({ refreshTimer: nextRefreshTimer });
 
       return { success: true };
     } catch (error) {

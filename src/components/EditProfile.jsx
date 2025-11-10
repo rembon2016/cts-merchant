@@ -4,6 +4,7 @@ import { useAuthStore } from "../store/authStore";
 import { toast } from "react-toastify";
 import useFetchDataStore from "../store/fetchDataStore";
 import SimpleInput from "./form/SimpleInput";
+import BackButton from "./BackButton";
 
 const ROOT_API = import.meta.env.VITE_API_ROUTES;
 
@@ -129,77 +130,82 @@ export default function EditProfile() {
   }, [formData, userInfo.name]);
 
   return (
-    <div className="max-w-md mx-auto p-6 rounded-lg bg-white shadow mt-5">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold dark:text-slate-400">
-          Edit Profil
-        </h2>
-        <button
-          onClick={() => navigate(-1)}
-          className="text-slate-600 hover:text-slate-800"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M18 6 6 18" />
-            <path d="m6 6 12 12" />
-          </svg>
-        </button>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <SimpleInput
-          name="name"
-          type="text"
-          label="Nama Lengkap"
-          value={formData.name}
-          errors={errors.name}
-          handleChange={handleChange}
-        />
-        <div className="flex w-full justify-end">
-          <button onClick={(e) => handleEditPassword(e)}>Edit Password?</button>
-        </div>
-        {isEditPassword && (
-          <>
-            <SimpleInput
-              name="password"
-              type="password"
-              label="Password Baru"
-              value={formData.password}
-              errors={errors.password}
-              handleChange={handleChange}
-              disabled={!isEditPassword}
-            />
-            <SimpleInput
-              name="confirmPassword"
-              type="password"
-              label="Konfirmasi Password"
-              value={formData.confirmPassword}
-              errors={errors.confirmPassword}
-              handleChange={handleChange}
-              disabled={!isEditPassword}
-            />
-          </>
-        )}
-
-        <div className="pt-4">
+    <>
+      <BackButton to="/account-information" />
+      <div className="max-w-md mx-auto p-6 rounded-lg bg-white shadow mt-5">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-semibold dark:text-slate-400">
+            Edit Profil
+          </h2>
           <button
-            type="submit"
-            className="w-full bg-[var(--c-primary)] font-semibold text-white p-4 rounded-lg hover:bg-blue-600 transition-colors"
-            disabled={disabledButton}
+            onClick={() => navigate(-1)}
+            className="text-slate-600 hover:text-slate-800"
           >
-            {loading ? "Tunggu..." : " Simpan Perubahan"}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M18 6 6 18" />
+              <path d="m6 6 12 12" />
+            </svg>
           </button>
         </div>
-      </form>
-    </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <SimpleInput
+            name="name"
+            type="text"
+            label="Nama Lengkap"
+            value={formData.name}
+            errors={errors.name}
+            handleChange={handleChange}
+          />
+          <div className="flex w-full justify-end">
+            <button onClick={(e) => handleEditPassword(e)}>
+              Edit Password?
+            </button>
+          </div>
+          {isEditPassword && (
+            <>
+              <SimpleInput
+                name="password"
+                type="password"
+                label="Password Baru"
+                value={formData.password}
+                errors={errors.password}
+                handleChange={handleChange}
+                disabled={!isEditPassword}
+              />
+              <SimpleInput
+                name="confirmPassword"
+                type="password"
+                label="Konfirmasi Password"
+                value={formData.confirmPassword}
+                errors={errors.confirmPassword}
+                handleChange={handleChange}
+                disabled={!isEditPassword}
+              />
+            </>
+          )}
+
+          <div className="pt-4">
+            <button
+              type="submit"
+              className="w-full bg-[var(--c-primary)] font-semibold text-white p-4 rounded-lg hover:bg-blue-600 transition-colors"
+              disabled={disabledButton}
+            >
+              {loading ? "Tunggu..." : " Simpan Perubahan"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
   );
 }
