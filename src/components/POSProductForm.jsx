@@ -57,7 +57,7 @@ export default function POSProductForm({
     ],
   });
 
-  const [adjustStocks, setAdjustStocks] = useState(!editMode ? true : false);
+  const [adjustStocks, setAdjustStocks] = useState(false);
 
   const {
     brands,
