@@ -14,6 +14,7 @@ const EXPIRED_KEY = "authExpireAt";
 const TOKEN_POS_KEY = "authPosToken";
 const BRANCH_ACTIVE = "branchActive";
 const TOTAL_PAYMENT = "totalPayment";
+const CART_ITEM_ID = "cartItemId";
 const ROOT_API = import.meta.env?.VITE_API_ROUTES;
 const ROOT_API_POS = import.meta.env?.VITE_API_POS_ROUTES;
 
@@ -189,6 +190,7 @@ export const useAuthStore = create((set, get) => ({
   clearSession: () => {
     sessionStorage.removeItem(SESSION_KEY);
     sessionStorage.removeItem(USER_ID);
+    sessionStorage.removeItem(USER_POS_ID);
     sessionStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem(EXPIRED_KEY);
     sessionStorage.removeItem(TOKEN_POS_KEY);
@@ -197,6 +199,7 @@ export const useAuthStore = create((set, get) => ({
     sessionStorage.removeItem(TAX);
     sessionStorage.removeItem(DISCOUNT);
     sessionStorage.removeItem(TOTAL_PAYMENT);
+    sessionStorage.removeItem(CART_ITEM_ID);
   },
 
   // Setup auto logout
