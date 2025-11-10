@@ -172,7 +172,7 @@ export default function POSProductForm({
               branch_id: stock?.branch_id || activeBranch,
               qty: stock?.qty || "",
               reason: stock?.reason || "",
-              type: stock?.tipe || stock?.type || "",
+              type: stock?.type || "",
             }))
           : [
               {
@@ -255,15 +255,15 @@ export default function POSProductForm({
       editMode && typeof formData.image === "string" ? "" : formData.image;
 
     // Validate required `type` for stock adjustments in edit mode
-    if (editMode) {
-      const missingType = (formData.stocks || []).some(
-        (s) => (s?.qty ?? "") !== "" && (s?.type ?? "").trim() === ""
-      );
-      if (missingType) {
-        toast.error("Tipe penyesuaian stok wajib diisi untuk setiap item.");
-        return;
-      }
-    }
+    // if (editMode) {
+    //   const missingType = (formData.stocks || []).some(
+    //     (s) => (s?.qty ?? "") !== "" && (s?.type ?? "").trim() === ""
+    //   );
+    //   if (missingType) {
+    //     toast.error("Tipe penyesuaian stok wajib diisi untuk setiap item.");
+    //     return;
+    //   }
+    // }
 
     const categoryIds = Array.isArray(formData.category_ids)
       ? formData.category_ids.map((item) =>
@@ -507,7 +507,7 @@ export default function POSProductForm({
                 handleNestedChange("stocks", index, "qty", e.target.value, true)
               }
             />
-            {editMode && (
+            {/* {editMode && (
               <SimpleInput
                 name="stocks.type"
                 type="text"
@@ -519,7 +519,7 @@ export default function POSProductForm({
                   handleNestedChange("stocks", index, "type", e.target.value)
                 }
               />
-            )}
+            )} */}
             <SimpleInput
               name="stocks.reason"
               type="text"
