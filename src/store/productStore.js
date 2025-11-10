@@ -422,8 +422,23 @@ const useProductStore = create((set, get) => ({
     try {
       set({ isLoading: true, error: null });
 
-      // Detect if there is any File in the formData values
-      const hasFile = Object.values(formData || {}).some(
+      // API key change for edit only: rename `stocks` to `stock_adjustments`
+      const editedPayload = { ...formData };
+      if (Object.prototype.hasOwnProperty.call(editedPayload, "stocks")) {
+        // Map `stocks` to `stock_adjustments` and rename field `type` -> `tipe`
+        const stockAdjustments = (editedPayload.stocks || []).map((s) => {
+          const { type, ...rest } = s || {};
+          return {
+            ...rest,
+            ...(type !== undefined ? { type } : {}),
+          };
+        });
+        editedPayload.stock_adjustments = stockAdjustments;
+        delete editedPayload.stocks;
+      }
+
+      // Detect if there is any File in the payload values
+      const hasFile = Object.values(editedPayload || {}).some(
         (v) =>
           v instanceof File ||
           (Array.isArray(v) && v.some((i) => i instanceof File))
@@ -440,7 +455,7 @@ const useProductStore = create((set, get) => ({
         // Use FormData for file upload
         body = new FormData();
 
-        Object.entries(formData || {}).forEach(([key, value]) => {
+        Object.entries(editedPayload || {}).forEach(([key, value]) => {
           if (value instanceof File) {
             body.append(key, value, value.name);
           } else if (Array.isArray(value)) {
@@ -465,7 +480,7 @@ const useProductStore = create((set, get) => ({
         // NOTE: do NOT set Content-Type header for FormData — browser will set boundary
       } else {
         headers["Content-Type"] = "application/json";
-        body = JSON.stringify(formData);
+        body = JSON.stringify(editedPayload);
       }
 
       const response = await fetch(

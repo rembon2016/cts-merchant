@@ -68,7 +68,7 @@ export default function SimpleInput({
           disabled={disabled}
           placeholder={placeholder || "Pilih..."}
         >
-          <option selected>Select Items</option>
+          <option selected>Pilih</option>
           {Array?.isArray(selectBoxData) &&
             selectBoxData?.map((item) => (
               <option key={item?.id} value={item?.id}>
