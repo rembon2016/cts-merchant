@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import SimpleAlert from "./alert/SimpleAlert";
 import { useThemeStore } from "../store/themeStore";
+import SimpleInput from "./form/SimpleInput";
 
 export default function Register() {
   const { register, isLoading, isLoggedIn } = useAuthStore();
@@ -111,12 +112,6 @@ export default function Register() {
     }));
   };
 
-  const inputClassName =
-    "w-full p-4 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-slate-200";
-
-  const showPasswordClassName =
-    "text-sm border-none outline-none absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-600 dark:text-blue-300";
-
   const getImage = useMemo(() => {
     if (isDark) {
       return "/images/logo-cts.svg";
@@ -141,100 +136,40 @@ export default function Register() {
           <p className="text-slate-600 text-base">Buat akun CTS Merchant</p>
         </div>
         <form className="space-y-3">
-          <div>
-            <label className="block text-sm font-medium  mb-2" htmlFor="name">
-              Nama Lengkap
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              onChange={handleChange}
-              className={inputClassName}
-              placeholder="Masukkan nama lengkap"
-            />
-            {validationErrors.name && (
-              <p className="mt-1 text-sm text-red-600">
-                {validationErrors.name}
-              </p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium  mb-2" htmlFor="email">
-              Email
-            </label>
-            <input
-              type="text"
-              id="email"
-              name="email"
-              onChange={handleChange}
-              className={inputClassName}
-              placeholder="Masukkan username atau email"
-            />
-            {validationErrors.email && (
-              <p className="mt-1 text-sm text-red-600">
-                {validationErrors.email}
-              </p>
-            )}
-          </div>
-          <div>
-            <label
-              className="block text-sm font-medium  mb-2"
-              htmlFor="password"
-            >
-              Password
-            </label>
-            <div className="relative">
-              <input
-                type={changeType.password ? "text" : "password"}
-                id="password"
-                name="password"
-                onChange={handleChange}
-                className={inputClassName}
-                placeholder="Masukkan password"
-              />
-              <button
-                className={showPasswordClassName}
-                onClick={(e) => handleChangeType(e, "password")}
-              >
-                {changeType?.password ? "Sembunyikan" : "Tampilkan"}
-              </button>
-            </div>
-            {validationErrors.password && (
-              <p className="mt-1 text-sm text-red-600">
-                {validationErrors.password}
-              </p>
-            )}
-          </div>
-          <div>
-            <label
-              className="block text-sm font-medium  mb-2"
-              htmlFor="confirmPassword"
-            >
-              Konfirmasi Password
-            </label>
-            <div className="relative">
-              <input
-                type={changeType.confirmPassword ? "text" : "password"}
-                id="confirmPassword"
-                name="confirmPassword"
-                onChange={handleChange}
-                className={inputClassName}
-                placeholder="Masukkan password"
-              />
-              <button
-                className={showPasswordClassName}
-                onClick={(e) => handleChangeType(e, "confirmPassword")}
-              >
-                {changeType?.confirmPassword ? "Sembunyikan" : "Tampilkan"}
-              </button>
-            </div>
-            {validationErrors.confirmPassword && (
-              <p className="mt-1 text-sm text-red-600">
-                {validationErrors.confirmPassword}
-              </p>
-            )}
-          </div>
+          <SimpleInput
+            name="name"
+            type="text"
+            label="Nama Lengkap"
+            value={formData?.name}
+            handleChange={handleChange}
+            errors={validationErrors.name}
+          />
+          <SimpleInput
+            name="email"
+            type="text"
+            label="Email"
+            value={formData?.email}
+            handleChange={handleChange}
+            errors={validationErrors.email}
+          />
+          <SimpleInput
+            name="password"
+            type="password"
+            label="Password"
+            value={formData?.password}
+            handleChange={handleChange}
+            errors={validationErrors.password}
+            changeInputType={true}
+          />
+          <SimpleInput
+            name="confirmPassword"
+            type="password"
+            label="Konfirmasi Password"
+            value={formData?.confirmPassword}
+            handleChange={handleChange}
+            errors={validationErrors.confirmPassword}
+            changeInputType={true}
+          />
         </form>
         <div className="mt-6 flex flex-col gap-3">
           <div className="flex items-center">
@@ -277,8 +212,3 @@ export default function Register() {
     </div>
   );
 }
-
-// 1. misalnya merchant daftar dengan email bambang@rembon.com
-// 2. connect ke api pos login dengan kredensial api_bambang@rembon.com dengan password 123456789
-// 3. simpan token di application storage
-// 4. setiap mau konek kedalam api pos maka headernya pake dari generated pos login token

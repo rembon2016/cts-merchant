@@ -1,4 +1,6 @@
 import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 SimpleInput.propTypes = {
   label: PropTypes.string,
@@ -13,6 +15,7 @@ SimpleInput.propTypes = {
   disabled: PropTypes.bool,
   isSelectBox: PropTypes.bool,
   selectBoxData: PropTypes.array,
+  changeInputType: PropTypes.bool,
 };
 
 export default function SimpleInput({
@@ -28,17 +31,31 @@ export default function SimpleInput({
   selectBoxData,
   min,
   max,
+  changeInputType = false,
 }) {
+  const canToggleType =
+    changeInputType && (type === "password" || type === "text");
+  const [dynamicType, setDynamicType] = useState(type);
+  useEffect(() => {
+    if (canToggleType) {
+      setDynamicType(type);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [type]);
   const inputClassName = `w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500  ${
     disabled ? "bg-gray-200 dark:bg-slate-600" : "bg-white dark:bg-slate-600"
-  } dark:text-slate-100 font-semibold`;
+  } dark:text-slate-100 font-semibold ${
+    errors ? "text-red-500 border-2 border-red-600" : ""
+  }`;
 
   return (
     <div className="relative w-full">
       <label
         className={`${
           label !== ""
-            ? "block text-sm font-semibold text-gray-700 mb-2"
+            ? `block text-sm font-semibold ${
+                errors ? "text-red-500" : "text-gray-700"
+              } mb-2`
             : "hidden"
         }`}
         htmlFor="name"
@@ -47,17 +64,42 @@ export default function SimpleInput({
       </label>
       {!isSelectBox && (
         <input
-          type={type}
+          type={canToggleType ? dynamicType : type}
           name={name}
-          value={type === "file" ? null : value}
+          value={(canToggleType ? dynamicType : type) === "file" ? null : value}
           onChange={handleChange}
           className={inputClassName}
           placeholder={placeholder}
           disabled={disabled}
           min={min}
           max={max}
-          {...(type === "file" && { accept: "image/*, .pdf" })}
+          {...((canToggleType ? dynamicType : type) === "file" && {
+            accept: "image/*, .pdf",
+          })}
         />
+      )}
+      {!isSelectBox && canToggleType && (
+        <button
+          type="button"
+          className="absolute right-3 top-12 text-gray-500 dark:text-blue-300"
+          onClick={() => {
+            if (disabled) return;
+            setDynamicType((prev) =>
+              prev === "password" ? "text" : "password"
+            );
+          }}
+          aria-label={
+            dynamicType === "password"
+              ? "Tampilkan password"
+              : "Sembunyikan password"
+          }
+        >
+          {dynamicType === "password" ? (
+            <Eye className="w-6 h-6" />
+          ) : (
+            <EyeOff className="w-6 h-6" />
+          )}
+        </button>
       )}
       {isSelectBox && (
         <select
@@ -79,7 +121,7 @@ export default function SimpleInput({
             ))}
         </select>
       )}
-      {errors && <p className="mt-1 text-sm text-red-600">{errors}</p>}
+      {errors && <p className="mt-2 text-sm text-red-600">{errors}</p>}
     </div>
   );
 }

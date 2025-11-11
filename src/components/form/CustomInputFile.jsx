@@ -30,6 +30,7 @@ export default function CustomInputFile({
   placeholder = "Klik atau drop file di sini",
   className = "",
   initialPreview = null,
+  errors = "",
 }) {
   const inputRef = useRef(null);
   const [files, setFiles] = useState([]);
@@ -264,6 +265,10 @@ export default function CustomInputFile({
           Maks: {humanFileSize(maxSize)}
         </p>
       ) : null}
+
+      {errors && (
+        <p className="mt-1 text-sm text-red-600">{errors}</p>
+      )}
     </div>
   );
 }

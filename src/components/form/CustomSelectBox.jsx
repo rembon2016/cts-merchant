@@ -66,7 +66,9 @@ export default function CustomSelectBox({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const inputClassName = `w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500  ${
+  const inputClassName = `w-full p-4 ${
+    errors ? "border-2 border-red-500" : "border border-slate-300"
+  } rounded-xl focus:ring-2 focus:ring-blue-500  ${
     disabled ? "bg-gray-200 dark:bg-slate-600" : "bg-white dark:bg-slate-600"
   } dark:text-slate-100 font-semibold`;
 
@@ -132,10 +134,12 @@ export default function CustomSelectBox({
   const selectedItems = selectedObjects;
 
   return (
-    <div className="relative" ref={containerRef}>
+    <div className="relative rounded-xl" ref={containerRef}>
       {label && (
         <label
-          className="block text-sm font-semibold text-gray-700 mb-2"
+          className={`block text-sm font-semibold text-gray-700 mb-2 ${
+            errors ? "text-red-500" : "text-gray-600"
+          }`}
           htmlFor={name}
         >
           {label}
@@ -150,7 +154,7 @@ export default function CustomSelectBox({
         aria-expanded={isOpen}
         tabIndex={0}
       >
-        <div className="flex-1 min-h-[38px]">
+        <div className="flex-1 min-h-[38px] rounded-xl">
           {selectedItems && selectedItems.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {selectedItems.map((item) => (
