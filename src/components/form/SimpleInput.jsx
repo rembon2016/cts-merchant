@@ -81,7 +81,9 @@ export default function SimpleInput({
       {!isSelectBox && canToggleType && (
         <button
           type="button"
-          className="absolute right-3 top-12 text-gray-500 dark:text-blue-300"
+          className={`absolute right-3 top-12 ${
+            errors ? "text-red-500" : "text-gray-500"
+          } dark:text-blue-300`}
           onClick={() => {
             if (disabled) return;
             setDynamicType((prev) =>
