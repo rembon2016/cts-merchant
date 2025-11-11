@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { usePosStore } from "./posStore";
 import { useAuthStore } from "./authStore";
-import { toast } from "react-toastify";
 
 const ROOT_API = import.meta.env.VITE_API_POS_ROUTES;
 const CART_ITEM_ID = "cartItemId";
@@ -38,8 +37,7 @@ const useCartStore = create((set, get) => ({
     const stock = getProductStock(product, variant?.id, isFromDetail);
 
     if (stock < quantity) {
-      toast.warning(`Stok tidak mencukupi. Stok tersedia: ${stock}`);
-      return;
+      return { success: false, error: `Stok tidak mencukupi. Stok tersedia: ${stock}` };
     }
 
     set({ isLoading: true, error: null, success: null });

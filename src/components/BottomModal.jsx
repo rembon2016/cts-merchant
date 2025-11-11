@@ -3,7 +3,8 @@ import { useThemeStore } from "../store/themeStore";
 import { formatCurrency } from "../helper/currency";
 import { useCartStore } from "../store/cartStore";
 import { usePosStore } from "../store/posStore";
-import { toast } from "react-toastify";
+import { useCustomToast } from "../hooks/useCustomToast";
+import CustomToast from "./CustomToast";
 import SimpleInput from "./form/SimpleInput";
 import ButtonQuantity from "./ButtonQuantity";
 import PropTypes from "prop-types";
@@ -26,6 +27,7 @@ export default function BottomModal(props) {
   const { getProductPrice, getProductStock } = usePosStore();
   const { addToCart, getCart, updateCartItem, success, isLoading } =
     useCartStore();
+  const { toast, success: showSuccess, error: showError, hideToast } = useCustomToast();
 
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [formData, setFormData] = useState({
@@ -97,39 +99,32 @@ export default function BottomModal(props) {
 
   const handleVariantSelect = (variant) => setSelectedVariant(variant);
 
-  const toastConfig = {
-    position: "top-center",
-    autoClose: 3000,
-    hideProgressBar: false,
-    closeOnClick: false,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-    theme: "light",
-  };
-
   const handleAddToCart = async (data, variant, quantity, isFromDetail) => {
     try {
       if (filterLocalCartByProductId?.length > 0) {
         const cartItemId = filterLocalCartByProductId[0]?.cart_id;
         const response = await updateCartItem(cartItemId, quantity);
         if (response?.success === true) {
-          toast.success("Produk Berhasil DIperbarui", { ...toastConfig });
-          setTimeout(() => setIsOpen(false), 50);
+          showSuccess("Produk Berhasil Diperbarui");
+          setTimeout(() => setIsOpen(false), 1600);
         } else {
-          toast.error("Produk Gagal DIperbarui", { ...toastConfig });
+          showError(response?.error || "Produk Gagal Diperbarui");
+          setTimeout(() => setIsOpen(false), 1600);
         }
       } else {
         const response = await addToCart(data, variant, quantity, isFromDetail);
         if (response?.success === true) {
-          toast.success("Produk Berhasil Ditambahkan", { ...toastConfig });
-          setTimeout(() => setIsOpen(false), 50);
+          showSuccess("Produk Berhasil Ditambahkan");
+          setTimeout(() => setIsOpen(false), 1600);
         } else {
-          toast.error("Produk Gagal Ditambahkan", { ...toastConfig });
+          showError(response?.error || "Produk Gagal Ditambahkan");
+          setTimeout(() => setIsOpen(false), 1600);
         }
       }
     } catch (error) {
       console.log(error);
+      showError("Terjadi Kesalahan");
+      setTimeout(() => setIsOpen(false), 1600);
     }
   };
 
@@ -224,11 +219,17 @@ export default function BottomModal(props) {
     if (!isOpen) setQuantity(1);
   }, [isOpen]);
 
-  if (!isOpen) return null;
-
   return (
     <>
-      {/* Overlay + Bottom Sheet */}
+      <CustomToast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+        duration={toast.duration}
+      />
+
+      {!isOpen ? null : (
       <div className="fixed inset-0 z-[9999]">
         {/* Backdrop with blur */}
         <div
@@ -343,6 +344,7 @@ export default function BottomModal(props) {
           </div>
         </div>
       </div>
+      )}
     </>
   );
 }
