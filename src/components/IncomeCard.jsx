@@ -3,13 +3,14 @@ import { useUserStore } from "../store/userStore";
 import { useTransactionStore } from "../store/transactionStore";
 import { formatCurrency } from "../helper/currency";
 import { RefreshCcw } from "lucide-react";
+import { formatDate } from "../helper/format-date";
 
 const IncomeCard = () => {
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
   const [activeItem, setActiveItem] = useState("");
   const [activeChip, setActiveChip] = useState("");
   const [showPopover, setShowPopover] = useState(null);
-  const { income, updateIncomeAmount } = useUserStore();
+  const { updateIncomeAmount } = useUserStore();
   const { getStatisticTransaction, statistic, isLoading } =
     useTransactionStore();
 
@@ -85,7 +86,7 @@ const IncomeCard = () => {
 
   const handleOptionClick = (value, type) => {
     const valueMonth = months.find((m) => m.key === value);
-    const valueRange = `${value?.from} - ${value?.to}`;
+    const valueRange = `${formatDate(value?.from)} - ${formatDate(value?.to)}`;
 
     setActiveItem(
       activeChip === "month"
@@ -114,19 +115,12 @@ const IncomeCard = () => {
     setShowPopover(null);
   };
 
-  const getLabelText = useMemo(() => {
-    if (isLoading) {
-      return "";
-    }
-
-    if (activeChip === "month") {
-      return " Bulan";
-    } else if (activeChip === "year") {
-      return " Tahun";
-    } else {
-      return "";
-    }
-  }, [isLoading, activeChip]);
+  const resetData = () => {
+    setActiveChip("");
+    setActiveItem("");
+    setDateRange({ from: "", to: "" });
+    getStatisticTransaction();
+  };
 
   useEffect(() => {
     getStatisticTransaction();
@@ -136,29 +130,22 @@ const IncomeCard = () => {
     <section className="px-4 mt-4">
       <div className="income-card bg-[var(--c-primary)] text-white p-5 rounded-3xl shadow-soft">
         <div className="content">
-          <h2 className="flex items-center justify-between text-[14px] font-semibold">
-            <span className="gap-2">
-              Pendapatan
-              {getLabelText}: {activeItem || "Hari Ini"}
-            </span>
+          <h2 className="flex items-center justify-between text-base font-semibold">
+            Pendapatan
             <button
-              onClick={() => {
-                setActiveChip("");
-                setActiveItem("");
-                getStatisticTransaction();
-              }}
+              onClick={() => resetData()}
               className="p-2 text-white rounded-xl items-end w-fit ml-auto"
             >
               <RefreshCcw className="w-4 h-4" />
             </button>
           </h2>
 
-          <div className="mt-4">
+          <div className="mt-2">
             <p className="text-[1.7rem] font-extrabold tracking-tight text-white">
               <span>{isLoading ? "..." : AMOUNT}</span>
             </p>
-            <p className="mt-2 text-sm text-slate-200/70">
-              {income.lastUpdated}
+            <p className="mt-2 text-sm text-slate-200/80">
+              Data: {activeItem || "Hari Ini"}
             </p>
           </div>
 
