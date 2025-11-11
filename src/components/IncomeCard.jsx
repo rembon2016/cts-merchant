@@ -1,20 +1,23 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useUserStore } from "../store/userStore";
 import { useTransactionStore } from "../store/transactionStore";
 import { formatCurrency } from "../helper/currency";
+import { RefreshCcw } from "lucide-react";
+import { formatDate } from "../helper/format-date";
 
 const IncomeCard = () => {
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
+  const [activeItem, setActiveItem] = useState("");
   const [activeChip, setActiveChip] = useState("");
   const [showPopover, setShowPopover] = useState(null);
-  const { income, updateIncomeAmount } = useUserStore();
+  const { updateIncomeAmount } = useUserStore();
   const { getStatisticTransaction, statistic, isLoading } =
     useTransactionStore();
 
   const chips = [
     { id: "month", label: "Bulan" },
     { id: "year", label: "Tahun" },
-    { id: "range", label: "Rentang" },
+    { id: "range", label: "Rentang Waktu" },
   ];
 
   const AMOUNT = formatCurrency(Number.parseFloat(statistic.amount || 0));
@@ -22,19 +25,19 @@ const IncomeCard = () => {
   const months = [
     {
       key: "01",
-      value: "Jan",
+      value: "Januari",
     },
     {
       key: "02",
-      value: "Feb",
+      value: "Februari",
     },
     {
       key: "03",
-      value: "Mar",
+      value: "Maret",
     },
     {
       key: "04",
-      value: "Apr",
+      value: "April",
     },
     {
       key: "05",
@@ -42,31 +45,31 @@ const IncomeCard = () => {
     },
     {
       key: "06",
-      value: "Jun",
+      value: "Juni",
     },
     {
       key: "07",
-      value: "Jul",
+      value: "Juli",
     },
     {
       key: "08",
-      value: "Agu",
+      value: "Agustus",
     },
     {
       key: "09",
-      value: "Sep",
+      value: "September",
     },
     {
       key: "10",
-      value: "Okt",
+      value: "Oktober",
     },
     {
       key: "11",
-      value: "Nov",
+      value: "November",
     },
     {
       key: "12",
-      value: "Des",
+      value: "Desember",
     },
   ];
 
@@ -82,6 +85,17 @@ const IncomeCard = () => {
   };
 
   const handleOptionClick = (value, type) => {
+    const valueMonth = months.find((m) => m.key === value);
+    const valueRange = `${formatDate(value?.from)} - ${formatDate(value?.to)}`;
+
+    setActiveItem(
+      activeChip === "month"
+        ? valueMonth.value
+        : activeChip === "range"
+        ? valueRange
+        : value
+    );
+
     // Simulate income update based on selection
     const amounts = {
       [type]: getStatisticTransaction(value, type),
@@ -101,6 +115,13 @@ const IncomeCard = () => {
     setShowPopover(null);
   };
 
+  const resetData = () => {
+    setActiveChip("");
+    setActiveItem("");
+    setDateRange({ from: "", to: "" });
+    getStatisticTransaction();
+  };
+
   useEffect(() => {
     getStatisticTransaction();
   }, []);
@@ -109,24 +130,27 @@ const IncomeCard = () => {
     <section className="px-4 mt-4">
       <div className="income-card bg-[var(--c-primary)] text-white p-5 rounded-3xl shadow-soft">
         <div className="content">
-          <div className="flex items-start justify-between">
-            <h2 className="text-base font-semibold">Pendapatan Hari Ini</h2>
-            <span className="text-xs px-3 py-1 rounded-full accent-bg font-semibold">
-              {income.period}
-            </span>
-          </div>
+          <h2 className="flex items-center justify-between text-base font-semibold">
+            Pendapatan
+            <button
+              onClick={() => resetData()}
+              className="p-2 text-white rounded-xl items-end w-fit ml-auto"
+            >
+              <RefreshCcw className="w-4 h-4" />
+            </button>
+          </h2>
 
-          <div className="mt-4">
-            <p className="text-4xl font-extrabold tracking-tight text-white">
+          <div className="mt-2">
+            <p className="text-[1.7rem] font-extrabold tracking-tight text-white">
               <span>{isLoading ? "..." : AMOUNT}</span>
             </p>
-            <p className="mt-2 text-sm text-slate-200/70">
-              {income.lastUpdated}
+            <p className="mt-2 text-sm text-slate-200/80">
+              Data: {activeItem || "Hari Ini"}
             </p>
           </div>
 
           {/* Chips */}
-          <div className="mt-6 flex items-center gap-3">
+          <div className="mt-6 flex items-center gap-2">
             {chips.map((chip) => (
               <button
                 key={chip.id}
@@ -145,15 +169,21 @@ const IncomeCard = () => {
             <div className="mt-3 rounded-2xl border border-slate-200 bg-white shadow-soft p-3 text-slate-700">
               <p className="text-xs text-slate-500 mb-2">Pilih Bulan</p>
               <div className="grid grid-cols-3 gap-2 text-sm">
-                {months.map((month) => (
-                  <button
-                    key={month}
-                    onClick={() => handleOptionClick(month?.key, "month")}
-                    className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
-                  >
-                    {month?.value}
-                  </button>
-                ))}
+                {months.map((month) => {
+                  return (
+                    <button
+                      key={month.key}
+                      onClick={() => handleOptionClick(month?.key, "month")}
+                      className={`p-2 rounded-lg transition-colors ${
+                        activeChip === "month" && month.key === activeItem.key
+                          ? "bg-[var(--c-accent)] text-gray-600 font-semibold"
+                          : "hover:bg-slate-100"
+                      }`}
+                    >
+                      {month?.value}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -167,7 +197,11 @@ const IncomeCard = () => {
                   <button
                     key={year}
                     onClick={() => handleOptionClick(year, "year")}
-                    className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
+                    className={`p-2 rounded-lg transition-colors ${
+                      activeChip === "year" && year === activeItem
+                        ? "bg-[var(--c-accent)] text-gray-600 font-semibold"
+                        : "hover:bg-slate-100"
+                    }`}
                   >
                     {year}
                   </button>
