@@ -119,12 +119,12 @@ const QuickMenus = () => {
   return (
     <>
       <section className="px-4 mt-4">
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-4 gap-2">
           {menuItems.map((item) => (
             <button
               key={item.id}
               onClick={() => handleMenuClick(item)}
-              className="bg-white dark:bg-slate-700 rounded-2xl p-3 flex flex-col items-center gap-2 shadow-soft"
+              className="bg-white dark:bg-slate-700 rounded-2xl p-2 flex flex-col items-center gap-2 shadow-soft"
             >
               <span className="grid place-items-center size-12 rounded-xl accent-bg">
                 {item.icon}
