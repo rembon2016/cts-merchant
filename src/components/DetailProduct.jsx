@@ -127,7 +127,7 @@ export default function DetailProduct() {
 
   return (
     <div className="px-4">
-      <BackButton to="/pos/products" />
+      <BackButton />
       {renderElements}
     </div>
   );

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
  * BackButton Component - Reusable back navigation button
  * 
  * @param {Object} props
- * @param {string} props.to - The path to navigate back to (required)
+ * @param {string} props.to - The path to navigate back to (optional, if not provided uses browser back)
  * @param {boolean} props.replace - Whether to replace current history entry (default: true)
  * @param {string} props.className - Additional CSS classes (optional)
  * @param {Function} props.onClick - Custom onClick handler (optional, overrides navigation)
@@ -24,6 +24,8 @@ export default function BackButton({
       onClick();
     } else if (to) {
       navigate(to, { replace });
+    } else {
+      navigate(-1); 
     }
   };
 
