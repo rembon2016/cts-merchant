@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useAuthStore } from "../store/authStore";
 import SimpleAlert from "./alert/SimpleAlert";
 import { useThemeStore } from "../store/themeStore";
+import SimpleInput from "./form/SimpleInput";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -63,7 +64,7 @@ export default function Login() {
     if (e.key === "Enter") {
       handleSubmit(e);
     }
-  }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -87,12 +88,6 @@ export default function Login() {
       setError(err.message || "An error occurred during login");
     }
   };
-
-  const inputClassName =
-    "w-full p-4 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-slate-200";
-
-  const showPasswordClassName =
-    "text-sm border-none outline-none absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-600 dark:text-blue-300";
 
   const getImage = useMemo(() => {
     if (isDark) {
@@ -121,63 +116,23 @@ export default function Login() {
           <p className="text-slate-600 text-base">Masuk ke CTS Merchant</p>
         </div>
         <form className="space-y-3">
-          <div>
-            <label
-              className="block text-sm font-medium mb-2"
-              htmlFor="username"
-            >
-              Username / Email
-            </label>
-            <input
-              type="text"
-              id="email"
-              name="email"
-              className={inputClassName}
-              placeholder="Masukkan username atau email"
-              onChange={handleChange}
-              value={formData?.email}
-              onKeyDown={handleOnKeyDown}
-            />
-            {validationErrors.email && (
-              <p className="mt-1 text-sm text-red-600">
-                {validationErrors.email}
-              </p>
-            )}
-          </div>
-          <div>
-            <label
-              className="block text-sm font-medium mb-2"
-              htmlFor="password"
-            >
-              Password
-            </label>
-            <div className="relative">
-              <input
-                type={changeType ? "text" : "password"}
-                id="password"
-                name="password"
-                className={inputClassName}
-                placeholder="Masukkan password"
-                onChange={handleChange}
-                value={formData?.password}
-                onKeyDown={handleOnKeyDown}
-              />
-              <button
-                className={showPasswordClassName}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setChangeType(!changeType);
-                }}
-              >
-                {changeType ? "Sembunyikan" : "Tampilkan"}
-              </button>
-            </div>
-            {validationErrors.password && (
-              <p className="mt-1 text-sm text-red-600">
-                {validationErrors.password}
-              </p>
-            )}
-          </div>
+          <SimpleInput
+            name="email"
+            type="text"
+            label="Username / Email"
+            value={formData?.email}
+            handleChange={handleChange}
+            errors={validationErrors.email}
+          />
+          <SimpleInput
+            name="password"
+            type="password"
+            label="Password"
+            value={formData?.password}
+            handleChange={handleChange}
+            errors={validationErrors.password}
+            changeInputType={true}
+          />
         </form>
         <div className="mt-6 flex flex-col gap-3">
           <button
