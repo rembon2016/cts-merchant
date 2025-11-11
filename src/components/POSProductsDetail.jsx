@@ -101,7 +101,7 @@ export default function POSProductsDetail() {
           />
         )}
         <div className="flex justify-between items-center w-full mb-4">
-          <BackButton to="/pos/products" />
+          <BackButton />
           <div className="flex gap-1">
             <button
               onClick={handleOpenModal}
