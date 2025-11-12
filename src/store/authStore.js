@@ -59,7 +59,7 @@ export const useAuthStore = create((set, get) => ({
 
       if (!response?.ok && !responseApiPOS?.ok) {
         set({ error: result?.message, isLoading: false });
-        throw new Error(result?.message || "Login failed");
+        throw new Error("Login failed");
       }
 
       const TOKEN = result?.access_token;
