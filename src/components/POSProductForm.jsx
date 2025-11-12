@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 
 import SimpleInput from "./form/SimpleInput";
 import CustomTextarea from "./form/CustomTextarea";
@@ -8,12 +7,10 @@ import CustomInputFile from "./form/CustomInputFile";
 import CustomSelectBox from "./form/CustomSelectBox";
 
 import { useProductStore } from "../store/productStore";
+import { useCustomToast } from "../hooks/useCustomToast";
+import CustomToast from "./CustomToast";
 
-export default function POSProductForm({
-  editMode = false,
-  productId = null,
-  navigateOnSuccessTo = "/pos/products",
-}) {
+export default function POSProductForm({ editMode = false, productId = null }) {
   const navigate = useNavigate();
 
   const getToday = new Date().toISOString().split("T")[0];
@@ -72,11 +69,15 @@ export default function POSProductForm({
     addProducts,
     editProducts,
     getDetailProduct,
-    success,
-    error,
     isLoading,
   } = useProductStore();
   const { products, getProducts } = useProductStore();
+  const {
+    toast,
+    success: showSuccess,
+    error: showError,
+    hideToast,
+  } = useCustomToast();
 
   const listFormatToNumber = [
     "cost_product",
@@ -358,7 +359,7 @@ export default function POSProductForm({
       is_bundle: formData.is_bundle ? 1 : 0,
       bundle_items: formData.is_bundle ? formData.bundle_items : [],
       skus: formData.is_variant ? skuForm : [],
-      stocks: editMode && adjustStocks ? stocksPayload : [],
+      stocks: editMode && adjustStocks ? stocksPayload : formData.stocks,
       prices: [
         {
           branch_id: activeBranch,
@@ -374,25 +375,22 @@ export default function POSProductForm({
       ? await editProducts(dataToSubmit, productId)
       : await addProducts(dataToSubmit);
 
-    if (response?.success) {
-      toast.success(
-        typeof success === "string"
-          ? success
-          : editMode
-          ? "Berhasil mengubah Produk"
-          : "Berhasil menambahkan Produk"
+    if (response?.success === true) {
+      showSuccess(
+        `${
+          editMode
+            ? "Produk Berhasil Diperbarui"
+            : "Produk Berhasil Ditambahkan"
+        }`
       );
-      const timer = setTimeout(() => {
-        navigate(navigateOnSuccessTo);
-      }, 3000);
-      return () => clearTimeout(timer);
+      setTimeout(() => {
+        navigate("/pos/products", {
+          replace: true,
+        });
+      }, 2000);
     } else {
-      toast.error(
-        typeof error === "string"
-          ? editMode
-            ? "Gagal Mengubah Produk"
-            : "Gagal Menambahkan Produk"
-          : "Terjadi kesalahan"
+      showError(
+        `${editMode ? "Gagal Memperbarui Produk" : "Gagal Menambahkan Produk"}`
       );
     }
   };
@@ -410,7 +408,7 @@ export default function POSProductForm({
 
   const renderForm = useMemo(() => {
     return (
-      <div className="flex flex-col gap-3 mt-3">
+      <div className="flex flex-col gap-3 mt-3 p-4">
         <div className="flex gap-2">
           <SimpleInput
             name="sku"
@@ -972,11 +970,7 @@ export default function POSProductForm({
           disabled={isLoading}
           className="bg-[var(--c-primary)] text-white py-4 w-full rounded-lg font-semibold"
         >
-          {isLoading
-            ? "Memproses..."
-            : editMode
-            ? "Edit Produk"
-            : "Tambah Produk"}
+          {isLoading ? "Memproses..." : "Simpan"}
         </button>
       </div>
     );
@@ -991,5 +985,16 @@ export default function POSProductForm({
     validationErrors,
   ]);
 
-  return renderForm;
+  return (
+    <>
+      <CustomToast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+        duration={toast.duration}
+      />
+      {renderForm}
+    </>
+  );
 }
