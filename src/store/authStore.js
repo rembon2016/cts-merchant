@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { useUserDataStore } from "./userDataStore";
-import { toast } from "react-toastify";
 
 // custom hooks for checking authentication
 const TAX = "tax";
@@ -59,7 +58,7 @@ export const useAuthStore = create((set, get) => ({
 
       if (!response?.ok && !responseApiPOS?.ok) {
         set({ error: result?.message, isLoading: false });
-        throw new Error("Login failed");
+        throw new Error(result?.message || "Login failed");
       }
 
       const TOKEN = result?.access_token;
@@ -300,9 +299,6 @@ export const useAuthStore = create((set, get) => ({
     setTimeout(() => {
       set({ isLogout: false });
     }, 3000);
-
-    // Optional: Show notification
-    toast.warning("Sesi Anda telah berakhir. Silakan login kembali.");
   },
 
   logout: async () => {
@@ -418,13 +414,10 @@ export const useAuthStore = create((set, get) => ({
         return { success: false, error: result?.message };
       }
 
-      const newToken =
-        result?.access_token || result?.token || result?.data?.access_token;
       const expiresIn = result?.expires_in || result?.data?.expires_in;
-      const newPosToken =
-        result?.pos?.token || result?.data?.pos?.auth?.token || null;
+      const newPosToken = result?.data?.token || null;
 
-      if (!newToken || !expiresIn) {
+      if (!newPosToken) {
         set({ isLoading: false, error: "Invalid refresh response" });
         get().handleAutoLogout();
         return { success: false, error: "Invalid refresh response" };
@@ -432,7 +425,7 @@ export const useAuthStore = create((set, get) => ({
 
       const newExpiry = Date.now() + Number(expiresIn) * 1000;
 
-      sessionStorage.setItem(TOKEN_KEY, newToken);
+      // sessionStorage.setItem(TOKEN_KEY, newToken);
       sessionStorage.setItem(EXPIRED_KEY, newExpiry.toString());
       if (newPosToken) {
         sessionStorage.setItem(TOKEN_POS_KEY, newPosToken);
@@ -453,7 +446,6 @@ export const useAuthStore = create((set, get) => ({
 
       return { success: true };
     } catch (error) {
-      console.error("Refresh token error:", error?.message || error);
       set({ isLoading: false, error: error?.message });
       get().handleAutoLogout();
       return { success: false, error: error?.message };
