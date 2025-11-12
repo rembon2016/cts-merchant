@@ -6,6 +6,8 @@ import { toast } from "react-toastify";
 import CustomLoading from "./CustomLoading";
 import ButtonQuantity from "./ButtonQuantity";
 import SimpleModal from "./modal/SimpleModal";
+import CustomToast from "./CustomToast";
+import { useCustomToast } from "../hooks/useCustomToast";
 
 const Cart = () => {
   const {
@@ -19,6 +21,13 @@ const Cart = () => {
     success,
     updateLocalCartItem,
   } = useCartStore();
+
+  const {
+    toast,
+    success: showSuccess,
+    error: showError,
+    hideToast,
+  } = useCustomToast();
 
   const [showModal, setShowModal] = useState(false);
   const [confirmMode, setConfirmMode] = useState(null); // 'clear' | 'item'
@@ -40,7 +49,7 @@ const Cart = () => {
     const isChecked = checkbox.checked;
     const price = Number(checkbox.dataset.price);
     const subtotal = Number(checkbox.dataset.subtotal);
-    const itemId = Number(checkbox.id);
+    const productId = Number(checkbox.dataset.productid); // Product ID for selection
     const cartId = checkbox.dataset.cartid; // Main cart ID
     const itemCartId = checkbox.dataset.itemid; // Cart item ID
     const itemName = checkbox.dataset.name;
@@ -52,7 +61,7 @@ const Cart = () => {
       const newItem = {
         cart_id: cartId, // Main cart ID for clearing
         item_id: itemCartId, // Cart item ID for reference
-        product_id: itemId,
+        product_id: productId,
         name: itemName,
         image: itemImage,
         product_sku_id: Number.parseInt(itemSku),
@@ -64,7 +73,9 @@ const Cart = () => {
     } else {
       // Remove by product_id (store uses product_id for selected items)
       setSelectedCart((prevItems) =>
-        prevItems.filter((item) => String(item.product_id) !== String(itemId))
+        prevItems.filter(
+          (item) => String(item.product_id) !== String(productId)
+        )
       );
     }
 
@@ -92,15 +103,15 @@ const Cart = () => {
 
     if (isChecked) {
       const allItems = cart?.data?.items?.map((item) => ({
-        cart_id: item.cart_id, // Use the main cart ID, not item ID
-        item_id: item.id, // Store the item ID separately
-        product_id: item.product?.id ?? String(item.id),
-        name: item.product.name,
-        price: item.price,
-        subtotal: item.subtotal,
-        image: item.product.image,
-        product_sku_id: Number.parseInt(item.product.sku),
-        quantity: item.quantity,
+        cart_id: item?.cart_id, // Use the main cart ID, not item ID
+        item_id: item?.id, // Store the item ID separately
+        product_id: item?.product_id ?? String(item?.id),
+        name: item.product?.name,
+        price: item?.price,
+        subtotal: item?.subtotal,
+        image: item?.product?.image,
+        product_sku_id: Number.parseInt(item?.product?.sku),
+        quantity: item?.quantity,
       }));
       setSelectedCart(allItems);
     } else {
@@ -127,9 +138,21 @@ const Cart = () => {
 
     // Proceed with deletion
     if (confirmMode === "item" && pendingItemId) {
-      deleteCartItems(pendingItemId);
+      deleteCartItems(pendingItemId)
+        .then(() => {
+          showSuccess("Item berhasil dihapus");
+        })
+        .catch(() => {
+          showError("Gagal menghapus item");
+        });
     } else {
-      clearMultipleCarts(cartIds);
+      clearMultipleCarts(cartIds)
+        .then(() => {
+          showSuccess("Semua item berhasil dihapus");
+        })
+        .catch(() => {
+          showError("Gagal menghapus semua item");
+        });
     }
   };
 
@@ -151,38 +174,6 @@ const Cart = () => {
   useEffect(() => {
     if (success) setShowModal(false);
     if (error) setShowModal(false);
-  }, [success, error]);
-
-  // Show toast notifications when success/error changes
-  useEffect(() => {
-    if (success) {
-      toast.success(
-        typeof success === "string" ? success : "Berhasil Dihapus",
-        {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        }
-      );
-    }
-
-    if (error) {
-      toast.error(typeof error === "string" ? error : "Terjadi kesalahan", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-    }
   }, [success, error]);
 
   const renderElement = useMemo(() => {
@@ -225,9 +216,9 @@ const Cart = () => {
         )}
         {/* toasts are triggered in useEffect when success/error change */}
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Keranjang Saya</h2>
+          <h2 className="text-lg font-semibold">Keranjang Saya</h2>
           <div className="flex gap-1 items-center">
-            <label htmlFor="select-all text-sm">
+            <label htmlFor="select-all text-base">
               Pilih Semua{" "}
               <input
                 type="checkbox"
@@ -274,6 +265,7 @@ const Cart = () => {
                   id={cartItem?.product?.id}
                   data-price={cartItem?.price}
                   data-cartid={cartItem?.cart_id}
+                  data-productid={cartItem?.product_id}
                   data-itemid={cartItem?.id}
                   data-subtotal={cartItem?.subtotal}
                   data-name={cartItem?.product?.name}
@@ -289,8 +281,8 @@ const Cart = () => {
                   className="w-20 h-20 rounded-lg"
                 />
                 <div key={cartItem?.id} className="flex flex-col">
-                  <div className="font-bold text-md">
-                    {cartItem?.product?.name}
+                  <div className="font-bold text-base">
+                    {cartItem?.product?.name.slice(0, 20) + "..."}
                   </div>
                   <div className="text-gray-700 dark:text-gray-200 text-md">
                     <h3 className="font-medium">
@@ -407,7 +399,18 @@ const Cart = () => {
     );
   }, [cart, isLoading, error, success, showModal]);
 
-  return <div className="p-6">{renderElement}</div>;
+  return (
+    <div className="p-6">
+      <CustomToast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+        duration={toast.duration}
+      />
+      {renderElement}
+    </div>
+  );
 };
 
 export default Cart;
