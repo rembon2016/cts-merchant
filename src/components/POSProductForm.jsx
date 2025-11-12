@@ -412,7 +412,7 @@ export default function POSProductForm({
 
   const renderForm = useMemo(() => {
     return (
-      <div className="flex flex-col gap-3 mt-3">
+      <div className="flex flex-col gap-3 mt-3 p-4">
         <div className="flex gap-2">
           <SimpleInput
             name="sku"
