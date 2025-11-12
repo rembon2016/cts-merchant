@@ -4,6 +4,8 @@ import { useCartStore } from "../store/cartStore";
 import { useCheckoutStore } from "../store/checkoutStore";
 import { formatCurrency } from "../helper/currency";
 import SimpleModal from "./modal/SimpleModal";
+import { useCustomToast } from "../hooks/useCustomToast";
+import CustomToast from "./CustomToast";
 
 const BottomNav = () => {
   const location = useLocation();
@@ -14,9 +16,14 @@ const BottomNav = () => {
     cart,
     setSelectedCart,
     clearDiscountData,
-    clearMultipleCarts,
     deleteCartItems,
   } = useCartStore();
+  const {
+    toast,
+    success: showSuccess,
+    error: showError,
+    hideToast,
+  } = useCustomToast();
   const navigation = useNavigate();
   const pathname = location.pathname;
   const getCart = sessionStorage.getItem("cart");
@@ -187,8 +194,6 @@ const BottomNav = () => {
 
   const proccessOrder = async (dataCheckout) => {
     try {
-      // setLoading(true);
-
       // Extract unique cart_ids from selected items
       // Since all items in the same cart share the same cart_id,
       // we only need unique cart_ids
@@ -201,15 +206,18 @@ const BottomNav = () => {
       const response = await saveOrder(dataCheckout);
 
       if (response?.success) {
+        showSuccess("Pesanan berhasil diproses");
         // Clear carts based on unique cart_ids
         if (cartIds && cartIds?.length > 0) {
           // await clearMultipleCarts(cartIds);
           await Promise.all(cartIds.map((cartId) => deleteCartItems(cartId)));
         }
 
-        navigation(`/pos/transaction/${response?.data?.id}`, {
-          replace: true,
-        });
+        setTimeout(() => {
+          navigation(`/pos/transaction/${response?.data?.id}`, {
+            replace: true,
+          });
+        }, 2000);
         sessionStorage.removeItem("cart");
         sessionStorage.removeItem("tax");
         sessionStorage.removeItem("discount");
@@ -219,7 +227,7 @@ const BottomNav = () => {
 
       setLoading(false);
     } catch (error) {
-      console.log(error);
+      showError("Gagal memproses pesanan");
       setLoading(false);
     }
   };
@@ -360,6 +368,13 @@ const BottomNav = () => {
 
   return (
     <>
+      <CustomToast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+        duration={toast.duration}
+      />
       <nav className="fixed bottom-0 inset-x-0 z-20">{renderElements}</nav>
       {showExitModal && (
         <SimpleModal
