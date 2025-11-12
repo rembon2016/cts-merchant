@@ -1,11 +1,13 @@
 import { useMemo, useCallback, useState, useRef, useEffect } from "react";
-import { Pencil, Trash2, XCircle } from "lucide-react";
+import { AlertCircle, Pencil, Trash2, XCircle } from "lucide-react";
 import { usePosStore } from "../store/posStore";
 import { useProductStore } from "../store/productStore";
 import { formatCurrency } from "../helper/currency";
 import { useNavigate } from "react-router-dom";
 import CustomLoading from "./CustomLoading";
 import SimpleModal from "./modal/SimpleModal";
+import { useCustomToast } from "../hooks/useCustomToast";
+import CustomToast from "./CustomToast";
 
 export default function POSProducts() {
   const {
@@ -24,7 +26,14 @@ export default function POSProducts() {
     hasAvailableStock,
   } = usePosStore();
 
-  const { removeCategories, isLoading: removingCategory } = useProductStore();
+  const {
+    toast,
+    success: showSuccess,
+    error: showError,
+    hideToast,
+  } = useCustomToast();
+
+  const { removeCategories } = useProductStore();
 
   const [selectedSub, setSelectedSub] = useState("");
   const [activeTab, setActiveTab] = useState("Produk");
@@ -96,6 +105,25 @@ export default function POSProducts() {
   // Navigate to product detail page
   const goToProductDetail = (productId) =>
     navigate(`/pos/products/${productId}`);
+
+  const deleteCategory = async (paramsId) => {
+    try {
+      const response = await removeCategories(paramsId);
+
+      if (response?.success === true) {
+        showSuccess("Kategori berhasil dihapus");
+      } else {
+        showError(response?.message || "Gagal menghapus kategori");
+      }
+
+      setShowDeleteModal(false);
+      setSelectedCategory(null);
+      getCategories();
+    } catch (e) {
+      // silently close modal; error feedback handled by store
+      setShowDeleteModal(false);
+    }
+  };
 
   // Compute total stocks across all products
   const totalStocks = useMemo(() => {
@@ -344,18 +372,7 @@ export default function POSProducts() {
             {showDeleteModal && selectedCategory && (
               <SimpleModal
                 onClose={() => setShowDeleteModal(false)}
-                handleClick={async () => {
-                  try {
-                    await removeCategories(selectedCategory.id);
-                    setShowDeleteModal(false);
-                    setSelectedCategory(null);
-                    // refresh categories after deletion
-                    getCategories();
-                  } catch (e) {
-                    // silently close modal; error feedback handled by store
-                    setShowDeleteModal(false);
-                  }
-                }}
+                handleClick={() => deleteCategory(selectedCategory.id)}
                 title={"Konfirmasi Hapus"}
                 content={`Apakah Anda yakin ingin menghapus kategori "${selectedCategory?.name}"?`}
                 showButton={true}
@@ -373,10 +390,19 @@ export default function POSProducts() {
     activeTab,
     selectedSub,
     subCategories,
+    selectedCategory,
+    showDeleteModal,
   ]);
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-slate-900">
+      <CustomToast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+        duration={toast.duration}
+      />
       <div className="p-4 max-w-sm mx-auto safe-bottom">{renderElements}</div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { replace, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import SimpleInput from "./form/SimpleInput";
 import CustomTextarea from "./form/CustomTextarea";
@@ -10,11 +10,7 @@ import { useProductStore } from "../store/productStore";
 import { useCustomToast } from "../hooks/useCustomToast";
 import CustomToast from "./CustomToast";
 
-export default function POSProductForm({
-  editMode = false,
-  productId = null,
-  navigateOnSuccessTo = "/pos/products",
-}) {
+export default function POSProductForm({ editMode = false, productId = null }) {
   const navigate = useNavigate();
 
   const getToday = new Date().toISOString().split("T")[0];
@@ -412,7 +408,7 @@ export default function POSProductForm({
 
   const renderForm = useMemo(() => {
     return (
-      <div className="flex flex-col gap-3 mt-3">
+      <div className="flex flex-col gap-3 mt-3 p-4">
         <div className="flex gap-2">
           <SimpleInput
             name="sku"
@@ -974,11 +970,7 @@ export default function POSProductForm({
           disabled={isLoading}
           className="bg-[var(--c-primary)] text-white py-4 w-full rounded-lg font-semibold"
         >
-          {isLoading
-            ? "Memproses..."
-            : editMode
-            ? "Edit Produk"
-            : "Tambah Produk"}
+          {isLoading ? "Memproses..." : "Simpan"}
         </button>
       </div>
     );
