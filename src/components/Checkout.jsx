@@ -97,7 +97,7 @@ export default function Checkout() {
     if (response?.success) {
       showSuccess("Voucher diskon berhasil ditemukan");
     } else {
-      showError("Voucher diskon tidak ada");
+      showError("Voucher diskon tidak ditemukan / sudah kadaluwarsa");
     }
   };
 
