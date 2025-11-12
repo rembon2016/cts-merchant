@@ -1,9 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useAuthStore } from "../store/authStore";
 import SimpleAlert from "./alert/SimpleAlert";
 import { useThemeStore } from "../store/themeStore";
 import SimpleInput from "./form/SimpleInput";
+import CustomToast from "./CustomToast";
+import { useCustomToast } from "../hooks/useCustomToast";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -13,9 +15,13 @@ export default function Login() {
   const [validationErrors, setValidationErrors] = useState({});
   const [error, setError] = useState("");
 
+  const hasShownLogoutToast = useRef(false);
+
   const navigate = useNavigate();
   const { login, isLoggedIn, isLoading, isLogout } = useAuthStore();
   const { isDark } = useThemeStore();
+
+  const { toast, success: showSuccess, hideToast } = useCustomToast();
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -24,6 +30,13 @@ export default function Login() {
       }, 500);
     }
   }, [isLoggedIn, navigate]);
+
+  useEffect(() => {
+    if (isLogout && !hasShownLogoutToast.current) {
+      showSuccess("Anda Berhasil Keluar");
+      hasShownLogoutToast.current = true;
+    }
+  }, [isLogout]);
 
   const validateForm = () => {
     const errors = {};
@@ -56,12 +69,6 @@ export default function Login() {
         ...prev,
         [name]: "",
       }));
-    }
-  };
-
-  const handleOnKeyDown = (e) => {
-    if (e.key === "Enter") {
-      handleSubmit(e);
     }
   };
 
@@ -107,9 +114,13 @@ export default function Login() {
           type={error ? "error" : null}
           textContent={error || null}
         />
-        {isLogout && (
-          <SimpleAlert type="success" textContent="Anda Berhasil Keluar" />
-        )}
+        <CustomToast
+          message={toast.message}
+          type={toast.type}
+          isVisible={toast.isVisible}
+          onClose={hideToast}
+          duration={toast.duration}
+        />
         <div className="flex flex-col gap-1 my-8">
           <h2 className="text-2xl font-bold text-start">Masuk</h2>
           <p className="text-slate-600 text-base">Masuk ke CTS Merchant</p>
