@@ -12,7 +12,6 @@ export default function Login() {
   });
   const [validationErrors, setValidationErrors] = useState({});
   const [error, setError] = useState("");
-  const [changeType, setChangeType] = useState(false);
 
   const navigate = useNavigate();
   const { login, isLoggedIn, isLoading, isLogout } = useAuthStore();
