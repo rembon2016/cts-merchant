@@ -93,7 +93,7 @@ export default function POSProductsDetail() {
           <div className="flex gap-1">
             <button
               onClick={handleOpenModal}
-              className="bg-white w-[100px] py-2 text-gray-700 font-semibold rounded-sm hover:bg-slate-100 transition-colors duration-200"
+              className="bg-red-500 text-white w-[100px] py- font-semibold rounded-md hover:bg-red-700 transition-colors duration-200"
             >
               Hapus
             </button>
@@ -103,7 +103,7 @@ export default function POSProductsDetail() {
                   replace: true,
                 })
               }
-              className="bg-white w-[100px] py-2 text-gray-700 font-semibold rounded-sm hover:bg-slate-100 transition-colors duration-200"
+              className="bg-[var(--c-primary)] w-[100px] py-2 text-white font-semibold rounded-md hover:bg-blue-700 transition-colors duration-200"
             >
               Edit
             </button>
