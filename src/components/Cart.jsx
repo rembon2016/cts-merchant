@@ -216,9 +216,9 @@ const Cart = () => {
         )}
         {/* toasts are triggered in useEffect when success/error change */}
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Keranjang Saya</h2>
+          <h2 className="text-lg font-semibold">Keranjang Saya</h2>
           <div className="flex gap-1 items-center">
-            <label htmlFor="select-all text-sm">
+            <label htmlFor="select-all text-base">
               Pilih Semua{" "}
               <input
                 type="checkbox"
@@ -281,8 +281,8 @@ const Cart = () => {
                   className="w-20 h-20 rounded-lg"
                 />
                 <div key={cartItem?.id} className="flex flex-col">
-                  <div className="font-bold text-md">
-                    {cartItem?.product?.name}
+                  <div className="font-bold text-base">
+                    {cartItem?.product?.name.slice(0, 20) + "..."}
                   </div>
                   <div className="text-gray-700 dark:text-gray-200 text-md">
                     <h3 className="font-medium">
