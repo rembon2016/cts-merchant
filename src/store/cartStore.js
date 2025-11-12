@@ -37,7 +37,10 @@ const useCartStore = create((set, get) => ({
     const stock = getProductStock(product, variant?.id, isFromDetail);
 
     if (stock < quantity) {
-      return { success: false, error: `Stok tidak mencukupi. Stok tersedia: ${stock}` };
+      return {
+        success: false,
+        error: `Stok tidak mencukupi. Stok tersedia: ${stock}`,
+      };
     }
 
     set({ isLoading: true, error: null, success: null });
@@ -398,10 +401,6 @@ const useCartStore = create((set, get) => ({
     }
   },
   clearMultipleCarts: async (cartIds) => {
-    console.log(cartIds);
-
-    // return;
-
     try {
       set({ isLoading: true, error: null });
 
