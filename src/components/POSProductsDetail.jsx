@@ -3,14 +3,21 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useProductStore } from "../store/productStore";
 import { useThemeStore } from "../store/themeStore";
 import { formatCurrency } from "../helper/currency";
-import { toast } from "react-toastify";
 import CustomLoading from "./CustomLoading";
 import SimpleModal from "./modal/SimpleModal";
 import BackButton from "./BackButton";
+import { useCustomToast } from "../hooks/useCustomToast";
+import CustomToast from "./CustomToast";
 
 export default function POSProductsDetail() {
   const { getDetailProduct, removeProducts, isLoading, products, error } =
     useProductStore();
+  const {
+    toast,
+    success: showSuccess,
+    error: showError,
+    hideToast,
+  } = useCustomToast();
 
   const [showModal, setShowModal] = useState(false);
 
@@ -29,38 +36,19 @@ export default function POSProductsDetail() {
 
   const handleDeleteProducts = async () => {
     const response = await removeProducts(products?.id);
+    setShowModal(false);
 
-    if (response?.success) {
-      toast.success(
-        typeof success === "string" ? success : "Berhasil menghapus Produk",
-        {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        }
-      );
-      navigate("/pos/products", { replace: true });
+    if (response?.success === true) {
+      setShowModal(false);
+      showSuccess("Berhasil Menghapus Produk");
+      setTimeout(() => {
+        navigate("/pos/products", {
+          replace: true,
+        });
+      }, 2000);
     } else {
-      toast.error(
-        typeof error === "string"
-          ? "Gagal menghapus Produk"
-          : "Terjadi kesalahan",
-        {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        }
-      );
+      showError("Gagal Menghapus Produk");
+      setShowModal(false);
     }
   };
 
@@ -105,7 +93,7 @@ export default function POSProductsDetail() {
           <div className="flex gap-1">
             <button
               onClick={handleOpenModal}
-              className="bg-white w-[100px] py-2 text-gray-700 font-semibold rounded-sm hover:bg-slate-100 transition-colors duration-200"
+              className="bg-red-500 text-white w-[100px] py- font-semibold rounded-md hover:bg-red-700 transition-colors duration-200"
             >
               Hapus
             </button>
@@ -115,7 +103,7 @@ export default function POSProductsDetail() {
                   replace: true,
                 })
               }
-              className="bg-white w-[100px] py-2 text-gray-700 font-semibold rounded-sm hover:bg-slate-100 transition-colors duration-200"
+              className="bg-[var(--c-primary)] w-[100px] py-2 text-white font-semibold rounded-md hover:bg-blue-700 transition-colors duration-200"
             >
               Edit
             </button>
@@ -210,5 +198,16 @@ export default function POSProductsDetail() {
     );
   }, [products, isLoading, isDark, error, showModal]);
 
-  return <div className="px-4">{renderElements}</div>;
+  return (
+    <div className="px-4">
+      <CustomToast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+        duration={toast.duration}
+      />
+      {renderElements}
+    </div>
+  );
 }

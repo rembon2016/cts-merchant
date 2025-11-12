@@ -4,6 +4,8 @@ import SimpleInput from "./form/SimpleInput";
 import { useInvoiceStore } from "../store/invoiceStore";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useCustomToast } from "../hooks/useCustomToast";
+import CustomToast from "./CustomToast";
 
 const AddInvoice = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -23,6 +25,13 @@ const AddInvoice = () => {
   const [errors, setErrors] = useState({});
 
   const { addInvoices, isLoading, error, success } = useInvoiceStore();
+
+  const {
+    toast,
+    success: showSuccess,
+    error: showError,
+    hideToast,
+  } = useCustomToast();
 
   const getTrashIcon = useMemo(() => {
     return (
@@ -158,19 +167,9 @@ const AddInvoice = () => {
     setErrors({});
     const response = await addInvoices(selectedData);
 
-    if (response?.success) {
-      toast.success(
-        typeof success === "string" ? success : "Invoices Berhasil Dibuat",
-        {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        }
+    if (response?.success === true) {
+      showSuccess(
+        typeof success === "string" ? success : "Invoices Berhasil Dibuat"
       );
 
       setTimeout(() => {
@@ -187,20 +186,10 @@ const AddInvoice = () => {
       setCurrentStep(1);
       setErrors({});
     } else {
-      toast.error(
+      showError(
         typeof error === "string"
           ? "Terjadi Kesalahan Saat Membuat Invoices"
-          : "Terjadi kesalahan",
-        {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        }
+          : "Terjadi kesalahan"
       );
     }
   };
@@ -446,6 +435,14 @@ const AddInvoice = () => {
 
   return (
     <div className="p-4 sm:p-6 lg:p-10">
+      <CustomToast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+        duration={toast.duration}
+      />
+
       <div className="flex flex-col gap-4">
         <StepIndicator />
 
