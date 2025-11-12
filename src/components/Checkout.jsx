@@ -4,6 +4,8 @@ import { useCheckoutStore } from "../store/checkoutStore";
 import { formatCurrency } from "../helper/currency";
 import { isEmpty } from "../helper/is-empty";
 import SimpleInput from "./form/SimpleInput";
+import { useCustomToast } from "../hooks/useCustomToast";
+import CustomToast from "./CustomToast";
 
 export default function Checkout() {
   const getCart = JSON.parse(sessionStorage.getItem("cart"));
@@ -18,6 +20,12 @@ export default function Checkout() {
   const { checkVoucherDiscount, discountData, isLoading, error } =
     useCartStore();
   const { getPosSettings, posSettingsData } = useCheckoutStore();
+  const {
+    toast,
+    success: showSuccess,
+    error: showError,
+    hideToast,
+  } = useCustomToast();
 
   const checkTax = async () => await getPosSettings();
 
@@ -84,7 +92,13 @@ export default function Checkout() {
 
   const checkDiscountCode = async (e) => {
     e?.preventDefault();
-    await checkVoucherDiscount(discountCode);
+    const response = await checkVoucherDiscount(discountCode);
+
+    if (response?.success) {
+      showSuccess("Voucher diskon berhasil ditemukan");
+    } else {
+      showError("Voucher diskon tidak ditemukan / sudah kadaluarsa");
+    }
   };
 
   const handleChange = (e) => setSelectPaymentMethod(e.target.value);
@@ -151,6 +165,13 @@ export default function Checkout() {
 
   return (
     <div className="w-full h-full p-4 rounded-lg flex flex-col gap-3">
+      <CustomToast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+        duration={toast.duration}
+      />
       {getCart?.items?.map((data) => (
         <div
           className="flex items-center justify-between gap-2 w-full"

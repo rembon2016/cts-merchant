@@ -1,16 +1,25 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
-import { toast } from "react-toastify";
 import useFetchDataStore from "../store/fetchDataStore";
 import SimpleInput from "./form/SimpleInput";
 import BackButton from "./BackButton";
+import { useCustomToast } from "../hooks/useCustomToast";
+import CustomToast from "./CustomToast";
 
 const ROOT_API = import.meta.env.VITE_API_ROUTES;
 
 export default function EditProfile() {
   const { user: userInfo, logout } = useAuthStore();
-  const { loading, success, error, fetchData } = useFetchDataStore();
+  const [loading, setLoading] = useState(false);
+
+  const {
+    toast,
+    success: showSuccess,
+    error: showError,
+    hideToast,
+  } = useCustomToast();
+
   const [disabledButton, setDisabledButton] = useState(false);
   const [isEditPassword, setIsEditPassword] = useState(false);
   const navigate = useNavigate();
@@ -83,55 +92,26 @@ export default function EditProfile() {
       // ...(formData.password && { password_confirmation: formData.password }),
     };
 
-    fetchData(`${ROOT_API}/v1/user/update`, {
+    setLoading(true);
+
+    const response = await fetch(`${ROOT_API}/v1/user/update`, {
       method: "POST",
       headers: headersApi,
       body: JSON.stringify(updateData),
     });
+
+    if (response?.ok === true) {
+      showSuccess("Profil Berhasil Diperbarui");
+      setTimeout(() => logout(), 1000);
+    } else {
+      showError("Gagal Memperbarui Profil");
+    }
+
+    setLoading(false);
   };
 
-  useEffect(() => {
-    if (success) {
-      toast.success("Profil berhasil diubah", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-      setTimeout(() => logout(), [3000]);
-      setDisabledButton(false);
-    }
-
-    if (error) {
-      toast.error(typeof error === "string" ? error : "Terjadi kesalahan", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-      setDisabledButton(false);
-    }
-  }, [success, error]);
-
-  useEffect(() => {
-    const hasChanged =
-      formData.name !== userInfo.name ||
-      formData.password !== "" ||
-      formData.confirmPassword !== "";
-    setDisabledButton(!hasChanged);
-  }, [formData, userInfo.name]);
-
-  return (
-    <>
-      <BackButton to="/account-information" />
+  const renderElements = useMemo(() => {
+    return (
       <div className="max-w-md mx-auto p-6 rounded-lg bg-white shadow mt-5">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold dark:text-slate-400">
@@ -206,6 +186,28 @@ export default function EditProfile() {
           </div>
         </form>
       </div>
+    );
+  }, [formData, errors, isEditPassword, loading, disabledButton]);
+
+  useEffect(() => {
+    const hasChanged =
+      formData.name !== userInfo.name ||
+      formData.password !== "" ||
+      formData.confirmPassword !== "";
+    setDisabledButton(!hasChanged);
+  }, [formData, userInfo.name]);
+
+  return (
+    <>
+      <CustomToast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+        duration={toast.duration}
+      />
+      <BackButton to="/account-information" />
+      {renderElements}
     </>
   );
 }
