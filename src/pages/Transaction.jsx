@@ -1,4 +1,4 @@
-import TransactionComponent from "../components/Transaction";
+import TransactionComponent from "../components/transaction/Transaction";
 
 const Transaction = () => {
   return <TransactionComponent />;

@@ -1,4 +1,4 @@
-import FaQComponent from "../components/FaQ";
+import FaQComponent from "../components/user/FaQ";
 
 const FaQ = () => {
   return <FaQComponent />;

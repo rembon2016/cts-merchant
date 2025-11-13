@@ -1,4 +1,4 @@
-import POSComponent from "../../components/POS";
+import POSComponent from "../../components/pos/POS";
 
 const POS = () => {
   return <POSComponent />;

@@ -1,6 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useThemeStore } from "./store/themeStore";
-import { ProtectedRoute, PublicRoute } from "./components/ProtectedRoute";
+import {
+  ProtectedRoute,
+  PublicRoute,
+} from "./components/customs/route/ProtectedRoute";
 import { useAuthStore } from "./store/authStore";
 import { useEffect } from "react";
 import { useRegisterSW } from "virtual:pwa-register/react";

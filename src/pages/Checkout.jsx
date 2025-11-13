@@ -1,4 +1,4 @@
-import CheckoutComponent from "../components/Checkout";
+import CheckoutComponent from "../components/pos/Checkout";
 
 export default function Cart() {
   return <CheckoutComponent />;

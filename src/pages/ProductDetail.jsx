@@ -1,4 +1,4 @@
-import DetailProductComponent from "../components/DetailProduct";
+import DetailProductComponent from "../components/pos/DetailProduct";
 
 const DetailProduct = () => {
   return <DetailProductComponent />;

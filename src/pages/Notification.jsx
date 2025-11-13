@@ -1,4 +1,4 @@
-import NotificationComponent from "../components/Notification.jsx";
+import NotificationComponent from "../components/customs/notification/Notification.jsx";
 
 const Notification = () => {
   return <NotificationComponent />;

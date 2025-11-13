@@ -1,4 +1,4 @@
-import POSEditCategoriesComponent from "../../components/POSEditCategories";
+import POSEditCategoriesComponent from "../../components/pos/POSEditCategories";
 
 const POSEditCategories = () => {
   return <POSEditCategoriesComponent />;
