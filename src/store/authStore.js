@@ -10,6 +10,7 @@ const DISCOUNT = "discount";
 const TOKEN_KEY = "authToken";
 const SESSION_KEY = "authUser";
 const EXPIRED_KEY = "authExpireAt";
+const EXPIRED_TOKEN_KEY = "tokenExpireAt";
 const TOKEN_POS_KEY = "authPosToken";
 const BRANCH_ACTIVE = "branchActive";
 const TOTAL_PAYMENT = "totalPayment";
@@ -68,6 +69,8 @@ export const useAuthStore = create((set, get) => ({
 
       // Hitung timestamp expiry (expires_in biasanya dalam detik)
       const expiryTimestamp = Date.now() + EXPIRED_IN * 1000;
+      const calculateTImeRefresh =
+        import.meta.env.VITE_REFRESH_USER_TOKEN_TIMER * 1000;
 
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(userData?.data));
       sessionStorage.setItem(USER_ID, result?.data?.id);
@@ -76,6 +79,7 @@ export const useAuthStore = create((set, get) => ({
       sessionStorage.setItem(EXPIRED_KEY, expiryTimestamp.toString());
       sessionStorage.setItem(TOKEN_POS_KEY, result?.pos?.token);
       sessionStorage.setItem(BRANCH_ACTIVE, result?.pos?.branches?.[0]?.id);
+      sessionStorage.setItem(EXPIRED_TOKEN_KEY, calculateTImeRefresh);
       const { setUserData } = useUserDataStore.getState();
       setUserData(userData?.data);
 
@@ -192,6 +196,7 @@ export const useAuthStore = create((set, get) => ({
     sessionStorage.removeItem(USER_POS_ID);
     sessionStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem(EXPIRED_KEY);
+    sessionStorage.removeItem(EXPIRED_TOKEN_KEY);
     sessionStorage.removeItem(TOKEN_POS_KEY);
     sessionStorage.removeItem(BRANCH_ACTIVE);
     sessionStorage.removeItem(CART);
@@ -204,6 +209,7 @@ export const useAuthStore = create((set, get) => ({
   // Setup auto logout
   setupAutoLogout: () => {
     const expiredAt = sessionStorage.getItem(EXPIRED_KEY);
+    const tokenExpiredAt = sessionStorage.getItem(EXPIRED_TOKEN_KEY);
 
     if (!expiredAt) {
       console.warn("No expiration time found");
@@ -220,7 +226,7 @@ export const useAuthStore = create((set, get) => ({
     get().clearAutoLogoutTimer();
 
     // Jika sudah expired, coba refresh token terlebih dahulu
-    if (timeUntilExpiry <= 0) {
+    if (tokenExpiredAt <= 0) {
       get().refreshToken();
       return;
     }
@@ -236,19 +242,18 @@ export const useAuthStore = create((set, get) => ({
     }
 
     // Set timeout untuk auto logout
-    const timer = setTimeout(() => {
-      get().handleAutoLogout();
-    }, timeUntilExpiry);
+    const timer = setTimeout(() => get().handleAutoLogout(), timeUntilExpiry);
+    const tokenExpireAt = sessionStorage.getItem(EXPIRED_TOKEN_KEY);
 
     // Set interval untuk check setiap detik (sebagai backup)
     const interval = setInterval(() => {
       const now = Date.now();
-      const expired = Number.parseInt(sessionStorage.getItem(EXPIRED_KEY), 10);
+      const expired = Number.parseInt(tokenExpireAt, 10);
       // Backup trigger: refresh 5 menit sebelum expired
-      if (now >= expired - FIVE_MINUTES) {
+      if (now >= expired) {
         get().refreshToken();
       }
-    }, 1000);
+    }, tokenExpiredAt);
 
     set({ autoLogoutTimer: timer, checkInterval: interval });
   },
@@ -404,17 +409,16 @@ export const useAuthStore = create((set, get) => ({
 
       const result = await response.json();
 
-      if (!response.ok) {
+      if (!response?.ok) {
         set({
           isLoading: false,
           error: result?.message || "Refresh token failed",
         });
         // Jika gagal refresh, lakukan auto logout
-        get().handleAutoLogout();
+        // get().handleAutoLogout();
         return { success: false, error: result?.message };
       }
 
-      const expiresIn = result?.expires_in || result?.data?.expires_in;
       const newPosToken = result?.data?.token || null;
 
       if (!newPosToken) {
@@ -423,9 +427,10 @@ export const useAuthStore = create((set, get) => ({
         return { success: false, error: "Invalid refresh response" };
       }
 
-      const newExpiry = Date.now() + Number(expiresIn) * 1000;
+      const newExpiry =
+        Date.now() +
+        Number(import.meta.env.VITE_REFRESH_USER_TOKEN_TIMER) * 1000;
 
-      // sessionStorage.setItem(TOKEN_KEY, newToken);
       sessionStorage.setItem(EXPIRED_KEY, newExpiry.toString());
       if (newPosToken) {
         sessionStorage.setItem(TOKEN_POS_KEY, newPosToken);
@@ -439,15 +444,16 @@ export const useAuthStore = create((set, get) => ({
 
       // Schedule next refresh in 5 minutes
       const FIVE_MINUTES = 50 * 60 * 1000;
-      const nextRefreshTimer = setTimeout(() => {
-        get().refreshToken();
-      }, FIVE_MINUTES);
+      const nextRefreshTimer = setTimeout(
+        () => get().refreshToken(),
+        FIVE_MINUTES
+      );
       set({ refreshTimer: nextRefreshTimer });
 
       return { success: true };
     } catch (error) {
       set({ isLoading: false, error: error?.message });
-      get().handleAutoLogout();
+      // get().handleAutoLogout();
       return { success: false, error: error?.message };
     }
   },
