@@ -1,4 +1,4 @@
-import POSAddCategoriesComponent from "../../components/POSAddCategories";
+import POSAddCategoriesComponent from "../../components/pos/POSAddCategories";
 
 const POSAddCategories = () => {
   return <POSAddCategoriesComponent />;

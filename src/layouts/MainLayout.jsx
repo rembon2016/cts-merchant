@@ -1,6 +1,6 @@
 import { Outlet, useLocation } from "react-router-dom";
-import BottomNav from "../components/BottomNav";
-import Header from "../components/Header";
+import BottomNav from "../components/customs/menu/BottomNav";
+import Header from "../components/homepage/Header";
 import ChatBubble from "../components/cs/ChatBubble";
 import { useAuthStore } from "../store/authStore";
 import { useEffect } from "react";

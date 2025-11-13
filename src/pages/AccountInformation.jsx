@@ -1,4 +1,4 @@
-import AccountInformationComponent from "../components/AccountInformation";
+import AccountInformationComponent from "../components/user/AccountInformation";
 
 export default function AccountInformation() {
   return <AccountInformationComponent />;

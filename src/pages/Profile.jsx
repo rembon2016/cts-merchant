@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import { useTransactionStore } from "../store/transactionStore";
 import { useEffect, useMemo } from "react";
-import CustomLoading from "../components/CustomLoading";
+import CustomLoading from "../components/customs/loading/CustomLoading";
 
 const Profile = () => {
   const { isDark, toggleTheme } = useThemeStore();

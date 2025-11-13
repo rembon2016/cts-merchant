@@ -1,107 +1,133 @@
-import { ArrowLeft, Upload, X } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
-import { useTicketStore } from '../store/ticketStore';
-import { useAuthStore } from '../store/authStore';
-import { toast } from 'react-toastify';
-import CustomLoading from '../components/CustomLoading';
+import { ArrowLeft, Upload, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useTicketStore } from "../store/ticketStore";
+import { useAuthStore } from "../store/authStore";
+import { toast } from "react-toastify";
+import CustomLoading from "../components/customs/loading/CustomLoading";
 
 const TicketCreate = () => {
   const navigate = useNavigate();
   const { createTicket, loading } = useTicketStore();
   const { user } = useAuthStore();
-  
+
   const [formData, setFormData] = useState({
-    category: '',
-    priority: 'medium',
-    title: '',
-    description: '',
-    orderId: ''
+    category: "",
+    priority: "medium",
+    title: "",
+    description: "",
+    orderId: "",
   });
-  
+
   const [errors, setErrors] = useState({});
   const [attachments, setAttachments] = useState([]);
 
   const categories = [
-    { value: 'transaction', label: 'Transaksi' },
-    { value: 'pos', label: 'POS' },
-    { value: 'account', label: 'Akun' },
-    { value: 'payment', label: 'Pembayaran' },
-    { value: 'technical', label: 'Teknis' },
-    { value: 'other', label: 'Lainnya' }
+    { value: "transaction", label: "Transaksi" },
+    { value: "pos", label: "POS" },
+    { value: "account", label: "Akun" },
+    { value: "payment", label: "Pembayaran" },
+    { value: "technical", label: "Teknis" },
+    { value: "other", label: "Lainnya" },
   ];
 
   const priorities = [
-    { value: 'low', label: 'Low', color: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300' },
-    { value: 'medium', label: 'Medium', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' },
-    { value: 'high', label: 'High', color: 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300' },
-    { value: 'urgent', label: 'Urgent', color: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' }
+    {
+      value: "low",
+      label: "Low",
+      color: "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300",
+    },
+    {
+      value: "medium",
+      label: "Medium",
+      color: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
+    },
+    {
+      value: "high",
+      label: "High",
+      color:
+        "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300",
+    },
+    {
+      value: "urgent",
+      label: "Urgent",
+      color: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
+    },
   ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
   const handlePriorityChange = (priority) => {
-    setFormData(prev => ({ ...prev, priority }));
+    setFormData((prev) => ({ ...prev, priority }));
   };
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    const validFiles = files.filter(file => {
+    const validFiles = files.filter((file) => {
       const isValidSize = file.size <= 10 * 1024 * 1024; // 10MB
-      const isValidType = ['image/jpeg', 'image/png', 'application/pdf', 'application/msword'].includes(file.type);
+      const isValidType = [
+        "image/jpeg",
+        "image/png",
+        "application/pdf",
+        "application/msword",
+      ].includes(file.type);
       return isValidSize && isValidType;
     });
-    
+
     if (validFiles.length !== files.length) {
-      toast.error('Beberapa file tidak valid (max 10MB, format: jpg, png, pdf, doc)');
+      toast.error(
+        "Beberapa file tidak valid (max 10MB, format: jpg, png, pdf, doc)"
+      );
     }
-    
-    setAttachments(prev => [...prev, ...validFiles].slice(0, 5)); // Max 5 files
+
+    setAttachments((prev) => [...prev, ...validFiles].slice(0, 5)); // Max 5 files
   };
 
   const removeAttachment = (index) => {
-    setAttachments(prev => prev.filter((_, i) => i !== index));
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
   };
 
   const validate = () => {
     const newErrors = {};
-    
-    if (!formData.category) newErrors.category = 'Kategori harus dipilih';
-    if (!formData.title.trim()) newErrors.title = 'Judul harus diisi';
-    if (!formData.description.trim()) newErrors.description = 'Deskripsi harus diisi';
-    if (formData.title.length < 5) newErrors.title = 'Judul minimal 5 karakter';
-    if (formData.description.length < 10) newErrors.description = 'Deskripsi minimal 10 karakter';
-    
+
+    if (!formData.category) newErrors.category = "Kategori harus dipilih";
+    if (!formData.title.trim()) newErrors.title = "Judul harus diisi";
+    if (!formData.description.trim())
+      newErrors.description = "Deskripsi harus diisi";
+    if (formData.title.length < 5) newErrors.title = "Judul minimal 5 karakter";
+    if (formData.description.length < 10)
+      newErrors.description = "Deskripsi minimal 10 karakter";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validate()) {
-      toast.error('Mohon lengkapi form dengan benar');
+      toast.error("Mohon lengkapi form dengan benar");
       return;
     }
 
     try {
       const ticketData = {
         ...formData,
-        userId: user?.id || 'user123',
-        attachments: attachments.map(f => f.name)
+        userId: user?.id || "user123",
+        attachments: attachments.map((f) => f.name),
       };
-      
+
       await createTicket(ticketData);
-      toast.success('Laporan berhasil dibuat!');
-      navigate('/cs/tickets');
+      toast.success("Laporan berhasil dibuat!");
+      navigate("/cs/tickets");
     } catch (error) {
-      toast.error('Gagal membuat Laporan. Silakan coba lagi.');
+      toast.error("Gagal membuat Laporan. Silakan coba lagi.");
     }
   };
 
@@ -112,7 +138,9 @@ const TicketCreate = () => {
           <button onClick={() => navigate(-1)}>
             <ArrowLeft className="w-6 h-6 text-gray-700 dark:text-gray-300" />
           </button>
-          <h1 className="text-xl font-semibold text-gray-900 dark:text-white">Buat Laporan Baru</h1>
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+            Buat Laporan Baru
+          </h1>
         </div>
       </div>
 
@@ -129,17 +157,21 @@ const TicketCreate = () => {
             value={formData.category}
             onChange={handleChange}
             className={`w-full px-4 py-3 rounded-lg border ${
-              errors.category 
-                ? 'border-red-500' 
-                : 'border-gray-300 dark:border-gray-600'
+              errors.category
+                ? "border-red-500"
+                : "border-gray-300 dark:border-gray-600"
             } bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500`}
           >
             <option value="">Pilih kategori</option>
-            {categories.map(cat => (
-              <option key={cat.value} value={cat.value}>{cat.label}</option>
+            {categories.map((cat) => (
+              <option key={cat.value} value={cat.value}>
+                {cat.label}
+              </option>
             ))}
           </select>
-          {errors.category && <p className="text-red-500 text-xs mt-1">{errors.category}</p>}
+          {errors.category && (
+            <p className="text-red-500 text-xs mt-1">{errors.category}</p>
+          )}
         </div>
 
         {/* Priority */}
@@ -177,12 +209,14 @@ const TicketCreate = () => {
             onChange={handleChange}
             placeholder="Contoh: Pembayaran tidak masuk"
             className={`w-full px-4 py-3 rounded-lg border ${
-              errors.title 
-                ? 'border-red-500' 
-                : 'border-gray-300 dark:border-gray-600'
+              errors.title
+                ? "border-red-500"
+                : "border-gray-300 dark:border-gray-600"
             } bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500`}
           />
-          {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
+          {errors.title && (
+            <p className="text-red-500 text-xs mt-1">{errors.title}</p>
+          )}
         </div>
 
         {/* Description */}
@@ -197,12 +231,14 @@ const TicketCreate = () => {
             rows={5}
             placeholder="Jelaskan masalah Anda dengan detail..."
             className={`w-full px-4 py-3 rounded-lg border ${
-              errors.description 
-                ? 'border-red-500' 
-                : 'border-gray-300 dark:border-gray-600'
+              errors.description
+                ? "border-red-500"
+                : "border-gray-300 dark:border-gray-600"
             } bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none`}
           />
-          {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
+          {errors.description && (
+            <p className="text-red-500 text-xs mt-1">{errors.description}</p>
+          )}
         </div>
 
         {/* Order ID */}
@@ -244,12 +280,17 @@ const TicketCreate = () => {
                 className="hidden"
               />
             </label>
-            
+
             {attachments.length > 0 && (
               <div className="space-y-2">
                 {attachments.map((file, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                    <span className="text-sm text-gray-700 dark:text-gray-300 truncate">{file.name}</span>
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 bg-gray-100 dark:bg-gray-700 rounded-lg"
+                  >
+                    <span className="text-sm text-gray-700 dark:text-gray-300 truncate">
+                      {file.name}
+                    </span>
                     <button
                       type="button"
                       onClick={() => removeAttachment(index)}
@@ -278,7 +319,7 @@ const TicketCreate = () => {
             disabled={loading}
             className="flex-1 px-4 py-3 bg-[var(--c-primary)] from-blue-500 to-blue-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 transition-all disabled:opacity-50"
           >
-            {loading ? 'Mengirim...' : 'Kirim Laporan'}
+            {loading ? "Mengirim..." : "Kirim Laporan"}
           </button>
         </div>
       </form>

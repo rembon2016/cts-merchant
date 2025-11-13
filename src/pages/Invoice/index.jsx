@@ -1,4 +1,4 @@
-import InvoiceComponent from "../../components/Invoice";
+import InvoiceComponent from "../../components/invoice/Invoice";
 
 export default function Invoice() {
   return <InvoiceComponent />;
