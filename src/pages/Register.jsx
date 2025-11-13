@@ -1,7 +1,7 @@
-import RegisterComponent from "../components/auth/Register";
+import AuthForm from "../components/auth/AuthForm";
 
 const Register = () => {
-  return <RegisterComponent />;
+  return <AuthForm formMode="register" />;
 };
 
 export default Register;
