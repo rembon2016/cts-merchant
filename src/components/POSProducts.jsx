@@ -40,30 +40,43 @@ export default function POSProducts() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const observerRef = useRef();
+  const initialFetchDoneRef = useRef(false);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   const navigate = useNavigate();
 
-  // Reset and fetch all products when component mounts
+  // Orchestrate initial fetch (categories then products) so big loading runs once
   useEffect(() => {
-    resetProducts();
-    getProducts({
-      category_id: "",
-      search: "",
-      page: 1,
-      per_page: 20,
-      reset: true,
-    });
-  }, [getProducts, resetProducts]);
-
-  // Ensure categories are fetched for Kategori tab
-  useEffect(() => {
-    if (typeof getCategories === "function") {
-      getCategories();
+    let cancelled = false;
+    async function init() {
+      try {
+        if (typeof getCategories === "function") {
+          await getCategories();
+        }
+        resetProducts();
+        await getProducts({
+          category_id: "",
+          search: "",
+          page: 1,
+          per_page: 20,
+          reset: true,
+        });
+      } finally {
+        if (!cancelled) {
+          initialFetchDoneRef.current = true;
+          setInitialLoading(false);
+        }
+      }
     }
-  }, [getCategories]);
+    init();
+    return () => {
+      cancelled = true;
+    };
+  }, [getCategories, getProducts, resetProducts]);
 
   // Refetch products when selected category changes
   useEffect(() => {
+    if (!initialFetchDoneRef.current) return;
     const categoryId = selectedSub
       ? subCategories.find((cat) => cat.name === selectedSub)?.id || ""
       : "";
@@ -75,11 +88,11 @@ export default function POSProducts() {
       per_page: 20,
       reset: true,
     });
-  }, [selectedSub, subCategories, getProducts, resetProducts]);
+  }, [selectedSub, getProducts, resetProducts]);
 
   const lastProductElementRef = useCallback(
     (node) => {
-      if (productsLoading) return;
+      if (initialLoading || productsLoading) return;
       if (observerRef.current) observerRef.current.disconnect();
       observerRef.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMoreProducts) {
@@ -94,6 +107,7 @@ export default function POSProducts() {
       if (node) observerRef.current.observe(node);
     },
     [
+      initialLoading,
       productsLoading,
       hasMoreProducts,
       loadMoreProducts,
@@ -166,7 +180,7 @@ export default function POSProducts() {
     "text-2xl w-16 h-16 bg-[var(--c-primary)] text-white rounded-full font-semibold hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center shadow-xl shadow-blue-700/20 hover:shadow-none transition-all duration-500 ease-in-out";
 
   const renderElements = useMemo(() => {
-    if (productsLoading) {
+    if (initialLoading) {
       return (
         <div className="w-full text-center">
           <CustomLoading />
@@ -213,13 +227,15 @@ export default function POSProducts() {
         {activeTab === "Produk" && (
           <div className="relative">
             <div className="grid grid-cols-2 gap-2">
-              <div className="w-full p-4 bg-white flex flex-col gap-2 rounded-lg shadow">
-                <h3 className="font-normal">Jumlah Produk</h3>
-                <h1 className="font-bold text-xl">{products.length}</h1>
+              <div className="w-full income-card p-4 bg-[var(--c-primary)] flex flex-col gap-2 rounded-xl shadow">
+                <h3 className="font-normal text-white">Jumlah Produk</h3>
+                <h1 className="font-bold text-xl text-white">
+                  {products.length}
+                </h1>
               </div>
-              <div className="w-full p-4 bg-white flex flex-col gap-2 rounded-lg shadow">
-                <h3 className="font-normal">Total Stok</h3>
-                <h1 className="font-bold text-xl">
+              <div className="w-full income-card p-4 bg-[var(--c-primary)] flex flex-col gap-2 rounded-xl shadow">
+                <h3 className="font-normal text-white">Total Stok</h3>
+                <h1 className="font-bold text-xl text-white">
                   {new Intl.NumberFormat("id-ID", {
                     minimumFractionDigits: 0,
                   }).format(totalStocks)}
@@ -408,6 +424,7 @@ export default function POSProducts() {
     subCategories,
     selectedCategory,
     showDeleteModal,
+    initialLoading,
   ]);
 
   return (
