@@ -128,7 +128,7 @@ const IncomeCard = () => {
 
   return (
     <section className="px-4 mt-4">
-      <div className="income-card bg-[var(--c-primary)] text-white p-5 rounded-3xl shadow-soft">
+      <div className="income-card  bg-[var(--c-primary)] text-white p-5 rounded-3xl shadow-soft">
         <div className="content">
           <h2 className="flex items-center justify-between text-base font-semibold">
             Pendapatan
