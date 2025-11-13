@@ -162,6 +162,9 @@ export default function POSProducts() {
     }, 0);
   }, [products, getProductStock, getTotalVariantStock]);
 
+  const buttonClassName =
+    "text-2xl w-16 h-16 bg-[var(--c-primary)] text-white rounded-full font-semibold hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center shadow-xl shadow-blue-700/20 hover:shadow-none transition-all duration-500 ease-in-out";
+
   const renderElements = useMemo(() => {
     if (productsLoading) {
       return (
@@ -208,7 +211,7 @@ export default function POSProducts() {
         </div>
 
         {activeTab === "Produk" && (
-          <>
+          <div className="relative">
             <div className="grid grid-cols-2 gap-2">
               <div className="w-full p-4 bg-white flex flex-col gap-2 rounded-lg shadow">
                 <h3 className="font-normal">Jumlah Produk</h3>
@@ -223,17 +226,6 @@ export default function POSProducts() {
                 </h1>
               </div>
             </div>
-            <div className="flex">
-              <button
-                onClick={() =>
-                  navigate("/pos/tambah-produk", { replace: true })
-                }
-                className="text-md w-full bg-[var(--c-primary)] text-white rounded-md py-4 font-semibold hover:bg-blue-700 transition-colors duration-200"
-              >
-                + Produk
-              </button>
-            </div>
-
             {!productsLoading && !productsError && products?.length === 0 && (
               <div className="col-span-2 flex flex-col items-center justify-center text-gray-500 p-4 bg-gray-100 rounded-lg h-[250px]">
                 <XCircle className="w-16 h-16 mb-2 text-gray-400" />
@@ -241,7 +233,7 @@ export default function POSProducts() {
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2 mt-2">
               {products.map((product, index) => {
                 const isLastProduct = products.length === index + 1;
                 const productPrice = getProductPrice(product);
@@ -310,21 +302,28 @@ export default function POSProducts() {
                 );
               })}
             </div>
-          </>
+            <div
+              className="fixed"
+              style={{
+                bottom: "6rem",
+                marginBottom: "1.7rem",
+                right: "max(0px, calc((100vw - 24rem)/2 + 1rem))",
+              }}
+            >
+              <button
+                onClick={() =>
+                  navigate("/pos/tambah-produk", { replace: true })
+                }
+                className={buttonClassName}
+              >
+                +
+              </button>
+            </div>
+          </div>
         )}
 
         {activeTab === "Kategori" && (
-          <>
-            <div className="flex mb-2">
-              <button
-                onClick={() =>
-                  navigate("/pos/tambah-kategori", { replace: true })
-                }
-                className="text-md w-full bg-[var(--c-primary)] text-white rounded-md py-4 font-semibold hover:bg-blue-700 transition-colors duration-200"
-              >
-                + Kategori
-              </button>
-            </div>
+          <div className="relative pb-16">
             <div className="space-y-2">
               {subCategories.map((sub) => {
                 return (
@@ -378,7 +377,24 @@ export default function POSProducts() {
                 showButton={true}
               />
             )}
-          </>
+            <div
+              className="fixed"
+              style={{
+                bottom: "6rem",
+                marginBottom: "1.7rem",
+                right: "max(0px, calc((100vw - 24rem)/2 + 1rem))",
+              }}
+            >
+              <button
+                onClick={() =>
+                  navigate("/pos/tambah-kategori", { replace: true })
+                }
+                className={buttonClassName}
+              >
+                +
+              </button>
+            </div>
+          </div>
         )}
       </div>
     );
@@ -395,7 +411,7 @@ export default function POSProducts() {
   ]);
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-slate-900">
+    <div className="min-h-screen bg-gray-100 dark:bg-slate-900 relative">
       <CustomToast
         message={toast.message}
         type={toast.type}
