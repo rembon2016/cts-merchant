@@ -602,9 +602,7 @@ export default function POSProductForm({ editMode = false, productId = null }) {
         <SimpleInput
           name="minimum_sales_quantity"
           type="text"
-          label={
-            editMode ? "Minimum Sales Quantity" : "Jumlah Minimum Penjualan"
-          }
+          label={"Jumlah Minimum Penjualan"}
           value={formData?.minimum_sales_quantity}
           handleChange={handleChange}
           errors={validationErrors.minimum_sales_quantity}
@@ -801,7 +799,7 @@ export default function POSProductForm({ editMode = false, productId = null }) {
                   <SimpleInput
                     name="skus.variant_name"
                     type="text"
-                    label={editMode ? "Variant Name" : "Nama Varian"}
+                    label={"Nama Varian"}
                     value={item?.variant_name}
                     handleChange={(e) =>
                       handleNestedChange(
@@ -951,7 +949,7 @@ export default function POSProductForm({ editMode = false, productId = null }) {
                   <SimpleInput
                     name="bundle_items.product_id"
                     type="text"
-                    label={editMode ? "Product" : "Produk"}
+                    label={"Produk"}
                     value={item?.product_id}
                     handleChange={(e) =>
                       handleNestedChange(
@@ -966,8 +964,8 @@ export default function POSProductForm({ editMode = false, productId = null }) {
                   />
                   <SimpleInput
                     name="bundle_items.qty"
-                    type={editMode ? "number" : "text"}
-                    label={editMode ? "Quantity" : "Kuantitas"}
+                    type={"text"}
+                    label={"Kuantitas"}
                     value={item?.qty}
                     handleChange={(e) =>
                       handleNestedChange(
@@ -982,7 +980,7 @@ export default function POSProductForm({ editMode = false, productId = null }) {
                   <SimpleInput
                     name="bundle_items.price"
                     type="text"
-                    label={editMode ? "Price" : "Harga"}
+                    label={"Harga"}
                     value={item?.price}
                     handleChange={(e) =>
                       handleNestedChange(
