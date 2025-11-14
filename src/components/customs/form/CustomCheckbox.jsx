@@ -58,10 +58,10 @@ export default function CustomCheckbox({
       >
         {/* Knob */}
         <span
-          className={`absolute top-1/2 left-1 transform -translate-y-1/2 bg-white rounded-full shadow-md ${
+          className={`absolute top-1/2 left-0 transform -translate-y-1/2 bg-white rounded-full shadow-md ${
             s.knob
           } transition-transform duration-200 ${
-            checked ? s.translateX : "translate-x-0"
+            checked ? s.translateX : "translate-x-1"
           }`}
         />
       </div>

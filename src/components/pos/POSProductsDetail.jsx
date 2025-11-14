@@ -8,6 +8,8 @@ import SimpleModal from "../customs/modal/SimpleModal";
 import BackButton from "../customs/button/BackButton";
 import { useCustomToast } from "../../hooks/useCustomToast";
 import CustomToast from "../customs/toast/CustomToast";
+import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
+import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
 
 export default function POSProductsDetail() {
   const { getDetailProduct, removeProducts, isLoading, products, error } =
@@ -61,12 +63,7 @@ export default function POSProductsDetail() {
 
   const renderElements = useMemo(() => {
     if (isLoading) {
-      return (
-        <div className="w-full text-center">
-          {/* Loading indicator for infinite scroll */}
-          <CustomLoading />
-        </div>
-      );
+      return <LoadingSkeletonCard />;
     }
 
     if (error) {
