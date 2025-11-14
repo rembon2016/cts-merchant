@@ -16,6 +16,8 @@ export default function POSCategoriesForm(props) {
     image: "",
   });
 
+  const [validationErrors, setValidationErrors] = useState({});
+
   const {
     addCategories,
     editCategories,
@@ -33,15 +35,36 @@ export default function POSCategoriesForm(props) {
 
   const navigate = useNavigate();
 
+  const validateForm = () => {
+    const errors = {};
+
+    const isEmptyStr = (v) =>
+      v === undefined || v === null || String(v).trim() === "";
+
+    // Basic required fields
+    if (isEmptyStr(formData.name)) errors.name = "Nama kategori wajib diisi";
+
+    return errors;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+
+    setValidationErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const handleSubmit = async () => {
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+    setValidationErrors({});
+
     const response = editMode
       ? await editCategories(formData, categoryId)
       : await addCategories(formData);
@@ -93,7 +116,7 @@ export default function POSCategoriesForm(props) {
 
   useEffect(() => {
     if (editMode && categoryId) {
-      getCategoriesForEdit(categoryId);
+      getCategoriesForEdit();
     }
   }, [editMode, categoryId]);
 
@@ -106,6 +129,8 @@ export default function POSCategoriesForm(props) {
           label="Nama Kategori"
           value={formData?.name}
           handleChange={handleChange}
+          isRequired={true}
+          errors={validationErrors?.name}
           // disabled={true}
         />
         <SimpleInput
