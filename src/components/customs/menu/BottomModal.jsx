@@ -17,10 +17,23 @@ BottomModal.propTypes = {
   stocks: PropTypes.number,
   data: PropTypes.object,
   isFromDetail: PropTypes.bool,
+  mode: PropTypes.oneOf(["cart", "custom"]),
+  title: PropTypes.string,
+  children: PropTypes.node,
 };
 
 export default function BottomModal(props) {
-  const { isOpen, setIsOpen, onClose, stocks, data, isFromDetail } = props;
+  const {
+    isOpen,
+    setIsOpen,
+    onClose,
+    stocks,
+    data,
+    isFromDetail,
+    mode = "cart",
+    title,
+    children,
+  } = props;
 
   const sheetRef = useRef(null);
   const { isDark } = useThemeStore();
@@ -76,6 +89,7 @@ export default function BottomModal(props) {
   }, [isOpen]);
 
   useEffect(() => {
+    if (mode !== "cart") return;
     if (success) {
       setTimeout(() => {
         getCart();
@@ -83,7 +97,7 @@ export default function BottomModal(props) {
       }, 1060);
       return () => clearTimeout();
     }
-  }, [success]);
+  }, [success, mode]);
 
   const handleClose = () => {
     if (sheetRef.current) {
@@ -154,7 +168,7 @@ export default function BottomModal(props) {
             Pilih Varian:
           </h5>
           <div className="space-y-2">
-            {data.skus?.map((variant) => {
+            {data?.skus?.map((variant) => {
               const price = getVariantPrice(variant);
               const stock = getVariantStock(variant);
               const isSelected = selectedVariant?.id === variant?.id;
@@ -257,95 +271,119 @@ export default function BottomModal(props) {
                 <div className="h-1.5 w-12 rounded-full bg-gray-300 dark:bg-slate-500" />
               </div>
               {/* Content wrapper adds bottom padding so footer doesn't overlap */}
-              <div className="pb-24">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-semibold text-primary dark:text-slate-300">
-                    Detail Produk
-                  </h4>
-                  <button
-                    onClick={handleClose}
-                    className="absolute top-4 right-4 text-gray-600 bg-gray-200 rounded-full p-1 hover:text-gray-900 dark:text-gray-300 dark:bg-slate-700 dark:hover:text-white"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
+              {mode === "cart" ? (
+                <div className="pb-24">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-semibold text-primary dark:text-slate-300">
+                      Detail Produk
+                    </h4>
+                    <button
+                      onClick={handleClose}
+                      className="absolute top-4 right-4 text-gray-600 bg-gray-200 rounded-full p-1 hover:text-gray-900 dark:text-gray-300 dark:bg-slate-700 dark:hover:text-white"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                  {/* <button
-                onClick={handleClose}
-                className="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
-              >
-                Tutup
-              </button> */}
-                </div>
-
-                {/* Grid 3 cols with 3-2-1 layout */}
-                <div className="flex gap-2 mb-4">
-                  <img
-                    src={data?.image}
-                    alt={data?.name}
-                    className="w-28 h-20 object-cover object-center rounded-lg"
-                  />
-                  <div className="flex flex-col gap-1">
-                    <h3 className="font-bold text-lg">{data?.name}</h3>
-                    <h3 className="font-medium text-lg">
-                      Harga:{" "}
-                      <span
-                        className={`text-[var(--c-primary)] ${
-                          isDark && "text-blue-300"
-                        }`}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
                       >
-                        {formatCurrency(data?.price_product)}
-                      </span>
-                    </h3>
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
                   </div>
-                </div>
 
-                <div className="flex flex-col gap-2">
-                  {data?.is_variant ? renderVariants : null}
-                  <div className="flex items-center gap-2 ">
-                    <SimpleInput
-                      name="harga"
-                      type="text"
-                      label="Harga Pembelian"
-                      value={totalPrice}
-                      handleChange={handleChange}
-                      disabled={true}
+                  {/* Grid 3 cols with 3-2-1 layout */}
+                  <div className="flex gap-2 mb-4">
+                    <img
+                      src={data?.image}
+                      alt={data?.name}
+                      className="w-28 h-20 object-cover object-center rounded-lg"
                     />
-                    <ButtonQuantity
-                      quantity={quantity}
-                      setQuantity={setQuantity}
-                      stocks={stocks}
-                      style={{
-                        marginTop: "20px",
-                      }}
-                    />
+                    <div className="flex flex-col gap-1">
+                      <h3 className="font-bold text-lg">{data?.name}</h3>
+                      <h3 className="font-medium text-lg">
+                        Harga:{" "}
+                        <span
+                          className={`text-[var(--c-primary)] ${
+                            isDark && "text-blue-300"
+                          }`}
+                        >
+                          {formatCurrency(data?.price_product)}
+                        </span>
+                      </h3>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    {data?.is_variant ? renderVariants : null}
+                    <div className="flex items-center gap-2 ">
+                      <SimpleInput
+                        name="harga"
+                        type="text"
+                        label="Harga Pembelian"
+                        value={totalPrice}
+                        handleChange={handleChange}
+                        disabled={true}
+                      />
+                      <ButtonQuantity
+                        quantity={quantity}
+                        setQuantity={setQuantity}
+                        stocks={stocks}
+                        style={{
+                          marginTop: "20px",
+                        }}
+                      />
+                    </div>
+                  </div>
+                  {/* Absolute footer button at the bottom */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-white dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+                    <button
+                      className={`w-full flex gap-2 justify-center items-center h-16 py-2 rounded-lg transition-colors bg-[var(--c-primary)] text-white hover:bg-blue-700`}
+                      onClick={() =>
+                        handleAddToCart(data, null, quantity, isFromDetail)
+                      }
+                      disabled={isLoading}
+                    >
+                      <ShoppingCart className="w-5 h-5" />
+                      {!isLoading ? "Masukkan Keranjang" : "Memproses..."}
+                    </button>
                   </div>
                 </div>
-                {/* Absolute footer button at the bottom */}
-                <div className="absolute bottom-0 left-0 right-0 p-4 bg-white dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
-                  <button
-                    className={`w-full flex gap-2 justify-center items-center h-16 py-2 rounded-lg transition-colors bg-[var(--c-primary)] text-white hover:bg-blue-700`}
-                    onClick={() =>
-                      handleAddToCart(data, null, quantity, isFromDetail)
-                    }
-                    disabled={isLoading}
-                  >
-                    <ShoppingCart className="w-5 h-5" />
-                    {!isLoading ? "Masukkan Keranjang" : "Memproses..."}
-                  </button>
+              ) : (
+                <div className="pb-2">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-semibold text-primary dark:text-slate-300">
+                      {title || "Form"}
+                    </h4>
+                    <button
+                      onClick={handleClose}
+                      className="absolute top-4 right-4 text-gray-600 bg-gray-200 rounded-full p-1 hover:text-gray-900 dark:text-gray-300 dark:bg-slate-700 dark:hover:text-white"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  <div className="flex flex-col gap-3">{children}</div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>

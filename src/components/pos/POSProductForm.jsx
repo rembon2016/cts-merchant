@@ -5,6 +5,7 @@ import SimpleInput from "../customs/form/SimpleInput";
 import CustomTextarea from "../customs/form/CustomTextarea";
 import CustomInputFile from "../customs/form/CustomInputFile";
 import CustomSelectBox from "../customs/form/CustomSelectBox";
+import BottomModal from "../customs/menu/BottomModal";
 
 import { useProductStore } from "../../store/productStore";
 import { useCustomToast } from "../../hooks/useCustomToast";
@@ -66,6 +67,7 @@ export default function POSProductForm({ editMode = false, productId = null }) {
     getUnits,
     categories,
     getCategories,
+    addCategories,
     addProducts,
     editProducts,
     getDetailProduct,
@@ -85,6 +87,16 @@ export default function POSProductForm({ editMode = false, productId = null }) {
     "minimum_sales_quantity",
     "stok_alert",
   ];
+
+  // Inline Add Category
+  const [newCategory, setNewCategory] = useState({
+    name: "",
+    description: "",
+    image: null,
+  });
+  const [newCategoryErrors, setNewCategoryErrors] = useState({});
+  const [addingCategory, setAddingCategory] = useState(false);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
 
   const formatToNumber = (value) => value?.replaceAll(/\D/g, "");
 
@@ -277,16 +289,16 @@ export default function POSProductForm({ editMode = false, productId = null }) {
       errors.type_product_id = "Tipe produk wajib dipilih";
     if (isEmptyStr(formData.unit_id)) errors.unit_id = "Unit wajib dipilih";
     if (isEmptyStr(formData.cost_product))
-      errors.cost_product = "Biaya/Cost wajib diisi";
+      errors.cost_product = "Biaya wajib diisi";
     if (isEmptyStr(formData.price_product))
-      errors.price_product = "Harga/Price wajib diisi";
+      errors.price_product = "Harga wajib diisi";
     if (isEmptyStr(formData.minimum_sales_quantity))
       errors.minimum_sales_quantity = "Jumlah minimum penjualan wajib diisi";
     if (isEmptyStr(formData.stok_alert))
       errors.stok_alert = "Peringatan stok wajib diisi";
 
     if (isEmptyArr(formData.category_ids))
-      errors.category_ids = "Kategori minimal 1";
+      errors.category_ids = "Kategori wajib di pilih";
     if (isEmptyArr(formData.brand_ids)) errors.brand_ids = "Brand minimal 1";
 
     // Prices are constructed from cost/price; above fields cover their requirement
@@ -424,6 +436,7 @@ export default function POSProductForm({ editMode = false, productId = null }) {
             value={formData?.code}
             handleChange={handleChange}
             errors={validationErrors.code}
+            isRequired={true}
           />
         </div>
 
@@ -434,6 +447,7 @@ export default function POSProductForm({ editMode = false, productId = null }) {
           value={formData?.name}
           handleChange={handleChange}
           errors={validationErrors.name}
+          isRequired={true}
         />
 
         <CustomSelectBox
@@ -451,24 +465,61 @@ export default function POSProductForm({ editMode = false, productId = null }) {
           placeholder="Cari atau pilih..."
           multiple={true}
           errors={validationErrors.brand_ids}
+          isRequired={true}
         />
 
-        <CustomSelectBox
-          label="Pilih Kategori"
-          name="category_ids"
-          value={formData?.category_ids}
-          selectBoxData={categories}
-          onChange={(items) => {
-            setFormData((prev) => ({
-              ...prev,
-              category_ids: items,
-            }));
-            setValidationErrors((prev) => ({ ...prev, category_ids: "" }));
-          }}
-          placeholder="Cari atau pilih..."
-          multiple={true}
-          errors={validationErrors.category_ids}
-        />
+        {Array.isArray(categories) && categories.length !== 0 && (
+          <CustomSelectBox
+            label="Pilih Kategori"
+            name="category_ids"
+            value={formData?.category_ids}
+            selectBoxData={categories}
+            onChange={(items) => {
+              setFormData((prev) => ({
+                ...prev,
+                category_ids: items,
+              }));
+              setValidationErrors((prev) => ({ ...prev, category_ids: "" }));
+            }}
+            placeholder="Cari atau pilih..."
+            multiple={true}
+            errors={validationErrors.category_ids}
+            isRequired={true}
+          />
+        )}
+
+        {Array.isArray(categories) && categories.length === 0 ? (
+          <div
+            className={`mt-2 rounded-lg border-2  ${
+              validationErrors.category_ids
+                ? "border-red-500"
+                : "border-gray-300"
+            } p-4 bg-white`}
+          >
+            <div className="mb-1">
+              <h4
+                className={`font-semibold text-sm ${
+                  validationErrors.category_ids
+                    ? "text-red-500"
+                    : "text-gray-800"
+                }`}
+              >
+                Belum ada kategori
+              </h4>
+            </div>
+            <button
+              type="button"
+              className={`text-sm font-medium ${
+                validationErrors.category_ids
+                  ? "text-red-500"
+                  : "text-[var(--c-primary)]"
+              }`}
+              onClick={() => setShowCategoryModal(true)}
+            >
+              + Tambah kategori baru
+            </button>
+          </div>
+        ) : null}
 
         <div className="flex gap-2">
           <SimpleInput
@@ -480,6 +531,7 @@ export default function POSProductForm({ editMode = false, productId = null }) {
             selectBoxData={typeProducts}
             handleChange={handleChange}
             errors={validationErrors.type_product_id}
+            isRequired={true}
           />
           <SimpleInput
             name="unit_id"
@@ -490,6 +542,7 @@ export default function POSProductForm({ editMode = false, productId = null }) {
             selectBoxData={units}
             handleChange={handleChange}
             errors={validationErrors.unit_id}
+            isRequired={true}
           />
         </div>
 
@@ -522,24 +575,27 @@ export default function POSProductForm({ editMode = false, productId = null }) {
                 : `${import.meta.env.VITE_API_IMAGE}${formData.image}`
               : null
           }
+          label="Foto Produk"
         />
 
         <div className="flex gap-2">
           <SimpleInput
             name="cost_product"
             type="text"
-            label={editMode ? "Cost" : "Biaya"}
+            label="Biaya"
             value={formData?.cost_product}
             handleChange={handleChange}
             errors={validationErrors.cost_product}
+            isRequired={true}
           />
           <SimpleInput
             name="price_product"
             type="text"
-            label={editMode ? "Price" : "Harga"}
+            label="Harga"
             value={formData?.price_product}
             handleChange={handleChange}
             errors={validationErrors.price_product}
+            isRequired={true}
           />
         </div>
 
@@ -552,6 +608,7 @@ export default function POSProductForm({ editMode = false, productId = null }) {
           value={formData?.minimum_sales_quantity}
           handleChange={handleChange}
           errors={validationErrors.minimum_sales_quantity}
+          isRequired={true}
         />
 
         <SimpleInput
@@ -561,6 +618,7 @@ export default function POSProductForm({ editMode = false, productId = null }) {
           value={formData?.stok_alert}
           handleChange={handleChange}
           errors={validationErrors.stok_alert}
+          isRequired={true}
         />
 
         <div className="mt-6 p-4 border border-gray-200 rounded-lg">
@@ -983,6 +1041,9 @@ export default function POSProductForm({ editMode = false, productId = null }) {
     products,
     isLoading,
     validationErrors,
+    newCategory,
+    newCategoryErrors,
+    addingCategory,
   ]);
 
   return (
@@ -994,6 +1055,98 @@ export default function POSProductForm({ editMode = false, productId = null }) {
         onClose={hideToast}
         duration={toast.duration}
       />
+      <BottomModal
+        isOpen={showCategoryModal}
+        setIsOpen={setShowCategoryModal}
+        onClose={() => setShowCategoryModal(false)}
+        mode="custom"
+        title="Tambah Kategori"
+      >
+        <SimpleInput
+          name="new_category_name"
+          type="text"
+          label="Nama Kategori"
+          value={newCategory.name}
+          handleChange={(e) => {
+            const v = e.target.value;
+            setNewCategory((prev) => ({ ...prev, name: v }));
+            setNewCategoryErrors((prev) => ({ ...prev, name: "" }));
+          }}
+          isRequired={true}
+          errors={newCategoryErrors.name}
+        />
+        <SimpleInput
+          name="new_category_description"
+          type="text"
+          label="Deskripsi (opsional)"
+          value={newCategory.description}
+          handleChange={(e) =>
+            setNewCategory((prev) => ({
+              ...prev,
+              description: e.target.value,
+            }))
+          }
+        />
+        <CustomInputFile
+          name="new_category_image"
+          accept="image/*"
+          onChange={(file) =>
+            setNewCategory((prev) => ({ ...prev, image: file }))
+          }
+          label="Gambar Kategori (opsional)"
+        />
+        <div className="flex justify-end pt-2">
+          <button
+            type="button"
+            className="px-4 py-2 rounded-lg bg-[var(--c-primary)] text-white text-sm font-medium disabled:opacity-60"
+            onClick={async () => {
+              const errs = {};
+              if (!newCategory.name || String(newCategory.name).trim() === "") {
+                errs.name = "Nama kategori wajib diisi";
+              }
+              setNewCategoryErrors(errs);
+              if (Object.keys(errs).length > 0) return;
+              try {
+                setAddingCategory(true);
+                const payload = {
+                  name: newCategory.name.trim(),
+                  description: newCategory.description || "",
+                  image: newCategory.image || "",
+                };
+                const res = await addCategories(payload);
+                await getCategories();
+                let createdId =
+                  res?.data?.id || res?.data?.category?.id || null;
+                if (!createdId) {
+                  const list = useProductStore.getState().categories || [];
+                  const match = list.find(
+                    (c) =>
+                      String(c?.name || "").toLowerCase() ===
+                      String(newCategory.name).trim().toLowerCase()
+                  );
+                  if (match?.id) createdId = match.id;
+                }
+                if (createdId) {
+                  setFormData((prev) => ({
+                    ...prev,
+                    category_ids: [...(prev.category_ids || []), createdId],
+                  }));
+                }
+                showSuccess("Kategori Berhasil Ditambahkan");
+                setNewCategory({ name: "", description: "", image: null });
+                setShowCategoryModal(false);
+              } catch (e) {
+                showError("Gagal Menambahkan Kategori");
+              } finally {
+                setAddingCategory(false);
+              }
+            }}
+            disabled={addingCategory || isLoading}
+          >
+            {addingCategory || isLoading ? "Menyimpan..." : "Simpan Kategori"}
+          </button>
+        </div>
+      </BottomModal>
       {renderForm}
     </>
   );

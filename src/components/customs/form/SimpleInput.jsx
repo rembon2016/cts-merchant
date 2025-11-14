@@ -16,6 +16,7 @@ SimpleInput.propTypes = {
   isSelectBox: PropTypes.bool,
   selectBoxData: PropTypes.array,
   changeInputType: PropTypes.bool,
+  isRequired: PropTypes.bool,
 };
 
 export default function SimpleInput({
@@ -28,10 +29,11 @@ export default function SimpleInput({
   placeholder,
   disabled,
   isSelectBox = false,
+  isRequired = false,
+  changeInputType = false,
   selectBoxData,
   min,
   max,
-  changeInputType = false,
 }) {
   const canToggleType =
     changeInputType && (type === "password" || type === "text");
@@ -60,7 +62,7 @@ export default function SimpleInput({
         }`}
         htmlFor="name"
       >
-        {label}
+        {isRequired ? `${label} *` : label}
       </label>
       {!isSelectBox && (
         <input
