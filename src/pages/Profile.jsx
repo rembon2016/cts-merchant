@@ -4,6 +4,7 @@ import { useAuthStore } from "../store/authStore";
 import { useTransactionStore } from "../store/transactionStore";
 import { useEffect, useMemo } from "react";
 import CustomLoading from "../components/customs/loading/CustomLoading";
+import LoadingSkeletonList from "../components/customs/loading/LoadingSkeletonList";
 
 const Profile = () => {
   const { isDark, toggleTheme } = useThemeStore();
@@ -123,7 +124,7 @@ const Profile = () => {
 
   const renderElements = useMemo(() => {
     if (loadTransaction) {
-      return <CustomLoading />;
+      return <LoadingSkeletonList items={6} />;
     }
 
     return (

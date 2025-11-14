@@ -183,7 +183,7 @@ export default function POSProducts() {
 
   const renderElemntsTab = useMemo(() => {
     if (initialLoading) {
-      return <LoadingSkeletonList />;
+      return <LoadingSkeletonList items={1} />;
     }
 
     return (
