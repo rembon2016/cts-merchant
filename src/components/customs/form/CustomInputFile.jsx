@@ -31,10 +31,13 @@ export default function CustomInputFile({
   className = "",
   initialPreview = null,
   errors = "",
+  label = "Upload Gambar",
+  required = false,
 }) {
   const inputRef = useRef(null);
   const [files, setFiles] = useState([]);
   const [dragActive, setDragActive] = useState(false);
+  const inputId = name || "file-input";
 
   // create previews for image files
   // useEffect(() => {
@@ -157,9 +160,18 @@ export default function CustomInputFile({
 
   return (
     <div className={`w-full ${className}`}>
+      {label ? (
+        <label
+          htmlFor={inputId}
+          className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
+          {!required ? label : `${label} *`}
+        </label>
+      ) : null}
       <input
         ref={inputRef}
         type="file"
+        id={inputId}
         name={name}
         accept={accept}
         multiple={multiple}
@@ -266,9 +278,7 @@ export default function CustomInputFile({
         </p>
       ) : null}
 
-      {errors && (
-        <p className="mt-1 text-sm text-red-600">{errors}</p>
-      )}
+      {errors && <p className="mt-1 text-sm text-red-600">{errors}</p>}
     </div>
   );
 }
