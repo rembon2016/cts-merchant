@@ -424,6 +424,7 @@ export default function POSProductForm({ editMode = false, productId = null }) {
             value={formData?.code}
             handleChange={handleChange}
             errors={validationErrors.code}
+            isRequired={true}
           />
         </div>
 
@@ -434,6 +435,7 @@ export default function POSProductForm({ editMode = false, productId = null }) {
           value={formData?.name}
           handleChange={handleChange}
           errors={validationErrors.name}
+          isRequired={true}
         />
 
         <CustomSelectBox
@@ -451,6 +453,7 @@ export default function POSProductForm({ editMode = false, productId = null }) {
           placeholder="Cari atau pilih..."
           multiple={true}
           errors={validationErrors.brand_ids}
+          isRequired={true}
         />
 
         <CustomSelectBox
@@ -468,6 +471,7 @@ export default function POSProductForm({ editMode = false, productId = null }) {
           placeholder="Cari atau pilih..."
           multiple={true}
           errors={validationErrors.category_ids}
+          isRequired={true}
         />
 
         <div className="flex gap-2">
@@ -480,6 +484,7 @@ export default function POSProductForm({ editMode = false, productId = null }) {
             selectBoxData={typeProducts}
             handleChange={handleChange}
             errors={validationErrors.type_product_id}
+            isRequired={true}
           />
           <SimpleInput
             name="unit_id"
@@ -490,6 +495,7 @@ export default function POSProductForm({ editMode = false, productId = null }) {
             selectBoxData={units}
             handleChange={handleChange}
             errors={validationErrors.unit_id}
+            isRequired={true}
           />
         </div>
 
@@ -522,24 +528,27 @@ export default function POSProductForm({ editMode = false, productId = null }) {
                 : `${import.meta.env.VITE_API_IMAGE}${formData.image}`
               : null
           }
+          label="Foto Produk"
         />
 
         <div className="flex gap-2">
           <SimpleInput
             name="cost_product"
             type="text"
-            label={editMode ? "Cost" : "Biaya"}
+            label="Biaya"
             value={formData?.cost_product}
             handleChange={handleChange}
             errors={validationErrors.cost_product}
+            isRequired={true}
           />
           <SimpleInput
             name="price_product"
             type="text"
-            label={editMode ? "Price" : "Harga"}
+            label="Harga"
             value={formData?.price_product}
             handleChange={handleChange}
             errors={validationErrors.price_product}
+            isRequired={true}
           />
         </div>
 
@@ -552,6 +561,7 @@ export default function POSProductForm({ editMode = false, productId = null }) {
           value={formData?.minimum_sales_quantity}
           handleChange={handleChange}
           errors={validationErrors.minimum_sales_quantity}
+          isRequired={true}
         />
 
         <SimpleInput
@@ -561,6 +571,7 @@ export default function POSProductForm({ editMode = false, productId = null }) {
           value={formData?.stok_alert}
           handleChange={handleChange}
           errors={validationErrors.stok_alert}
+          isRequired={true}
         />
 
         <div className="mt-6 p-4 border border-gray-200 rounded-lg">
