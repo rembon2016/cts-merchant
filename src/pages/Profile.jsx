@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import { useTransactionStore } from "../store/transactionStore";
 import { useEffect, useMemo } from "react";
-import CustomLoading from "../components/customs/loading/CustomLoading";
 import LoadingSkeletonList from "../components/customs/loading/LoadingSkeletonList";
+import CustomCheckbox from "../components/customs/form/CustomCheckbox";
 
 const Profile = () => {
-  const { isDark, toggleTheme } = useThemeStore();
+  const { isDark, setTheme, toggleTheme } = useThemeStore();
   const { user, logout, isLoading } = useAuthStore();
   const {
     total,
@@ -217,18 +217,7 @@ const Profile = () => {
                 </p>
               </div>
             </div>
-            <button
-              onClick={toggleTheme}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                isDark ? "bg-[var(--c-accent)]" : "bg-slate-200"
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  isDark ? "translate-x-6" : "translate-x-1"
-                }`}
-              />
-            </button>
+            <CustomCheckbox checked={isDark} onChange={setTheme} />
           </div>
         </div>
 
@@ -268,7 +257,7 @@ const Profile = () => {
         </div>
       </>
     );
-  }, [total, loadTransaction, isLoading, getListTransactions]);
+  }, [total, loadTransaction, isLoading, getListTransactions, isDark]);
 
   useEffect(() => {
     if (!pathname.includes("/profile")) return;

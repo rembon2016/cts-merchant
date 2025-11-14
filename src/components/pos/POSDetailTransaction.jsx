@@ -1,8 +1,8 @@
 import { useEffect, useMemo } from "react";
 import { useCheckoutStore } from "../../store/checkoutStore";
 import { formatCurrency } from "../../helper/currency";
-import CustomLoading from "../customs/loading/CustomLoading";
 import BackButton from "../customs/button/BackButton";
+import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
 
 const POSDetailTransaction = () => {
   const date = (iso) =>
@@ -33,7 +33,7 @@ const POSDetailTransaction = () => {
 
   const renderElements = useMemo(() => {
     if (isLoading) {
-      return <CustomLoading />;
+      return <LoadingSkeletonCard />;
     }
 
     return (
