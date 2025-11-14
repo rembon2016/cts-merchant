@@ -25,6 +25,7 @@ export default function CustomSelectBox({
   errors,
   multiple = true,
   searchable = true,
+  isRequired = false,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -142,7 +143,7 @@ export default function CustomSelectBox({
           }`}
           htmlFor={name}
         >
-          {label}
+          {isRequired ? `${label} *` : label}
         </label>
       )}
 

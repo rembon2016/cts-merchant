@@ -143,7 +143,10 @@ export default function AuthForm({ formMode = "login" }) {
           <h3 className="font-bold text-4xl text-center">Merchant</h3>
         </div>
 
-        <SimpleAlert type={error ? "error" : null} textContent={error || null} />
+        <SimpleAlert
+          type={error ? "error" : null}
+          textContent={error || null}
+        />
         <CustomToast
           message={toast.message}
           type={toast.type}

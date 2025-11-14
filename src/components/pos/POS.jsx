@@ -272,7 +272,7 @@ export default function POS() {
                   src={
                     product.image
                       ? `${import.meta.env.VITE_API_IMAGE}${product.image}`
-                      : "/images/placeholder.jpg"
+                      : "/images/image-placeholder.png"
                   }
                   alt={product.name || "Product Image"}
                   className="w-full h-[100px] object-cover"
