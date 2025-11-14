@@ -3,7 +3,7 @@ import useFetchDataStore from "../../store/fetchDataStore";
 import { useDebounce } from "../../hooks/useDebounce";
 import SearchInput from "../customs/form/SearchInput";
 import LoadMoreButton from "../customs/button/LoadMoreButton";
-import CustomLoading from "../customs/loading/CustomLoading";
+import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 import { formatCurrency } from "../../helper/currency";
 import { XCircle } from "lucide-react";
 
@@ -50,12 +50,6 @@ export default function Transaction() {
   const { data, totalData, loading, error, fetchData } = useFetchDataStore();
   const [accumulatedData, setAccumulatedData] = useState([]);
 
-  // const filterButton = [
-  //   { name: "Semua", type: "all" },
-  //   { name: "Pemasukan", type: "income" },
-  //   { name: "Pengeluaran", type: "outcome" },
-  // ];
-
   // Debounce search query with 500ms delay
   const debouncedSearch = useDebounce(state.searchQuery, 500);
 
@@ -87,9 +81,6 @@ export default function Transaction() {
     if (filter !== "all") {
       url += `&type=${filter}`;
     }
-    if (debouncedSearch) {
-      url += `&search=${debouncedSearch}`;
-    }
     fetchData(url, {
       method: "GET",
       headers: headersApi,
@@ -114,7 +105,7 @@ export default function Transaction() {
 
   const renderElement = useMemo(() => {
     if (loading && !accumulatedData.length) {
-      return <CustomLoading />;
+      return <LoadingSkeletonList items={accumulatedData?.length} />;
     }
     if (error) {
       return <div className="text-center text-red-500">Error: {error}</div>;

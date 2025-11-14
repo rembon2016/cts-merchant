@@ -6,6 +6,7 @@ import LoadMoreButton from "../customs/button/LoadMoreButton";
 import CustomLoading from "../customs/loading/CustomLoading";
 import { XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 
 const ROOT_API = import.meta.env.VITE_API_ROUTES;
 
@@ -103,8 +104,8 @@ export default function FaQ() {
   };
 
   const renderElement = useMemo(() => {
-    if (loading && !accumulatedData.length) {
-      return <CustomLoading />;
+    if (loading) {
+      return <LoadingSkeletonList items={accumulatedData.length} />;
     }
     if (error) {
       return <div className="text-center text-red-500">Error: {error}</div>;
