@@ -8,6 +8,7 @@ import CustomLoading from "../customs/loading/CustomLoading";
 import SimpleModal from "../customs/modal/SimpleModal";
 import { useCustomToast } from "../../hooks/useCustomToast";
 import CustomToast from "../customs/toast/CustomToast";
+import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
 
 export default function POSProducts() {
   const {
@@ -242,6 +243,15 @@ export default function POSProducts() {
                 </h1>
               </div>
             </div>
+
+            {productsLoading && (
+              <div className="grid grid-cols-2 gap-2">
+                {products?.map((product) => (
+                  <LoadingSkeletonCard key={product?.id} />
+                ))}
+              </div>
+            )}
+
             {!productsLoading && !productsError && products?.length === 0 && (
               <div className="col-span-2 flex flex-col items-center justify-center text-gray-500 p-4 bg-gray-100 rounded-lg h-[250px]">
                 <XCircle className="w-16 h-16 mb-2 text-gray-400" />

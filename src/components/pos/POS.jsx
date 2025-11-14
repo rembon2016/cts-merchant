@@ -9,6 +9,7 @@ import SearchInput from "../customs/form/SearchInput";
 import { toast } from "react-toastify";
 import { AlertCircle, ShoppingCart, XCircle } from "lucide-react";
 import BottomModal from "../customs/menu/BottomModal";
+import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
 
 const MENU = [
   {
@@ -204,24 +205,8 @@ export default function POS() {
     if (productsLoading) {
       return (
         <div className="grid grid-cols-2 gap-2">
-          {[...Array(4)].map((_, idx) => (
-            <div
-              key={idx}
-              className="w-full h-[220px] bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"
-            >
-              <div className="w-full h-[80px] bg-gray-400 dark:bg-gray-600 rounded-t-[10px] p-2"></div>
-              <div className="flex h-full flex-col gap-6 p-3">
-                <div className="w-full">
-                  <div className="w-[90%] h-[20px] bg-gray-300 dark:bg-gray-500 rounded-sm mb-3"></div>
-                  <div className="flex flex-col gap-1">
-                    <div className="w-full h-[10px] bg-gray-300 dark:bg-gray-500 rounded-sm"></div>
-                    <div className="w-[30%] h-[10px] bg-gray-300 dark:bg-gray-500 rounded-sm"></div>
-                  </div>
-                </div>
-
-                <div className="w-full h-[35px] bg-gray-400 dark:bg-gray-500 rounded-lg p-2"></div>
-              </div>
-            </div>
+          {[...new Array(products)]?.map((product) => (
+            <LoadingSkeletonCard key={product?.id} />
           ))}
         </div>
       );
