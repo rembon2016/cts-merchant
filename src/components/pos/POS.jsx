@@ -10,15 +10,18 @@ import { toast } from "react-toastify";
 import { AlertCircle, ShoppingCart, XCircle } from "lucide-react";
 import BottomModal from "../customs/menu/BottomModal";
 import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
+import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 
-const MENU = [
+const MAIN_MENU = [
   {
+    id: 1,
     name: "TRANSAKSI",
     iconLight: "/icons/transaction.svg",
     iconDark: "/icons/transaction-white.svg",
     path: "/pos/transaction",
   },
   {
+    id: 2,
     name: "PRODUK",
     iconLight: "/icons/product.svg",
     iconDark: "/icons/product-white.svg",
@@ -31,12 +34,13 @@ export default function POS() {
   const [selectedSub, setSelectedSub] = useState("");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showVariantModal, setShowVariantModal] = useState(false);
+
   const observerRef = useRef();
 
   const { isDark } = useThemeStore();
   const { error } = useCartStore();
   const {
-    categories: subCategories,
+    categories,
     isLoading,
     getCategories,
     products,
@@ -84,7 +88,7 @@ export default function POS() {
     resetProducts();
     getProducts({
       category_id: selectedSub
-        ? subCategories.find((cat) => cat.name === selectedSub)?.id || ""
+        ? categories.find((cat) => cat.name === selectedSub)?.id || ""
         : "",
       search: debouncedSearch,
       page: 1,
@@ -102,7 +106,7 @@ export default function POS() {
         if (entries[0].isIntersecting && hasMoreProducts) {
           loadMoreProducts({
             category_id: selectedSub
-              ? subCategories.find((cat) => cat.name === selectedSub)?.id || ""
+              ? categories.find((cat) => cat.name === selectedSub)?.id || ""
               : "",
             search: debouncedSearch,
             per_page: 20,
@@ -117,7 +121,7 @@ export default function POS() {
       loadMoreProducts,
       selectedSub,
       debouncedSearch,
-      subCategories,
+      categories,
     ]
   );
 
@@ -143,20 +147,36 @@ export default function POS() {
     navigate(`/product/${productId}`);
   };
 
+  const renderMainMenu = useMemo(() => {
+    if (isLoading) {
+      return <LoadingSkeletonCard items={MAIN_MENU?.length} />;
+    }
+
+    return (
+      <div className="flex gap-2 mb-6">
+        {MAIN_MENU.map((cat) => (
+          <button
+            key={cat.name}
+            className="w-full min-h-[100px] max-h-full flex flex-col justify-center items-center hover:bg-slate-200 dark:hover:bg-slate-600 bg-white  text-slate-600 dark:text-slate-100 rounded-lg font-semibold cursor-pointer text-[12px]"
+            onClick={() => navigate(cat?.path, { replace: true })}
+          >
+            <div className=" bg-[var(--c-accent)] p-2 rounded-2xl flex items-center justify-center mb-2">
+              <img
+                src={isDark ? cat.iconDark : cat.iconLight}
+                alt={cat.name}
+                className="w-10 h-10"
+              />
+            </div>
+            {cat.name}
+          </button>
+        ))}
+      </div>
+    );
+  }, [isLoading]);
+
   const renderCategories = useMemo(() => {
     if (isLoading) {
-      return (
-        <div className="mb-3">
-          <div className="flex gap-1 overflow-x-auto invisible-scrollbar pb-2">
-            {[...Array(4)].map((_, idx) => (
-              <div
-                key={idx}
-                className="w-32 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"
-              />
-            ))}
-          </div>
-        </div>
-      );
+      return <LoadingSkeletonList items={categories?.length} />;
     }
 
     if (error) {
@@ -172,7 +192,7 @@ export default function POS() {
     return (
       <div className="mb-3">
         <div className="flex gap-1 overflow-x-auto invisible-scrollbar pb-2">
-          {subCategories.map((sub) => (
+          {categories.map((sub) => (
             <button
               key={sub.id}
               className={`w-full flex flex-nowrap px-4 py-2 border ${
@@ -199,7 +219,7 @@ export default function POS() {
         </div>
       </div>
     );
-  }, [isLoading, error, subCategories, selectedSub]);
+  }, [isLoading, error, categories, selectedSub]);
 
   const renderProducts = useMemo(() => {
     if (productsLoading) {
@@ -324,24 +344,7 @@ export default function POS() {
   return (
     <div className="p-6 max-w-3xl mx-auto">
       {/* Kategori Produk */}
-      <div className="flex gap-2 mb-6">
-        {MENU.map((cat) => (
-          <button
-            key={cat.name}
-            className="w-full min-h-[100px] max-h-full flex flex-col justify-center items-center hover:bg-slate-200 dark:hover:bg-slate-600 bg-white  text-slate-600 dark:text-slate-100 rounded-lg font-semibold cursor-pointer text-[12px]"
-            onClick={() => navigate(cat?.path, { replace: true })}
-          >
-            <div className=" bg-[var(--c-accent)] p-2 rounded-2xl flex items-center justify-center mb-2">
-              <img
-                src={isDark ? cat.iconDark : cat.iconLight}
-                alt={cat.name}
-                className="w-10 h-10"
-              />
-            </div>
-            {cat.name}
-          </button>
-        ))}
-      </div>
+      {renderMainMenu}
       {/* Sub Kategori */}
       {renderCategories}
       <div className="mb-6">
