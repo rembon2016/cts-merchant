@@ -7,6 +7,7 @@ import { ShoppingCart } from "lucide-react";
 import CustomLoading from "../customs/loading/CustomLoading";
 import BottomModal from "../customs/menu/BottomModal";
 import BackButton from "../customs/button/BackButton";
+import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
 
 export default function DetailProduct() {
   const { getDetailProduct, isLoading, products, error } = useProductStore();
@@ -23,12 +24,7 @@ export default function DetailProduct() {
 
   const renderElements = useMemo(() => {
     if (isLoading) {
-      return (
-        <div className="w-full text-center">
-          {/* Loading indicator for infinite scroll */}
-          <CustomLoading />
-        </div>
-      );
+      return <LoadingSkeletonCard />;
     }
 
     if (error) {

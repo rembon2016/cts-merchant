@@ -4,8 +4,8 @@ import { formatCurrency } from "../../helper/currency";
 import { useTransactionStore } from "../../store/transactionStore";
 import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import CustomLoading from "../customs/loading/CustomLoading";
 import { XCircle } from "lucide-react";
+import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 
 export default function POSTransaction() {
   const { transactions, isLoading, getListTransactions } =
@@ -24,7 +24,7 @@ export default function POSTransaction() {
 
   const renderElements = useMemo(() => {
     if (isLoading) {
-      return <CustomLoading />;
+      return <LoadingSkeletonList items={6} />;
     }
 
     if (!isLoading && transactions.length === 0) {
@@ -40,29 +40,6 @@ export default function POSTransaction() {
       <div className="p-4 min-h-[70vh]">
         <div className="w-full space-y-4">
           {/* Header / Search / Filters */}
-          <div className="bg-white border border-gray-100 rounded-lg p-4 shadow-sm">
-            <h2 className="text-lg font-semibold text-gray-800">
-              Transaksi POS
-            </h2>
-            <p className="text-xs text-gray-500 mt-1">
-              Transaksi terbaru berdasarkan tanggal
-            </p>
-
-            <div className="mt-4">
-              <div className="w-full">
-                <SearchInput />
-              </div>
-            </div>
-
-            <div className="mt-4 text-sm text-gray-600">
-              <div className="flex items-center justify-between border-t pt-3">
-                <span>Total hari ini</span>
-                <span className="font-semibold text-lg text-[var(--c-primary)]">
-                  {formatCurrency(totalToday)}
-                </span>
-              </div>
-            </div>
-          </div>
 
           {/* Transactions List */}
           <div className="space-y-6">
@@ -132,5 +109,30 @@ export default function POSTransaction() {
     getListTransactions();
   }, []);
 
-  return renderElements;
+  return (
+    <>
+      <div className="bg-white border border-gray-100 rounded-lg p-4 shadow-sm">
+        <h2 className="text-lg font-semibold text-gray-800">Transaksi POS</h2>
+        <p className="text-xs text-gray-500 mt-1">
+          Transaksi terbaru berdasarkan tanggal
+        </p>
+
+        <div className="mt-4">
+          <div className="w-full">
+            <SearchInput />
+          </div>
+        </div>
+
+        <div className="mt-4 text-sm text-gray-600">
+          <div className="flex items-center justify-between border-t pt-3">
+            <span>Total hari ini</span>
+            <span className="font-semibold text-lg text-[var(--c-primary)]">
+              {formatCurrency(totalToday)}
+            </span>
+          </div>
+        </div>
+      </div>
+      {renderElements}
+    </>
+  );
 }
