@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState, useRef, useEffect } from "react";
+import { useMemo, useCallback, useState, useRef, useEffect, act } from "react";
 import { AlertCircle, Pencil, Trash2, XCircle } from "lucide-react";
 import { usePosStore } from "../../store/posStore";
 import { useProductStore } from "../../store/productStore";
@@ -9,6 +9,7 @@ import SimpleModal from "../customs/modal/SimpleModal";
 import { useCustomToast } from "../../hooks/useCustomToast";
 import CustomToast from "../customs/toast/CustomToast";
 import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
+import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 
 export default function POSProducts() {
   const {
@@ -180,15 +181,63 @@ export default function POSProducts() {
   const buttonClassName =
     "text-2xl w-16 h-16 bg-[var(--c-primary)] text-white rounded-full font-semibold hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center shadow-xl shadow-blue-700/20 hover:shadow-none transition-all duration-500 ease-in-out";
 
-  const renderElements = useMemo(() => {
+  const renderElemntsTab = useMemo(() => {
     if (initialLoading) {
-      return (
-        <div className="w-full text-center">
-          <CustomLoading />
-        </div>
-      );
+      return <LoadingSkeletonList />;
     }
 
+    return (
+      <div className="w-full mb-4">
+        <div className="flex bg-white dark:bg-slate-800 rounded-lg p-1 shadow">
+          <button
+            className={`w-1/2 px-4 py-2 rounded-md text-sm font-semibold ${
+              activeTab === "Produk"
+                ? "bg-[var(--c-accent)] text-slate-700"
+                : "text-gray-700 dark:text-slate-100"
+            }`}
+            onClick={() => setActiveTab("Produk")}
+          >
+            Produk
+          </button>
+          <button
+            className={`w-1/2 px-4 py-2 rounded-md text-sm font-semibold ${
+              activeTab === "Kategori"
+                ? "bg-[var(--c-accent)] text-slate-700"
+                : "text-gray-700 dark:text-slate-100"
+            }`}
+            onClick={() => setActiveTab("Kategori")}
+          >
+            Kategori
+          </button>
+        </div>
+      </div>
+    );
+  }, [initialLoading, activeTab]);
+
+  const renderCatalogProducts = useMemo(() => {
+    if (initialLoading) {
+      return <LoadingSkeletonList />;
+    }
+
+    return (
+      <div className="grid grid-cols-2 gap-2">
+        <div className="w-full income-card p-4 bg-[var(--c-primary)] flex flex-col gap-2 rounded-xl shadow">
+          <h3 className="font-normal text-white">Jumlah Produk</h3>
+          <h1 className="font-bold text-xl text-white">{products.length}</h1>
+        </div>
+        <div className="w-full income-card p-4 bg-[var(--c-primary)] flex flex-col gap-2 rounded-xl shadow">
+          <h3 className="font-normal text-white">Total Stok</h3>
+          <h1 className="font-bold text-xl text-white">
+            {new Intl.NumberFormat("id-ID", {
+              minimumFractionDigits: 0,
+            }).format(totalStocks)}
+          </h1>
+        </div>
+      </div>
+    );
+  }, [initialLoading, products, totalStocks]);
+
+  const renderElements = useMemo(() => {
     if (productsError) {
       return (
         <div className="col-span-2 flex flex-col items-center justify-center text-gray-500 p-4 bg-gray-100 rounded-lg h-[250px]">
@@ -200,151 +249,109 @@ export default function POSProducts() {
 
     return (
       <div className="flex flex-col gap-3">
-        <div className="w-full">
-          <div className="flex bg-white dark:bg-slate-800 rounded-lg p-1 shadow">
-            <button
-              className={`w-1/2 px-4 py-2 rounded-md text-sm font-semibold ${
-                activeTab === "Produk"
-                  ? "bg-[var(--c-accent)] text-slate-700"
-                  : "text-gray-700 dark:text-slate-100"
-              }`}
-              onClick={() => setActiveTab("Produk")}
-            >
-              Produk
-            </button>
-            <button
-              className={`w-1/2 px-4 py-2 rounded-md text-sm font-semibold ${
-                activeTab === "Kategori"
-                  ? "bg-[var(--c-accent)] text-slate-700"
-                  : "text-gray-700 dark:text-slate-100"
-              }`}
-              onClick={() => setActiveTab("Kategori")}
-            >
-              Kategori
-            </button>
-          </div>
-        </div>
-
         {activeTab === "Produk" && (
           <div className="relative">
-            <div className="grid grid-cols-2 gap-2">
-              <div className="w-full income-card p-4 bg-[var(--c-primary)] flex flex-col gap-2 rounded-xl shadow">
-                <h3 className="font-normal text-white">Jumlah Produk</h3>
-                <h1 className="font-bold text-xl text-white">
-                  {products.length}
-                </h1>
-              </div>
-              <div className="w-full income-card p-4 bg-[var(--c-primary)] flex flex-col gap-2 rounded-xl shadow">
-                <h3 className="font-normal text-white">Total Stok</h3>
-                <h1 className="font-bold text-xl text-white">
-                  {new Intl.NumberFormat("id-ID", {
-                    minimumFractionDigits: 0,
-                  }).format(totalStocks)}
-                </h1>
-              </div>
-            </div>
+            {renderCatalogProducts}
 
-            {productsLoading && (
-              <div className="grid grid-cols-2 gap-2">
-                {products?.map((product) => (
-                  <LoadingSkeletonCard key={product?.id} />
-                ))}
-              </div>
-            )}
+            {initialLoading && <LoadingSkeletonCard items={products?.length} />}
 
-            {!productsLoading && !productsError && products?.length === 0 && (
+            {!initialLoading && !productsError && products?.length === 0 && (
               <div className="col-span-2 flex flex-col items-center justify-center text-gray-500 p-4 bg-gray-100 rounded-lg h-[250px]">
                 <XCircle className="w-16 h-16 mb-2 text-gray-400" />
                 <span className="text-sm">Produk tidak ditemukan</span>
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-2 mt-2">
-              {products.map((product, index) => {
-                const isLastProduct = products.length === index + 1;
-                const productPrice = getProductPrice(product);
-                const productStock = product.is_variant
-                  ? getTotalVariantStock(product)
-                  : getProductStock(product);
-                const isOutOfStock = !hasAvailableStock(product);
+            {!initialLoading && !productsError && products?.length !== 0 && (
+              <>
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  {products.map((product, index) => {
+                    const isLastProduct = products.length === index + 1;
+                    const productPrice = getProductPrice(product);
+                    const productStock = product.is_variant
+                      ? getTotalVariantStock(product)
+                      : getProductStock(product);
+                    const isOutOfStock = !hasAvailableStock(product);
 
-                return (
-                  <button
-                    key={product.id}
-                    ref={isLastProduct ? lastProductElementRef : null}
-                    className={`border rounded-lg shadow hover:shadow-lg transition flex flex-col items-start overflow-hidden ${
-                      isOutOfStock ? "opacity-50" : "cursor-pointer"
-                    }`}
-                    onClick={() =>
-                      !isOutOfStock && goToProductDetail(product.id)
-                    }
-                  >
-                    <div className="relative w-full">
-                      <img
-                        src={
-                          product?.image
-                            ? `${import.meta.env.VITE_API_IMAGE}${
-                                product.image
-                              }`
-                            : "/images/image-placeholder.png"
+                    return (
+                      <button
+                        key={product.id}
+                        ref={isLastProduct ? lastProductElementRef : null}
+                        className={`border rounded-lg shadow hover:shadow-lg transition flex flex-col items-start overflow-hidden ${
+                          isOutOfStock ? "opacity-50" : "cursor-pointer"
+                        }`}
+                        onClick={() =>
+                          !isOutOfStock && goToProductDetail(product.id)
                         }
-                        alt={product.name || "Product Image"}
-                        className="w-full h-[100px] object-cover rounded-t-[10px]"
-                        onError={(e) => {
-                          e.target.src = "/images/placeholder.jpg";
-                        }}
-                      />
-                      {isOutOfStock && (
-                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-t-[10px]">
-                          <span className="text-white font-semibold text-sm">
-                            HABIS
-                          </span>
+                      >
+                        <div className="relative w-full">
+                          <img
+                            src={
+                              product?.image
+                                ? `${import.meta.env.VITE_API_IMAGE}${
+                                    product.image
+                                  }`
+                                : "/images/image-placeholder.png"
+                            }
+                            alt={product.name || "Product Image"}
+                            className="w-full h-[100px] object-cover rounded-t-[10px]"
+                            onError={(e) => {
+                              e.target.src = "/images/placeholder.jpg";
+                            }}
+                          />
+                          {isOutOfStock && (
+                            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-t-[10px]">
+                              <span className="text-white font-semibold text-sm">
+                                HABIS
+                              </span>
+                            </div>
+                          )}
+                          {product.is_variant && (
+                            <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                              Varian
+                            </div>
+                          )}
                         </div>
-                      )}
-                      {product.is_variant && (
-                        <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
-                          Varian
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-2 w-full h-full flex flex-col justify-between">
-                      <div>
-                        <div className="text-slate-600 dark:text-slate-300">
-                          <span className="font-bold text-md">
-                            {formatCurrency(productPrice)}
-                          </span>
-                        </div>
-                        <div className="mt-2 mb-4">
-                          <div className="font-semibold text-md line-clamp-2 leading-5 mb-1">
-                            {product.name}
+                        <div className="p-2 w-full h-full flex flex-col justify-between">
+                          <div>
+                            <div className="text-slate-600 dark:text-slate-300">
+                              <span className="font-bold text-md">
+                                {formatCurrency(productPrice)}
+                              </span>
+                            </div>
+                            <div className="mt-2 mb-4">
+                              <div className="font-semibold text-md line-clamp-2 leading-5 mb-1">
+                                {product.name}
+                              </div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400">
+                                Stok: {productStock}
+                              </div>
+                            </div>
                           </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
-                            Stok: {productStock}
-                          </div>
                         </div>
-                      </div>
-                    </div>
+                      </button>
+                    );
+                  })}
+                </div>
+                <div
+                  className="fixed"
+                  style={{
+                    bottom: "6rem",
+                    marginBottom: "1.7rem",
+                    right: "max(0px, calc((100vw - 24rem)/2 + 1rem))",
+                  }}
+                >
+                  <button
+                    onClick={() =>
+                      navigate("/pos/tambah-produk", { replace: true })
+                    }
+                    className={buttonClassName}
+                  >
+                    +
                   </button>
-                );
-              })}
-            </div>
-            <div
-              className="fixed"
-              style={{
-                bottom: "6rem",
-                marginBottom: "1.7rem",
-                right: "max(0px, calc((100vw - 24rem)/2 + 1rem))",
-              }}
-            >
-              <button
-                onClick={() =>
-                  navigate("/pos/tambah-produk", { replace: true })
-                }
-                className={buttonClassName}
-              >
-                +
-              </button>
-            </div>
+                </div>
+              </>
+            )}
           </div>
         )}
 
@@ -426,7 +433,6 @@ export default function POSProducts() {
     );
   }, [
     productsError,
-    productsLoading,
     products,
     hasMoreProducts,
     activeTab,
@@ -446,7 +452,10 @@ export default function POSProducts() {
         onClose={hideToast}
         duration={toast.duration}
       />
-      <div className="p-4 max-w-sm mx-auto safe-bottom">{renderElements}</div>
+      <div className="p-4 max-w-sm mx-auto safe-bottom">
+        {renderElemntsTab}
+        {renderElements}
+      </div>
     </div>
   );
 }
