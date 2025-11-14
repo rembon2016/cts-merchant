@@ -13,7 +13,7 @@ const Cart = () => {
     cart,
     getCart,
     deleteCartItems,
-    clearMultipleCarts,
+    clearAllCart,
     setSelectedCart,
     isLoading,
     error,
@@ -133,8 +133,6 @@ const Cart = () => {
     setPendingItemId(null);
     setPendingItemName("");
 
-    const cartIds = [cart?.data?.id].filter(Boolean);
-
     // Proceed with deletion
     if (confirmMode === "item" && pendingItemId) {
       deleteCartItems(pendingItemId)
@@ -145,7 +143,9 @@ const Cart = () => {
           showError("Gagal menghapus item");
         });
     } else {
-      clearMultipleCarts(cartIds)
+      // For clearing all cart, use the cart ID (not item IDs)
+      const cartIds = [cart?.data?.id].filter(Boolean);
+      clearAllCart(cartIds)
         .then(() => {
           showSuccess("Semua item berhasil dihapus");
         })

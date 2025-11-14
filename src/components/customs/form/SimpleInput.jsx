@@ -44,11 +44,11 @@ export default function SimpleInput({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type]);
-  const inputClassName = `w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500  ${
+  const inputClassName = `w-full p-4 border ${
+    errors ? "border-2 border-red-600" : "border-slate-300"
+  } rounded-xl focus:ring-2 focus:ring-blue-500  ${
     disabled ? "bg-gray-200 dark:bg-slate-600" : "bg-white dark:bg-slate-600"
-  } dark:text-slate-100 font-semibold ${
-    errors ? "text-red-500 border-2 border-red-600" : ""
-  }`;
+  } dark:text-slate-100 font-semibold ${errors ? "text-red-500" : ""}`;
 
   return (
     <div className="relative w-full">

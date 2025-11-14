@@ -400,30 +400,80 @@ const useCartStore = create((set, get) => ({
       set({ error: error.message, isLoading: false });
     }
   },
+  clearAllCart: async (cartIds) => {
+    try {
+      set({ isLoading: true, error: null });
+
+      const tokenPos = sessionStorage.getItem("authPosToken");
+
+      // Build query string with cart_id[] array for clear all cart
+      const queryParams = cartIds
+        .map((cartId) => `cart_id[]=${cartId}`)
+        .join("&");
+
+      const response = await fetch(
+        `${ROOT_API}/pos/cart/clear?${queryParams}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${tokenPos}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to clear all cart");
+      }
+
+      set({
+        cart: [],
+        selectedCart: [],
+        isLoading: false,
+        error: false,
+        success: true,
+      });
+
+      get().getCart();
+
+      setTimeout(() => {
+        set({ success: null });
+      }, 3000);
+
+      return true;
+    } catch (error) {
+      console.log("Error clearing all cart: ", error.message);
+      set({ error: error.message, isLoading: false });
+      setTimeout(() => {
+        set({ error: null });
+      }, 3000);
+      return false;
+    }
+  },
   clearMultipleCarts: async (cartIds) => {
     try {
       set({ isLoading: true, error: null });
 
       const tokenPos = sessionStorage.getItem("authPosToken");
 
-      // Loop through each cart_id and call the clear API
-      const clearPromises = cartIds.map((cartId) =>
-        fetch(`${ROOT_API}/pos/cart/clear?cart_id=${cartId}`, {
+      // Build query string with item_id[] array
+      const queryParams = cartIds
+        .map((cartId) => `item_id[]=${cartId}`)
+        .join("&");
+
+      const response = await fetch(
+        `${ROOT_API}/pos/cart/item/null?${queryParams}`,
+        {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${tokenPos}`,
           },
-        })
+        }
       );
 
-      const responses = await Promise.all(clearPromises);
-
-      // Check if all requests were successful
-      const allSuccessful = responses.every((response) => response.ok);
-
-      if (!allSuccessful) {
-        throw new Error("Failed to clear some cart items");
+      if (!response.ok) {
+        throw new Error("Failed to clear cart items");
       }
 
       set({

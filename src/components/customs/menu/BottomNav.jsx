@@ -16,7 +16,7 @@ const BottomNav = () => {
     cart,
     setSelectedCart,
     clearDiscountData,
-    deleteCartItems,
+    clearMultipleCarts,
   } = useCartStore();
   const {
     toast,
@@ -209,8 +209,7 @@ const BottomNav = () => {
         showSuccess("Pesanan berhasil diproses");
         // Clear carts based on unique cart_ids
         if (cartIds && cartIds?.length > 0) {
-          // await clearMultipleCarts(cartIds);
-          await Promise.all(cartIds.map((cartId) => deleteCartItems(cartId)));
+          await clearMultipleCarts(cartIds);
         }
 
         setTimeout(() => {
