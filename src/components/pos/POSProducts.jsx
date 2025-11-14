@@ -237,6 +237,31 @@ export default function POSProducts() {
     );
   }, [initialLoading, products, totalStocks]);
 
+  const renderElementsNoData = (type) => (
+    <div className="col-span-2 flex flex-col items-center justify-center text-gray-500 p-4 bg-gray-100 rounded-lg h-[250px]">
+      <XCircle className="w-16 h-16 mb-2 text-gray-400" />
+      <span className="text-sm">Tidak ada {type} yang ditemukan</span>
+    </div>
+  );
+
+  const renderElementsButtons = (redirectTo) => (
+    <div
+      className="fixed"
+      style={{
+        bottom: "6rem",
+        marginBottom: "1.7rem",
+        right: "max(0px, calc((100vw - 24rem)/2 + 1rem))",
+      }}
+    >
+      <button
+        onClick={() => navigate(`/pos/${redirectTo}`, { replace: true })}
+        className={buttonClassName}
+      >
+        +
+      </button>
+    </div>
+  );
+
   const renderElements = useMemo(() => {
     if (productsError) {
       return (
@@ -255,108 +280,96 @@ export default function POSProducts() {
 
             {initialLoading && <LoadingSkeletonCard items={products?.length} />}
 
-            {!initialLoading && !productsError && products?.length === 0 && (
-              <div className="col-span-2 flex flex-col items-center justify-center text-gray-500 p-4 bg-gray-100 rounded-lg h-[250px]">
-                <XCircle className="w-16 h-16 mb-2 text-gray-400" />
-                <span className="text-sm">Produk tidak ditemukan</span>
-              </div>
-            )}
+            {!initialLoading &&
+              !productsError &&
+              products?.length === 0 &&
+              renderElementsNoData("produk")}
 
-            {!initialLoading && !productsError && products?.length !== 0 && (
-              <>
-                <div className="grid grid-cols-2 gap-2 mt-2">
-                  {products.map((product, index) => {
-                    const isLastProduct = products.length === index + 1;
-                    const productPrice = getProductPrice(product);
-                    const productStock = product.is_variant
-                      ? getTotalVariantStock(product)
-                      : getProductStock(product);
-                    const isOutOfStock = !hasAvailableStock(product);
+            {!initialLoading && !productsError && products?.length > 0 && (
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                {products.map((product, index) => {
+                  const isLastProduct = products.length === index + 1;
+                  const productPrice = getProductPrice(product);
+                  const productStock = product.is_variant
+                    ? getTotalVariantStock(product)
+                    : getProductStock(product);
+                  const isOutOfStock = !hasAvailableStock(product);
 
-                    return (
-                      <button
-                        key={product.id}
-                        ref={isLastProduct ? lastProductElementRef : null}
-                        className={`border rounded-lg shadow hover:shadow-lg transition flex flex-col items-start overflow-hidden ${
-                          isOutOfStock ? "opacity-50" : "cursor-pointer"
-                        }`}
-                        onClick={() =>
-                          !isOutOfStock && goToProductDetail(product.id)
-                        }
-                      >
-                        <div className="relative w-full">
-                          <img
-                            src={
-                              product?.image
-                                ? `${import.meta.env.VITE_API_IMAGE}${
-                                    product.image
-                                  }`
-                                : "/images/image-placeholder.png"
-                            }
-                            alt={product.name || "Product Image"}
-                            className="w-full h-[100px] object-cover rounded-t-[10px]"
-                            onError={(e) => {
-                              e.target.src = "/images/placeholder.jpg";
-                            }}
-                          />
-                          {isOutOfStock && (
-                            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-t-[10px]">
-                              <span className="text-white font-semibold text-sm">
-                                HABIS
-                              </span>
+                  return (
+                    <button
+                      key={product.id}
+                      ref={isLastProduct ? lastProductElementRef : null}
+                      className={`border rounded-lg shadow hover:shadow-lg transition flex flex-col items-start overflow-hidden ${
+                        isOutOfStock ? "opacity-50" : "cursor-pointer"
+                      }`}
+                      onClick={() =>
+                        !isOutOfStock && goToProductDetail(product.id)
+                      }
+                    >
+                      <div className="relative w-full">
+                        <img
+                          src={
+                            product?.image
+                              ? `${import.meta.env.VITE_API_IMAGE}${
+                                  product.image
+                                }`
+                              : "/images/image-placeholder.png"
+                          }
+                          alt={product.name || "Product Image"}
+                          className="w-full h-[100px] object-cover rounded-t-[10px]"
+                          onError={(e) => {
+                            e.target.src = "/images/placeholder.jpg";
+                          }}
+                        />
+                        {isOutOfStock && (
+                          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-t-[10px]">
+                            <span className="text-white font-semibold text-sm">
+                              HABIS
+                            </span>
+                          </div>
+                        )}
+                        {product.is_variant && (
+                          <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                            Varian
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-2 w-full h-full flex flex-col justify-between">
+                        <div>
+                          <div className="text-slate-600 dark:text-slate-300">
+                            <span className="font-bold text-md">
+                              {formatCurrency(productPrice)}
+                            </span>
+                          </div>
+                          <div className="mt-2 mb-4">
+                            <div className="font-semibold text-md line-clamp-2 leading-5 mb-1">
+                              {product.name}
                             </div>
-                          )}
-                          {product.is_variant && (
-                            <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
-                              Varian
-                            </div>
-                          )}
-                        </div>
-                        <div className="p-2 w-full h-full flex flex-col justify-between">
-                          <div>
-                            <div className="text-slate-600 dark:text-slate-300">
-                              <span className="font-bold text-md">
-                                {formatCurrency(productPrice)}
-                              </span>
-                            </div>
-                            <div className="mt-2 mb-4">
-                              <div className="font-semibold text-md line-clamp-2 leading-5 mb-1">
-                                {product.name}
-                              </div>
-                              <div className="text-xs text-gray-500 dark:text-gray-400">
-                                Stok: {productStock}
-                              </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                              Stok: {productStock}
                             </div>
                           </div>
                         </div>
-                      </button>
-                    );
-                  })}
-                </div>
-                <div
-                  className="fixed"
-                  style={{
-                    bottom: "6rem",
-                    marginBottom: "1.7rem",
-                    right: "max(0px, calc((100vw - 24rem)/2 + 1rem))",
-                  }}
-                >
-                  <button
-                    onClick={() =>
-                      navigate("/pos/tambah-produk", { replace: true })
-                    }
-                    className={buttonClassName}
-                  >
-                    +
-                  </button>
-                </div>
-              </>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             )}
+            {renderElementsButtons("tambah-produk")}
           </div>
         )}
 
         {activeTab === "Kategori" && (
           <div className="relative pb-16">
+            {initialLoading && (
+              <LoadingSkeletonList items={subCategories?.length} />
+            )}
+
+            {!initialLoading &&
+              subCategories?.length === 0 &&
+              renderElementsNoData("kategori")}
+
             <div className="space-y-2">
               {subCategories.map((sub) => {
                 return (
@@ -410,23 +423,7 @@ export default function POSProducts() {
                 showButton={true}
               />
             )}
-            <div
-              className="fixed"
-              style={{
-                bottom: "6rem",
-                marginBottom: "1.7rem",
-                right: "max(0px, calc((100vw - 24rem)/2 + 1rem))",
-              }}
-            >
-              <button
-                onClick={() =>
-                  navigate("/pos/tambah-kategori", { replace: true })
-                }
-                className={buttonClassName}
-              >
-                +
-              </button>
-            </div>
+            {renderElementsButtons("tambah-kategori")}
           </div>
         )}
       </div>
