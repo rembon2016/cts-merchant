@@ -1,5 +1,5 @@
-import AddInvoiceComponent from "../../components/invoice/AddInvoice";
+import InvoiceForm from "../../components/invoice/InvoiceForm";
 
 export default function AddInvoice() {
-  return <AddInvoiceComponent />;
+  return <InvoiceForm />;
 }
