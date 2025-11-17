@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { formatCurrency } from "../../helper/currency";
 import SearchInput from "../customs/form/SearchInput";
 import { toast } from "react-toastify";
-import { AlertCircle, ShoppingCart, XCircle } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import BottomModal from "../customs/menu/BottomModal";
 import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
 import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
