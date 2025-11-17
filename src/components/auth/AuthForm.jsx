@@ -6,6 +6,7 @@ import SimpleAlert from "../customs/alert/SimpleAlert";
 import SimpleInput from "../customs/form/SimpleInput";
 import CustomToast from "../customs/toast/CustomToast";
 import { useCustomToast } from "../../hooks/useCustomToast";
+import PrimaryButton from "../customs/button/PrimaryButton";
 
 export default function AuthForm({ formMode = "login" }) {
   const isLoginMode = formMode === "login";
@@ -225,23 +226,14 @@ export default function AuthForm({ formMode = "login" }) {
             </div>
           )}
 
-          <button
-            type="submit"
-            className="w-full py-4 bg-[var(--c-primary)] text-white font-semibold rounded-xl hover:bg-blue-700 transition"
-            onClick={handleSubmit}
-            disabled={isLoginMode ? isLoading : !checked || isLoading}
-          >
-            {isLoading ? (
-              <div className="flex items-center justify-center gap-2">
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Tunggu...
-              </div>
-            ) : isLoginMode ? (
-              "Masuk"
-            ) : (
-              "Daftar"
-            )}
-          </button>
+          <PrimaryButton
+            isLoginMode={isLoginMode}
+            isLoading={isLoading}
+            checked={checked}
+            handleSubmit={handleSubmit}
+            title={isLoginMode ? "Masuk" : "Daftar"}
+            disableCondition={isLoginMode ? isLoading : !checked || isLoading}
+          />
 
           <h6 className="flex justify-center gap-1">
             {isLoginMode ? "Belum Punya Akun?" : "Sudah Punya Akun?"}

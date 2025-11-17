@@ -1,0 +1,24 @@
+import PropTypes from "prop-types";
+import LoadingSpinner from "../loading/LoadingSpinner";
+
+AccentButton.propTypes = {
+  title: PropTypes.string.isRequired,
+  isLoading: PropTypes.bool,
+  disableCondition: PropTypes.bool,
+  handleSubmit: PropTypes.func,
+};
+
+export default function AccentButton(props) {
+  const { title, isLoading, disableCondition, handleSubmit } = props;
+
+  return (
+    <button
+      type="submit"
+      className="w-full py-4 bg-[var(--c-accent)] text-gray-700 font-semibold rounded-xl hover:bg-yellow-400 transition"
+      onClick={handleSubmit}
+      disabled={disableCondition}
+    >
+      {isLoading ? <LoadingSpinner /> : title}
+    </button>
+  );
+}
