@@ -11,7 +11,7 @@ import { AlertCircle, ShoppingCart, XCircle } from "lucide-react";
 import BottomModal from "../customs/menu/BottomModal";
 import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
 import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
-import QuickMenus from "../customs/menu/QuickMenus";
+import BottomSheet from "../customs/menu/BottomSheet";
 
 const MAIN_MENU = [
   {
@@ -35,6 +35,7 @@ export default function POS() {
   const [selectedSub, setSelectedSub] = useState("");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showVariantModal, setShowVariantModal] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const observerRef = useRef();
 
@@ -88,9 +89,7 @@ export default function POS() {
   useEffect(() => {
     resetProducts();
     getProducts({
-      category_id: selectedSub
-        ? categories.find((cat) => cat.name === selectedSub)?.id || ""
-        : "",
+      category_id: selectedSub,
       search: debouncedSearch,
       page: 1,
       per_page: 20,
@@ -150,7 +149,7 @@ export default function POS() {
 
   const renderMainMenu = useMemo(() => {
     if (isLoading) {
-      return <LoadingSkeletonCard items={MAIN_MENU?.length} />;
+      return <LoadingSkeletonList />;
     }
 
     return (
@@ -190,6 +189,8 @@ export default function POS() {
       );
     }
 
+    return;
+
     return (
       <div className="mb-3">
         <div className="flex gap-1 overflow-x-auto invisible-scrollbar pb-2">
@@ -224,13 +225,7 @@ export default function POS() {
 
   const renderProducts = useMemo(() => {
     if (productsLoading) {
-      return (
-        <div className="grid grid-cols-2 gap-2">
-          {[...new Array(products)]?.map((product) => (
-            <LoadingSkeletonCard key={product?.id} />
-          ))}
-        </div>
-      );
+      return <LoadingSkeletonCard items={products} />;
     }
 
     if (productsError) {
@@ -347,14 +342,17 @@ export default function POS() {
       {/* Kategori Produk */}
       {renderMainMenu}
       {/* Sub Kategori */}
-      {renderCategories}
+      {/* {renderCategories} */}
       <div className="mb-6 flex gap-2">
         <SearchInput
           value={search}
           onChange={(value) => setSearch(value)}
           placeholder="Cari produk..."
         />
-        <button className="bg-[var(--c-primary)] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1">
+        <button
+          onClick={() => setIsSheetOpen(true)}
+          className="bg-[var(--c-primary)] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1"
+        >
           <svg
             width="17"
             height="12"
@@ -404,7 +402,20 @@ export default function POS() {
         />
       )}
 
-      {/* <QuickMenus isMenuItems={false} /> */}
+      <BottomSheet
+        isOpen={isSheetOpen}
+        onClose={() => setIsSheetOpen(false)}
+        onItemClick={(url, title) => {
+          setIsSheetOpen(false);
+          setTimeout(() => {
+            setModalData({ isOpen: true, url, title });
+          }, 320);
+        }}
+        isMenuItems={false}
+        setSelectedSub={setSelectedSub}
+        data={categories}
+        // token={token}
+      />
     </div>
   );
 }
