@@ -104,22 +104,16 @@ const usePosStore = create((set, get) => ({
 
       const result = await response.json();
 
-      if (result.success && result.data) {
-        const newProducts = result.data.data || [];
-        const currentProducts = reset ? [] : get().products;
-
-        set({
-          products: [...currentProducts, ...newProducts],
-          currentPage: result.data.current_page || page,
-          hasMoreProducts:
-            (result.data.current_page || page) < (result.data.last_page || 1),
-          totalProducts: result.data.total || 0,
-          productsLoading: false,
-          productsError: null,
-        });
-      } else {
-        throw new Error(result.message || "Failed to fetch products");
-      }
+      set({
+        products: result?.data?.data,
+        currentPage: result.data.current_page || page,
+        hasMoreProducts:
+          (result.data.current_page || page) < (result.data.last_page || 1),
+        totalProducts: result.data.total || 0,
+        productsLoading: false,
+        productsError: null,
+        reset: false,
+      });
     } catch (error) {
       set({
         productsLoading: false,
