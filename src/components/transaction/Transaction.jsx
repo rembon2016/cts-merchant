@@ -6,6 +6,7 @@ import LoadMoreButton from "../customs/button/LoadMoreButton";
 import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 import { formatCurrency } from "../../helper/currency";
 import { ElementsNoData } from "../customs/element/NoData";
+import { formatDate } from "../../helper/format-date";
 
 // Define action types
 const SET_FILTER = "SET_FILTER";
@@ -121,40 +122,11 @@ export default function Transaction() {
             key={`${item.id}-${idx}`}
             className="bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex gap-2 flex-col justify-between">
               <div className="flex items-center gap-3">
                 <div
                   className={`size-10 rounded-xl grid place-items-center bg-blue-100 dark:bg-green-900/30`}
                 >
-                  {/* {item.type === "income" ? (
-                    <svg
-                      className="w-5 h-5 text-green-600 dark:text-green-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 4v16m8-8H4"
-                      />
-                    </svg>
-                  ) : (
-                    <svg
-                      className="w-5 h-5 text-red-600 dark:text-red-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M20 12H4"
-                      />
-                    </svg>
-                  )} */}
                   <svg
                     width="20"
                     height="22"
@@ -181,11 +153,10 @@ export default function Transaction() {
                 </div>
                 <div>
                   <p className="font-medium text-slate-900 dark:text-slate-100">
-                    {item.title}
+                    {item.code}
                   </p>
                   <p className="text-sm text-slate-500 dark:text-slate-400">
-                    {new Date(item.transaction_at).toISOString().split("T")[0]}{" "}
-                    *{" "}
+                    {formatDate(item.transaction_at)} *{" "}
                     {new Date(item.transaction_at).toLocaleTimeString("id-ID", {
                       hour: "2-digit",
                       minute: "2-digit",
@@ -194,7 +165,10 @@ export default function Transaction() {
                   </p>
                 </div>
               </div>
-              <div className="text-right">
+              <div className="text-right flex items-center justify-end gap-2 m">
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  {item.status.toLowerCase()} {"-"}
+                </p>
                 <p className={`font-semibold text-blue-600 dark:text-blue-400`}>
                   {/* {item.type === "income" ? "+" : "-"}Rp{" "} */}
                   {formatCurrency(item?.amount)}
