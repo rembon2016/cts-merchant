@@ -2,11 +2,21 @@ import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuthStore } from "../../../store/authStore";
+import { usePosStore } from "../../../store/posStore";
 
-const BottomSheet = ({ isOpen, onClose, onItemClick, token = null }) => {
+const BottomSheet = ({
+  isOpen,
+  onClose,
+  onItemClick,
+  token = null,
+  isMenuItems = true,
+  data = null,
+  setSelectedSub = null,
+}) => {
   const sheetRef = useRef(null);
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  const { getProducts } = usePosStore();
 
   const menuItems = [
     {
@@ -218,6 +228,11 @@ const BottomSheet = ({ isOpen, onClose, onItemClick, token = null }) => {
     }
   };
 
+  const handleItemClickMenu = async (item) => {
+    setSelectedSub(item);
+    handleClose();
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -250,30 +265,66 @@ const BottomSheet = ({ isOpen, onClose, onItemClick, token = null }) => {
 
             {/* Grid 3 cols with 3-2-1 layout */}
             <div className="grid grid-cols-3 gap-3">
-              {menuItems.map((item, index) => {
-                // Hide the last item if it would be alone in the last row
-                if (
-                  index === menuItems.length - 1 &&
-                  menuItems.length % 3 === 1
-                ) {
-                  return <div key={item.id} className="placeholder-cell" />;
-                }
+              {isMenuItems &&
+                menuItems.map((item, index) => {
+                  // Hide the last item if it would be alone in the last row
+                  if (
+                    index === menuItems.length - 1 &&
+                    menuItems.length % 3 === 1
+                  ) {
+                    return <div key={item.id} className="placeholder-cell" />;
+                  }
 
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => handleItemClick(item)}
-                    className="sheet-item bg-slate-50 dark:bg-slate-600 rounded-xl p-3 flex flex-col items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-500 transition-colors"
-                  >
-                    <span className="size-12 grid place-items-center rounded-xl accent-bg">
-                      {item.icon}
-                    </span>
-                    <span className="text-xs text-center text-primary dark:text-slate-300">
-                      {item.label}
-                    </span>
-                  </button>
-                );
-              })}
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleItemClick(item)}
+                      className="sheet-item bg-slate-50 dark:bg-slate-600 rounded-xl p-3 flex flex-col items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-500 transition-colors"
+                    >
+                      <span className="size-12 grid place-items-center rounded-xl accent-bg">
+                        {item.icon}
+                      </span>
+                      <span className="text-xs text-center text-primary dark:text-slate-300">
+                        {item.label}
+                      </span>
+                    </button>
+                  );
+                })}
+
+              {/* Add placeholder cells to maintain grid layout */}
+              {Array.from({ length: (3 - (menuItems.length % 3)) % 3 }).map(
+                (_, index) => (
+                  <div
+                    key={`placeholder-${menuItems?.length + index}`}
+                    className="placeholder-cell"
+                  />
+                )
+              )}
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              {!isMenuItems &&
+                data.map((item) => {
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleItemClickMenu(item?.id)}
+                      className="sheet-item bg-slate-50 dark:bg-slate-600 rounded-xl p-3 flex flex-col items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-500 transition-colors"
+                    >
+                      <img
+                        src={
+                          item.image
+                            ? `${import.meta.env.VITE_API_IMAGE}${item.image}`
+                            : "/images/image-placeholder.png"
+                        }
+                        alt={item.name}
+                        className="size-12 grid place-items-center rounded-xl accent-bg p-2"
+                      />
+                      <span className="text-xs text-center text-primary dark:text-slate-300">
+                        {item.name}
+                      </span>
+                    </button>
+                  );
+                })}
 
               {/* Add placeholder cells to maintain grid layout */}
               {Array.from({ length: (3 - (menuItems.length % 3)) % 3 }).map(
