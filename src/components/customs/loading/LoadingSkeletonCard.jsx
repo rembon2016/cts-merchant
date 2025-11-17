@@ -1,13 +1,13 @@
 import React from "react";
 
-export default function LoadingSkeletonCard({ items = 2, className = "" }) {
+export default function LoadingSkeletonCard({ items = 1, className = "" }) {
   return (
     <div
-      className={`border rounded-lg shadow overflow-hidden bg-white dark:bg-slate-800 animate-pulse mb-4 ${className}`}
+      className={`border  rounded-lg shadow overflow-hidden bg-white dark:bg-slate-800 animate-pulse mb-4 ${className}`}
       aria-busy="true"
       aria-live="polite"
     >
-      {Array.from({ length: Number(items) || 2 }).map((item) => (
+      {Array.from({ length: Number(items) || 1 }).map((item) => (
         <div key={item?.id}>
           <div className="relative w-full">
             <div className="w-full h-[100px] bg-gray-200 dark:bg-slate-700" />

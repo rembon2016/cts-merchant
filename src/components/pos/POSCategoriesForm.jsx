@@ -58,6 +58,9 @@ export default function POSCategoriesForm(props) {
   };
 
   const handleSubmit = async () => {
+    const normalizedImage =
+      editMode && typeof formData.image === "string" ? "" : formData.image;
+
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors);
@@ -66,7 +69,13 @@ export default function POSCategoriesForm(props) {
     setValidationErrors({});
 
     const response = editMode
-      ? await editCategories(formData, categoryId)
+      ? await editCategories(
+          {
+            ...formData,
+            image: normalizedImage,
+          },
+          categoryId
+        )
       : await addCategories(formData);
 
     if (response?.success === true) {
@@ -145,7 +154,13 @@ export default function POSCategoriesForm(props) {
           name="image"
           accept="image/*"
           onChange={(file) => setFormData((prev) => ({ ...prev, image: file }))}
-          initialPreview={formData?.image || null}
+          initialPreview={
+            typeof formData?.image === "string" && formData.image
+              ? /^https?:\/\//.test(formData.image)
+                ? formData.image
+                : `${import.meta.env.VITE_API_IMAGE}${formData.image}`
+              : null
+          }
           label="Gambar Kategori"
         />
         <button
