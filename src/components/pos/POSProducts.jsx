@@ -1,15 +1,15 @@
-import { useMemo, useCallback, useState, useRef, useEffect, act } from "react";
-import { AlertCircle, Pencil, Trash2, XCircle } from "lucide-react";
+import { useMemo, useCallback, useState, useRef, useEffect } from "react";
+import { Pencil, Trash2 } from "lucide-react";
 import { usePosStore } from "../../store/posStore";
 import { useProductStore } from "../../store/productStore";
 import { formatCurrency } from "../../helper/currency";
 import { useNavigate } from "react-router-dom";
-import CustomLoading from "../customs/loading/CustomLoading";
 import SimpleModal from "../customs/modal/SimpleModal";
 import { useCustomToast } from "../../hooks/useCustomToast";
 import CustomToast from "../customs/toast/CustomToast";
 import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
 import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
+import { ElementsNoData } from "../customs/element/NoData";
 
 export default function POSProducts() {
   const {
@@ -237,13 +237,6 @@ export default function POSProducts() {
     );
   }, [initialLoading, products, totalStocks]);
 
-  const renderElementsNoData = (type) => (
-    <div className="col-span-2 flex flex-col items-center justify-center text-gray-500 p-4 bg-gray-100 rounded-lg h-[250px]">
-      <XCircle className="w-16 h-16 mb-2 text-gray-400" />
-      <span className="text-sm">Tidak ada {type} yang ditemukan</span>
-    </div>
-  );
-
   const renderElementsButtons = (redirectTo) => (
     <div
       className="fixed"
@@ -264,12 +257,7 @@ export default function POSProducts() {
 
   const renderElements = useMemo(() => {
     if (productsError) {
-      return (
-        <div className="col-span-2 flex flex-col items-center justify-center text-gray-500 p-4 bg-gray-100 rounded-lg h-[250px]">
-          <AlertCircle className="w-16 h-16 mb-2 text-gray-400" />
-          <span className="text-sm">Error: {productsError}</span>
-        </div>
-      );
+      return <ElementsNoData text={productsError} />;
     }
 
     return (
@@ -280,10 +268,9 @@ export default function POSProducts() {
 
             {initialLoading && <LoadingSkeletonCard items={products?.length} />}
 
-            {!initialLoading &&
-              !productsError &&
-              products?.length === 0 &&
-              renderElementsNoData("produk")}
+            {!initialLoading && !productsError && products?.length === 0 && (
+              <ElementsNoData text="Tidak ada produk" />
+            )}
 
             {!initialLoading && !productsError && products?.length > 0 && (
               <div className="grid grid-cols-2 gap-2 mt-2">
@@ -366,9 +353,9 @@ export default function POSProducts() {
               <LoadingSkeletonList items={subCategories?.length} />
             )}
 
-            {!initialLoading &&
-              subCategories?.length === 0 &&
-              renderElementsNoData("kategori")}
+            {!initialLoading && subCategories?.length === 0 && (
+              <ElementsNoData text="Tidak ada kategori" />
+            )}
 
             <div className="space-y-2">
               {subCategories.map((sub) => {

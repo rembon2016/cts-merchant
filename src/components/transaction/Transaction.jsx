@@ -5,7 +5,7 @@ import SearchInput from "../customs/form/SearchInput";
 import LoadMoreButton from "../customs/button/LoadMoreButton";
 import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 import { formatCurrency } from "../../helper/currency";
-import { XCircle } from "lucide-react";
+import { ElementsNoData } from "../customs/element/NoData";
 
 // Define action types
 const SET_FILTER = "SET_FILTER";
@@ -111,14 +111,7 @@ export default function Transaction() {
       return <div className="text-center text-red-500">Error: {error}</div>;
     }
     if (!accumulatedData.length) {
-      return (
-        <div className="flex flex-col items-center text-center py-4">
-          <XCircle className="w-16 h-16 mb-2 text-gray-400" />
-          {state.searchQuery
-            ? "Transaksi Tidak Ditemukan."
-            : "Tidak Transaksi."}
-        </div>
-      );
+      return <ElementsNoData text="Tidak ada transaksi" />;
     }
 
     return (
