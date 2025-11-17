@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuthStore } from "../../../store/authStore";
+import { usePosStore } from "../../../store/posStore";
 
 const BottomSheet = ({
   isOpen,
@@ -15,6 +16,7 @@ const BottomSheet = ({
   const sheetRef = useRef(null);
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  const { getProducts } = usePosStore();
 
   const menuItems = [
     {
