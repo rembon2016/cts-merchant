@@ -12,6 +12,7 @@ import BottomModal from "../customs/menu/BottomModal";
 import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
 import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 import BottomSheet from "../customs/menu/BottomSheet";
+import { ElementsNoData } from "../customs/element/NoData";
 
 const MAIN_MENU = [
   {
@@ -229,21 +230,11 @@ export default function POS() {
     }
 
     if (productsError) {
-      return (
-        <div className="col-span-2 flex flex-col items-center justify-center text-gray-500 p-4 bg-gray-100 rounded-lg h-[250px]">
-          <AlertCircle className="w-16 h-16 mb-2 text-gray-400" />
-          <span className="text-sm">Error: {productsError}</span>
-        </div>
-      );
+      return <ElementsNoData text={productsError} />;
     }
 
     if (!productsLoading && !productsError && products?.length === 0) {
-      return (
-        <div className="col-span-2 flex flex-col items-center justify-center text-gray-500 p-4 bg-gray-100 rounded-lg h-[250px]">
-          <XCircle className="w-16 h-16 mb-2 text-gray-400" />
-          <span className="text-sm">Produk tidak ditemukan</span>
-        </div>
-      );
+      return <ElementsNoData text="Produk tidak ditemukan" />;
     }
 
     return (
@@ -403,6 +394,7 @@ export default function POS() {
       )}
 
       <BottomSheet
+        title="Kategori"
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
         onItemClick={(url, title) => {

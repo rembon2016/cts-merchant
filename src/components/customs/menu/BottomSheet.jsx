@@ -2,8 +2,10 @@ import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuthStore } from "../../../store/authStore";
+import { ElementsNoData } from "../element/NoData";
 
 const BottomSheet = ({
+  title = "Menu Lainnya",
   isOpen,
   onClose,
   onItemClick,
@@ -251,7 +253,7 @@ const BottomSheet = ({
           >
             <div className="flex items-center justify-between mb-3">
               <h4 className="font-semibold text-primary dark:text-slate-300">
-                Menu Lainnya
+                {title}
               </h4>
               <button
                 onClick={handleClose}
@@ -299,7 +301,8 @@ const BottomSheet = ({
                 )
               )}
             </div>
-            <div className="grid grid-cols-3 gap-3">
+            {data?.length === 0 && <ElementsNoData text="Tidak ada kategori" />}
+            <div className="grid grid-cols-3 gap-3 w-full">
               {!isMenuItems &&
                 data.map((item) => {
                   return (
@@ -323,16 +326,6 @@ const BottomSheet = ({
                     </button>
                   );
                 })}
-
-              {/* Add placeholder cells to maintain grid layout */}
-              {Array.from({ length: (3 - (menuItems.length % 3)) % 3 }).map(
-                (_, index) => (
-                  <div
-                    key={`placeholder-${menuItems?.length + index}`}
-                    className="placeholder-cell"
-                  />
-                )
-              )}
             </div>
           </div>
         </div>
