@@ -227,9 +227,7 @@ export default function AuthForm({ formMode = "login" }) {
           )}
 
           <PrimaryButton
-            isLoginMode={isLoginMode}
             isLoading={isLoading}
-            checked={checked}
             handleSubmit={handleSubmit}
             title={isLoginMode ? "Masuk" : "Daftar"}
             disableCondition={isLoginMode ? isLoading : !checked || isLoading}
