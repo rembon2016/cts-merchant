@@ -571,21 +571,67 @@ const useProductStore = create((set, get) => ({
     try {
       set({ isLoading: true, error: null });
 
+      // Detect if there is any File in the formData values
+      const hasFile = Object.values(formData || {}).some(
+        (v) =>
+          v instanceof File ||
+          (Array.isArray(v) && v.some((i) => i instanceof File))
+      );
+
+      let body;
+
+      const headers = {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+
+      if (hasFile) {
+        // Use FormData for file upload
+        body = new FormData();
+
+        Object.entries(formData || {}).forEach(([key, value]) => {
+          if (value instanceof File) {
+            body.append(key, value, value.name);
+          } else if (Array.isArray(value)) {
+            // 🔥 kirim array sesuai jenis isinya
+            if (typeof value[0] === "object") {
+              // kirim array of object dengan indeks
+              value.forEach((obj, i) => {
+                Object.entries(obj).forEach(([k, v]) => {
+                  body.append(`${key}[${i}][${k}]`, v);
+                });
+              });
+            } else {
+              // array biasa (seperti category_ids[])
+              value.forEach((v) => body.append(`${key}[]`, v));
+            }
+          } else if (value && typeof value === "object") {
+            body.append(key, JSON.stringify(value));
+          } else if (value !== undefined && value !== null) {
+            body.append(key, String(value));
+          }
+        });
+        // headers["Content-Type"] = "multipart/form-data";
+        // NOTE: do NOT set Content-Type header for FormData — browser will set boundary
+      } else {
+        headers["Content-Type"] = "application/json";
+        body = JSON.stringify(formData);
+      }
+
       const response = await fetch(
         `${import.meta.env.VITE_API_POS_ROUTES}/categories`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(formData),
+          headers,
+          body,
         }
       );
 
       if (!response.ok) {
         set({ isLoading: false, error: `Gagal menambahkan kategori` });
+        setTimeout(() => {
+          set({ error: null });
+        }, 2000);
         throw new Error(`HTTP error! status: ${response?.status}`);
       }
 
@@ -593,16 +639,10 @@ const useProductStore = create((set, get) => ({
 
       set({
         isLoading: false,
-        categories: result?.data,
+        products: result?.data,
         error: null,
         success: true,
       });
-
-      if (response.ok) {
-        setTimeout(() => {
-          set({ success: null });
-        }, 2000);
-      }
 
       return result;
     } catch (error) {
@@ -661,24 +701,44 @@ const useProductStore = create((set, get) => ({
       );
 
       let body;
+      let httpMethod = "PUT";
       const headers = {
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
       };
 
       if (hasFile) {
+        // Use FormData for file upload
         body = new FormData();
+        // Laravel and some backends may not parse multipart on PUT.
+        // Use POST with method override to ensure all fields are received.
+        body.append("_method", "PUT");
+        httpMethod = "POST";
+
         Object.entries(formData || {}).forEach(([key, value]) => {
           if (value instanceof File) {
             body.append(key, value, value.name);
           } else if (Array.isArray(value)) {
-            value.forEach((v) => body.append(`${key}[]`, v));
+            // 🔥 kirim array sesuai jenis isinya
+            if (typeof value[0] === "object") {
+              // kirim array of object dengan indeks
+              value.forEach((obj, i) => {
+                Object.entries(obj).forEach(([k, v]) => {
+                  body.append(`${key}[${i}][${k}]`, v);
+                });
+              });
+            } else {
+              // array biasa (seperti category_ids[])
+              value.forEach((v) => body.append(`${key}[]`, v));
+            }
           } else if (value && typeof value === "object") {
             body.append(key, JSON.stringify(value));
           } else if (value !== undefined && value !== null) {
             body.append(key, String(value));
           }
         });
+        // headers["Content-Type"] = "multipart/form-data";
+        // NOTE: do NOT set Content-Type header for FormData — browser will set boundary
       } else {
         headers["Content-Type"] = "application/json";
         body = JSON.stringify(formData);
@@ -687,7 +747,7 @@ const useProductStore = create((set, get) => ({
       const response = await fetch(
         `${import.meta.env.VITE_API_POS_ROUTES}/categories/${categoryId}`,
         {
-          method: "PUT",
+          method: httpMethod,
           headers,
           body,
         }

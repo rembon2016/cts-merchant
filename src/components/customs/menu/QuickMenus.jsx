@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useGenerateToken } from "../../../store/tokenStore";
 import { useAuthStore } from "../../../store/authStore";
 
-const QuickMenus = () => {
+const QuickMenus = ({ isMenuItems = true }) => {
   const [modalData, setModalData] = useState({
     isOpen: false,
     url: "",
@@ -120,20 +120,21 @@ const QuickMenus = () => {
     <>
       <section className="px-4 mt-4">
         <div className="grid grid-cols-4 gap-2">
-          {menuItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => handleMenuClick(item)}
-              className="bg-white dark:bg-slate-700 rounded-2xl p-2 flex flex-col items-center gap-2 shadow-soft"
-            >
-              <span className="grid place-items-center size-12 rounded-xl accent-bg">
-                {item.icon}
-              </span>
-              <span className="text-xs font-medium text-primary dark:text-slate-300">
-                {item.label}
-              </span>
-            </button>
-          ))}
+          {isMenuItems &&
+            menuItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => handleMenuClick(item)}
+                className="bg-white dark:bg-slate-700 rounded-2xl p-2 flex flex-col items-center gap-2 shadow-soft"
+              >
+                <span className="grid place-items-center size-12 rounded-xl accent-bg">
+                  {item.icon}
+                </span>
+                <span className="text-xs font-medium text-primary dark:text-slate-300">
+                  {item.label}
+                </span>
+              </button>
+            ))}
 
           <button
             onClick={() => setIsSheetOpen(true)}
