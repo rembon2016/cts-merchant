@@ -2,14 +2,20 @@ import VariantModal from "../customs/modal/VariantModal";
 import SearchInput from "../customs/form/SearchInput";
 import { formatCurrency } from "../../helper/currency";
 import { useTransactionStore } from "../../store/transactionStore";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { XCircle } from "lucide-react";
+import { ElementsNoData } from "../customs/element/NoData";
 import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
+import { useDebounce } from "../../hooks/useDebounce";
 
 export default function POSTransaction() {
+  const [search, setSearch] = useState("");
+
   const { transactions, isLoading, getListTransactions } =
     useTransactionStore();
+
+  // Debounce search input
+  const debouncedSearch = useDebounce(search, 500);
 
   const navigate = useNavigate();
 
@@ -28,12 +34,7 @@ export default function POSTransaction() {
     }
 
     if (!isLoading && transactions.length === 0) {
-      return (
-        <div className="col-span-2 flex flex-col items-center justify-center text-gray-500 p-4 bg-gray-100 rounded-lg h-[250px]">
-          <XCircle className="w-16 h-16 mb-2 text-gray-400" />
-          <span className="text-sm">Tidak ada Transaksi</span>
-        </div>
-      );
+      return <ElementsNoData text="Tidak ada transaksi" />;
     }
 
     return (
@@ -106,8 +107,10 @@ export default function POSTransaction() {
   }, [transactions, isLoading]);
 
   useEffect(() => {
-    getListTransactions();
-  }, []);
+    getListTransactions({
+      search: debouncedSearch,
+    });
+  }, [debouncedSearch]);
 
   return (
     <>
@@ -119,7 +122,11 @@ export default function POSTransaction() {
 
         <div className="mt-4">
           <div className="w-full">
-            <SearchInput />
+            <SearchInput
+              value={search}
+              onChange={setSearch}
+              placeholder="Cari transaksi..."
+            />
           </div>
         </div>
 
