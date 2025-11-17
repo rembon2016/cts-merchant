@@ -14,9 +14,18 @@ const useTransactionStore = create((set, get) => ({
   },
 
   // Get transactions from API with pagination and filters
-  getListTransactions: async () => {
+  getListTransactions: async (params = {}) => {
+    const { page = 1, per_page = 10, search = "" } = params;
+
     const tokenPos = sessionStorage.getItem("authPosToken");
     const activeBranch = sessionStorage.getItem("branchActive");
+
+    const queryParams = new URLSearchParams({
+      branch_id: activeBranch,
+      page: page.toString(),
+      per_page: per_page.toString(),
+      search,
+    });
 
     try {
       set({ isLoading: true, error: null });
@@ -24,7 +33,7 @@ const useTransactionStore = create((set, get) => ({
       const response = await fetch(
         `${
           import.meta.env.VITE_API_POS_ROUTES
-        }/transactions?branch_id=${activeBranch}`,
+        }/transactions?${queryParams.toString()}`,
         {
           method: "GET",
           headers: {
