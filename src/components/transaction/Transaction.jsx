@@ -165,7 +165,10 @@ export default function Transaction() {
                   </p>
                 </div>
               </div>
-              <div className="text-right">
+              <div className="text-right flex items-center justify-end gap-2 m">
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  {item.status.toLowerCase()} {"-"}
+                </p>
                 <p className={`font-semibold text-blue-600 dark:text-blue-400`}>
                   {/* {item.type === "income" ? "+" : "-"}Rp{" "} */}
                   {formatCurrency(item?.amount)}
