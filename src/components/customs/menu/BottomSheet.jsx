@@ -47,7 +47,7 @@ const BottomSheet = ({
   };
 
   const handleItemClick = (item) => {
-    if (!isMenuItems) setSelectedSub(item?.id);
+    if (!isMenuItems) setSelectedSub({ id: item.id, name: item.name });
 
     if (item.url === "#") {
       toast.info(`Fitur ${item?.label} Segera Hadir`, {
