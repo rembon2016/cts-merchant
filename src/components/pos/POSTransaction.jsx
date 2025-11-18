@@ -7,12 +7,36 @@ import { useNavigate } from "react-router-dom";
 import { ElementsNoData } from "../customs/element/NoData";
 import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 import { useDebounce } from "../../hooks/useDebounce";
+import { useDashboardStore } from "../../store/dashboardStore";
+import { QuickBarChart } from "../customs/chart/chart";
+import SimpleInput from "../customs/form/SimpleInput";
 
 export default function POSTransaction() {
   const [search, setSearch] = useState("");
 
+  const [formData, setFormData] = useState({
+    date: "",
+  });
+  const [activeRange, setActiveRange] = useState("day");
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
   const { transactions, isLoading, getListTransactions } =
     useTransactionStore();
+
+  const {
+    getChartSales,
+    getChartOverView,
+    data,
+    dataOverview,
+    isLoading: loadingChart,
+  } = useDashboardStore();
 
   // Debounce search input
   const debouncedSearch = useDebounce(search, 500);
@@ -39,7 +63,7 @@ export default function POSTransaction() {
 
     return (
       <div className="p-4 min-h-[70vh]">
-        <div className="w-full space-y-4">
+        <div className="w-full">
           {/* Header / Search / Filters */}
 
           {/* Transactions List */}
@@ -112,8 +136,102 @@ export default function POSTransaction() {
     });
   }, [debouncedSearch]);
 
+  useEffect(() => {
+    const salesKey = {
+      day: "day",
+      week: "weekly",
+      month: "monthly",
+      year: "yearly",
+    }[activeRange];
+    const overviewKey = {
+      day: "today",
+      week: "week",
+      month: "month",
+      year: "year",
+    }[activeRange];
+    if (salesKey && overviewKey) {
+      Promise.all([
+        getChartSales(salesKey, formData),
+        getChartOverView(overviewKey),
+      ]);
+    }
+  }, [activeRange, formData]);
+
   return (
     <>
+      <div className="w-full bg-white p-4 my-2 rounded-lg">
+        <div className="flex flex-col flex-wrap items-center gap-2 mb-4">
+          <div className="inline-flex rounded-md border border-gray-200 overflow-hidden">
+            {[
+              { key: "day", label: "Hari Ini" },
+              { key: "week", label: "Minggu" },
+              { key: "month", label: "Bulan" },
+              { key: "year", label: "Tahun" },
+            ].map((btn) => (
+              <button
+                key={btn.key}
+                onClick={() => setActiveRange(btn.key)}
+                className={`px-3 py-1.5 text-sm ${
+                  activeRange === btn.key
+                    ? "bg-[var(--c-accent)] text-gray-700 rounded-lg"
+                    : "bg-white text-gray-700"
+                }`}
+              >
+                {btn.label}
+              </button>
+            ))}
+          </div>
+          <div className="grid grid-cols-2 gap-2 my-4 w-full">
+            <div className="w-full income-card p-4 bg-[var(--c-primary)] flex flex-col gap-2 rounded-xl shadow">
+              <h3 className="font-normal text-white text-sm">
+                Total Pendapatan
+              </h3>
+              <h1 className="font-bold text-lg text-white">
+                {loadingChart
+                  ? "..."
+                  : formatCurrency(dataOverview?.overview?.total_amount)}
+              </h1>
+            </div>
+            <div className="w-full income-card p-4 bg-[var(--c-primary)] flex flex-col gap-2 rounded-xl shadow">
+              <h3 className="font-normal text-white text-sm">
+                Keuntungan Bersih
+              </h3>
+              <h1 className="font-bold text-lg text-white">
+                {loadingChart
+                  ? "..."
+                  : formatCurrency(dataOverview?.overview?.net_profit)}
+              </h1>
+            </div>
+          </div>
+          <div className="flex-1 min-w-[160px] w-full">
+            {activeRange === "day" && (
+              <SimpleInput
+                name="date"
+                type="date"
+                label=""
+                value={formData?.date}
+                handleChange={handleChange}
+              />
+            )}
+          </div>
+        </div>
+        <QuickBarChart
+          labels={data?.labels || []}
+          values={data?.amount || data?.sales || []}
+          title={
+            activeRange === "day"
+              ? "Total Penjualan Harian"
+              : activeRange === "week"
+              ? "Total Penjualan Mingguan"
+              : activeRange === "month"
+              ? "Total Penjualan Bulanan"
+              : "Total Penjualan Tahunan"
+          }
+          height="300px"
+          isLoading={loadingChart}
+        />
+      </div>
+
       <div className="bg-white border border-gray-100 rounded-lg p-4 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-800">Transaksi POS</h2>
         <p className="text-xs text-gray-500 mt-1">
@@ -139,6 +257,7 @@ export default function POSTransaction() {
           </div>
         </div>
       </div>
+
       {renderElements}
     </>
   );
