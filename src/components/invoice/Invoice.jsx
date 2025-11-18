@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { formatDate } from "../../helper/format-date";
 import { useInvoiceStore } from "../../store/invoiceStore";
 import SimpleInput from "../customs/form/SimpleInput";
-import { XCircle } from "lucide-react";
 import FloatingButton from "../customs/button/FloatingButton";
 import { ElementsNoData } from "../customs/element/NoData";
 
