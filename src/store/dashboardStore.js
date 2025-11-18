@@ -3,15 +3,27 @@ import { create } from "zustand";
 export const useDashboardStore = create((set, get) => ({
   isLoading: false,
   data: [],
+  dataOverview: [],
   error: null,
-  getDaySales: async () => {
+  getChartSales: async (type = "day", params = {}) => {
+    const { date = "", user = "" } = params;
+
     try {
       const tokenPos = sessionStorage.getItem("authPosToken");
+      const branchId = sessionStorage.getItem("branchActive");
+
+      const queryParams = new URLSearchParams({
+        branch_id: branchId,
+        user,
+        date,
+      });
 
       set({ isLoading: true, error: null });
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_POS_ROUTES}/dashboard/charts/day-sales`,
+        `${
+          import.meta.env.VITE_API_POS_ROUTES
+        }/dashboard/charts/${type}-sales?${queryParams}`,
         {
           method: "GET",
           headers: {
@@ -29,96 +41,6 @@ export const useDashboardStore = create((set, get) => ({
       const result = await response.json();
       set({ data: result.data, isLoading: false });
 
-      return result;
-    } catch (error) {
-      console.log(error.message);
-      set({ error: error.message, isLoading: false });
-    }
-  },
-  getWeeklySales: async () => {
-    try {
-      const tokenPos = sessionStorage.getItem("authPosToken");
-
-      set({ isLoading: true, error: null });
-
-      const response = await fetch(
-        `${import.meta.env.VITE_API_POS_ROUTES}/dashboard/charts/weekly-sales`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${tokenPos}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
-
-      const result = await response.json();
-      set({ data: result.data, isLoading: false });
-      return result;
-    } catch (error) {
-      console.log(error.message);
-      set({ error: error.message, isLoading: false });
-    }
-  },
-  getMonthlySales: async () => {
-    try {
-      const tokenPos = sessionStorage.getItem("authPosToken");
-
-      set({ isLoading: true, error: null });
-
-      const response = await fetch(
-        `${import.meta.env.VITE_API_POS_ROUTES}/dashboard/charts/monthly-sales`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${tokenPos}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
-
-      const result = await response.json();
-      set({ data: result.data, isLoading: false });
-      return result;
-    } catch (error) {
-      console.log(error.message);
-      set({ error: error.message, isLoading: false });
-    }
-  },
-  getYearlySales: async () => {
-    try {
-      const tokenPos = sessionStorage.getItem("authPosToken");
-
-      set({ isLoading: true, error: null });
-
-      const response = await fetch(
-        `${import.meta.env.VITE_API_POS_ROUTES}/dashboard/charts/yearly-sales`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${tokenPos}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
-
-      const result = await response.json();
-      set({ data: result.data, isLoading: false });
       return result;
     } catch (error) {
       console.log(error.message);
@@ -157,14 +79,14 @@ export const useDashboardStore = create((set, get) => ({
       set({ error: error.message, isLoading: false });
     }
   },
-  getTodayOverview: async () => {
+  getChartOverView: async (type = "today") => {
     try {
       const tokenPos = sessionStorage.getItem("authPosToken");
 
       set({ isLoading: true, error: null });
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_POS_ROUTES}/dashboard/overview/today`,
+        `${import.meta.env.VITE_API_POS_ROUTES}/dashboard/overview/${type}`,
         {
           method: "GET",
           headers: {
@@ -180,97 +102,7 @@ export const useDashboardStore = create((set, get) => ({
       }
 
       const result = await response.json();
-      set({ data: result.data, isLoading: false });
-      return result;
-    } catch (error) {
-      console.log(error.message);
-      set({ error: error.message, isLoading: false });
-    }
-  },
-  getCurrentWeekSales: async () => {
-    try {
-      const tokenPos = sessionStorage.getItem("authPosToken");
-
-      set({ isLoading: true, error: null });
-
-      const response = await fetch(
-        `${import.meta.env.VITE_API_POS_ROUTES}/dashboard/overview/week`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${tokenPos}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
-
-      const result = await response.json();
-      set({ data: result.data, isLoading: false });
-      return result;
-    } catch (error) {
-      console.log(error.message);
-      set({ error: error.message, isLoading: false });
-    }
-  },
-  getCurrentMonthSales: async () => {
-    try {
-      const tokenPos = sessionStorage.getItem("authPosToken");
-
-      set({ isLoading: true, error: null });
-
-      const response = await fetch(
-        `${import.meta.env.VITE_API_POS_ROUTES}/dashboard/overview/month`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${tokenPos}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
-
-      const result = await response.json();
-      set({ data: result.data, isLoading: false });
-      return result;
-    } catch (error) {
-      console.log(error.message);
-      set({ error: error.message, isLoading: false });
-    }
-  },
-  getCurrentYearSales: async () => {
-    try {
-      const tokenPos = sessionStorage.getItem("authPosToken");
-
-      set({ isLoading: true, error: null });
-
-      const response = await fetch(
-        `${import.meta.env.VITE_API_POS_ROUTES}/dashboard/overview/year`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${tokenPos}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
-
-      const result = await response.json();
-      set({ data: result.data, isLoading: false });
+      set({ dataOverview: result.data, isLoading: false });
       return result;
     } catch (error) {
       console.log(error.message);
