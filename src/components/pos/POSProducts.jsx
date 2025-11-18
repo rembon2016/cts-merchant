@@ -10,6 +10,7 @@ import CustomToast from "../customs/toast/CustomToast";
 import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
 import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 import { ElementsNoData } from "../customs/element/NoData";
+import FloatingButton from "../customs/button/FloatingButton";
 
 export default function POSProducts() {
   const {
@@ -178,9 +179,6 @@ export default function POSProducts() {
     }, 0);
   }, [products, getProductStock, getTotalVariantStock]);
 
-  const buttonClassName =
-    "text-2xl w-16 h-16 bg-[var(--c-primary)] text-white rounded-full font-semibold hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center shadow-xl shadow-blue-700/20 hover:shadow-none transition-all duration-500 ease-in-out";
-
   const renderElemntsTab = useMemo(() => {
     if (initialLoading) {
       return <LoadingSkeletonList items={1} />;
@@ -238,21 +236,9 @@ export default function POSProducts() {
   }, [initialLoading, products, totalStocks]);
 
   const renderElementsButtons = (redirectTo) => (
-    <div
-      className="fixed"
-      style={{
-        bottom: "6rem",
-        marginBottom: "1.7rem",
-        right: "max(0px, calc((100vw - 24rem)/2 + 1rem))",
-      }}
-    >
-      <button
-        onClick={() => navigate(`/pos/${redirectTo}`, { replace: true })}
-        className={buttonClassName}
-      >
-        +
-      </button>
-    </div>
+    <FloatingButton
+      handleOnClick={() => navigate(redirectTo, { replace: true })}
+    />
   );
 
   const renderElements = useMemo(() => {
@@ -343,7 +329,7 @@ export default function POSProducts() {
                 })}
               </div>
             )}
-            {renderElementsButtons("tambah-produk")}
+            {renderElementsButtons("/pos/tambah-produk")}
           </div>
         )}
 
@@ -406,11 +392,12 @@ export default function POSProducts() {
                 onClose={() => setShowDeleteModal(false)}
                 handleClick={() => deleteCategory(selectedCategory.id)}
                 title={"Konfirmasi Hapus"}
-                content={`Apakah Anda yakin ingin menghapus kategori "${selectedCategory?.name}"?`}
+                content={`Apakah Anda yakin ingin menghapus kategori ini?`}
                 showButton={true}
+                isLoading={initialLoading}
               />
             )}
-            {renderElementsButtons("tambah-kategori")}
+            {renderElementsButtons("/pos/tambah-kategori")}
           </div>
         )}
       </div>

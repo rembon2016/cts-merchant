@@ -1,4 +1,6 @@
 import PropTypes from "prop-types";
+import PrimaryButton from "../button/PrimaryButton";
+import AccentButton from "../button/AccentButton";
 
 SimpleModal.propTypes = {
   onClose: PropTypes.func,
@@ -6,6 +8,7 @@ SimpleModal.propTypes = {
   title: PropTypes.string,
   content: PropTypes.string,
   showButton: PropTypes.bool,
+  isLoading: PropTypes.bool,
 };
 
 export default function SimpleModal({
@@ -14,6 +17,7 @@ export default function SimpleModal({
   title,
   content,
   showButton = false,
+  isLoading = false,
 }) {
   const handleClose = () => onClose();
 
@@ -54,20 +58,17 @@ export default function SimpleModal({
         </button>
         {showButton && (
           <div className="mt-4 flex justify-end gap-2 w-full">
-            <button
-              type="submit"
-              className="py-4 px-6 bg-[var(--c-accent)] text-gray-700 font-semibold rounded-md hover:bg-yellow-300 transition mt-4"
-              onClick={onClose}
-            >
-              Batal
-            </button>
-            <button
-              type="submit"
-              className="py-4 px-6 bg-[var(--c-primary)] text-white font-semibold rounded-md hover:bg-blue-700 transition mt-4"
-              onClick={handleClick}
-            >
-              Hapus
-            </button>
+            <AccentButton
+              title="Batal"
+              isLoading={isLoading}
+              handleOnClick={onClose}
+            />
+            <PrimaryButton
+              title="Hapus"
+              isLoading={isLoading}
+              handleOnClick={handleClick}
+              disableCondition={isLoading}
+            />
           </div>
         )}
       </div>
