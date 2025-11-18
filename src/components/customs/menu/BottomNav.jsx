@@ -6,6 +6,7 @@ import { formatCurrency } from "../../../helper/currency";
 import SimpleModal from "../modal/SimpleModal";
 import CustomToast from "../toast/CustomToast";
 import { useCustomToast } from "../../../hooks/useCustomToast";
+import PrimaryButton from "../button/PrimaryButton";
 
 const BottomNav = () => {
   const location = useLocation();
@@ -262,18 +263,18 @@ const BottomNav = () => {
                 )}
               </div>
               {showButtonFromPath.includes(location.pathname) && (
-                <button
-                  type="submit"
-                  className="w-full py-4 bg-[var(--c-primary)] text-white font-semibold rounded-xl hover:bg-blue-700 transition mt-4"
-                  onClick={handleSubmit}
-                  disabled={selectedCart?.length === 0 || loading}
-                >
-                  {loading
-                    ? "Memproses..."
-                    : ObjectTitle.find(
-                        (item) => item.path === location.pathname
-                      ).title}
-                </button>
+                <PrimaryButton
+                  isLoading={loading}
+                  handleOnClick={handleSubmit}
+                  title={
+                    loading
+                      ? "Memproses..."
+                      : ObjectTitle.find(
+                          (item) => item.path === location.pathname
+                        ).title
+                  }
+                  disableCondition={loading}
+                />
               )}
             </div>
           )}
