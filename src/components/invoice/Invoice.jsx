@@ -6,6 +6,7 @@ import { useInvoiceStore } from "../../store/invoiceStore";
 import CustomLoading from "../customs/loading/CustomLoading";
 import SimpleInput from "../customs/form/SimpleInput";
 import { Plus, XCircle } from "lucide-react";
+import FloatingButton from "../customs/button/FloatingButton";
 
 const Invoice = () => {
   const navigate = useNavigate();
@@ -98,20 +99,7 @@ const Invoice = () => {
               Daftar invoice dan detail transaksi
             </p>
           </div>
-
-          {/* Tampilkan tombol add hanya jika tidak sedang loading dan ada data */}
-          {!isLoading && (
-            <div className="flex items-center gap-3">
-              <button
-                className="p-3 bg-[var(--c-primary)] text-white rounded-md text-sm hover:bg-indigo-700"
-                onClick={() => navigate("/invoice/add", { replace: true })}
-              >
-                <Plus />
-              </button>
-            </div>
-          )}
         </div>
-
         {/* Filters */}
         <div className="mb-4 flex gap-2">
           <SimpleInput
@@ -147,7 +135,6 @@ const Invoice = () => {
             Reset
           </button>
         </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Summary + list */}
           <div className="lg:col-span-3 space-y-2">
@@ -259,6 +246,10 @@ const Invoice = () => {
             }
           </div>
         </div>
+        =
+        <FloatingButton
+          handleOnClick={() => navigate("/invoice/add", { replace: true })}
+        />
       </div>
     );
   }, [isLoading, invoices, summary, navigate, filterStatus, filterDueDate]);

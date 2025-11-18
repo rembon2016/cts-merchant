@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { useCustomToast } from "../../hooks/useCustomToast";
 import SimpleInput from "../customs/form/SimpleInput";
 import CustomToast from "../customs/toast/CustomToast";
+import PrimaryButton from "../customs/button/PrimaryButton";
+import SecondaryButton from "../customs/button/SecondaryButton";
 
 // Step Indicator Component
 const StepIndicator = ({ currentStep }) => (
@@ -445,29 +447,27 @@ const InvoiceForm = () => {
 
         <div className="flex gap-3 mt-4">
           {currentStep > 1 && (
-            <button
-              onClick={handleBack}
-              className="bg-gray-500 text-white rounded-lg py-4 px-6 font-semibold flex-1 hover:bg-gray-600 transition-colors ease-linear duration-300"
-            >
-              Kembali
-            </button>
+            <SecondaryButton
+              title="Kembali"
+              handleOnClick={handleBack}
+              disableCondition={isLoading}
+            />
           )}
 
           {currentStep < 3 ? (
-            <button
-              onClick={handleNext}
-              className="bg-[var(--c-primary)] text-white rounded-lg py-4 px-6 font-semibold flex-1 hover:bg-blue-700 transition-colors ease-linear duration-300"
-            >
-              Lanjut
-            </button>
+            <PrimaryButton
+              isLoading={isLoading}
+              handleOnClick={handleNext}
+              title="Lanjut"
+              disableCondition={isLoading}
+            />
           ) : (
-            <button
-              onClick={handleSubmit}
-              className="bg-[var(--c-primary)] text-white rounded-lg py-4 px-6 font-semibold flex-1 hover:bg-blue-700 transition-colors ease-linear duration-300"
-              disabled={isLoading}
-            >
-              {isLoading ? "Memproses..." : "Simpan"}
-            </button>
+            <PrimaryButton
+              isLoading={isLoading}
+              handleOnClick={handleSubmit}
+              title="Simpan"
+              disableCondition={isLoading}
+            />
           )}
         </div>
       </div>
