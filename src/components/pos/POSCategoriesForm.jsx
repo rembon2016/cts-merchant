@@ -6,6 +6,7 @@ import BackButton from "../customs/button/BackButton";
 import CustomToast from "../customs/toast/CustomToast";
 import { useProductStore } from "../../store/productStore";
 import { useCustomToast } from "../../hooks/useCustomToast";
+import PrimaryButton from "../customs/button/PrimaryButton";
 
 export default function POSCategoriesForm(props) {
   const { editMode = false, categoryId = null } = props;
@@ -163,13 +164,12 @@ export default function POSCategoriesForm(props) {
           }
           label="Gambar Kategori"
         />
-        <button
-          onClick={handleSubmit}
-          className="bg-[var(--c-primary)] text-white py-4 w-full rounded-lg font-semibold"
-          disabled={isLoading}
-        >
-          {isLoading ? "Memproses..." : "Simpan"}
-        </button>
+        <PrimaryButton
+          isLoading={isLoading}
+          handleOnClick={handleSubmit}
+          title="Simpan"
+          disableCondition={isLoading}
+        />
       </div>
     );
   }, [formData, handleChange]);
