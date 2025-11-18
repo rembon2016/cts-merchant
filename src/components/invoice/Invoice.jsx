@@ -3,10 +3,10 @@ import { formatCurrency } from "../../helper/currency";
 import { useLocation, useNavigate } from "react-router-dom";
 import { formatDate } from "../../helper/format-date";
 import { useInvoiceStore } from "../../store/invoiceStore";
-import CustomLoading from "../customs/loading/CustomLoading";
 import SimpleInput from "../customs/form/SimpleInput";
-import { Plus, XCircle } from "lucide-react";
+import { XCircle } from "lucide-react";
 import FloatingButton from "../customs/button/FloatingButton";
+import { ElementsNoData } from "../customs/element/NoData";
 
 const Invoice = () => {
   const navigate = useNavigate();
@@ -239,9 +239,7 @@ const Invoice = () => {
                 </>
               ) : (
                 /* Tidak ada data invoice - tampilkan empty state */
-                <div className="col-span-2 flex flex-col items-center justify-center text-gray-500 p-4 bg-gray-100 rounded-lg h-[250px]">
-                  <XCircle className="w-20 h-20 mb-2 text-gray-400" />
-                </div>
+                <ElementsNoData text="Tidak ada invoice" />
               )
             }
           </div>
