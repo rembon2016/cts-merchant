@@ -10,6 +10,8 @@ import BottomModal from "../customs/menu/BottomModal";
 import { useProductStore } from "../../store/productStore";
 import { useCustomToast } from "../../hooks/useCustomToast";
 import CustomToast from "../customs/toast/CustomToast";
+import PrimaryButton from "../customs/button/PrimaryButton";
+import BackButton from "../customs/button/BackButton";
 
 export default function POSProductForm({ editMode = false, productId = null }) {
   const navigate = useNavigate();
@@ -421,6 +423,7 @@ export default function POSProductForm({ editMode = false, productId = null }) {
   const renderForm = useMemo(() => {
     return (
       <div className="flex flex-col gap-3 mt-3 p-4">
+        <BackButton to="/pos/products" />
         <div className="flex gap-2">
           <SimpleInput
             name="sku"
@@ -1020,14 +1023,12 @@ export default function POSProductForm({ editMode = false, productId = null }) {
           )}
         </div>
 
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={isLoading}
-          className="bg-[var(--c-primary)] text-white py-4 w-full rounded-lg font-semibold"
-        >
-          {isLoading ? "Memproses..." : "Simpan"}
-        </button>
+        <PrimaryButton
+          isLoading={isLoading}
+          handleOnClick={handleSubmit}
+          title="Simpan"
+          disableCondition={isLoading}
+        />
       </div>
     );
   }, [
