@@ -191,8 +191,6 @@ export function QuickLineChart({
   height,
   isLoading = false,
 }) {
-  console.log("Render QuickLineChart");
-
   const data = {
     labels,
     datasets: [

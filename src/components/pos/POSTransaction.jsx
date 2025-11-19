@@ -235,9 +235,15 @@ export default function POSTransaction() {
             )}
           </div>
         </div>
-        <div className="flex gap-1 mb-2 w-full justify-end">
+        <div className="flex gap-1 my-2 w-full justify-end">
           <button
-            className="w-8 h-8 bg-white border border-gray-500 flex justify-center items-center"
+            className={`w-8 h-8 ${
+              typeChart === "bar" ? "bg-[var(--c-accent)]" : "bg-white"
+            } border ${
+              typeChart === "bar"
+                ? "border-[var(--c-accent)]"
+                : "border-gray-300"
+            } flex justify-center items-center`}
             onClick={() => handleChangeTypeChart("bar")}
           >
             <svg
@@ -254,7 +260,13 @@ export default function POSTransaction() {
             </svg>
           </button>
           <button
-            className="w-8 h-8 bg-white border border-gray-500 flex justify-center items-center"
+            className={`w-8 h-8 ${
+              typeChart === "line" ? "bg-[var(--c-accent)]" : "bg-white"
+            } border ${
+              typeChart === "line"
+                ? "border-[var(--c-accent)]"
+                : "border-gray-300"
+            } flex justify-center items-center`}
             onClick={() => handleChangeTypeChart("line")}
           >
             <svg
@@ -273,7 +285,13 @@ export default function POSTransaction() {
             </svg>
           </button>
           <button
-            className="w-8 h-8 bg-white border border-gray-500 flex justify-center items-center"
+            className={`w-8 h-8 ${
+              typeChart === "pie" ? "bg-[var(--c-accent)]" : "bg-white"
+            } border ${
+              typeChart === "pie"
+                ? "border-[var(--c-accent)]"
+                : "border-gray-300"
+            } flex justify-center items-center`}
             onClick={() => handleChangeTypeChart("pie")}
           >
             <svg
