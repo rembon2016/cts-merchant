@@ -137,6 +137,14 @@ export default function POSTransaction() {
 
   const handleChangeTypeChart = (type) => setTypeChart(type);
 
+  const renderClassName = (type) => {
+    return `w-8 h-8 ${
+      typeChart === type ? "bg-[var(--c-accent)]" : "bg-white"
+    } border ${
+      typeChart === type ? "border-[var(--c-accent)]" : "border-gray-300"
+    } flex justify-center items-center rounded-md`;
+  };
+
   const chartConfig = {
     labels: data?.labels || [],
     values: data?.amount || [],
@@ -237,13 +245,7 @@ export default function POSTransaction() {
         </div>
         <div className="flex gap-1 my-2 w-full justify-end">
           <button
-            className={`w-8 h-8 ${
-              typeChart === "bar" ? "bg-[var(--c-accent)]" : "bg-white"
-            } border ${
-              typeChart === "bar"
-                ? "border-[var(--c-accent)]"
-                : "border-gray-300"
-            } flex justify-center items-center`}
+            className={renderClassName("bar")}
             onClick={() => handleChangeTypeChart("bar")}
           >
             <svg
@@ -260,13 +262,7 @@ export default function POSTransaction() {
             </svg>
           </button>
           <button
-            className={`w-8 h-8 ${
-              typeChart === "line" ? "bg-[var(--c-accent)]" : "bg-white"
-            } border ${
-              typeChart === "line"
-                ? "border-[var(--c-accent)]"
-                : "border-gray-300"
-            } flex justify-center items-center`}
+            className={renderClassName("line")}
             onClick={() => handleChangeTypeChart("line")}
           >
             <svg
@@ -285,13 +281,7 @@ export default function POSTransaction() {
             </svg>
           </button>
           <button
-            className={`w-8 h-8 ${
-              typeChart === "pie" ? "bg-[var(--c-accent)]" : "bg-white"
-            } border ${
-              typeChart === "pie"
-                ? "border-[var(--c-accent)]"
-                : "border-gray-300"
-            } flex justify-center items-center`}
+            className={renderClassName("pie")}
             onClick={() => handleChangeTypeChart("pie")}
           >
             <svg
