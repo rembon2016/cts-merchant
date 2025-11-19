@@ -6,7 +6,9 @@ export const useDashboardStore = create((set, get) => ({
   dataOverview: [],
   error: null,
   getChartSales: async (type = "day", params = {}) => {
-    const { date = "", user = "" } = params;
+    const { date = "", start_date = "", end_date = "", user = "" } = params;
+
+    console.log(params);
 
     try {
       const tokenPos = sessionStorage.getItem("authPosToken");
@@ -14,6 +16,8 @@ export const useDashboardStore = create((set, get) => ({
 
       const queryParams = new URLSearchParams({
         branch_id: branchId,
+        start_date,
+        end_date,
         user,
         date,
       });
