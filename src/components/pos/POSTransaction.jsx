@@ -60,6 +60,19 @@ export default function POSTransaction() {
     0
   );
 
+  const salesKey = {
+    day: "day",
+    week: "weekly",
+    month: "monthly",
+    year: "yearly",
+  }[activeRange];
+  const overviewKey = {
+    day: "today",
+    week: "week",
+    month: "month",
+    year: "year",
+  }[activeRange];
+
   const renderElements = useMemo(() => {
     if (isLoading) {
       return <LoadingSkeletonList items={6} />;
@@ -140,6 +153,15 @@ export default function POSTransaction() {
 
   const handleChangeTypeChart = (type) => setTypeChart(type);
 
+  const handleFilterChart = () => {
+    if (formData?.start_date === "" && formData?.end_date === "") return;
+
+    Promise.all([
+      getChartSales("sales-by-date-range", true, formData),
+      getChartOverView("custom-date", formData),
+    ]);
+  };
+
   const renderClassName = (type) => {
     return `w-8 h-8 ${
       typeChart === type ? "bg-[var(--c-accent)]" : "bg-white"
@@ -180,8 +202,8 @@ export default function POSTransaction() {
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
+              fillRule="evenodd"
+              clipRule="evenodd"
               d="M11.6914 0.737187L11.0157 0L7.15888 3.53525H2.47978L0 6.01503L0.707094 6.72216L2.89356 4.53525H7.54803L11.6914 0.737187ZM11.4633 4.58806L11.9105 5.48247L8.43481 7.22031L4.15688 6.56194L1.32719 8.76328L0.71325 7.97391L3.88331 5.50831L8.27222 6.18325L11.4633 4.58806ZM0.0201563 10.0352H12.0202V11.3686H0.0202187L0.0201563 10.0352Z"
               fill="black"
             />
@@ -258,26 +280,35 @@ export default function POSTransaction() {
 
   const renderFilterInputs = useMemo(() => {
     return (
-      <div className="inline-flex w-full gap-2">
-        <SimpleInput
-          name="start_date"
-          type="date"
-          label="Date Start"
-          value={formData?.start_date}
-          handleChange={handleChange}
-          isDefaultSize={false}
-        />
-        <SimpleInput
-          name="end_date"
-          type="date"
-          label="Date End"
-          value={formData?.end_date}
-          handleChange={handleChange}
-          isDefaultSize={false}
-        />
+      <div className="flex flex-col gap-2">
+        <div className="inline-flex w-full gap-2">
+          <SimpleInput
+            name="start_date"
+            type="date"
+            label="Date Start"
+            value={formData?.start_date}
+            handleChange={handleChange}
+            isDefaultSize={false}
+          />
+          <SimpleInput
+            name="end_date"
+            type="date"
+            label="Date End"
+            value={formData?.end_date}
+            handleChange={handleChange}
+            isDefaultSize={false}
+          />
+        </div>
+        <div className="flex w-40 ml-auto">
+          <PrimaryButton
+            title="Filter"
+            handleOnClick={handleFilterChart}
+            isLoading={loadingChart}
+          />
+        </div>
       </div>
     );
-  }, [formData]);
+  }, [formData, loadingChart]);
 
   const chartConfig = {
     labels: data?.labels || [],
@@ -301,27 +332,15 @@ export default function POSTransaction() {
   }, [debouncedSearch]);
 
   useEffect(() => {
-    const salesKey = {
-      day: "day",
-      week: "weekly",
-      month: "monthly",
-      year: "yearly",
-    }[activeRange];
-    const overviewKey = {
-      day: "today",
-      week: "week",
-      month: "month",
-      year: "year",
-    }[activeRange];
     if (salesKey && overviewKey) {
       Promise.all([getChartSales(salesKey), getChartOverView(overviewKey)]);
     }
-  }, [activeRange, formData]);
+  }, [activeRange]);
 
   return (
     <div className="px-4 py-2">
       <div className="w-full bg-white p-4 my-2 rounded-lg">
-        <div className="flex flex-col gap-4 flex-wrap items-center">
+        <div className="flex flex-col gap-4 flex-wrap items-center mb-6">
           {renderTabsChart}
           {renderCardOverview}
           {/* {renderFilterInputs} */}
