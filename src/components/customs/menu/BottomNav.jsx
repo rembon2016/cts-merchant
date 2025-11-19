@@ -273,7 +273,7 @@ const BottomNav = () => {
                           (item) => item.path === location.pathname
                         ).title
                   }
-                  disableCondition={loading}
+                  disableCondition={loading || selectedCart.length === 0}
                 />
               )}
             </div>
