@@ -11,7 +11,8 @@ import PrimaryButton from "../button/PrimaryButton";
 const BottomNav = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
-  const { saveOrder, selectPaymentMethod } = useCheckoutStore();
+  const { saveOrder, proccessPayment, selectPaymentMethod } =
+    useCheckoutStore();
   const {
     selectedCart,
     cart,
@@ -190,10 +191,18 @@ const BottomNav = () => {
       ...JSON.parse(getCart),
     };
 
-    proccessOrder(checkoutValue);
+    const paymentValue = {
+      branch_id: sessionStorage.getItem("branchActive"),
+      payment_amount: JSON.parse(sessionStorage.getItem("totalPayment")),
+      payment_method_id: selectPaymentMethod,
+      discount_amount: discountAmount,
+      tax_amount: taxAmount,
+    };
+
+    proccessOrder(checkoutValue, paymentValue);
   };
 
-  const proccessOrder = async (dataCheckout) => {
+  const proccessOrder = async (dataCheckout, dataPayment) => {
     try {
       // Extract unique cart_ids from selected items
       // Since all items in the same cart share the same cart_id,
@@ -205,8 +214,9 @@ const BottomNav = () => {
       ];
 
       const response = await saveOrder(dataCheckout);
+      const responsePayment = await proccessPayment(dataPayment);
 
-      if (response?.success) {
+      if (response?.success && responsePayment?.success) {
         showSuccess("Pesanan berhasil diproses");
         // Clear carts based on unique cart_ids
         if (cartIds && cartIds?.length > 0) {
