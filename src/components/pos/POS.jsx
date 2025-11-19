@@ -411,12 +411,7 @@ export default function POS() {
         title="Kategori"
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
-        onItemClick={(url, title) => {
-          setIsSheetOpen(false);
-          setTimeout(() => {
-            setModalData({ isOpen: true, url, title });
-          }, 320);
-        }}
+        onItemClick={() => setIsSheetOpen(false)}
         isMenuItems={false}
         setSelectedSub={setSelectedSub}
         data={categories}
