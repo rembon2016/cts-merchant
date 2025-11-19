@@ -364,10 +364,10 @@ export default function POS() {
             Filter
           </button>
         </div>
-        {selectedSub !== null && (
+        {selectedSub !== null && !productsLoading && (
           <div className="flex items-center gap-2  mb-4 font-semibold">
             <span className="text-gray-600 text-sm">Kategori:</span>
-            <span className="bg-[var(--c-accent)] text-gray-700 py-2 px-3 rounded-full hover:bg-yellow-400 transition-colors flex items-center justify-between gap-1 text-sm  w-fit ">
+            <span className="bg-[var(--c-accent)] text-gray-700 py-2 px-3 rounded-lg hover:bg-yellow-400 transition-colors flex items-center justify-between gap-2 text-sm  w-fit ">
               {selectedSub?.name}
               <button onClick={() => setSelectedSub(null)}>
                 <XCircle />
