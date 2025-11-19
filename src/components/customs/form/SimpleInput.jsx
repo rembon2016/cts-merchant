@@ -17,6 +17,7 @@ SimpleInput.propTypes = {
   selectBoxData: PropTypes.array,
   changeInputType: PropTypes.bool,
   isRequired: PropTypes.bool,
+  isDefaultSize: PropTypes.bool,
 };
 
 export default function SimpleInput({
@@ -34,6 +35,7 @@ export default function SimpleInput({
   selectBoxData,
   min,
   max,
+  isDefaultSize = true,
 }) {
   const canToggleType =
     changeInputType && (type === "password" || type === "text");
@@ -44,7 +46,7 @@ export default function SimpleInput({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type]);
-  const inputClassName = `w-full p-4 border ${
+  const inputClassName = `w-full ${isDefaultSize ? "p-4" : "p-1"} border ${
     errors ? "border-2 border-red-600" : "border-slate-300"
   } rounded-xl focus:ring-2 focus:ring-blue-500  ${
     disabled ? "bg-gray-200 dark:bg-slate-600" : "bg-white dark:bg-slate-600"

@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { formatCurrency } from "../../helper/currency";
 import SearchInput from "../customs/form/SearchInput";
 import { toast } from "react-toastify";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, XCircle } from "lucide-react";
 import BottomModal from "../customs/menu/BottomModal";
 import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
 import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
@@ -33,7 +33,7 @@ const MAIN_MENU = [
 
 export default function POS() {
   const [search, setSearch] = useState("");
-  const [selectedSub, setSelectedSub] = useState("");
+  const [selectedSub, setSelectedSub] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showVariantModal, setShowVariantModal] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -90,7 +90,7 @@ export default function POS() {
   useEffect(() => {
     resetProducts();
     getProducts({
-      category_id: selectedSub,
+      category_id: selectedSub?.id,
       search: debouncedSearch,
       page: 1,
       per_page: 20,
@@ -106,8 +106,9 @@ export default function POS() {
       observerRef.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMoreProducts) {
           loadMoreProducts({
-            category_id: selectedSub
-              ? categories.find((cat) => cat.name === selectedSub)?.id || ""
+            category_id: selectedSub?.id
+              ? categories.find((cat) => cat.name === selectedSub?.name)?.id ||
+                ""
               : "",
             search: debouncedSearch,
             per_page: 20,
@@ -334,33 +335,46 @@ export default function POS() {
       {renderMainMenu}
       {/* Sub Kategori */}
       {/* {renderCategories} */}
-      <div className="mb-6 flex gap-2">
-        <SearchInput
-          value={search}
-          onChange={(value) => setSearch(value)}
-          placeholder="Cari produk..."
-        />
-        <button
-          onClick={() => setIsSheetOpen(true)}
-          className="bg-[var(--c-primary)] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1"
-        >
-          <svg
-            width="17"
-            height="12"
-            viewBox="0 0 17 12"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
+      <div className="flex flex-col gap-2 mb-4">
+        <div className="flex gap-2">
+          <SearchInput
+            value={search}
+            onChange={(value) => setSearch(value)}
+            placeholder="Cari produk..."
+          />
+          <button
+            onClick={() => setIsSheetOpen(true)}
+            className="bg-[var(--c-primary)] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1"
           >
-            <path
-              d="M0.75 0.75H15.75M3.25 5.75H13.25M6.25 10.75H10.25"
-              stroke="white"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          Filter
-        </button>
+            <svg
+              width="17"
+              height="12"
+              viewBox="0 0 17 12"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M0.75 0.75H15.75M3.25 5.75H13.25M6.25 10.75H10.25"
+                stroke="white"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            Filter
+          </button>
+        </div>
+        {selectedSub !== null && !productsLoading && (
+          <div className="flex items-center gap-2  mb-4 font-semibold">
+            <span className="text-gray-600 text-sm">Kategori:</span>
+            <span className="bg-[var(--c-accent)] text-gray-700 py-2 px-3 rounded-lg hover:bg-yellow-400 transition-colors flex items-center justify-between gap-2 text-sm  w-fit ">
+              {selectedSub?.name}
+              <button onClick={() => setSelectedSub(null)}>
+                <XCircle />
+              </button>
+            </span>
+          </div>
+        )}
       </div>
       {/* Daftar Produk */}
       {renderProducts}
@@ -397,12 +411,7 @@ export default function POS() {
         title="Kategori"
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
-        onItemClick={(url, title) => {
-          setIsSheetOpen(false);
-          setTimeout(() => {
-            setModalData({ isOpen: true, url, title });
-          }, 320);
-        }}
+        onItemClick={() => setIsSheetOpen(false)}
         isMenuItems={false}
         setSelectedSub={setSelectedSub}
         data={categories}
