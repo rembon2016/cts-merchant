@@ -179,8 +179,6 @@ export default function POSTransaction() {
     }
   }, [activeRange, formData]);
 
-  console.log("Type Chart: ", typeChart);
-
   return (
     <div className="px-4 py-2">
       <div className="w-full bg-white p-4 my-2 rounded-lg">
