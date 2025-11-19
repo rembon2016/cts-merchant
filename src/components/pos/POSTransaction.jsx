@@ -8,7 +8,11 @@ import { ElementsNoData } from "../customs/element/NoData";
 import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useDashboardStore } from "../../store/dashboardStore";
-import { QuickBarChart } from "../customs/chart/chart";
+import {
+  QuickBarChart,
+  QuickLineChart,
+  QuickPieChart,
+} from "../customs/chart/chart";
 import SimpleInput from "../customs/form/SimpleInput";
 
 export default function POSTransaction() {
@@ -18,6 +22,7 @@ export default function POSTransaction() {
     date: "",
   });
   const [activeRange, setActiveRange] = useState("day");
+  const [typeChart, setTypeChart] = useState("bar");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -62,7 +67,7 @@ export default function POSTransaction() {
     }
 
     return (
-      <div className="p-4 min-h-[70vh]">
+      <div className="min-h-[70vh]">
         <div className="w-full">
           {/* Header / Search / Filters */}
 
@@ -130,6 +135,23 @@ export default function POSTransaction() {
     );
   }, [transactions, isLoading]);
 
+  const handleChangeTypeChart = (type) => setTypeChart(type);
+
+  const chartConfig = {
+    labels: data?.labels || [],
+    values: data?.amount || [],
+    title:
+      activeRange === "day"
+        ? "Total Penjualan Harian"
+        : activeRange === "week"
+        ? "Total Penjualan Mingguan"
+        : activeRange === "month"
+        ? "Total Penjualan Bulanan"
+        : "Total Penjualan Tahunan",
+    height: "300px",
+    isLoading: loadingChart,
+  };
+
   useEffect(() => {
     getListTransactions({
       search: debouncedSearch,
@@ -157,10 +179,12 @@ export default function POSTransaction() {
     }
   }, [activeRange, formData]);
 
+  console.log("Type Chart: ", typeChart);
+
   return (
-    <>
+    <div className="px-4 py-2">
       <div className="w-full bg-white p-4 my-2 rounded-lg">
-        <div className="flex flex-col flex-wrap items-center gap-2 mb-4">
+        <div className="flex flex-col flex-wrap items-center gap-2">
           <div className="inline-flex rounded-md border border-gray-200 overflow-hidden">
             {[
               { key: "day", label: "Hari Ini" },
@@ -182,21 +206,19 @@ export default function POSTransaction() {
             ))}
           </div>
           <div className="grid grid-cols-2 gap-2 my-4 w-full">
-            <div className="w-full income-card p-4 bg-[var(--c-primary)] flex flex-col gap-2 rounded-xl shadow">
+            <div className="w-full income-card p-4 bg-[var(--c-primary)] flex flex-col gap-1 rounded-xl shadow">
               <h3 className="font-normal text-white text-sm">
                 Total Pendapatan
               </h3>
-              <h1 className="font-bold text-lg text-white">
+              <h1 className="font-bold text-md text-white">
                 {loadingChart
                   ? "..."
                   : formatCurrency(dataOverview?.overview?.total_amount)}
               </h1>
             </div>
-            <div className="w-full income-card p-4 bg-[var(--c-primary)] flex flex-col gap-2 rounded-xl shadow">
-              <h3 className="font-normal text-white text-sm">
-                Keuntungan Bersih
-              </h3>
-              <h1 className="font-bold text-lg text-white">
+            <div className="w-full income-card p-4 bg-[var(--c-primary)] flex flex-col gap-1 rounded-xl shadow">
+              <h3 className="font-normal text-white text-sm">Laba</h3>
+              <h1 className="font-bold text-md text-white">
                 {loadingChart
                   ? "..."
                   : formatCurrency(dataOverview?.overview?.net_profit)}
@@ -215,24 +237,67 @@ export default function POSTransaction() {
             )}
           </div>
         </div>
-        <QuickBarChart
-          labels={data?.labels || []}
-          values={data?.amount || data?.sales || []}
-          title={
-            activeRange === "day"
-              ? "Total Penjualan Harian"
-              : activeRange === "week"
-              ? "Total Penjualan Mingguan"
-              : activeRange === "month"
-              ? "Total Penjualan Bulanan"
-              : "Total Penjualan Tahunan"
-          }
-          height="300px"
-          isLoading={loadingChart}
-        />
+        <div className="flex gap-1 mb-2 w-full justify-end">
+          <button
+            className="w-8 h-8 bg-white border border-gray-500 flex justify-center items-center"
+            onClick={() => handleChangeTypeChart("bar")}
+          >
+            <svg
+              width="13"
+              height="12"
+              viewBox="0 0 13 12"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 2.125V11.9375H12.25V2.125H9ZM4.5 11.9375H7.75V0H4.5V11.9375ZM0 11.9375H3.25V4.25H0V11.9375Z"
+                fill="black"
+              />
+            </svg>
+          </button>
+          <button
+            className="w-8 h-8 bg-white border border-gray-500 flex justify-center items-center"
+            onClick={() => handleChangeTypeChart("line")}
+          >
+            <svg
+              width="13"
+              height="12"
+              viewBox="0 0 13 12"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M11.6914 0.737187L11.0157 0L7.15888 3.53525H2.47978L0 6.01503L0.707094 6.72216L2.89356 4.53525H7.54803L11.6914 0.737187ZM11.4633 4.58806L11.9105 5.48247L8.43481 7.22031L4.15688 6.56194L1.32719 8.76328L0.71325 7.97391L3.88331 5.50831L8.27222 6.18325L11.4633 4.58806ZM0.0201563 10.0352H12.0202V11.3686H0.0202187L0.0201563 10.0352Z"
+                fill="black"
+              />
+            </svg>
+          </button>
+          <button
+            className="w-8 h-8 bg-white border border-gray-500 flex justify-center items-center"
+            onClick={() => handleChangeTypeChart("pie")}
+          >
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 12 12"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M5.4585 6.395L6.2825 1.005C6.01011 0.961549 5.73483 0.938651 5.459 0.9365C2.4435 0.9365 0 3.3805 0 6.395C0 9.41 2.444 11.8535 5.4585 11.8535C8.473 11.8535 10.917 9.4095 10.917 6.395C10.917 6.267 10.907 6.1415 10.898 6.015L5.4585 6.395ZM7.3855 0L6.5615 5.39L12.0005 5.01C11.9138 3.7752 11.4097 2.60659 10.5711 1.69615C9.73242 0.785708 8.60905 0.187573 7.3855 0Z"
+                fill="black"
+              />
+            </svg>
+          </button>
+        </div>
+        {typeChart === "bar" && <QuickBarChart {...chartConfig} />}
+        {typeChart === "line" && <QuickLineChart {...chartConfig} />}
+        {typeChart === "pie" && <QuickPieChart {...chartConfig} />}
       </div>
 
-      <div className="bg-white border border-gray-100 rounded-lg p-4 shadow-sm">
+      <div className="bg-white border border-gray-100 rounded-lg p-4 shadow-sm mb-4">
         <h2 className="text-lg font-semibold text-gray-800">Transaksi POS</h2>
         <p className="text-xs text-gray-500 mt-1">
           Transaksi terbaru berdasarkan tanggal
@@ -259,6 +324,6 @@ export default function POSTransaction() {
       </div>
 
       {renderElements}
-    </>
+    </div>
   );
 }
