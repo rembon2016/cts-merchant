@@ -2,11 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import { useCartStore } from "../../store/cartStore";
 import { useLocation } from "react-router-dom";
 import { formatCurrency } from "../../helper/currency";
+import { useCustomToast } from "../../hooks/useCustomToast";
+import { ElementsNoData } from "../customs/element/NoData";
+import { isEmpty } from "../../helper/is-empty";
 import CustomLoading from "../customs/loading/CustomLoading";
 import ButtonQuantity from "../customs/button/ButtonQuantity";
 import SimpleModal from "../customs/modal/SimpleModal";
 import CustomToast from "../customs/toast/CustomToast";
-import { useCustomToast } from "../../hooks/useCustomToast";
 
 const Cart = () => {
   const {
@@ -31,7 +33,6 @@ const Cart = () => {
   const [showModal, setShowModal] = useState(false);
   const [confirmMode, setConfirmMode] = useState(null); // 'clear' | 'item'
   const [pendingItemId, setPendingItemId] = useState(null);
-  const [pendingItemName, setPendingItemName] = useState("");
 
   const location = useLocation();
   const cartPath = location.pathname.includes("/cart");
@@ -131,7 +132,6 @@ const Cart = () => {
     // Reset modal state
     setConfirmMode(null);
     setPendingItemId(null);
-    setPendingItemName("");
 
     // Proceed with deletion
     if (confirmMode === "item" && pendingItemId) {
@@ -155,9 +155,8 @@ const Cart = () => {
     }
   };
 
-  const handleOpenItemModal = (itemId, itemName) => {
+  const handleOpenItemModal = (itemId) => {
     setPendingItemId(itemId);
-    setPendingItemName(itemName || "");
     setConfirmMode("item");
     setShowModal(true);
   };
@@ -176,10 +175,7 @@ const Cart = () => {
   }, [success, error]);
 
   const renderElement = useMemo(() => {
-    const nullCartData =
-      cart?.data?.items?.length === 0 ||
-      cart?.data?.items === undefined ||
-      cart?.data?.items === null;
+    const nullCartData = isEmpty(cart?.data?.items);
 
     if (isLoading) {
       return (
@@ -191,11 +187,7 @@ const Cart = () => {
     }
 
     if (!isLoading && nullCartData) {
-      return (
-        <div className="w-full text-center">
-          <p className="text-gray-800">Keranjang Kosong</p>
-        </div>
-      );
+      return <ElementsNoData text="Keranjang Kosong" />;
     }
 
     return (
