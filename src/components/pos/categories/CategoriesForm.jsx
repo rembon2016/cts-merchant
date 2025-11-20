@@ -1,14 +1,14 @@
 import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import SimpleInput from "../customs/form/SimpleInput";
-import CustomInputFile from "../customs/form/CustomInputFile";
-import BackButton from "../customs/button/BackButton";
-import CustomToast from "../customs/toast/CustomToast";
-import { useProductStore } from "../../store/productStore";
-import { useCustomToast } from "../../hooks/useCustomToast";
-import PrimaryButton from "../customs/button/PrimaryButton";
+import SimpleInput from "../../customs/form/SimpleInput";
+import CustomInputFile from "../../customs/form/CustomInputFile";
+import BackButton from "../../customs/button/BackButton";
+import CustomToast from "../../customs/toast/CustomToast";
+import { useProductStore } from "../../../store/productStore";
+import { useCustomToast } from "../../../hooks/useCustomToast";
+import PrimaryButton from "../../customs/button/PrimaryButton";
 
-export default function POSCategoriesForm(props) {
+export default function CategoriesForm(props) {
   const { editMode = false, categoryId = null } = props;
 
   const [formData, setFormData] = useState({

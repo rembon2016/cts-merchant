@@ -1,10 +1,10 @@
 import { useLocation } from "react-router-dom";
-import POSCategoriesForm from "./POSCategoriesForm";
+import CategoriesForm from "./CategoriesForm";
 
-export default function POSEditCategories() {
+export default function EditCategories() {
   const location = useLocation();
   const pathname = location.pathname;
   const categoryId = pathname.split("/pos/edit-kategori/")[1];
 
-  return <POSCategoriesForm editMode={true} categoryId={categoryId} />;
+  return <CategoriesForm editMode={true} categoryId={categoryId} />;
 }
