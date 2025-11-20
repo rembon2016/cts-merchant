@@ -1,7 +1,7 @@
-import POSEditProductsComponent from "../../components/pos/POSEditProducts";
+import EditProductComponent from "../../components/pos/products/EditProduct";
 
 const POSEditProducts = () => {
-  return <POSEditProductsComponent />;
+  return <EditProductComponent />;
 };
 
 export default POSEditProducts;

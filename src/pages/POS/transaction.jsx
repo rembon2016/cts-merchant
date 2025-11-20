@@ -1,7 +1,7 @@
-import POSTrsansactionComponent from "../../components/pos/POSTransaction";
+import TrsansactionComponent from "../../components/pos/transactions/Transaction";
 
 const POSTransaction = () => {
-  return <POSTrsansactionComponent />;
+  return <TrsansactionComponent />;
 };
 
 export default POSTransaction;

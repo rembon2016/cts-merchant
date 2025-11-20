@@ -1,19 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import SimpleInput from "../customs/form/SimpleInput";
-import CustomTextarea from "../customs/form/CustomTextarea";
-import CustomInputFile from "../customs/form/CustomInputFile";
-import CustomSelectBox from "../customs/form/CustomSelectBox";
-import BottomModal from "../customs/menu/BottomModal";
+import SimpleInput from "../../customs/form/SimpleInput";
+import CustomTextarea from "../../customs/form/CustomTextarea";
+import CustomInputFile from "../../customs/form/CustomInputFile";
+import CustomSelectBox from "../../customs/form/CustomSelectBox";
+import BottomModal from "../../customs/menu/BottomModal";
 
-import { useProductStore } from "../../store/productStore";
-import { useCustomToast } from "../../hooks/useCustomToast";
-import CustomToast from "../customs/toast/CustomToast";
-import PrimaryButton from "../customs/button/PrimaryButton";
-import BackButton from "../customs/button/BackButton";
+import { useProductStore } from "../../../store/productStore";
+import { useCustomToast } from "../../../hooks/useCustomToast";
+import CustomToast from "../../customs/toast/CustomToast";
+import PrimaryButton from "../../customs/button/PrimaryButton";
+import BackButton from "../../customs/button/BackButton";
 
-export default function POSProductForm({ editMode = false, productId = null }) {
+export default function ProductForm({ editMode = false, productId = null }) {
   const navigate = useNavigate();
 
   const getToday = new Date().toISOString().split("T")[0];

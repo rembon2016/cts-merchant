@@ -1,15 +1,15 @@
-import { formatCurrency } from "../../helper/currency";
+import { formatCurrency } from "../../../helper/currency";
 import { useEffect, useMemo, useState } from "react";
-import { useDashboardStore } from "../../store/dashboardStore";
+import { useDashboardStore } from "../../../store/dashboardStore";
 import {
   QuickBarChart,
   QuickLineChart,
   QuickPieChart,
-} from "../customs/chart/chart";
-import SimpleInput from "../customs/form/SimpleInput";
-import PrimaryButton from "../customs/button/PrimaryButton";
+} from "../../customs/chart/chart";
+import SimpleInput from "../../customs/form/SimpleInput";
+import PrimaryButton from "../../customs/button/PrimaryButton";
 
-export default function POSTransactionDashboard() {
+export default function DashboardTransaction() {
   const [formData, setFormData] = useState({
     date: "",
     start_date: "",

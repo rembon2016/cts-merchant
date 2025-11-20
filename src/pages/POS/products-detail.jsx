@@ -1,5 +1,5 @@
-import POSProductsDetailComponent from "../../components/pos/POSProductsDetail";
+import ProductsDetailComponent from "../../components/pos/products/DetailProduct";
 
 export default function POSProductsDetail() {
-  return <POSProductsDetailComponent />;
+  return <ProductsDetailComponent />;
 }

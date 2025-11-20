@@ -1,14 +1,14 @@
-import VariantModal from "../customs/modal/VariantModal";
-import SearchInput from "../customs/form/SearchInput";
-import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
-import { formatCurrency } from "../../helper/currency";
-import { useTransactionStore } from "../../store/transactionStore";
+import VariantModal from "../../customs/modal/VariantModal";
+import SearchInput from "../../customs/form/SearchInput";
+import LoadingSkeletonList from "../../customs/loading/LoadingSkeletonList";
+import { formatCurrency } from "../../../helper/currency";
+import { useTransactionStore } from "../../../store/transactionStore";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ElementsNoData } from "../customs/element/NoData";
-import { useDebounce } from "../../hooks/useDebounce";
+import { ElementsNoData } from "../../customs/element/NoData";
+import { useDebounce } from "../../../hooks/useDebounce";
 
-export default function POSListTransaction() {
+export default function ListTransaction() {
   const [search, setSearch] = useState("");
 
   const { transactions, isLoading, getListTransactions } =
