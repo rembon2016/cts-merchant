@@ -1,7 +1,7 @@
-import POSEditCategoriesComponent from "../../components/pos/POSEditCategories";
+import EditCategoriesComponent from "../../components/pos/categories/EditCategories";
 
 const POSEditCategories = () => {
-  return <POSEditCategoriesComponent />;
+  return <EditCategoriesComponent />;
 };
 
 export default POSEditCategories;

@@ -1,10 +1,10 @@
 import { useEffect, useMemo } from "react";
-import { useCheckoutStore } from "../../store/checkoutStore";
-import { formatCurrency } from "../../helper/currency";
-import BackButton from "../customs/button/BackButton";
-import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
+import { useCheckoutStore } from "../../../store/checkoutStore";
+import { formatCurrency } from "../../../helper/currency";
+import BackButton from "../../customs/button/BackButton";
+import LoadingSkeletonCard from "../../customs/loading/LoadingSkeletonCard";
 
-const POSDetailTransaction = () => {
+export default function DetailTransaction() {
   const date = (iso) =>
     new Date(iso).toLocaleString("id-ID", {
       dateStyle: "medium",
@@ -207,6 +207,4 @@ const POSDetailTransaction = () => {
       {renderElements}
     </div>
   );
-};
-
-export default POSDetailTransaction;
+}

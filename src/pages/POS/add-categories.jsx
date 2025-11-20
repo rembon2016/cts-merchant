@@ -1,7 +1,7 @@
-import POSAddCategoriesComponent from "../../components/pos/POSAddCategories";
+import AddCategoriesComponent from "../../components/pos/categories/AddCategories";
 
 const POSAddCategories = () => {
-  return <POSAddCategoriesComponent />;
+  return <AddCategoriesComponent />;
 };
 
 export default POSAddCategories;

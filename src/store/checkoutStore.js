@@ -120,6 +120,54 @@ export const useCheckoutStore = create((set) => ({
       set({ error: error.message, isLoading: false, success: null });
     }
   },
+  proccessPayment: async (orderData) => {
+    try {
+      const tokenPos = sessionStorage.getItem("authPosToken");
+
+      const response = await fetch(
+        `${ROOT_API}/pos/transaction/process-payment`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${tokenPos}`,
+          },
+          body: JSON.stringify(orderData),
+        }
+      );
+
+      if (!response.ok) {
+        set({
+          error: "Failed to process payment",
+          isLoading: false,
+          success: null,
+          response,
+        });
+        throw new Error("Failed to process payment");
+      }
+
+      const result = await response.json();
+
+      set({
+        // pendingOrder: result.data,
+        isLoading: false,
+        success: true,
+        response,
+      });
+
+      if (response) {
+        setTimeout(() => {
+          set({ success: null });
+        }, 2000);
+      }
+
+      return result;
+    } catch (error) {
+      console.log("Error:", error.message);
+      set({ error: error.message, isLoading: false, success: null });
+    }
+  },
   getTransactionDetail: async (transactionId) => {
     try {
       const tokenPos = sessionStorage.getItem("authPosToken");

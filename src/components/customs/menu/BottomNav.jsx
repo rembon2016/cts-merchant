@@ -1,20 +1,26 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCartStore } from "../../../store/cartStore";
 import { useCheckoutStore } from "../../../store/checkoutStore";
 import { formatCurrency } from "../../../helper/currency";
+import { useCustomToast } from "../../../hooks/useCustomToast";
 import SimpleModal from "../modal/SimpleModal";
 import CustomToast from "../toast/CustomToast";
-import { useCustomToast } from "../../../hooks/useCustomToast";
 import PrimaryButton from "../button/PrimaryButton";
 
 const BottomNav = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
-  const { saveOrder, selectPaymentMethod } = useCheckoutStore();
   const {
-    selectedCart,
+    saveOrder,
+    proccessPayment,
+    selectPaymentMethod,
+    getPosSettings,
+    posSettingsData,
+  } = useCheckoutStore();
+  const {
     cart,
+    selectedCart,
     setSelectedCart,
     clearDiscountData,
     clearMultipleCarts,
@@ -29,12 +35,25 @@ const BottomNav = () => {
   const pathname = location.pathname;
   const getCart = sessionStorage.getItem("cart");
 
+  const checkTax = async () => await getPosSettings();
+
   const [showExitModal, setShowExitModal] = useState(false);
   const [pendingPath, setPendingPath] = useState(null);
 
-  const totalPrice = selectedCart?.reduce(
+  // Read tax and discount directly from sessionStorage here to avoid using
+  // possibly-stale values captured earlier in the component lifecycle.
+  const currentTax = sessionStorage.getItem("tax");
+  const currentDiscount = sessionStorage.getItem("discount");
+
+  const taxAmount = Math.ceil(Number(currentTax || 0));
+
+  const subTotalPrice = selectedCart?.reduce(
     (a, b) => a + Number.parseFloat(b.subtotal),
     0
+  );
+
+  const totalPrice = Math.ceil(
+    (subTotalPrice || 0) + Number.parseFloat(taxAmount || 0)
   );
 
   const showButtonFromPath = ["/cart", "/checkout"];
@@ -166,13 +185,6 @@ const BottomNav = () => {
     if (!getCart) return;
 
     setLoading(true);
-
-    // Read tax and discount directly from sessionStorage here to avoid using
-    // possibly-stale values captured earlier in the component lifecycle.
-    const currentTax = sessionStorage.getItem("tax");
-    const currentDiscount = sessionStorage.getItem("discount");
-
-    const taxAmount = Math.ceil(Number(currentTax ?? 0));
     // If discount exists in sessionStorage use its numeric value, otherwise 0
     const discountAmount =
       currentDiscount !== null ? Math.ceil(Number(currentDiscount)) : 0;
@@ -180,7 +192,7 @@ const BottomNav = () => {
     const checkoutValue = {
       branch_id: sessionStorage.getItem("branchActive"),
       user_id: sessionStorage.getItem("userPosId"),
-      sub_total: Math.ceil(totalPrice),
+      sub_total: Math.ceil(subTotalPrice),
       tax_amount: taxAmount,
       discount_amount: discountAmount,
       payment_method_id: selectPaymentMethod,
@@ -190,10 +202,18 @@ const BottomNav = () => {
       ...JSON.parse(getCart),
     };
 
-    proccessOrder(checkoutValue);
+    const paymentValue = {
+      branch_id: sessionStorage.getItem("branchActive"),
+      payment_amount: JSON.parse(sessionStorage.getItem("totalPayment")),
+      payment_method_id: selectPaymentMethod,
+      discount_amount: discountAmount,
+      tax_amount: taxAmount,
+    };
+
+    proccessOrder(checkoutValue, paymentValue);
   };
 
-  const proccessOrder = async (dataCheckout) => {
+  const proccessOrder = async (dataCheckout, dataPayment) => {
     try {
       // Extract unique cart_ids from selected items
       // Since all items in the same cart share the same cart_id,
@@ -205,8 +225,9 @@ const BottomNav = () => {
       ];
 
       const response = await saveOrder(dataCheckout);
+      const responsePayment = await proccessPayment(dataPayment);
 
-      if (response?.success) {
+      if (response?.success && responsePayment?.success) {
         showSuccess("Pesanan berhasil diproses");
         // Clear carts based on unique cart_ids
         if (cartIds && cartIds?.length > 0) {
@@ -238,7 +259,7 @@ const BottomNav = () => {
         <>
           {cart?.data?.items?.length > 0 && (
             <div
-              className={`rounded-3xl bg-white dark:bg-slate-700 shadow-soft border border-slate-100 dark:border-slate-600 ${
+              className={`rounded-xl bg-white dark:bg-slate-700 shadow-soft border border-slate-100 dark:border-slate-600 ${
                 showButtonFromPath.includes(location.pathname)
                   ? "p-2 mx-4 mb-2"
                   : ""
@@ -247,18 +268,49 @@ const BottomNav = () => {
               <div className="flex flex-col gap-2">
                 {/* <div className="flex justify-between items-center">
               <h3 className="font-medium text-xl">Sub Total</h3>
-              <h3 className="font-bold text-xl">{Rupiah.format(totalPrice)}</h3>
+              <h3 className="font-bold text-xl">{Rupiah.format(subTotalPrice)}</h3>
             </div> */}
                 {/* <div className="flex justify-between items-center">
               <h3 className="font-medium text-xl">Pajak (+11%)</h3>
               <h3 className="font-bold text-xl">Rp. 6.000</h3>
             </div> */}
                 {location.pathname === "/cart" && (
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-medium text-xl">Total</h3>
-                    <h3 className="font-bold text-xl">
-                      {formatCurrency(totalPrice)}
-                    </h3>
+                  <div className="flex flex-col gap-2 mb-4">
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-medium text-gray-500 text-md">
+                        Sub Total
+                      </h3>
+                      <h3 className="font-bold text-md">
+                        {formatCurrency(subTotalPrice)}
+                      </h3>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-medium text-gray-500 text-md">
+                        Pajak
+                      </h3>
+                      <h3 className="font-bold text-md">
+                        +{" "}
+                        {formatCurrency(
+                          Math.ceil(
+                            (subTotalPrice * posSettingsData?.tax) / 100
+                          ) || 0
+                        )}{" "}
+                        ({Number.parseInt(posSettingsData?.tax)})%
+                      </h3>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-medium text-gray-500 text-md">
+                        Total
+                      </h3>
+                      <h3 className="font-bold text-md">
+                        {formatCurrency(
+                          subTotalPrice +
+                            Math.ceil(
+                              (subTotalPrice * posSettingsData?.tax) / 100
+                            ) || 0
+                        )}
+                      </h3>
+                    </div>
                   </div>
                 )}
               </div>
@@ -346,7 +398,7 @@ const BottomNav = () => {
         </div>
       </div>
     );
-  }, [navItems, totalPrice, location.pathname]);
+  }, [navItems, subTotalPrice, totalPrice, location.pathname]);
 
   // Modal confirm handlers
   const handleConfirmExit = () => {
@@ -365,6 +417,12 @@ const BottomNav = () => {
     setShowExitModal(false);
     setPendingPath(null);
   };
+
+  useEffect(() => {
+    if (location.pathname.includes("/cart")) {
+      checkTax();
+    }
+  }, [location.pathname]);
 
   return (
     <>
