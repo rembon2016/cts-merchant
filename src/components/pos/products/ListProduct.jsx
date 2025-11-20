@@ -1,18 +1,18 @@
 import { useMemo, useCallback, useState, useRef, useEffect } from "react";
 import { Pencil, Trash2 } from "lucide-react";
-import { usePosStore } from "../../store/posStore";
-import { useProductStore } from "../../store/productStore";
-import { formatCurrency } from "../../helper/currency";
+import { usePosStore } from "../../../store/posStore";
+import { useProductStore } from "../../../store/productStore";
+import { formatCurrency } from "../../../helper/currency";
 import { useNavigate } from "react-router-dom";
-import SimpleModal from "../customs/modal/SimpleModal";
-import { useCustomToast } from "../../hooks/useCustomToast";
-import CustomToast from "../customs/toast/CustomToast";
-import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
-import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
-import { ElementsNoData } from "../customs/element/NoData";
-import FloatingButton from "../customs/button/FloatingButton";
+import SimpleModal from "../../customs/modal/SimpleModal";
+import { useCustomToast } from "../../../hooks/useCustomToast";
+import CustomToast from "../../customs/toast/CustomToast";
+import LoadingSkeletonCard from "../../customs/loading/LoadingSkeletonCard";
+import LoadingSkeletonList from "../../customs/loading/LoadingSkeletonList";
+import { ElementsNoData } from "../../customs/element/NoData";
+import FloatingButton from "../../customs/button/FloatingButton";
 
-export default function POSProducts() {
+export default function ListProduct() {
   const {
     categories: subCategories,
     getCategories,

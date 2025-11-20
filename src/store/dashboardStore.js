@@ -5,17 +5,22 @@ export const useDashboardStore = create((set, get) => ({
   data: [],
   dataOverview: [],
   error: null,
-  getChartSales: async (type = "day", params = {}) => {
-    const { date = "", start_date = "", end_date = "", user = "" } = params;
+  getChartSales: async (type = "day", isDateRange = false, params = {}) => {
+    const tokenPos = sessionStorage?.getItem("authPosToken");
+    const branchId = sessionStorage?.getItem("branchActive");
 
-    console.log(params);
+    const {
+      date = "",
+      start_date = "",
+      end_date = "",
+      user = "",
+      group_by = "year",
+    } = params;
 
     try {
-      const tokenPos = sessionStorage.getItem("authPosToken");
-      const branchId = sessionStorage.getItem("branchActive");
-
       const queryParams = new URLSearchParams({
         branch_id: branchId,
+        group_by,
         start_date,
         end_date,
         user,
@@ -24,10 +29,12 @@ export const useDashboardStore = create((set, get) => ({
 
       set({ isLoading: true, error: null });
 
+      const urlCondition = !isDateRange ? `${type}-sales` : `${type}`;
+
       const response = await fetch(
         `${
           import.meta.env.VITE_API_POS_ROUTES
-        }/dashboard/charts/${type}-sales?${queryParams}`,
+        }/dashboard/charts/${urlCondition}?${queryParams}`,
         {
           method: "GET",
           headers: {
@@ -51,46 +58,27 @@ export const useDashboardStore = create((set, get) => ({
       set({ error: error.message, isLoading: false });
     }
   },
-  getSalesByDateRanges: async () => {
-    try {
-      const tokenPos = sessionStorage.getItem("authPosToken");
+  getChartOverView: async (type = "today", params = {}) => {
+    const tokenPos = sessionStorage?.getItem("authPosToken");
+    const branchId = sessionStorage?.getItem("branchActive");
 
+    const { start_date = "", end_date = "", date = "", user = "" } = params;
+
+    const queryParams = new URLSearchParams({
+      branch_id: branchId,
+      start_date,
+      end_date,
+      user,
+      date,
+    });
+
+    try {
       set({ isLoading: true, error: null });
 
       const response = await fetch(
         `${
           import.meta.env.VITE_API_POS_ROUTES
-        }/dashboard/charts/sales-by-date-range`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${tokenPos}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
-
-      const result = await response.json();
-      set({ data: result.data, isLoading: false });
-      return result;
-    } catch (error) {
-      console.log(error.message);
-      set({ error: error.message, isLoading: false });
-    }
-  },
-  getChartOverView: async (type = "today") => {
-    try {
-      const tokenPos = sessionStorage.getItem("authPosToken");
-
-      set({ isLoading: true, error: null });
-
-      const response = await fetch(
-        `${import.meta.env.VITE_API_POS_ROUTES}/dashboard/overview/${type}`,
+        }/dashboard/overview/${type}?${queryParams}`,
         {
           method: "GET",
           headers: {
@@ -113,44 +101,17 @@ export const useDashboardStore = create((set, get) => ({
       set({ error: error.message, isLoading: false });
     }
   },
-  getCurrentCustomDateRangeSales: async () => {
-    try {
-      const tokenPos = sessionStorage.getItem("authPosToken");
-
-      set({ isLoading: true, error: null });
-
-      const response = await fetch(
-        `${import.meta.env.VITE_API_POS_ROUTES}/dashboard/overview/custom-date`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${tokenPos}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
-
-      const result = await response.json();
-      set({ data: result.data, isLoading: false });
-      return result;
-    } catch (error) {
-      console.log(error.message);
-      set({ error: error.message, isLoading: false });
-    }
-  },
   getLowStockProduct: async () => {
-    try {
-      const tokenPos = sessionStorage.getItem("authPosToken");
+    const tokenPos = sessionStorage?.getItem("authPosToken");
+    const branchId = sessionStorage?.getItem("branchActive");
 
+    try {
       set({ isLoading: true, error: null });
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_POS_ROUTES}/dashboard/low-stock-products`,
+        `${
+          import.meta.env.VITE_API_POS_ROUTES
+        }/dashboard/low-stock-products?branch_id=${branchId}`,
         {
           method: "GET",
           headers: {

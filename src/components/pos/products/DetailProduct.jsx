@@ -1,17 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useProductStore } from "../../store/productStore";
-import { useThemeStore } from "../../store/themeStore";
-import { formatCurrency } from "../../helper/currency";
-import CustomLoading from "../customs/loading/CustomLoading";
-import SimpleModal from "../customs/modal/SimpleModal";
-import BackButton from "../customs/button/BackButton";
-import { useCustomToast } from "../../hooks/useCustomToast";
-import CustomToast from "../customs/toast/CustomToast";
-import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
-import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
+import { useProductStore } from "../../../store/productStore";
+import { useThemeStore } from "../../../store/themeStore";
+import { formatCurrency } from "../../../helper/currency";
+import SimpleModal from "../../customs/modal/SimpleModal";
+import BackButton from "../../customs/button/BackButton";
+import { useCustomToast } from "../../../hooks/useCustomToast";
+import CustomToast from "../../customs/toast/CustomToast";
+import LoadingSkeletonList from "../../customs/loading/LoadingSkeletonList";
+import LoadingSkeletonCard from "../../customs/loading/LoadingSkeletonCard";
 
-export default function POSProductsDetail() {
+export default function DetailProduct() {
   const { getDetailProduct, removeProducts, isLoading, products, error } =
     useProductStore();
   const {

@@ -86,7 +86,107 @@ const Invoice = () => {
     getInvoices();
   };
 
+  const renderLoading = () => {
+    return (
+      <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-2 gap-1">
+          <div className="col-span-2 w-1/2 h-[25px] bg-gray-200 rounded-lg animate-pulse mb-2"></div>
+          <div className="w-full h-[75px] bg-gray-200 rounded-lg animate-pulse"></div>
+          <div className="w-full h-[75px] bg-gray-200 rounded-lg animate-pulse"></div>
+          <div className="w-full h-[75px] bg-gray-200 rounded-lg animate-pulse"></div>
+          <div className="w-full h-[75px] bg-gray-200 rounded-lg animate-pulse"></div>
+        </div>
+        <div className="grid grid-cols-1 gap-2">
+          <div className="w-full h-[125px] bg-gray-200 rounded-lg animate-pulse"></div>
+          <div className="w-full h-[125px] bg-gray-200 rounded-lg animate-pulse"></div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderCatalogInvoice = useMemo(() => {
+    return (
+      <div className="grid grid-cols-2 gap-1 mt-2">
+        <div className="w-full flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
+          <div className="text-xs text-gray-500">Sudah Lunas</div>
+          <div className="mt-2 text-xl font-medium text-gray-900">
+            {summary.paid || 0}
+          </div>
+        </div>
+        <div className="w-full flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
+          <div className="text-xs text-gray-500">Belum Bayar</div>
+          <div className="mt-2 text-xl font-medium text-gray-900">
+            {summary.unpaid || 0}
+          </div>
+        </div>
+        <div className="w-full flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
+          <div className="text-xs text-gray-500">Dibatalkan</div>
+          <div className="mt-2 text-xl font-medium text-gray-900">
+            {summary.canceled || 0}
+          </div>
+        </div>
+        <div className="w-full flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
+          <div className="text-xs text-gray-500">Kadaluarsa</div>
+          <div className="mt-2 text-xl font-medium text-gray-900">
+            {summary.expired || 0}
+          </div>
+        </div>
+      </div>
+    );
+  }, [summary]);
+
+  const renderInvoiceList = useMemo(() => {
+    return (
+      <div className="divide-y flex flex-col gap-3">
+        {Array.isArray(invoices) &&
+          invoices?.map((inv) => (
+            <button
+              key={inv.id}
+              onClick={() =>
+                navigate(`/invoice/detail/${inv.id}`, {
+                  replace: true,
+                })
+              }
+              className={`bg-white dark:bg-slate-700 rounded-lg p-4 shadow-soft border border-slate-100 dark:border-slate-600`}
+            >
+              <div className="flex flex-col gap-1 items-start">
+                <div className="text-sm font-medium text-gray-900 truncate">
+                  {inv.code}
+                </div>
+                <div className="text-xs text-gray-500">
+                  Mulai: {formatDate(inv.invoice_date)} • Jatuh tempo:{" "}
+                  {formatDate(inv.invoice_due_date)}
+                </div>
+              </div>
+
+              <div className="text-sm font-medium text-gray-900 flex items-center gap-3 justify-between mt-3">
+                <span
+                  className={
+                    dataStatus.find((item) => item.id === inv.status)?.color +
+                    " inline-block px-2 py-1 rounded-full text-xs"
+                  }
+                >
+                  {dataStatus.find((item) => item.id === inv.status)?.name}
+                </span>
+                <span className="font-semibold text-lg text-[var(--c-primary)]">
+                  {formatCurrency(inv.invoice_amount)}
+                </span>
+              </div>
+            </button>
+          ))}
+      </div>
+    );
+  }, [invoices]);
+
   const renderElements = useMemo(() => {
+    if (isLoading) return renderLoading();
+
+    if (!isLoading && invoices?.length === 0)
+      return <ElementsNoData text="Tidak ada invoice" />;
+
+    const conditionDisable =
+      isLoading || filterStatus === "" || filterDueDate === "";
+
     return (
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
@@ -124,12 +224,14 @@ const Invoice = () => {
           <button
             className="w-full py-4 bg-[var(--c-primary)] text-white rounded-md font-semibold hover:bg-indigo-700 transition-colors duration-200"
             onClick={applyFilter}
+            disabled={conditionDisable}
           >
             Terapkan Filter
           </button>
           <button
             className="w-full py-4 bg-gray-200 text-gray-700 rounded-md font-semibold hover:bg-gray-300 transition-colors duration-200"
             onClick={resetFilter}
+            disabled={conditionDisable}
           >
             Reset
           </button>
@@ -137,113 +239,10 @@ const Invoice = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Summary + list */}
           <div className="lg:col-span-3 space-y-2">
-            {
-              /* Tampilkan loading jika sedang loading */
-              isLoading ? (
-                <div className="flex flex-col gap-2">
-                  <div className="grid grid-cols-2 gap-1">
-                    <div className="col-span-2 w-1/2 h-[25px] bg-gray-200 rounded-lg animate-pulse mb-2"></div>
-                    <div className="w-full h-[75px] bg-gray-200 rounded-lg animate-pulse"></div>
-                    <div className="w-full h-[75px] bg-gray-200 rounded-lg animate-pulse"></div>
-                    <div className="w-full h-[75px] bg-gray-200 rounded-lg animate-pulse"></div>
-                    <div className="w-full h-[75px] bg-gray-200 rounded-lg animate-pulse"></div>
-                  </div>
-                  <div className="grid grid-cols-1 gap-2">
-                    <div className="w-full h-[125px] bg-gray-200 rounded-lg animate-pulse"></div>
-                    <div className="w-full h-[125px] bg-gray-200 rounded-lg animate-pulse"></div>
-                  </div>
-                </div>
-              ) : /* Tampilkan konten berdasarkan apakah ada data atau tidak */
-              invoices.length > 0 ? (
-                /* Ada data invoice - tampilkan summary cards dan list */
-                <>
-                  <div className="grid grid-cols-2 gap-1 mt-2">
-                    {/* <div className="col-span-2 w-full my-2">
-                      <span>Jumlah Invoice:</span>
-                      <span className="inline-block font-bold ms-2">
-                        {summary.total || 0}
-                      </span>
-                    </div> */}
-
-                    <div className="w-full flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
-                      <div className="text-xs text-gray-500">Sudah Lunas</div>
-                      <div className="mt-2 text-xl font-medium text-gray-900">
-                        {summary.paid || 0}
-                      </div>
-                    </div>
-                    <div className="w-full flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
-                      <div className="text-xs text-gray-500">Belum Bayar</div>
-                      <div className="mt-2 text-xl font-medium text-gray-900">
-                        {summary.unpaid || 0}
-                      </div>
-                    </div>
-                    <div className="w-full flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
-                      <div className="text-xs text-gray-500">Dibatalkan</div>
-                      <div className="mt-2 text-xl font-medium text-gray-900">
-                        {summary.canceled || 0}
-                      </div>
-                    </div>
-                    <div className="w-full flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
-                      <div className="text-xs text-gray-500">Kadaluarsa</div>
-                      <div className="mt-2 text-xl font-medium text-gray-900">
-                        {summary.expired || 0}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="divide-y flex flex-col gap-3">
-                    {Array.isArray(invoices) &&
-                      invoices?.map((inv) => (
-                        <button
-                          key={inv.id}
-                          onClick={() =>
-                            navigate(`/invoice/detail/${inv.id}`, {
-                              replace: true,
-                            })
-                          }
-                          className={`bg-white dark:bg-slate-700 rounded-lg p-4 shadow-soft border border-slate-100 dark:border-slate-600`}
-                        >
-                          <div className="flex flex-col gap-1 items-start">
-                            <div className="text-sm font-medium text-gray-900 truncate">
-                              {inv.code}
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              Mulai: {formatDate(inv.invoice_date)} • Jatuh
-                              tempo: {formatDate(inv.invoice_due_date)}
-                            </div>
-                          </div>
-
-                          <div className="text-sm font-medium text-gray-900 flex items-center gap-3 justify-between mt-3">
-                            <span
-                              className={
-                                dataStatus.find(
-                                  (item) => item.id === inv.status
-                                )?.color +
-                                " inline-block px-2 py-1 rounded-full text-xs"
-                              }
-                            >
-                              {
-                                dataStatus.find(
-                                  (item) => item.id === inv.status
-                                )?.name
-                              }
-                            </span>
-                            <span className="font-semibold text-lg text-[var(--c-primary)]">
-                              {formatCurrency(inv.invoice_amount)}
-                            </span>
-                          </div>
-                        </button>
-                      ))}
-                  </div>
-                </>
-              ) : (
-                /* Tidak ada data invoice - tampilkan empty state */
-                <ElementsNoData text="Tidak ada invoice" />
-              )
-            }
+            {renderCatalogInvoice}
+            {renderInvoiceList}
           </div>
         </div>
-        =
         <FloatingButton
           handleOnClick={() => navigate("/invoice/add", { replace: true })}
         />
