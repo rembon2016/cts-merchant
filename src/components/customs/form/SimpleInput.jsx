@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, ChevronDown } from "lucide-react";
 
 SimpleInput.propTypes = {
   label: PropTypes.string,
@@ -108,24 +108,31 @@ export default function SimpleInput({
         </button>
       )}
       {isSelectBox && (
-        <select
-          name={name}
-          value={value}
-          onChange={handleChange}
-          className={inputClassName}
-          disabled={disabled}
-          placeholder={placeholder || "Pilih..."}
-        >
-          <option defaultValue selected>
-            Pilih
-          </option>
-          {Array?.isArray(selectBoxData) &&
-            selectBoxData?.map((item) => (
-              <option key={item?.id} value={item?.id}>
-                {item?.name}
-              </option>
-            ))}
-        </select>
+        <div className="relative">
+          <select
+            name={name}
+            value={value}
+            onChange={handleChange}
+            className={`${inputClassName} appearance-none`}
+            disabled={disabled}
+            placeholder={placeholder || "Pilih..."}
+          >
+            <option defaultValue selected>
+              Pilih
+            </option>
+            {Array?.isArray(selectBoxData) &&
+              selectBoxData?.map((item) => (
+                <option key={item?.id} value={item?.id}>
+                  {item?.name}
+                </option>
+              ))}
+          </select>
+          <ChevronDown
+            className={`absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 ${
+              errors ? "text-red-500" : "text-gray-500"
+            } dark:text-blue-300 pointer-events-none`}
+          />
+        </div>
       )}
       {errors && <p className="mt-2 text-sm text-red-600">{errors}</p>}
     </div>
