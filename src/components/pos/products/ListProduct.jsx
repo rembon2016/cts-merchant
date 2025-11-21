@@ -4,12 +4,12 @@ import { usePosStore } from "../../../store/posStore";
 import { useProductStore } from "../../../store/productStore";
 import { formatCurrency } from "../../../helper/currency";
 import { useNavigate } from "react-router-dom";
-import SimpleModal from "../../customs/modal/SimpleModal";
 import { useCustomToast } from "../../../hooks/useCustomToast";
+import SimpleModal from "../../customs/modal/SimpleModal";
 import CustomToast from "../../customs/toast/CustomToast";
 import LoadingSkeletonCard from "../../customs/loading/LoadingSkeletonCard";
 import LoadingSkeletonList from "../../customs/loading/LoadingSkeletonList";
-import { ElementsNoData } from "../../customs/element/NoData";
+import NoData from "../../customs/element/NoData";
 import FloatingButton from "../../customs/button/FloatingButton";
 
 export default function ListProduct() {
@@ -36,7 +36,7 @@ export default function ListProduct() {
     hideToast,
   } = useCustomToast();
 
-  const { removeCategories } = useProductStore();
+  const { removeCategories, isLoading } = useProductStore();
 
   const [selectedSub, setSelectedSub] = useState("");
   const [activeTab, setActiveTab] = useState("Produk");
@@ -243,7 +243,7 @@ export default function ListProduct() {
 
   const renderElements = useMemo(() => {
     if (productsError) {
-      return <ElementsNoData text={productsError} />;
+      return <NoData text={productsError} />;
     }
 
     return (
@@ -255,7 +255,7 @@ export default function ListProduct() {
             {initialLoading && <LoadingSkeletonCard items={products?.length} />}
 
             {!initialLoading && !productsError && products?.length === 0 && (
-              <ElementsNoData text="Tidak ada produk" />
+              <NoData text="Tidak ada produk" />
             )}
 
             {!initialLoading && !productsError && products?.length > 0 && (
@@ -340,7 +340,7 @@ export default function ListProduct() {
             )}
 
             {!initialLoading && subCategories?.length === 0 && (
-              <ElementsNoData text="Tidak ada kategori" />
+              <NoData text="Tidak ada kategori" />
             )}
 
             <div className="space-y-2">
@@ -394,7 +394,7 @@ export default function ListProduct() {
                 title={"Konfirmasi Hapus"}
                 content={`Apakah Anda yakin ingin menghapus kategori ini?`}
                 showButton={true}
-                isLoading={initialLoading}
+                isLoading={isLoading}
               />
             )}
             {renderElementsButtons("/pos/tambah-kategori")}
@@ -412,6 +412,7 @@ export default function ListProduct() {
     selectedCategory,
     showDeleteModal,
     initialLoading,
+    isLoading,
   ]);
 
   return (
