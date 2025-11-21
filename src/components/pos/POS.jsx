@@ -2,12 +2,11 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useThemeStore } from "../../store/themeStore";
 import { usePosStore } from "../../store/posStore";
 import { useDebounce } from "../../hooks/useDebounce";
-import { useCartStore } from "../../store/cartStore";
 import { useNavigate } from "react-router-dom";
 import { formatCurrency } from "../../helper/currency";
-import SearchInput from "../customs/form/SearchInput";
 import { toast } from "react-toastify";
 import { ShoppingCart, XCircle } from "lucide-react";
+import SearchInput from "../customs/form/SearchInput";
 import BottomModal from "../customs/menu/BottomModal";
 import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
 import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
@@ -41,7 +40,6 @@ export default function POS() {
   const observerRef = useRef();
 
   const { isDark } = useThemeStore();
-  const { error } = useCartStore();
   const {
     categories,
     isLoading,
@@ -68,23 +66,6 @@ export default function POS() {
   useEffect(() => {
     getCategories();
   }, [getCategories]);
-
-  // Show toast when cart add/update succeeds or fails
-  // useEffect(() => {
-  //   if (success) {
-  //     toast.success("Berhasil ditambahkan ke keranjang", {
-  //       position: "top-center",
-  //       autoClose: 3000,
-  //     });
-  //   }
-
-  //   if (error) {
-  //     toast.error("Terjadi kesalahan saat menambahkan ke keranjang", {
-  //       position: "top-center",
-  //       autoClose: 3000,
-  //     });
-  //   }
-  // }, [success, error]);
 
   // Fetch products when filters change
   useEffect(() => {
@@ -145,9 +126,44 @@ export default function POS() {
   };
 
   // Navigate to product detail page
-  const goToProductDetail = (productId) => {
-    navigate(`/product/${productId}`);
+  const goToProductDetail = (productId) => navigate(`/product/${productId}`);
+
+  const handleItemClick = (item) => {
+    setSelectedSub(item);
+    setIsSheetOpen(false);
   };
+
+  const renderElements = useMemo(() => {
+    return (
+      <div className="grid grid-cols-3 gap-3">
+        {categories?.map((item) => {
+          return (
+            <button
+              key={item.id}
+              onClick={() => handleItemClick(item)}
+              className="sheet-item bg-slate-50 dark:bg-slate-600 rounded-xl p-3 flex flex-col items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-500 transition-colors"
+            >
+              <img
+                src={
+                  item.image
+                    ? `${import.meta.env.VITE_API_IMAGE}${item.image}`
+                    : "/images/image-placeholder.png"
+                }
+                alt={item.name || "Product Image"}
+                className="w-full h-[60px] object-cover rounded-lg"
+                onError={(e) => {
+                  e.target.src = "/images/placeholder.jpg";
+                }}
+              />
+              <span className="text-xs text-center text-primary dark:text-slate-300">
+                {item?.name}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    );
+  }, [categories]);
 
   const renderMainMenu = useMemo(() => {
     if (isLoading) {
@@ -175,55 +191,6 @@ export default function POS() {
       </div>
     );
   }, [isLoading]);
-
-  const renderCategories = useMemo(() => {
-    if (isLoading) {
-      return <LoadingSkeletonList items={categories?.length} />;
-    }
-
-    if (error) {
-      return (
-        <div className="mb-3">
-          <div className="text-center text-red-500 mb-4 p-3 bg-red-50 rounded-lg">
-            Error: {error}
-          </div>
-        </div>
-      );
-    }
-
-    return;
-
-    return (
-      <div className="mb-3">
-        <div className="flex gap-1 overflow-x-auto invisible-scrollbar pb-2">
-          {categories.map((sub) => (
-            <button
-              key={sub.id}
-              className={`w-full flex flex-nowrap px-4 py-2 border ${
-                selectedSub?.toLowerCase() === sub?.name?.toLowerCase()
-                  ? "bg-[var(--c-accent)] text-slate-600"
-                  : "bg-white text-gray-700"
-              } hover:bg-[var(--c-accent)] hover:text-slate-600 transition slate-600 space-nowrap rounded-lg dark:text-slate-100 dark:hover:text-slate-600`}
-              onClick={() =>
-                setSelectedSub(sub?.name === selectedSub ? "" : sub?.name)
-              }
-            >
-              <span
-                className={
-                  (selectedSub?.toLowerCase() === sub?.name?.toLowerCase()
-                    ? "font-semibold"
-                    : "") +
-                  " w-full flex justify-center items-center text-nowrap whitespace-nowrap text-sm"
-                }
-              >
-                {sub.name}
-              </span>
-            </button>
-          ))}
-        </div>
-      </div>
-    );
-  }, [isLoading, error, categories, selectedSub]);
 
   const renderProducts = useMemo(() => {
     if (productsLoading) {
@@ -412,10 +379,7 @@ export default function POS() {
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
         onItemClick={() => setIsSheetOpen(false)}
-        isMenuItems={false}
-        setSelectedSub={setSelectedSub}
-        data={categories}
-        // token={token}
+        renderContent={renderElements}
       />
     </div>
   );

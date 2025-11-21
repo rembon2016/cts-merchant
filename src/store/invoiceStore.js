@@ -15,13 +15,14 @@ const useInvoiceStore = create((set) => ({
    */
   getInvoices: async (params = {}) => {
     const AUTH_TOKEN = sessionStorage.getItem("authToken");
-    const { status, end_date } = params || {};
+    const { status, end_date, search } = params || {};
 
     try {
       set({ isLoading: true, error: null });
       const qs = new URLSearchParams();
       if (status) qs.append("status", status);
       if (end_date) qs.append("end_date", end_date);
+      if (search) qs.append("search", search);
 
       const url = qs.toString()
         ? `${ROOT_API}/v1/merchant/invoice?${qs.toString()}`
@@ -47,6 +48,8 @@ const useInvoiceStore = create((set) => ({
           isLoading: false,
         });
       }
+
+      return result;
     } catch (error) {
       console.error("Error: ", error.message);
       set({
