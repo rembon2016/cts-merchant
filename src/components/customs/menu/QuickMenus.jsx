@@ -149,6 +149,7 @@ const QuickMenus = () => {
 
       <BottomSheet
         isOpen={isSheetOpen}
+        title="Daftar Menu"
         onClose={() => setIsSheetOpen(false)}
         onItemClick={(url, title) => {
           setIsSheetOpen(false);
