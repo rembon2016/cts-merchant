@@ -3,8 +3,8 @@ import { useCartStore } from "../../store/cartStore";
 import { useLocation } from "react-router-dom";
 import { formatCurrency } from "../../helper/currency";
 import { useCustomToast } from "../../hooks/useCustomToast";
-import { ElementsNoData } from "../customs/element/NoData";
 import { isEmpty } from "../../helper/is-empty";
+import NoData from "../customs/element/NoData";
 import CustomLoading from "../customs/loading/CustomLoading";
 import ButtonQuantity from "../customs/button/ButtonQuantity";
 import SimpleModal from "../customs/modal/SimpleModal";
@@ -187,7 +187,7 @@ const Cart = () => {
     }
 
     if (!isLoading && nullCartData) {
-      return <ElementsNoData text="Keranjang Kosong" />;
+      return <NoData text="Keranjang Kosong" />;
     }
 
     return (

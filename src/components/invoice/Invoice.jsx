@@ -3,8 +3,8 @@ import { formatCurrency } from "../../helper/currency";
 import { useLocation, useNavigate } from "react-router-dom";
 import { formatDate } from "../../helper/format-date";
 import { useInvoiceStore } from "../../store/invoiceStore";
-import { ElementsNoData } from "../customs/element/NoData";
 import FloatingButton from "../customs/button/FloatingButton";
+import NoData from "../customs/element/NoData";
 import BottomSheet from "../customs/menu/BottomSheet";
 import SearchInput from "../customs/form/SearchInput";
 import SimpleInput from "../customs/form/SimpleInput";
@@ -17,8 +17,14 @@ const Invoice = () => {
   // Filter states
   const [formData, setFormData] = useState({
     status: "",
-    due_date: "",
+    end_date: "",
     search: "",
+  });
+
+  const [resultFilter, setResultFilter] = useState({
+    status: "",
+    end_date: "",
+    // search: "",
   });
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -63,7 +69,7 @@ const Invoice = () => {
   const dueDateOptions = useMemo(() => {
     if (!Array.isArray(invoices)) return [];
     const unique = Array.from(
-      new Set(invoices.map((inv) => inv?.invoice_due_date).filter(Boolean))
+      new Set(invoices.map((inv) => inv?.invoice_end_date).filter(Boolean))
     );
     return unique.map((d) => ({ id: d, name: formatDate(d) }));
   }, [invoices]);
@@ -82,15 +88,21 @@ const Invoice = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const applyFilter = () => {
-    getInvoices({ ...formData });
-    resetFilter();
+  const applyFilter = async () => {
+    const response = await getInvoices({ ...formData });
+    console.log(response);
+    if (response.success) {
+      setResultFilter({
+        status: formData.status,
+        end_date: formData.end_date,
+      });
+    }
   };
 
   const resetFilter = () => {
     setFormData({
       status: "",
-      due_date: "",
+      end_date: "",
       search: "",
     });
     setIsSheetOpen(false);
@@ -247,7 +259,7 @@ const Invoice = () => {
                 </div>
                 <div className="text-xs text-gray-500">
                   Mulai: {formatDate(inv.invoice_date)} • Jatuh tempo:{" "}
-                  {formatDate(inv.invoice_due_date)}
+                  {formatDate(inv.invoice_end_date)}
                 </div>
               </div>
 
@@ -274,7 +286,7 @@ const Invoice = () => {
     if (isLoading) return renderLoading();
 
     if (!isLoading && invoices?.length === 0)
-      return <ElementsNoData text="Tidak ada invoice" />;
+      return <NoData text="Tidak ada invoice" />;
 
     return (
       <div className="max-w-7xl mx-auto">
@@ -301,6 +313,8 @@ const Invoice = () => {
       </div>
     );
   }, [isLoading, invoices, summary, navigate]);
+
+  console.log(resultFilter);
 
   return (
     <div className="p-4 sm:p-6 lg:p-10">
