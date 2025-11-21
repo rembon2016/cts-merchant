@@ -1,6 +1,11 @@
 import { XCircle } from "lucide-react";
+import PropTypes from "prop-types";
 
-export const ElementsNoData = (props) => {
+j.propTypes = {
+  text: PropTypes.string,
+};
+
+export default function j(props) {
   const { text } = props;
 
   return (
@@ -9,4 +14,4 @@ export const ElementsNoData = (props) => {
       <span className="text-sm">{text}</span>
     </div>
   );
-};
+}

@@ -6,8 +6,7 @@ import { formatCurrency } from "../../helper/currency";
 import BackButton from "../customs/button/BackButton";
 import CustomLoading from "../customs/loading/CustomLoading";
 import PrimaryButton from "../customs/button/PrimaryButton";
-import FloatingButton from "../customs/button/FloatingButton";
-import { ElementsNoData } from "../customs/element/NoData";
+import NoData from "../customs/element/NoData";
 
 const statusBadge = (status) => {
   if (status?.toLowerCase() === "paid") return "Sudah Bayar";
@@ -131,7 +130,7 @@ const DetailInvoice = () => {
         </div>
 
         {!invoices && (
-          <ElementsNoData
+          <NoData
             message={`Invoice tidak ditemukan untuk ${invoices?.code}"`}
           />
         )}
