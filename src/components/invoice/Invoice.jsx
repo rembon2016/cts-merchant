@@ -69,7 +69,7 @@ const Invoice = () => {
   const dueDateOptions = useMemo(() => {
     if (!Array.isArray(invoices)) return [];
     const unique = Array.from(
-      new Set(invoices.map((inv) => inv?.invoice_due_date).filter(Boolean))
+      new Set(invoices.map((inv) => inv?.invoice_end_date).filter(Boolean))
     );
     return unique.map((d) => ({ id: d, name: formatDate(d) }));
   }, [invoices]);
@@ -88,9 +88,15 @@ const Invoice = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const applyFilter = () => {
-    getInvoices({ ...formData });
-    resetFilter();
+  const applyFilter = async () => {
+    const response = await getInvoices({ ...formData });
+    console.log(response);
+    if (response.success) {
+      setResultFilter({
+        status: formData.status,
+        end_date: formData.end_date,
+      });
+    }
   };
 
   const resetFilter = () => {
@@ -253,7 +259,7 @@ const Invoice = () => {
                 </div>
                 <div className="text-xs text-gray-500">
                   Mulai: {formatDate(inv.invoice_date)} • Jatuh tempo:{" "}
-                  {formatDate(inv.invoice_due_date)}
+                  {formatDate(inv.invoice_end_date)}
                 </div>
               </div>
 
