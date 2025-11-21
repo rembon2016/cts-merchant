@@ -36,7 +36,7 @@ export default function ListProduct() {
     hideToast,
   } = useCustomToast();
 
-  const { removeCategories } = useProductStore();
+  const { removeCategories, isLoading } = useProductStore();
 
   const [selectedSub, setSelectedSub] = useState("");
   const [activeTab, setActiveTab] = useState("Produk");
@@ -394,7 +394,7 @@ export default function ListProduct() {
                 title={"Konfirmasi Hapus"}
                 content={`Apakah Anda yakin ingin menghapus kategori ini?`}
                 showButton={true}
-                isLoading={initialLoading}
+                isLoading={isLoading}
               />
             )}
             {renderElementsButtons("/pos/tambah-kategori")}
@@ -412,6 +412,7 @@ export default function ListProduct() {
     selectedCategory,
     showDeleteModal,
     initialLoading,
+    isLoading,
   ]);
 
   return (
