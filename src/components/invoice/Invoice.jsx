@@ -21,12 +21,6 @@ const Invoice = () => {
     search: "",
   });
 
-  const [resultFilter, setResultFilter] = useState({
-    status: "",
-    end_date: "",
-    // search: "",
-  });
-
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const location = useLocation();
@@ -253,7 +247,7 @@ const Invoice = () => {
                 </div>
                 <div className="text-xs text-gray-500">
                   Mulai: {formatDate(inv.invoice_date)} • Jatuh tempo:{" "}
-                  {formatDate(inv.invoice_due_date)}
+                  {formatDate(inv.invoice_end_date)}
                 </div>
               </div>
 
@@ -307,8 +301,6 @@ const Invoice = () => {
       </div>
     );
   }, [isLoading, invoices, summary, navigate]);
-
-  console.log(resultFilter);
 
   return (
     <div className="p-4 sm:p-6 lg:p-10">
