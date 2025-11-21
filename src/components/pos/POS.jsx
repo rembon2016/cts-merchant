@@ -303,7 +303,7 @@ export default function POS() {
       {/* Sub Kategori */}
       {/* {renderCategories} */}
       <div className="flex flex-col gap-2 mb-4">
-        <div className="flex gap-2">
+        <div className="flex gap-2 w-full">
           <SearchInput
             value={search}
             onChange={(value) => setSearch(value)}
