@@ -6,7 +6,7 @@ import { formatCurrency } from "../../helper/currency";
 import BackButton from "../customs/button/BackButton";
 import CustomLoading from "../customs/loading/CustomLoading";
 import PrimaryButton from "../customs/button/PrimaryButton";
-import FloatingButton from "../customs/button/FloatingButton";
+import NoData from "../customs/element/NoData";
 
 const statusBadge = (status) => {
   if (status?.toLowerCase() === "paid") return "Sudah Bayar";
@@ -122,7 +122,7 @@ const DetailInvoice = () => {
           )}
         </div>
 
-        <div className="text-right mt-4 border-t pt-4">
+        <div className="text-right mt-4 border-t pt-4 mb-4">
           <div className="text-xs text-gray-500">Total Pembayaran</div>
           <div className="text-lg font-medium mt-1">
             {invoices ? formatCurrency(invoices?.invoice_amount) : "-"}
@@ -130,16 +130,25 @@ const DetailInvoice = () => {
         </div>
 
         {!invoices && (
-          <div className="mt-4 text-sm text-red-600">
-            Invoice tidak ditemukan untuk "{invoices?.code}"
-          </div>
+          <NoData
+            message={`Invoice tidak ditemukan untuk ${invoices?.code}"`}
+          />
         )}
 
-        <FloatingButton
+        <PrimaryButton
+          title="Cetak"
+          handleOnClick={handlePrintInvoices}
+          isLoading={downloading}
+          disableCondition={!invoices || downloading}
+          showIcon={true}
+          icon={renderIconPrint}
+        />
+
+        {/* <FloatingButton
           title={renderIconPrint}
           isLoading={downloading}
           handleOnClick={handlePrintInvoices}
-        />
+        /> */}
       </div>
     );
   }, [isLoading, downloading]);

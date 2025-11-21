@@ -3,9 +3,12 @@ import { formatCurrency } from "../../helper/currency";
 import { useLocation, useNavigate } from "react-router-dom";
 import { formatDate } from "../../helper/format-date";
 import { useInvoiceStore } from "../../store/invoiceStore";
-import SimpleInput from "../customs/form/SimpleInput";
 import FloatingButton from "../customs/button/FloatingButton";
-import { ElementsNoData } from "../customs/element/NoData";
+import NoData from "../customs/element/NoData";
+import BottomSheet from "../customs/menu/BottomSheet";
+import SearchInput from "../customs/form/SearchInput";
+import SimpleInput from "../customs/form/SimpleInput";
+import { useDebounce } from "../../hooks/useDebounce";
 
 const Invoice = () => {
   const navigate = useNavigate();
@@ -13,8 +16,16 @@ const Invoice = () => {
   const { invoices, getInvoices, isLoading } = useInvoiceStore();
 
   // Filter states
-  const [filterStatus, setFilterStatus] = useState("");
-  const [filterDueDate, setFilterDueDate] = useState("");
+  const [formData, setFormData] = useState({
+    status: "",
+    end_date: "",
+    reset: false,
+  });
+  const [search, setSearch] = useState("");
+
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  const debouncedSearch = useDebounce(search || "", 500);
 
   const location = useLocation();
   const invoicePath = location.pathname.includes("/invoice");
@@ -23,8 +34,8 @@ const Invoice = () => {
     if (!invoicePath) return;
 
     // Selalu fetch data ketika komponen di-mount atau navigasi ke halaman invoice
-    getInvoices();
-  }, [invoicePath, getInvoices]);
+    getInvoices({ search: debouncedSearch });
+  }, [invoicePath, getInvoices, debouncedSearch]);
 
   const dataStatus = [
     { id: "paid", name: "Dibayar", color: "bg-green-300 text-green-800" },
@@ -70,20 +81,23 @@ const Invoice = () => {
     ];
   }, []);
 
-  const handleChangeStatus = (e) => setFilterStatus(e.target.value);
-  const handleChangeDueDate = (e) => setFilterDueDate(e.target.value);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
   const applyFilter = () => {
-    const params = {};
-    if (filterStatus) params.status = filterStatus;
-    if (filterDueDate) params.end_date = filterDueDate;
-    getInvoices(params);
+    getInvoices({ ...formData });
+    resetFilter();
   };
 
   const resetFilter = () => {
-    setFilterStatus("");
-    setFilterDueDate("");
-    getInvoices();
+    setFormData({
+      status: "",
+      end_date: "",
+      reset: true,
+    });
+    setIsSheetOpen(false);
   };
 
   const renderLoading = () => {
@@ -103,6 +117,52 @@ const Invoice = () => {
       </div>
     );
   };
+
+  const renderElementsFilter = useMemo(() => {
+    const conditionDisable =
+      formData?.status === "" && formData?.end_date === "";
+
+    return (
+      <>
+        <div className="mb-4 flex gap-2">
+          <SimpleInput
+            label="Status"
+            name="status"
+            type="text"
+            value={formData?.status}
+            isSelectBox={true}
+            selectBoxData={statusOptions}
+            handleChange={handleChange}
+          />
+          <SimpleInput
+            label="Jatuh Tempo"
+            name="end_date"
+            type="text"
+            value={formData?.end_date}
+            isSelectBox={true}
+            selectBoxData={dueDateOptions}
+            handleChange={handleChange}
+          />
+        </div>
+        <div className="flex items-end gap-2">
+          <button
+            className="w-full py-4 bg-[var(--c-primary)] text-white rounded-md font-semibold hover:bg-indigo-700 transition-colors duration-200"
+            onClick={applyFilter}
+            disabled={conditionDisable}
+          >
+            Terapkan Filter
+          </button>
+          <button
+            className="w-full py-4 bg-gray-200 text-gray-700 rounded-md font-semibold hover:bg-gray-300 transition-colors duration-200"
+            onClick={resetFilter}
+            disabled={conditionDisable}
+          >
+            Reset
+          </button>
+        </div>
+      </>
+    );
+  }, [isLoading, formData]);
 
   const renderCatalogInvoice = useMemo(() => {
     return (
@@ -182,10 +242,7 @@ const Invoice = () => {
     if (isLoading) return renderLoading();
 
     if (!isLoading && invoices?.length === 0)
-      return <ElementsNoData text="Tidak ada invoice" />;
-
-    const conditionDisable =
-      isLoading || filterStatus === "" || filterDueDate === "";
+      return <NoData text="Tidak ada invoice" />;
 
     return (
       <div className="max-w-7xl mx-auto">
@@ -199,58 +256,65 @@ const Invoice = () => {
             </p>
           </div>
         </div>
-        {/* Filters */}
-        <div className="mb-4 flex gap-2">
-          <SimpleInput
-            label="Status"
-            name="status"
-            type="text"
-            value={filterStatus}
-            isSelectBox={true}
-            selectBoxData={statusOptions}
-            handleChange={handleChangeStatus}
-          />
-          <SimpleInput
-            label="Jatuh Tempo"
-            name="end_date"
-            type="text"
-            value={filterDueDate}
-            isSelectBox={true}
-            selectBoxData={dueDateOptions}
-            handleChange={handleChangeDueDate}
-          />
-        </div>
-        <div className="flex items-end gap-2">
-          <button
-            className="w-full py-4 bg-[var(--c-primary)] text-white rounded-md font-semibold hover:bg-indigo-700 transition-colors duration-200"
-            onClick={applyFilter}
-            disabled={conditionDisable}
-          >
-            Terapkan Filter
-          </button>
-          <button
-            className="w-full py-4 bg-gray-200 text-gray-700 rounded-md font-semibold hover:bg-gray-300 transition-colors duration-200"
-            onClick={resetFilter}
-            disabled={conditionDisable}
-          >
-            Reset
-          </button>
-        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Summary + list */}
-          <div className="lg:col-span-3 space-y-2">
+          <div className="lg:col-span-3 space-y-4">
             {renderCatalogInvoice}
+            <div className="flex flex-col gap-2 mb-4">
+              <div className="flex gap-2">
+                <SearchInput
+                  value={search || ""}
+                  onChange={(value) => setSearch(value)}
+                  placeholder="Cari invoice..."
+                />
+                <button
+                  onClick={() => setIsSheetOpen(true)}
+                  className="bg-[var(--c-primary)] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1"
+                >
+                  <svg
+                    width="17"
+                    height="12"
+                    viewBox="0 0 17 12"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M0.75 0.75H15.75M3.25 5.75H13.25M6.25 10.75H10.25"
+                      stroke="white"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  Filter
+                </button>
+              </div>
+            </div>
             {renderInvoiceList}
           </div>
         </div>
+      </div>
+    );
+  }, [isLoading, invoices, summary, navigate, search]);
+
+  return (
+    <div className="p-4 sm:p-6 lg:p-10">
+      {renderElements}
+      {!isSheetOpen && (
         <FloatingButton
           handleOnClick={() => navigate("/invoice/add", { replace: true })}
         />
-      </div>
-    );
-  }, [isLoading, invoices, summary, navigate, filterStatus, filterDueDate]);
-
-  return <div className="p-4 sm:p-6 lg:p-10">{renderElements}</div>;
+      )}
+      <BottomSheet
+        title="Filter"
+        isOpen={isSheetOpen}
+        onClose={() => setIsSheetOpen(false)}
+        onItemClick={() => setIsSheetOpen(false)}
+        renderContent={renderElementsFilter}
+      />
+    </div>
+  );
 };
 
 export default Invoice;
