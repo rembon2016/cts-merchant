@@ -5,7 +5,7 @@ import { formatCurrency } from "../../../helper/currency";
 import { useTransactionStore } from "../../../store/transactionStore";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ElementsNoData } from "../../customs/element/NoData";
+import NoData from "../../customs/element/NoData";
 import { useDebounce } from "../../../hooks/useDebounce";
 
 export default function ListTransaction() {
@@ -35,7 +35,7 @@ export default function ListTransaction() {
     }
 
     if (!isLoading && transactions.length === 0) {
-      return <ElementsNoData text="Tidak ada transaksi" />;
+      return <NoData text="Tidak ada transaksi" />;
     }
 
     return (

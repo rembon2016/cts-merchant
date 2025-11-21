@@ -11,7 +11,7 @@ import BottomModal from "../customs/menu/BottomModal";
 import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
 import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 import BottomSheet from "../customs/menu/BottomSheet";
-import { ElementsNoData } from "../customs/element/NoData";
+import NoData from "../customs/element/NoData";
 
 const MAIN_MENU = [
   {
@@ -198,11 +198,11 @@ export default function POS() {
     }
 
     if (productsError) {
-      return <ElementsNoData text={productsError} />;
+      return <NoData text={productsError} />;
     }
 
     if (!productsLoading && !productsError && products?.length === 0) {
-      return <ElementsNoData text="Produk tidak ditemukan" />;
+      return <NoData text="Produk tidak ditemukan" />;
     }
 
     return (
