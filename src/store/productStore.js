@@ -792,11 +792,12 @@ const useProductStore = create((set, get) => ({
       );
 
       if (!response.ok) {
-        set({ isLoading: false, error: `Gagal menghapus kategori` });
-        setTimeout(() => {
-          set({ error: null });
-        }, 2000);
-        throw new Error(`HTTP error! status: ${response?.status}`);
+        set({
+          isLoading: false,
+          error: `Gagal menghapus kategori`,
+        });
+        setTimeout(() => set({ error: null }), 2000);
+        // throw new Error(`HTTP error! status: ${response?.status}`);
       }
 
       const result = await response.json();

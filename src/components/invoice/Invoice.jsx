@@ -6,6 +6,7 @@ import { useInvoiceStore } from "../../store/invoiceStore";
 import SimpleInput from "../customs/form/SimpleInput";
 import FloatingButton from "../customs/button/FloatingButton";
 import { ElementsNoData } from "../customs/element/NoData";
+import BottomSheet from "../customs/menu/BottomSheet";
 
 const Invoice = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const Invoice = () => {
   // Filter states
   const [filterStatus, setFilterStatus] = useState("");
   const [filterDueDate, setFilterDueDate] = useState("");
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const location = useLocation();
   const invoicePath = location.pathname.includes("/invoice");
@@ -250,7 +252,21 @@ const Invoice = () => {
     );
   }, [isLoading, invoices, summary, navigate, filterStatus, filterDueDate]);
 
-  return <div className="p-4 sm:p-6 lg:p-10">{renderElements}</div>;
+  return (
+    <div className="p-4 sm:p-6 lg:p-10">
+      {renderElements}
+      {/* <BottomSheet
+        title="Filter"
+        isOpen={isSheetOpen}
+        onClose={() => setIsSheetOpen(false)}
+        onItemClick={() => setIsSheetOpen(false)}
+        isMenuItems={false}
+        // setSelectedSub={setSelectedSub}
+        // data={categories}
+        // token={token}
+      /> */}
+    </div>
+  );
 };
 
 export default Invoice;
