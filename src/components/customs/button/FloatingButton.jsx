@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
 FloatingButton.propTypes = {
-  title: PropTypes.string.isRequired,
+  title: PropTypes.string,
   buttonClassName: PropTypes.string,
   handleOnClick: PropTypes.func,
   isLoading: PropTypes.bool,

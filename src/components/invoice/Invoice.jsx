@@ -8,7 +8,6 @@ import FloatingButton from "../customs/button/FloatingButton";
 import BottomSheet from "../customs/menu/BottomSheet";
 import SearchInput from "../customs/form/SearchInput";
 import SimpleInput from "../customs/form/SimpleInput";
-import { XCircle } from "lucide-react";
 
 const Invoice = () => {
   const navigate = useNavigate();
@@ -16,7 +15,11 @@ const Invoice = () => {
   const { invoices, getInvoices, isLoading } = useInvoiceStore();
 
   // Filter states
-  const [formData, setFormData] = useState(null);
+  const [formData, setFormData] = useState({
+    status: "",
+    due_date: "",
+    search: "",
+  });
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
@@ -116,9 +119,10 @@ const Invoice = () => {
       <div className="flex flex-col gap-2 mb-4">
         <div className="flex gap-2">
           <SearchInput
+            name="search"
             value={formData?.search}
             onChange={handleChange}
-            placeholder="Cari transaksi..."
+            placeholder="Cari invoice..."
           />
           <button
             onClick={() => setIsSheetOpen(true)}
@@ -148,7 +152,7 @@ const Invoice = () => {
 
   const renderElementsFilter = useMemo(() => {
     const conditionDisable =
-      isLoading || formData?.status === null || formData?.end_date === null;
+      isLoading || formData?.status === "" || formData?.end_date === "";
 
     return (
       <>
