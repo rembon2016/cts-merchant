@@ -1,5 +1,4 @@
 export default function SearchInput({
-  name,
   value,
   onChange,
   placeholder = "Cari...",
@@ -8,7 +7,6 @@ export default function SearchInput({
     <div className="relative">
       <input
         type="text"
-        name={name}
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}

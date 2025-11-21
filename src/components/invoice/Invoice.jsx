@@ -8,6 +8,7 @@ import NoData from "../customs/element/NoData";
 import BottomSheet from "../customs/menu/BottomSheet";
 import SearchInput from "../customs/form/SearchInput";
 import SimpleInput from "../customs/form/SimpleInput";
+import { useDebounce } from "../../hooks/useDebounce";
 
 const Invoice = () => {
   const navigate = useNavigate();
@@ -18,10 +19,13 @@ const Invoice = () => {
   const [formData, setFormData] = useState({
     status: "",
     end_date: "",
-    search: "",
+    reset: false,
   });
+  const [search, setSearch] = useState("");
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  const debouncedSearch = useDebounce(search || "", 500);
 
   const location = useLocation();
   const invoicePath = location.pathname.includes("/invoice");
@@ -30,8 +34,8 @@ const Invoice = () => {
     if (!invoicePath) return;
 
     // Selalu fetch data ketika komponen di-mount atau navigasi ke halaman invoice
-    getInvoices();
-  }, [invoicePath, getInvoices]);
+    getInvoices({ search: debouncedSearch });
+  }, [invoicePath, getInvoices, debouncedSearch]);
 
   const dataStatus = [
     { id: "paid", name: "Dibayar", color: "bg-green-300 text-green-800" },
@@ -91,7 +95,7 @@ const Invoice = () => {
     setFormData({
       status: "",
       end_date: "",
-      search: "",
+      reset: true,
     });
     setIsSheetOpen(false);
   };
@@ -113,42 +117,6 @@ const Invoice = () => {
       </div>
     );
   };
-
-  const renderFilter = useMemo(() => {
-    return (
-      <div className="flex flex-col gap-2 mb-4">
-        <div className="flex gap-2">
-          <SearchInput
-            name="search"
-            value={formData?.search}
-            onChange={handleChange}
-            placeholder="Cari invoice..."
-          />
-          <button
-            onClick={() => setIsSheetOpen(true)}
-            className="bg-[var(--c-primary)] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1"
-          >
-            <svg
-              width="17"
-              height="12"
-              viewBox="0 0 17 12"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M0.75 0.75H15.75M3.25 5.75H13.25M6.25 10.75H10.25"
-                stroke="white"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            Filter
-          </button>
-        </div>
-      </div>
-    );
-  }, []);
 
   const renderElementsFilter = useMemo(() => {
     const conditionDisable =
@@ -247,7 +215,7 @@ const Invoice = () => {
                 </div>
                 <div className="text-xs text-gray-500">
                   Mulai: {formatDate(inv.invoice_date)} • Jatuh tempo:{" "}
-                  {formatDate(inv.invoice_end_date)}
+                  {formatDate(inv.invoice_due_date)}
                 </div>
               </div>
 
@@ -293,14 +261,42 @@ const Invoice = () => {
           {/* Summary + list */}
           <div className="lg:col-span-3 space-y-4">
             {renderCatalogInvoice}
-            {/* Filters */}
-            {renderFilter}
+            <div className="flex flex-col gap-2 mb-4">
+              <div className="flex gap-2">
+                <SearchInput
+                  value={search || ""}
+                  onChange={(value) => setSearch(value)}
+                  placeholder="Cari invoice..."
+                />
+                <button
+                  onClick={() => setIsSheetOpen(true)}
+                  className="bg-[var(--c-primary)] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1"
+                >
+                  <svg
+                    width="17"
+                    height="12"
+                    viewBox="0 0 17 12"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M0.75 0.75H15.75M3.25 5.75H13.25M6.25 10.75H10.25"
+                      stroke="white"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  Filter
+                </button>
+              </div>
+            </div>
             {renderInvoiceList}
           </div>
         </div>
       </div>
     );
-  }, [isLoading, invoices, summary, navigate]);
+  }, [isLoading, invoices, summary, navigate, search]);
 
   return (
     <div className="p-4 sm:p-6 lg:p-10">

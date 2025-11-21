@@ -21,7 +21,7 @@ const useInvoiceStore = create((set) => ({
       set({ isLoading: true, error: null });
       const qs = new URLSearchParams();
       if (status) qs.append("status", status);
-      if (end_date) qs.append("end_date", end_date);
+      if (end_date) qs.append("invoice_date", end_date);
       if (search) qs.append("search", search);
 
       const url = qs.toString()
