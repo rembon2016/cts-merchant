@@ -5,7 +5,7 @@ import SearchInput from "../customs/form/SearchInput";
 import LoadMoreButton from "../customs/button/LoadMoreButton";
 import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 import { formatCurrency } from "../../helper/currency";
-import { ElementsNoData } from "../customs/element/NoData";
+import NoData from "../customs/element/NoData";
 import { formatDate } from "../../helper/format-date";
 
 // Define action types
@@ -112,7 +112,7 @@ export default function Transaction() {
       return <div className="text-center text-red-500">Error: {error}</div>;
     }
     if (!accumulatedData.length) {
-      return <ElementsNoData text="Tidak ada transaksi" />;
+      return <NoData text="Tidak ada transaksi" />;
     }
 
     return (

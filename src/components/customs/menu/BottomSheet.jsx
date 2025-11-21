@@ -2,9 +2,9 @@ import { useEffect, useMemo, useRef } from "react";
 import PropTypes from "prop-types";
 
 BottomSheet.propTypes = {
-  title: PropTypes.string.isRequired,
+  title: PropTypes.string,
   isOpen: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
+  onClose: PropTypes.func,
   onItemClick: PropTypes.func,
   isMenuItems: PropTypes.bool,
   data: PropTypes.arrayOf(PropTypes.object),
