@@ -150,7 +150,7 @@ export default function DashboardTransaction() {
     return (
       <div className="flex flex-col w-full gap-1 income-card bg-[var(--c-primary)] rounded-xl">
         <div className="w-full p-4 box-border  flex flex-col gap-1  shadow">
-          <h3 className="font-normal text-white text-md">Total Amount</h3>
+          <h3 className="font-normal text-white text-md">Jumlah Total</h3>
           <h1 className="font-bold text-3xl text-white">
             {isLoading
               ? "..."
@@ -159,7 +159,7 @@ export default function DashboardTransaction() {
         </div>
         <div className="flex w-full gap-2">
           <div className="w-full p-4 box-border  flex flex-col gap-1  shadow">
-            <h3 className="font-normal text-white text-md">Total Sales</h3>
+            <h3 className="font-normal text-white text-md">Total Penjualan</h3>
             <h1 className="font-bold text-[1.1rem] text-white">
               {isLoading
                 ? "..."
@@ -167,7 +167,9 @@ export default function DashboardTransaction() {
             </h1>
           </div>
           <div className="w-full p-4 box-border  flex flex-col gap-1  shadow">
-            <h3 className="font-normal text-white text-md">Total Cost</h3>
+            <h3 className="font-normal text-white text-md">
+              Total Pengeluaran
+            </h3>
             <h1 className="font-bold text-[1.1rem] text-white">
               {isLoading
                 ? "..."
@@ -177,15 +179,15 @@ export default function DashboardTransaction() {
         </div>
         <div className="flex w-full gap-2">
           <div className="w-full p-4 box-border  flex flex-col gap-1  shadow">
-            <h3 className="font-normal text-white text-md">Net Sales</h3>
+            <h3 className="font-normal text-white text-md">Pajak</h3>
             <h1 className="font-bold text-[1.1rem] text-white">
               {isLoading
                 ? "..."
-                : formatCurrency(dataOverview?.overview?.net_sales)}
+                : formatCurrency(dataOverview?.overview?.total_tax)}
             </h1>
           </div>
           <div className="w-full p-4 box-border  flex flex-col gap-1  shadow">
-            <h3 className="font-normal text-white text-md">Net Profit</h3>
+            <h3 className="font-normal text-white text-md">Untung Bersih</h3>
             <h1 className="font-bold text-[1.1rem] text-white">
               {isLoading
                 ? "..."

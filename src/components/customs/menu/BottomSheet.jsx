@@ -1,21 +1,25 @@
 import { useEffect, useMemo, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import { useAuthStore } from "../../../store/authStore";
-import { ElementsNoData } from "../element/NoData";
+import PropTypes from "prop-types";
 
-const BottomSheet = ({
+BottomSheet.propTypes = {
+  title: PropTypes.string.isRequired,
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onItemClick: PropTypes.func,
+  isMenuItems: PropTypes.bool,
+  data: PropTypes.arrayOf(PropTypes.object),
+  renderContent: PropTypes.node,
+};
+
+export default function BottomSheet({
   title = "Menu Lainnya",
   isOpen,
   onClose,
-  onItemClick,
   isMenuItems = true,
   data = null,
-  setSelectedSub = null,
-}) => {
+  renderContent = null,
+}) {
   const sheetRef = useRef(null);
-  const navigate = useNavigate();
-  const { user } = useAuthStore();
 
   useEffect(() => {
     if (isOpen) {
@@ -46,55 +50,6 @@ const BottomSheet = ({
     }, 260);
   };
 
-  const handleItemClick = (item) => {
-    if (!isMenuItems) setSelectedSub({ id: item.id, name: item.name });
-
-    if (item.url === "#") {
-      toast.info(`Fitur ${item?.label} Segera Hadir`, {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-      return;
-    }
-
-    if (item.url === "/pos") {
-      navigate(item.url, { replace: true });
-      return;
-    }
-
-    if (item.url === "/invoice") {
-      navigate(item.url, { replace: true });
-      return;
-    }
-
-    if (item.url === "/customer-support") {
-      navigate(item.url, { replace: true });
-      return;
-    }
-
-    if (item.url === "/ppob") {
-      navigate(item.url, { replace: true });
-      return;
-    }
-
-    if (item.target === "_blank") {
-      window.open(item.url, "_blank");
-    }
-
-    if (item.target !== "_blank") {
-      if (item.id === "soundbox" && user?.business_account !== null) {
-        return;
-      }
-      onItemClick(item.url, item.label);
-    }
-  };
-
   const renderElements = useMemo(() => {
     if (data?.length === 0) return;
 
@@ -121,47 +76,12 @@ const BottomSheet = ({
               </button>
             </div>
 
-            {data?.length === 0 && <ElementsNoData text="Tidak ada kategori" />}
-
-            {/* Grid 3 cols with 3-2-1 layout */}
-            <div className="grid grid-cols-3 gap-3">
-              {data?.map((item) => {
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => handleItemClick(item)}
-                    className="sheet-item bg-slate-50 dark:bg-slate-600 rounded-xl p-3 flex flex-col items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-500 transition-colors"
-                  >
-                    {isMenuItems ? (
-                      <span className="size-12 grid place-items-center rounded-xl accent-bg">
-                        {item?.icon}
-                      </span>
-                    ) : (
-                      <img
-                        src={
-                          item.image
-                            ? `${import.meta.env.VITE_API_IMAGE}${item.image}`
-                            : "/images/image-placeholder.png"
-                        }
-                        alt={item.name || "Product Image"}
-                        className="w-full h-[60px] object-cover"
-                        onError={(e) => {
-                          e.target.src = "/images/placeholder.jpg";
-                        }}
-                      />
-                    )}
-                    <span className="text-xs text-center text-primary dark:text-slate-300">
-                      {item?.name}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+            {renderContent}
           </div>
         </div>
       </div>
     );
-  }, [data, isMenuItems, sheetRef, handleClose, handleItemClick]);
+  }, [data, isMenuItems, sheetRef, handleClose]);
 
   if (!isOpen) return null;
 
@@ -179,6 +99,4 @@ const BottomSheet = ({
       {renderElements}
     </>
   );
-};
-
-export default BottomSheet;
+}
