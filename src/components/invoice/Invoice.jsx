@@ -8,7 +8,6 @@ import FloatingButton from "../customs/button/FloatingButton";
 import BottomSheet from "../customs/menu/BottomSheet";
 import SearchInput from "../customs/form/SearchInput";
 import SimpleInput from "../customs/form/SimpleInput";
-import { XCircle } from "lucide-react";
 
 const Invoice = () => {
   const navigate = useNavigate();
