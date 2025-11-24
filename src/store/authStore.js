@@ -57,7 +57,7 @@ export const useAuthStore = create((set, get) => ({
       const result = await response.json();
       const resultPOS = await responseApiPOS.json();
 
-      if (!response?.ok && !responseApiPOS?.ok) {
+      if (!response?.ok) {
         set({ error: result?.message, isLoading: false });
         throw new Error(result?.message || "Login failed");
       }

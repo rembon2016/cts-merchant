@@ -227,7 +227,7 @@ const BottomNav = () => {
       const response = await saveOrder(dataCheckout);
       const responsePayment = await proccessPayment(dataPayment);
 
-      if (response?.success && responsePayment?.success) {
+      if (response?.success || responsePayment?.success) {
         showSuccess("Pesanan berhasil diproses");
         // Clear carts based on unique cart_ids
         if (cartIds && cartIds?.length > 0) {

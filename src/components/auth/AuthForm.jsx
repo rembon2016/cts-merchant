@@ -168,7 +168,11 @@ export default function AuthForm({ formMode = "login" }) {
         <form
           className="space-y-3"
           onKeyDown={(e) => {
-            if (e.key === "Enter" && isLoginMode && e.target?.name === "password") {
+            if (
+              e.key === "Enter" &&
+              isLoginMode &&
+              e.target?.name === "password"
+            ) {
               handleSubmit(e);
             }
           }}
