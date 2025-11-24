@@ -5,13 +5,14 @@ import { useDebounce } from "../../hooks/useDebounce";
 import { useNavigate } from "react-router-dom";
 import { formatCurrency } from "../../helper/currency";
 import { toast } from "react-toastify";
-import { ShoppingCart, XCircle } from "lucide-react";
+import { XCircle } from "lucide-react";
 import SearchInput from "../customs/form/SearchInput";
 import BottomModal from "../customs/menu/BottomModal";
 import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
 import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 import BottomSheet from "../customs/menu/BottomSheet";
 import NoData from "../customs/element/NoData";
+import ProductCard from "../customs/card/ProductCard";
 
 const MAIN_MENU = [
   {
@@ -118,11 +119,6 @@ export default function POS() {
 
     setSelectedProduct(product);
     setShowVariantModal(true);
-    // addToCart(product);
-    // if (product.is_variant && product.skus?.length > 0) {
-    // } else {
-    //   // Add to cart directly for non-variant products
-    // }
   };
 
   // Navigate to product detail page
@@ -219,77 +215,17 @@ export default function POS() {
           const isOutOfStock = !hasAvailableStock(product);
 
           return (
-            <div
+            <ProductCard
               key={product.id}
               ref={isLastProduct ? lastProductElementRef : null}
-              className={`border rounded-lg shadow hover:shadow-lg transition flex flex-col items-start overflow-hidden ${
-                isOutOfStock ? "opacity-50" : "cursor-pointer"
-              }`}
-              onClick={() => !isOutOfStock && goToProductDetail(product.id)}
-            >
-              <div className="relative w-full">
-                <img
-                  src={
-                    product.image
-                      ? `${import.meta.env.VITE_API_IMAGE}${product.image}`
-                      : "/images/image-placeholder.png"
-                  }
-                  alt={product.name || "Product Image"}
-                  className="w-full h-[100px] object-cover"
-                  onError={(e) => {
-                    e.target.src = "/images/placeholder.jpg";
-                  }}
-                />
-                {isOutOfStock && (
-                  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-t-[10px]">
-                    <span className="text-white font-semibold text-sm">
-                      HABIS
-                    </span>
-                  </div>
-                )}
-                {product.is_variant && (
-                  <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
-                    Varian
-                  </div>
-                )}
-              </div>
-              <div className="p-2 w-full h-full flex flex-col justify-between">
-                <div>
-                  <div className="text-slate-600 dark:text-slate-300">
-                    <span className="font-bold text-md">
-                      {formatCurrency(productPrice)}
-                    </span>
-                  </div>
-                  <div className="mt-2 mb-4">
-                    <div className="font-semibold text-md line-clamp-2 leading-5 mb-1">
-                      {product.name}
-                    </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                      Stok: {productStock}
-                    </div>
-                  </div>
-                </div>
-                <button
-                  className={`w-full flex justify-center items-center gap-2 h-10 py-2 rounded-lg transition-colors ${
-                    isOutOfStock
-                      ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-                      : "bg-[var(--c-primary)] text-white hover:bg-blue-700"
-                  } text-xs`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (!isOutOfStock) {
-                      handleProductClick(product);
-                    }
-                  }}
-                  disabled={isOutOfStock}
-                >
-                  <span className="inline-block">
-                    <ShoppingCart className="w-4 h-4" />
-                  </span>
-                  {isOutOfStock ? "Habis" : "Tambahkan"}
-                </button>
-              </div>
-            </div>
+              product={product}
+              price={formatCurrency(productPrice)}
+              stock={productStock}
+              disabled={isOutOfStock}
+              onClick={() => goToProductDetail(product.id)}
+              showButtonCart={!isOutOfStock}
+              handleProductClick={handleProductClick}
+            />
           );
         })}
       </div>

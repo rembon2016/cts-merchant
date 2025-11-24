@@ -11,6 +11,7 @@ import LoadingSkeletonCard from "../../customs/loading/LoadingSkeletonCard";
 import LoadingSkeletonList from "../../customs/loading/LoadingSkeletonList";
 import NoData from "../../customs/element/NoData";
 import FloatingButton from "../../customs/button/FloatingButton";
+import ProductCard from "../../customs/card/ProductCard";
 
 export default function ListProduct() {
   const {
@@ -269,62 +270,16 @@ export default function ListProduct() {
                   const isOutOfStock = !hasAvailableStock(product);
 
                   return (
-                    <button
+                    <ProductCard
                       key={product.id}
                       ref={isLastProduct ? lastProductElementRef : null}
-                      className={`border rounded-lg shadow hover:shadow-lg transition flex flex-col items-start overflow-hidden ${
-                        isOutOfStock ? "opacity-50" : "cursor-pointer"
-                      }`}
-                      onClick={() =>
-                        !isOutOfStock && goToProductDetail(product.id)
-                      }
-                    >
-                      <div className="relative w-full">
-                        <img
-                          src={
-                            product?.image
-                              ? `${import.meta.env.VITE_API_IMAGE}${
-                                  product.image
-                                }`
-                              : "/images/image-placeholder.png"
-                          }
-                          alt={product.name || "Product Image"}
-                          className="w-full h-[100px] object-cover rounded-t-[10px]"
-                          onError={(e) => {
-                            e.target.src = "/images/placeholder.jpg";
-                          }}
-                        />
-                        {isOutOfStock && (
-                          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-t-[10px]">
-                            <span className="text-white font-semibold text-sm">
-                              HABIS
-                            </span>
-                          </div>
-                        )}
-                        {product.is_variant && (
-                          <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
-                            Varian
-                          </div>
-                        )}
-                      </div>
-                      <div className="p-2 w-full h-full flex flex-col justify-between">
-                        <div>
-                          <div className="text-slate-600 dark:text-slate-300">
-                            <span className="font-bold text-md">
-                              {formatCurrency(productPrice)}
-                            </span>
-                          </div>
-                          <div className="mt-2 mb-4">
-                            <div className="font-semibold text-md line-clamp-2 leading-5 mb-1">
-                              {product.name}
-                            </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                              Stok: {productStock}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </button>
+                      product={product}
+                      price={formatCurrency(productPrice)}
+                      stock={productStock}
+                      disabled={isOutOfStock}
+                      onClick={() => goToProductDetail(product.id)}
+                      showButtonCart={false}
+                    />
                   );
                 })}
               </div>
