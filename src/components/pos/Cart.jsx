@@ -269,7 +269,7 @@ const Cart = () => {
                 <img
                   src={getImageUrl(cartItem?.product?.image)}
                   alt={cartItem?.product?.name || "Product Image"}
-                  className="w-20 h-20 rounded-lg"
+                  className="w-20 h-20 object-cover rounded-lg"
                 />
                 <div key={cartItem?.id} className="flex flex-col">
                   <div className="font-bold text-base">
