@@ -255,7 +255,6 @@ export default function ProductForm({ editMode = false, productId = null }) {
     if (editMode && productId) {
       getProductsForEdit();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editMode, productId]);
 
   const getTrashIcon = useMemo(() => {

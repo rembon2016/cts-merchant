@@ -34,7 +34,7 @@ export const formatCurrency = (amount) => {
   // Truncate any fractional part (do not round)
   const truncated = Math.trunc(num);
 
-  const formatter = new Intl.NumberFormat("id-ID", {
+  const formatter = new globalThis.Intl.NumberFormat("id-ID", {
     minimumFractionDigits: 0,
   });
 

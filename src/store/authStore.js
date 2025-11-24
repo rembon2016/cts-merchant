@@ -446,7 +446,7 @@ export const useAuthStore = create((set, get) => ({
         set({ tokenPos: newPosToken });
       }
 
-      set({ token: newToken, isLoggedIn: true, isLoading: false, error: null });
+      set({ isLoggedIn: true, isLoading: false, error: null });
 
       // Reset auto logout timer berdasarkan expiry terbaru
       get().setupAutoLogout();

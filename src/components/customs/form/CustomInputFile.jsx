@@ -58,7 +58,6 @@ export default function CustomInputFile({
   //       }
   //     }
   //   };
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, []);
 
   useEffect(() => {
@@ -78,7 +77,6 @@ export default function CustomInputFile({
     // we intentionally only depend on initialPreview here to set initial preview once
     // cleanup for object URLs when files change or on unmount
     // use a separate effect for cleanup to avoid re-triggering initialPreview logic
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialPreview]);
 
   useEffect(() => {

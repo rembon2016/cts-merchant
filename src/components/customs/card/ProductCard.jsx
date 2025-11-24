@@ -113,6 +113,8 @@ const ProductCard = forwardRef((props) => {
   );
 });
 
+ProductCard.displayName = "ProductCard";
+
 ProductCard.propTypes = {
   product: PropTypes.object.isRequired,
   price: PropTypes.string.isRequired,

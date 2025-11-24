@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export const useDashboardStore = create((set, get) => ({
+export const useDashboardStore = create((set) => ({
   isLoading: false,
   data: [],
   dataOverview: [],

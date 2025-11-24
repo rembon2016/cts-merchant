@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export const useCheckEmptyStore = create((set) => ({
+export const useCheckEmptyStore = create((set, get) => ({
   isEmpty: false,
   checkEmptyValue: (value) => {
     if (

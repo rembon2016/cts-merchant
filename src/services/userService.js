@@ -1,5 +1,5 @@
 // Mock API service untuk user data
-const API_BASE_URL = 'https://api.example.com'
+// const API_BASE_URL = 'https://api.example.com'
 
 // Simulasi delay untuk API calls
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
@@ -109,7 +109,7 @@ export const userService = {
   },
 
   // Get income data
-  async getIncomeData(period = 'today') {
+  async getIncomeData(_period = 'today') {
     try {
       await delay(600)
       return {
