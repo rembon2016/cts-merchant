@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-const usePPOBProductStore = create((set) => ({
+const usePPOBProductStore = create(() => ({
   // Categories
   categories: [
     { id: 'pulsa', name: 'Pulsa & Data', icon: 'bx bx-mobile', popular: true },

@@ -8,7 +8,7 @@ import ProcessingModal from "../../components/ppob/ProcessingModal";
 
 const PPOBWithdraw = () => {
   const navigate = useNavigate();
-  const { balance, mainBalance } = usePPOBStore();
+  const { balance } = usePPOBStore();
 
   const [withdrawType, setWithdrawType] = useState("main"); // 'main' or 'bank'
   const [amount, setAmount] = useState("");

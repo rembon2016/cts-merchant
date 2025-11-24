@@ -67,18 +67,22 @@ const PPOBHistory = () => {
         const trxDate = new Date(trx.timestamp);
 
         switch (selectedPeriod) {
-          case "today":
+          case "today": {
             return trxDate >= today;
-          case "week":
+          }
+          case "week": {
             const weekAgo = new Date(today);
             weekAgo.setDate(weekAgo.getDate() - 7);
             return trxDate >= weekAgo;
-          case "month":
+          }
+          case "month": {
             const monthAgo = new Date(today);
             monthAgo.setMonth(monthAgo.getMonth() - 1);
             return trxDate >= monthAgo;
-          default:
+          }
+          default: {
             return true;
+          }
         }
       });
     }

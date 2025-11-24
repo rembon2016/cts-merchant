@@ -60,13 +60,7 @@ const usePosStore = create((set, get) => ({
 
   // Get products from API with pagination and filters
   getProducts: async (params = {}) => {
-    const {
-      page = 1,
-      per_page = 10,
-      category_id = "",
-      search = "",
-      reset = false,
-    } = params;
+    const { page = 1, per_page = 10, category_id = "", search = "" } = params;
 
     const token = sessionStorage.getItem("authPosToken");
     const activeBranch = sessionStorage.getItem("branchActive");

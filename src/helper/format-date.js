@@ -4,7 +4,7 @@ export const formatDate = (value) => {
   // Terima string ISO 'YYYY-MM-DD' atau objek Date
   const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat("id-ID", {
+  return new globalThis.Intl.DateTimeFormat("id-ID", {
     day: "2-digit",
     month: "short",
     year: "numeric",

@@ -44,7 +44,6 @@ export default function SimpleInput({
     if (canToggleType) {
       setDynamicType(type);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type]);
   const inputClassName = `w-full ${isDefaultSize ? "p-4" : "p-1"} border ${
     errors ? "border-2 border-red-600" : "border-slate-300"

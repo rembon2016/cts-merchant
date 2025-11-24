@@ -201,7 +201,7 @@ export default function ListProduct() {
         <div className="w-full income-card p-4 bg-[var(--c-primary)] flex flex-col gap-2 rounded-xl shadow">
           <h3 className="font-normal text-white">Total Stok</h3>
           <h1 className="font-bold text-xl text-white">
-            {new Intl.NumberFormat("id-ID", {
+            {new globalThis.Intl.NumberFormat("id-ID", {
               minimumFractionDigits: 0,
             }).format(totalStocks)}
           </h1>

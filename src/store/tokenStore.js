@@ -80,7 +80,9 @@ const generateToken = () => {
         const id = setInterval(() => {
           try {
             generateToken();
-          } catch (_) {}
+          } catch (e) {
+            setError(e?.message || "Failed to refresh token");
+          }
         }, ms);
         setRefreshIntervalId(id);
         return id;
@@ -95,7 +97,9 @@ const generateToken = () => {
           clearInterval(refreshIntervalId);
         }
         clearRefreshInterval();
-      } catch (_) {}
+      } catch (e) {
+        setError(e?.message || "Failed to stop auto refresh");
+      }
     },
   };
 }

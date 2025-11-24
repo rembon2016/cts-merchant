@@ -116,4 +116,6 @@ const CustomTextarea = forwardRef((props, ref) => {
   );
 });
 
+CustomTextarea.displayName = "CustomTextarea";
+
 export default CustomTextarea;
