@@ -94,32 +94,6 @@ export default function ListProduct() {
     });
   }, [selectedSub, getProducts, resetProducts]);
 
-  const lastProductElementRef = useCallback(
-    (node) => {
-      if (initialLoading || productsLoading) return;
-      if (observerRef.current) observerRef.current.disconnect();
-      observerRef.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMoreProducts) {
-          loadMoreProducts({
-            category_id: selectedSub
-              ? subCategories.find((cat) => cat.name === selectedSub)?.id || ""
-              : "",
-            per_page: 20,
-          });
-        }
-      });
-      if (node) observerRef.current.observe(node);
-    },
-    [
-      initialLoading,
-      productsLoading,
-      hasMoreProducts,
-      loadMoreProducts,
-      selectedSub,
-      subCategories,
-    ]
-  );
-
   // Navigate to product detail page
   const goToProductDetail = (productId) =>
     navigate(`/pos/products/${productId}`);
@@ -272,13 +246,18 @@ export default function ListProduct() {
                   return (
                     <ProductCard
                       key={product.id}
-                      ref={isLastProduct ? lastProductElementRef : null}
                       product={product}
                       price={formatCurrency(productPrice)}
                       stock={productStock}
                       disabled={isOutOfStock}
                       onClick={() => goToProductDetail(product.id)}
                       showButtonCart={false}
+                      loading={initialLoading || productsLoading}
+                      isLastProduct={isLastProduct}
+                      hasMoreProducts={hasMoreProducts}
+                      loadMoreProducts={loadMoreProducts}
+                      selectedSub={selectedSub}
+                      subCategories={subCategories}
                     />
                   );
                 })}
