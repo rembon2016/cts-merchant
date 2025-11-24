@@ -103,7 +103,7 @@ const QuickMenus = () => {
           {menuItems?.slice(0, 3)?.map((item) => (
             <button
               key={item.id}
-              onClick={() => handleMenuClick(item)}
+              onClick={() => handleItemClick(item)}
               className="bg-white dark:bg-slate-700 rounded-2xl p-2 flex flex-col items-center gap-2 shadow-soft"
             >
               <span className="grid place-items-center size-12 rounded-xl accent-bg">

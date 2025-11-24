@@ -58,7 +58,7 @@ export default function BottomSheet({
         <div className="mx-auto max-w-sm w-full mb-4 px-4 pointer-events-auto">
           <div
             ref={sheetRef}
-            className="rounded-t-3xl bg-white dark:bg-slate-700 shadow-soft p-4 h-[300px] sheet overflow-y-auto no-scrollbar"
+            className="rounded-t-3xl bg-white dark:bg-slate-700 shadow-soft p-4 min-h-[300px] h-full mb-10 sheet overflow-y-auto no-scrollbar"
             style={{
               borderTopLeftRadius: "1.25rem",
               borderTopRightRadius: "1.25rem",

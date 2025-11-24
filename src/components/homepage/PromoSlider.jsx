@@ -142,7 +142,7 @@ const PromoSlider = () => {
               <img
                 src={slide.thumbnail}
                 alt={slide.title}
-                className="w-full h-44 object-cover rounded-2xl shadow-soft"
+                className="w-fit h-44 object-cover rounded-2xl shadow-soft"
                 draggable={false}
               />
             </button>
