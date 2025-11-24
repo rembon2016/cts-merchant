@@ -82,7 +82,7 @@ export default function AccountInformation() {
           <h2 className="text-xl font-semibold my-4 dark:text-slate-400">
             Merchant
           </h2>
-          {renderIconEdit(true)}
+          {/* {renderIconEdit(true)} */}
         </div>
         <div className="flex flex-col">
           {renderElement(
