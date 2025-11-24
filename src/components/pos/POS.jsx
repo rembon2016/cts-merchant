@@ -217,7 +217,6 @@ export default function POS() {
           return (
             <ProductCard
               key={product.id}
-              ref={isLastProduct ? lastProductElementRef : null}
               product={product}
               price={formatCurrency(productPrice)}
               stock={productStock}
@@ -225,6 +224,11 @@ export default function POS() {
               onClick={() => goToProductDetail(product.id)}
               showButtonCart={!isOutOfStock}
               handleProductClick={handleProductClick}
+              isLastProduct={isLastProduct}
+              hasMoreProducts={hasMoreProducts}
+              loadMoreProducts={loadMoreProducts}
+              selectedSub={selectedSub}
+              subCategories={categories}
             />
           );
         })}

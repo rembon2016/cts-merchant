@@ -1,25 +1,52 @@
 import { ShoppingCart } from "lucide-react";
-import { forwardRef } from "react";
+import { forwardRef, useCallback, useRef } from "react";
 import { PropTypes } from "prop-types";
 
-const ProductCard = forwardRef((props, ref) => {
+const ProductCard = forwardRef((props) => {
   const {
+    loading,
     product,
     price,
     stock,
     disabled,
     onClick,
     handleProductClick,
+    isLastProduct,
+    hasMoreProducts,
+    loadMoreProducts,
+    selectedSub,
+    subCategories,
     showButtonCart = true,
   } = props;
+
+  const observerRef = useRef();
 
   const imageSrc = product?.image
     ? `${import.meta.env.VITE_API_IMAGE}${product.image}`
     : "/images/image-placeholder.png";
 
+  const lastProductElementRef = useCallback(
+    (node) => {
+      if (loading) return;
+      if (observerRef.current) observerRef.current.disconnect();
+      observerRef.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMoreProducts) {
+          loadMoreProducts({
+            category_id: selectedSub
+              ? subCategories.find((cat) => cat.name === selectedSub)?.id || ""
+              : "",
+            per_page: 20,
+          });
+        }
+      });
+      if (node) observerRef.current.observe(node);
+    },
+    [loading, hasMoreProducts, loadMoreProducts, selectedSub, subCategories]
+  );
+
   return (
     <button
-      ref={ref}
+      ref={isLastProduct ? lastProductElementRef : null}
       className={`border rounded-lg shadow hover:shadow-lg transition flex flex-col text-start overflow-hidden ${
         disabled ? "opacity-50" : "cursor-pointer"
       }`}
@@ -93,7 +120,18 @@ ProductCard.propTypes = {
   disabled: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
   handleProductClick: PropTypes.func,
+  loadMoreProducts: PropTypes.func,
   showButtonCart: PropTypes.bool,
+  loading: PropTypes.bool,
+  isLastProduct: PropTypes.bool,
+  hasMoreProducts: PropTypes.bool,
+  selectedSub: PropTypes.string,
+  subCategories: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+    })
+  ),
 };
 
 export default ProductCard;
