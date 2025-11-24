@@ -57,9 +57,18 @@ export const useAuthStore = create((set, get) => ({
       const result = await response.json();
       const resultPOS = await responseApiPOS.json();
 
-      if (!response?.ok && !responseApiPOS?.ok) {
-        set({ error: result?.message, isLoading: false });
-        throw new Error(result?.message || "Login failed");
+      if (!response?.ok) {
+        const Response401 = response.status === 401;
+        console.log(response.status);
+        set({
+          error: Response401 ? "Username atau password salah" : result?.message,
+          isLoading: false,
+        });
+        throw new Error(
+          Response401
+            ? "Username atau password salah"
+            : result?.message || "Login failed"
+        );
       }
 
       const TOKEN = result?.access_token;
