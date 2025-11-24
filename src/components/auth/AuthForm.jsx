@@ -165,7 +165,14 @@ export default function AuthForm({ formMode = "login" }) {
           </p>
         </div>
 
-        <form className="space-y-3">
+        <form
+          className="space-y-3"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && isLoginMode && e.target?.name === "password") {
+              handleSubmit(e);
+            }
+          }}
+        >
           {!isLoginMode && (
             <SimpleInput
               name="name"
