@@ -3,7 +3,6 @@ import useFetchDataStore from "../../store/fetchDataStore";
 import { useDebounce } from "../../hooks/useDebounce";
 import SearchInput from "../customs/form/SearchInput";
 import LoadMoreButton from "../customs/button/LoadMoreButton";
-import CustomLoading from "../customs/loading/CustomLoading";
 import { XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";

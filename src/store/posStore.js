@@ -17,7 +17,9 @@ const usePosStore = create((set, get) => ({
   totalProducts: 0,
 
   // Get categories from API
-  getCategories: async () => {
+  getCategories: async (params = {}) => {
+    const { page = 1, per_page = 10, search = "" } = params;
+
     set({ isLoading: true, error: null });
 
     try {
@@ -27,13 +29,22 @@ const usePosStore = create((set, get) => ({
         throw new Error("Token tidak ditemukan");
       }
 
-      const response = await fetch(`${ROOT_API}/pos/categories`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+      const queryParams = new URLSearchParams({
+        page: page.toString(),
+        per_page: per_page.toString(),
+        search,
       });
+
+      const response = await fetch(
+        `${ROOT_API}/pos/categories?${queryParams}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
