@@ -267,11 +267,11 @@ export default function POS() {
       {/* Daftar Produk */}
       {renderProducts}
 
-      {!productsError && !productsLoading && hasMoreProducts && (
+      {!productsError && !isLoading && hasMoreProducts && (
         <LoadMoreButton
           data={accumulatedData}
           totalData={totalProducts}
-          loading={productsLoading}
+          loading={isLoading}
           handleLoadMore={() => loadMoreProducts({ per_page: LIMIT_DATA })}
         />
       )}

@@ -60,7 +60,7 @@ export default function ListProduct() {
     async function init() {
       try {
         if (typeof getCategories === "function") {
-          await getCategories();
+          await getCategories({ per_page: LIMIT_DATA });
         }
         resetProducts();
         await getProducts({
@@ -116,8 +116,8 @@ export default function ListProduct() {
       setShowDeleteModal(false);
       setSelectedCategory(null);
       getCategories();
-    } catch (e) {
-      // silently close modal; error feedback handled by store
+    } catch (error) {
+      console.log(error);
       setShowDeleteModal(false);
     }
   };
@@ -263,7 +263,7 @@ export default function ListProduct() {
           <LoadMoreButton
             data={accumulatedData}
             totalData={totalProducts}
-            loading={initialLoading}
+            loading={productsLoading}
             handleLoadMore={() => loadMoreProducts({ per_page: LIMIT_DATA })}
           />
         )}
@@ -351,6 +351,7 @@ export default function ListProduct() {
     );
   }, [
     productsError,
+    productsLoading,
     accumulatedData,
     hasMoreProducts,
     activeTab,
