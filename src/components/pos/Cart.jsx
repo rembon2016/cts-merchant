@@ -178,12 +178,7 @@ const Cart = () => {
     const nullCartData = isEmpty(cart?.data?.items);
 
     if (isLoading) {
-      return (
-        <div className="w-full text-center">
-          {/* Loading indicator for infinite scroll */}
-          <CustomLoading />
-        </div>
-      );
+      return <CustomLoading />;
     }
 
     if (!isLoading && nullCartData) {
@@ -191,7 +186,7 @@ const Cart = () => {
     }
 
     return (
-      <div className="mt-4 p-4 bg-white dark:bg-slate-700 rounded-lg">
+      <div className="mt-2 p-4 bg-white dark:bg-slate-700 rounded-lg mb-[10rem]">
         {showModal && (
           <SimpleModal
             onClose={handleCloseModal}
