@@ -78,7 +78,8 @@ const ProductCard = forwardRef((props) => {
           </div>
           <div className="mt-2 mb-4">
             <div className="font-semibold text-md line-clamp-2 leading-5 mb-1">
-              {product?.name}
+              {product?.name?.slice(0, 12) +
+                (product?.name?.length > 12 ? "..." : "")}
             </div>
             <div className="text-xs text-gray-500 dark:text-gray-400">
               Stok: {stock}
