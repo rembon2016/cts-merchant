@@ -59,7 +59,6 @@ export const useAuthStore = create((set, get) => ({
 
       if (!response?.ok) {
         const Response401 = response.status === 401;
-        console.log(response.status);
         set({
           error: Response401 ? "Username atau password salah" : result?.message,
           isLoading: false,

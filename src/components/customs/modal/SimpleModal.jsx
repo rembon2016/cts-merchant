@@ -32,6 +32,7 @@ export default function SimpleModal({
     <div
       id="promo-detail-modal-backdrop"
       onClick={handleOutsideClick}
+      role="button"
       className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4"
     >
       <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto relative p-4">
@@ -60,8 +61,9 @@ export default function SimpleModal({
           <div className="mt-4 flex justify-end gap-2 w-full">
             <AccentButton
               title="Batal"
-              isLoading={isLoading}
+              // isLoading={isLoading}
               handleOnClick={onClose}
+              disableCondition={isLoading}
             />
             <PrimaryButton
               title="Hapus"

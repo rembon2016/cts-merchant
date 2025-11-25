@@ -627,15 +627,21 @@ const useProductStore = create((set, get) => ({
         }
       );
 
-      if (!response.ok) {
-        set({ isLoading: false, error: `Gagal menambahkan kategori` });
-        setTimeout(() => {
-          set({ error: null });
-        }, 2000);
-        throw new Error(`HTTP error! status: ${response?.status}`);
-      }
-
       const result = await response.json();
+
+      if (!response?.ok) {
+        const response422 = response?.status === 422;
+
+        const errorMessage = response422
+          ? "Nama kategori sudah ada"
+          : result?.message || `Gagal menambahkan kategori`;
+
+        set({
+          isLoading: false,
+          error: errorMessage,
+        });
+        throw new Error(errorMessage);
+      }
 
       set({
         isLoading: false,
@@ -644,10 +650,10 @@ const useProductStore = create((set, get) => ({
         success: true,
       });
 
-      return result;
+      return { success: true, data: result?.data };
     } catch (error) {
-      console.log("Error", error);
-      set({ error: error.message, isLoading: false });
+      set({ error: error?.message, isLoading: false });
+      return { success: false, error: error?.message };
     }
   },
 
@@ -765,10 +771,11 @@ const useProductStore = create((set, get) => ({
 
       set({ isLoading: false, error: null, success: true });
 
-      return result;
+      return { success: true, data: result?.data };
     } catch (error) {
       console.log("Error", error);
       set({ error: error.message, isLoading: false });
+      return { success: false, error: error?.message };
     }
   },
 
@@ -791,22 +798,27 @@ const useProductStore = create((set, get) => ({
         }
       );
 
-      if (!response.ok) {
-        set({
-          isLoading: false,
-          error: `Gagal menghapus kategori`,
-        });
-        setTimeout(() => set({ error: null }), 2000);
-        // throw new Error(`HTTP error! status: ${response?.status}`);
-      }
-
       const result = await response.json();
 
-      set({ isLoading: false, error: null, success: true });
+      if (!response?.ok) {
+        const response422 = response?.status === 422;
+
+        const errorMessage = response422
+          ? "Kategori gagal dihapus karena memiliki produk"
+          : "Gagal menghapus kategori";
+
+        set({
+          isLoading: false,
+          error: errorMessage,
+        });
+        throw new Error(errorMessage);
+      }
+
+      set({ data: result?.data, success: true });
       return result;
     } catch (error) {
-      console.log("Error", error);
       set({ error: error.message, isLoading: false });
+      return { success: false, error: error?.message };
     }
   },
 

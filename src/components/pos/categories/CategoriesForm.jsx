@@ -7,6 +7,12 @@ import CustomToast from "../../customs/toast/CustomToast";
 import { useProductStore } from "../../../store/productStore";
 import { useCustomToast } from "../../../hooks/useCustomToast";
 import PrimaryButton from "../../customs/button/PrimaryButton";
+import { PropTypes } from "prop-types";
+
+CategoriesForm.propTypes = {
+  editMode: PropTypes.bool,
+  categoryId: PropTypes.string,
+};
 
 export default function CategoriesForm(props) {
   const { editMode = false, categoryId = null } = props;
@@ -25,6 +31,7 @@ export default function CategoriesForm(props) {
     getDetailCategory,
     isLoading,
     clearError,
+    error,
   } = useProductStore();
 
   const {
@@ -79,23 +86,29 @@ export default function CategoriesForm(props) {
         )
       : await addCategories(formData);
 
-    if (response?.success === true) {
+    const defaultText = "Kategori Berhasil";
+
+    if (response?.success) {
       showSuccess(
         `${
-          editMode
-            ? "Kategori Berhasil Diperbarui"
-            : "Kategori Berhasil Ditambahkan"
+          editMode ? `${defaultText} Diperbarui` : `${defaultText} Ditambahkan`
         }`
       );
 
+      sessionStorage.setItem("activeTab", "Kategori");
+
       setTimeout(() => {
-        navigate("/pos/products", { replace: true });
-      }, 3000);
+        hideToast();
+        navigate("/pos/products");
+      }, 1000);
     } else {
       showError(
-        `${
-          editMode ? "Gagal Memperbarui Kategori" : "Gagal Menambahkan Kategori"
-        }`
+        response?.error ||
+          `${
+            editMode
+              ? "Gagal Memperbarui Kategori"
+              : "Gagal Menambahkan Kategori"
+          }`
       );
     }
   };
@@ -172,7 +185,7 @@ export default function CategoriesForm(props) {
         />
       </div>
     );
-  }, [formData, handleChange]);
+  }, [formData, handleChange, error]);
 
   return (
     <div className="p-6 max-w-3xl mx-auto">

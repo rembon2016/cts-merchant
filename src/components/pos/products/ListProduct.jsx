@@ -43,7 +43,6 @@ export default function ListProduct() {
   const [activeTab, setActiveTab] = useState("Produk");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const observerRef = useRef();
   const initialFetchDoneRef = useRef(false);
   const [initialLoading, setInitialLoading] = useState(true);
 
@@ -102,10 +101,10 @@ export default function ListProduct() {
     try {
       const response = await removeCategories(paramsId);
 
-      if (response?.success === true) {
+      if (response?.success) {
         showSuccess("Kategori berhasil dihapus");
       } else {
-        showError(response?.message || "Gagal menghapus kategori");
+        showError(response?.error || "Gagal menghapus kategori");
       }
 
       setShowDeleteModal(false);
@@ -116,6 +115,8 @@ export default function ListProduct() {
       setShowDeleteModal(false);
     }
   };
+
+  const handleChangeActiveTab = (tab) => setActiveTab(tab);
 
   // Compute total stocks across all products
   const totalStocks = useMemo(() => {
@@ -168,7 +169,7 @@ export default function ListProduct() {
                 ? "bg-[var(--c-accent)] text-slate-700"
                 : "text-gray-700 dark:text-slate-100"
             }`}
-            onClick={() => setActiveTab("Produk")}
+            onClick={() => handleChangeActiveTab("Produk")}
           >
             Produk
           </button>
@@ -178,7 +179,7 @@ export default function ListProduct() {
                 ? "bg-[var(--c-accent)] text-slate-700"
                 : "text-gray-700 dark:text-slate-100"
             }`}
-            onClick={() => setActiveTab("Kategori")}
+            onClick={() => handleChangeActiveTab("Kategori")}
           >
             Kategori
           </button>
@@ -286,7 +287,7 @@ export default function ListProduct() {
                   >
                     <button
                       className="text-left flex-1"
-                      onClick={() => setActiveTab("Kategori")}
+                      onClick={() => handleChangeActiveTab("Kategori")}
                     >
                       <span className="text-sm font-medium text-gray-900 dark:text-white">
                         {sub?.name}

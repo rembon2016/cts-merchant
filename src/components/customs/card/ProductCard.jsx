@@ -4,18 +4,12 @@ import { PropTypes } from "prop-types";
 
 const ProductCard = forwardRef((props) => {
   const {
-    loading,
     product,
     price,
     stock,
     disabled,
     onClick,
     handleProductClick,
-    isLastProduct,
-    hasMoreProducts,
-    loadMoreProducts,
-    selectedSub,
-    subCategories,
     showButtonCart = true,
   } = props;
 
@@ -25,28 +19,32 @@ const ProductCard = forwardRef((props) => {
     ? `${import.meta.env.VITE_API_IMAGE}${product.image}`
     : "/images/image-placeholder.png";
 
-  const lastProductElementRef = useCallback(
-    (node) => {
-      if (loading) return;
-      if (observerRef.current) observerRef.current.disconnect();
-      observerRef.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMoreProducts) {
-          loadMoreProducts({
-            category_id: selectedSub
-              ? subCategories.find((cat) => cat.name === selectedSub)?.id || ""
-              : "",
-            per_page: 20,
-          });
-        }
-      });
-      if (node) observerRef.current.observe(node);
-    },
-    [loading, hasMoreProducts, loadMoreProducts, selectedSub, subCategories]
-  );
+  // const lastProductElementRef = useCallback(
+  //   (node) => {
+  //     console.log("observerRef: ", observerRef);
+
+  //     if (loading) return;
+  //     if (observerRef.current) observerRef.current.disconnect();
+
+  //     return;
+  //     observerRef.current = new IntersectionObserver((entries) => {
+  //       if (entries[0].isIntersecting && hasMoreProducts) {
+  //         loadMoreProducts({
+  //           category_id: selectedSub
+  //             ? subCategories.find((cat) => cat.name === selectedSub)?.id || ""
+  //             : "",
+  //           per_page: 10,
+  //         });
+  //       }
+  //     });
+  //     if (node) observerRef.current.observe(node);
+  //   },
+  //   [loading, hasMoreProducts, loadMoreProducts, selectedSub, subCategories]
+  // );
 
   return (
     <button
-      ref={isLastProduct ? lastProductElementRef : null}
+      ref={observerRef}
       className={`border rounded-lg shadow hover:shadow-lg transition flex flex-col text-start overflow-hidden ${
         disabled ? "opacity-50" : "cursor-pointer"
       }`}
