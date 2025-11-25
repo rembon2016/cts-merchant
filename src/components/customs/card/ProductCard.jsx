@@ -1,5 +1,5 @@
 import { ShoppingCart } from "lucide-react";
-import { forwardRef, useCallback, useRef } from "react";
+import { forwardRef, useRef } from "react";
 import { PropTypes } from "prop-types";
 
 const ProductCard = forwardRef((props) => {

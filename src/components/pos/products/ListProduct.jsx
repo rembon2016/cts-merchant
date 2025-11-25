@@ -12,6 +12,7 @@ import LoadingSkeletonList from "../../customs/loading/LoadingSkeletonList";
 import NoData from "../../customs/element/NoData";
 import FloatingButton from "../../customs/button/FloatingButton";
 import ProductCard from "../../customs/card/ProductCard";
+import LoadMoreButton from "../../customs/button/LoadMoreButton";
 
 export default function ListProduct() {
   const {
@@ -28,6 +29,8 @@ export default function ListProduct() {
     getProductStock,
     getTotalVariantStock,
     hasAvailableStock,
+    totalProducts,
+    currentPage,
   } = usePosStore();
 
   const {
@@ -45,6 +48,9 @@ export default function ListProduct() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const initialFetchDoneRef = useRef(false);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [accumulatedData, setAccumulatedData] = useState([]);
+
+  const LIMIT_DATA = 20;
 
   const navigate = useNavigate();
 
@@ -61,7 +67,7 @@ export default function ListProduct() {
           category_id: "",
           search: "",
           page: 1,
-          per_page: 20,
+          per_page: LIMIT_DATA,
           reset: true,
         });
       } finally {
@@ -88,7 +94,7 @@ export default function ListProduct() {
       category_id: categoryId,
       search: "",
       page: 1,
-      per_page: 20,
+      per_page: LIMIT_DATA,
       reset: true,
     });
   }, [selectedSub, getProducts, resetProducts]);
@@ -209,7 +215,7 @@ export default function ListProduct() {
         </div>
       </div>
     );
-  }, [initialLoading, products, totalStocks]);
+  }, [initialLoading, accumulatedData, totalStocks]);
 
   const renderElementsButtons = (redirectTo) => (
     <FloatingButton
@@ -217,129 +223,135 @@ export default function ListProduct() {
     />
   );
 
-  const renderElements = useMemo(() => {
-    if (productsError) {
-      return <NoData text={productsError} />;
+  const renderElementsProducts = () => {
+    if (initialLoading) {
+      return <LoadingSkeletonCard items={accumulatedData?.length} />;
+    }
+
+    if (!initialLoading && !productsError && accumulatedData?.length === 0) {
+      return <NoData text="Tidak ada produk" />;
     }
 
     return (
-      <div className="flex flex-col gap-3">
-        {activeTab === "Produk" && (
-          <div className="relative">
-            {renderCatalogProducts}
+      <div className="relative">
+        {renderCatalogProducts}
 
-            {initialLoading && <LoadingSkeletonCard items={products?.length} />}
+        <div className="grid grid-cols-2 gap-2 mt-2">
+          {accumulatedData.map((product, index) => {
+            const productPrice = getProductPrice(product);
+            const productStock = product.is_variant
+              ? getTotalVariantStock(product)
+              : getProductStock(product);
+            const isOutOfStock = !hasAvailableStock(product);
 
-            {!initialLoading && !productsError && products?.length === 0 && (
-              <NoData text="Tidak ada produk" />
-            )}
-
-            {!initialLoading && !productsError && products?.length > 0 && (
-              <div className="grid grid-cols-2 gap-2 mt-2">
-                {products.map((product, index) => {
-                  const isLastProduct = products.length === index + 1;
-                  const productPrice = getProductPrice(product);
-                  const productStock = product.is_variant
-                    ? getTotalVariantStock(product)
-                    : getProductStock(product);
-                  const isOutOfStock = !hasAvailableStock(product);
-
-                  return (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      price={formatCurrency(productPrice)}
-                      stock={productStock}
-                      disabled={isOutOfStock}
-                      onClick={() => goToProductDetail(product.id)}
-                      showButtonCart={false}
-                      loading={initialLoading || productsLoading}
-                      isLastProduct={isLastProduct}
-                      hasMoreProducts={hasMoreProducts}
-                      loadMoreProducts={loadMoreProducts}
-                      selectedSub={selectedSub}
-                      subCategories={subCategories}
-                    />
-                  );
-                })}
-              </div>
-            )}
-            {renderElementsButtons("/pos/tambah-produk")}
-          </div>
-        )}
-
-        {activeTab === "Kategori" && (
-          <div className="relative pb-16">
-            {initialLoading && (
-              <LoadingSkeletonList items={subCategories?.length} />
-            )}
-
-            {!initialLoading && subCategories?.length === 0 && (
-              <NoData text="Tidak ada kategori" />
-            )}
-
-            <div className="space-y-2">
-              {subCategories.map((sub) => {
-                return (
-                  <div
-                    key={sub.id}
-                    className="bg-white dark:bg-slate-700 rounded-lg p-4 shadow-sm border border-slate-100 dark:border-slate-600 flex items-center justify-between"
-                  >
-                    <button
-                      className="text-left flex-1"
-                      onClick={() => handleChangeActiveTab("Kategori")}
-                    >
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">
-                        {sub?.name}
-                      </span>
-                    </button>
-                    <div className="flex items-center gap-2 ml-4">
-                      <button
-                        type="button"
-                        className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-slate-600 dark:hover:bg-slate-500 text-gray-700 dark:text-white"
-                        onClick={() =>
-                          navigate(`/pos/edit-kategori/${sub.id}`, {
-                            replace: true,
-                          })
-                        }
-                        aria-label="Edit kategori"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                      <button
-                        type="button"
-                        className="p-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/30 dark:hover:bg-red-900/40"
-                        onClick={() => {
-                          setSelectedCategory(sub);
-                          setShowDeleteModal(true);
-                        }}
-                        aria-label="Hapus kategori"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            {showDeleteModal && selectedCategory && (
-              <SimpleModal
-                onClose={() => setShowDeleteModal(false)}
-                handleClick={() => deleteCategory(selectedCategory.id)}
-                title={"Konfirmasi Hapus"}
-                content={`Apakah Anda yakin ingin menghapus kategori ini?`}
-                showButton={true}
-                isLoading={isLoading}
+            return (
+              <ProductCard
+                key={product.id}
+                product={product}
+                price={formatCurrency(productPrice)}
+                stock={productStock}
+                disabled={isOutOfStock}
+                onClick={() => goToProductDetail(product.id)}
+                showButtonCart={false}
+                loading={initialLoading || productsLoading}
               />
-            )}
-            {renderElementsButtons("/pos/tambah-kategori")}
-          </div>
+            );
+          })}
+        </div>
+
+        {!initialLoading && !productsError && hasMoreProducts && (
+          <LoadMoreButton
+            data={accumulatedData}
+            totalData={totalProducts}
+            loading={initialLoading}
+            handleLoadMore={() => loadMoreProducts({ per_page: LIMIT_DATA })}
+          />
         )}
+        {renderElementsButtons("/pos/tambah-produk")}
+      </div>
+    );
+  };
+
+  const renderElementsCategories = () => {
+    if (initialLoading) {
+      return <LoadingSkeletonList items={subCategories?.length} />;
+    }
+
+    if (!initialLoading && subCategories?.length === 0) {
+      return <NoData text="Tidak ada kategori" />;
+    }
+
+    return (
+      <div className="relative pb-16">
+        <div className="space-y-2">
+          {subCategories.map((sub) => {
+            return (
+              <div
+                key={sub.id}
+                className="bg-white dark:bg-slate-700 rounded-lg p-4 shadow-sm border border-slate-100 dark:border-slate-600 flex items-center justify-between"
+              >
+                <button
+                  className="text-left flex-1"
+                  onClick={() => handleChangeActiveTab("Kategori")}
+                >
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">
+                    {sub?.name}
+                  </span>
+                </button>
+                <div className="flex items-center gap-2 ml-4">
+                  <button
+                    type="button"
+                    className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-slate-600 dark:hover:bg-slate-500 text-gray-700 dark:text-white"
+                    onClick={() =>
+                      navigate(`/pos/edit-kategori/${sub.id}`, {
+                        replace: true,
+                      })
+                    }
+                    aria-label="Edit kategori"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    className="p-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/30 dark:hover:bg-red-900/40"
+                    onClick={() => {
+                      setSelectedCategory(sub);
+                      setShowDeleteModal(true);
+                    }}
+                    aria-label="Hapus kategori"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        {showDeleteModal && selectedCategory && (
+          <SimpleModal
+            onClose={() => setShowDeleteModal(false)}
+            handleClick={() => deleteCategory(selectedCategory.id)}
+            title={"Konfirmasi Hapus"}
+            content={`Apakah Anda yakin ingin menghapus kategori ini?`}
+            showButton={true}
+            isLoading={isLoading}
+          />
+        )}
+        {renderElementsButtons("/pos/tambah-kategori")}
+      </div>
+    );
+  };
+
+  const renderElements = useMemo(() => {
+    return (
+      <div className="flex flex-col gap-3">
+        {activeTab === "Produk" && renderElementsProducts()}
+        {activeTab === "Kategori" && renderElementsCategories()}
       </div>
     );
   }, [
     productsError,
-    products,
+    accumulatedData,
     hasMoreProducts,
     activeTab,
     selectedSub,
@@ -349,6 +361,17 @@ export default function ListProduct() {
     initialLoading,
     isLoading,
   ]);
+
+  // Effect untuk mengelola accumulated data ketika data berubah
+  useEffect(() => {
+    if (products) {
+      if (currentPage > 1) {
+        setAccumulatedData((prev) => [...prev, ...products]);
+      } else {
+        setAccumulatedData(products);
+      }
+    }
+  }, [products]);
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-slate-900 relative">
