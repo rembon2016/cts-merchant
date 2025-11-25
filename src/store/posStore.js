@@ -102,8 +102,8 @@ const usePosStore = create((set, get) => ({
         products: result?.data?.data,
         currentPage: result.data.current_page || page,
         hasMoreProducts:
-          (result.data.current_page || page) < (result.data.last_page || 1),
-        totalProducts: result.data.total || 0,
+          (result.data.current_page || page) < (result.data?.last_page || 1),
+        totalProducts: result.data?.total || 0,
         productsLoading: false,
         productsError: null,
         reset: false,

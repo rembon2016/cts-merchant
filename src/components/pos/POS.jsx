@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useThemeStore } from "../../store/themeStore";
 import { usePosStore } from "../../store/posStore";
 import { useDebounce } from "../../hooks/useDebounce";
@@ -13,6 +13,7 @@ import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 import BottomSheet from "../customs/menu/BottomSheet";
 import NoData from "../customs/element/NoData";
 import ProductCard from "../customs/card/ProductCard";
+import LoadMoreButton from "../customs/button/LoadMoreButton";
 
 const MAIN_MENU = [
   {
@@ -37,8 +38,9 @@ export default function POS() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showVariantModal, setShowVariantModal] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [accumulatedData, setAccumulatedData] = useState([]);
 
-  const observerRef = useRef();
+  const LIMIT_DATA = 20;
 
   const { isDark } = useThemeStore();
   const {
@@ -56,6 +58,8 @@ export default function POS() {
     getProductStock,
     getTotalVariantStock,
     hasAvailableStock,
+    totalProducts,
+    currentPage,
   } = usePosStore();
 
   // Debounce search input
@@ -75,39 +79,21 @@ export default function POS() {
       category_id: selectedSub?.id,
       search: debouncedSearch,
       page: 1,
-      per_page: 20,
+      per_page: LIMIT_DATA,
       reset: true,
     });
   }, [selectedSub, debouncedSearch, getProducts, resetProducts]);
 
-  // Infinite scroll observer
-  const lastProductElementRef = useCallback(
-    (node) => {
-      if (productsLoading) return;
-      if (observerRef.current) observerRef.current.disconnect();
-      observerRef.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMoreProducts) {
-          loadMoreProducts({
-            category_id: selectedSub?.id
-              ? categories.find((cat) => cat.name === selectedSub?.name)?.id ||
-                ""
-              : "",
-            search: debouncedSearch,
-            per_page: 20,
-          });
-        }
-      });
-      if (node) observerRef.current.observe(node);
-    },
-    [
-      productsLoading,
-      hasMoreProducts,
-      loadMoreProducts,
-      selectedSub,
-      debouncedSearch,
-      categories,
-    ]
-  );
+  // Effect untuk mengelola accumulated data ketika data berubah
+  useEffect(() => {
+    if (products) {
+      if (currentPage > 1) {
+        setAccumulatedData((prev) => [...prev, ...products]);
+      } else {
+        setAccumulatedData(products);
+      }
+    }
+  }, [products]);
 
   // Handle product click
   const handleProductClick = (product) => {
@@ -197,14 +183,14 @@ export default function POS() {
       return <NoData text={productsError} />;
     }
 
-    if (!productsLoading && !productsError && products?.length === 0) {
+    if (!productsLoading && !productsError && accumulatedData?.length === 0) {
       return <NoData text="Produk tidak ditemukan" />;
     }
 
     return (
       <div className="grid grid-cols-2 gap-2">
-        {products.map((product, index) => {
-          const isLastProduct = products.length === index + 1;
+        {accumulatedData?.map((product, index) => {
+          // const isLastProduct = products.length === index + 1;
           const productPrice = getProductPrice(product);
 
           // For variant products, show total stock across all variants
@@ -224,17 +210,12 @@ export default function POS() {
               onClick={() => goToProductDetail(product.id)}
               showButtonCart={!isOutOfStock}
               handleProductClick={handleProductClick}
-              isLastProduct={isLastProduct}
-              hasMoreProducts={hasMoreProducts}
-              loadMoreProducts={loadMoreProducts}
-              selectedSub={selectedSub}
-              subCategories={categories}
             />
           );
         })}
       </div>
     );
-  }, [productsError, productsLoading, products, hasMoreProducts]);
+  }, [productsError, productsLoading, accumulatedData]);
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
@@ -285,6 +266,15 @@ export default function POS() {
       </div>
       {/* Daftar Produk */}
       {renderProducts}
+
+      {!productsError && !productsLoading && hasMoreProducts && (
+        <LoadMoreButton
+          data={accumulatedData}
+          totalData={totalProducts}
+          loading={productsLoading}
+          handleLoadMore={() => loadMoreProducts({ per_page: LIMIT_DATA })}
+        />
+      )}
 
       {/* Variant Modal */}
       {selectedProduct && (
