@@ -378,7 +378,7 @@ export default function AuthForm({ formMode = "login" }) {
                   />
                   <div className="flex items-center leading-tight">
                     <span className="text-lg font-semibold">
-                      Install On Android
+                      Install on Android
                     </span>
                   </div>
                 </button>
@@ -386,7 +386,7 @@ export default function AuthForm({ formMode = "login" }) {
               {platform === "ios" && (
                 <button
                   onClick={handleInstallClick}
-                  className="w-full h-14 rounded-xl bg-white text-black flex items-center px-4 gap-3 shadow-md hover:opacity-90"
+                  className="w-full h-14 rounded-xl bg-white text-black flex justify-center items-center px-4 gap-3 shadow-md hover:opacity-90"
                   aria-label="Download on the IOS"
                   title="Lihat cara pasang di layar utama untuk iOS"
                 >
@@ -397,7 +397,7 @@ export default function AuthForm({ formMode = "login" }) {
                   />
                   <div className="flex justify-center items-center leading-tight">
                     <span className="text-lg font-semibold">
-                      Install On IOS
+                      Install on IOS
                     </span>
                   </div>
                 </button>
