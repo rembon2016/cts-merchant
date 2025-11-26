@@ -6,8 +6,8 @@ import SimpleAlert from "../customs/alert/SimpleAlert";
 import SimpleInput from "../customs/form/SimpleInput";
 import CustomToast from "../customs/toast/CustomToast";
 import { useCustomToast } from "../../hooks/useCustomToast";
+import { useInstallPWA } from "../../hooks/useInstallPWA";
 import PrimaryButton from "../customs/button/PrimaryButton";
-import { Apple } from "lucide-react";
 
 export default function AuthForm({ formMode = "login" }) {
   const isLoginMode = formMode === "login";
@@ -34,9 +34,7 @@ export default function AuthForm({ formMode = "login" }) {
     hideToast,
   } = useCustomToast();
 
-  const [installEvent, setInstallEvent] = useState(null);
-  const [isStandalone, setIsStandalone] = useState(false);
-  const [platform, setPlatform] = useState("web");
+  const { platform, showInstallCTA, installEvent, install } = useInstallPWA();
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -54,87 +52,42 @@ export default function AuthForm({ formMode = "login" }) {
     }
   }, [isLogout]);
 
-  useEffect(() => {
-    const handler = (e) => {
-      e.preventDefault();
-      setInstallEvent(e);
-      setPlatform("android");
-    };
-    window.addEventListener("beforeinstallprompt", handler);
-    return () => {
-      window.removeEventListener("beforeinstallprompt", handler);
-    };
-  }, []);
-
-  useEffect(() => {
-    const standalone =
-      window.matchMedia("(display-mode: standalone)").matches ||
-      window.navigator.standalone;
-    setIsStandalone(!!standalone);
-
-    const ua = (window.navigator.userAgent || "").toLowerCase();
-    const isSafari =
-      ua.includes("safari") &&
-      !ua.includes("chrome") &&
-      !ua.includes("crios") &&
-      !ua.includes("fxios");
-    const isChromium =
-      ua.includes("chrome") ||
-      ua.includes("crios") ||
-      ua.includes("edg") ||
-      ua.includes("opr") ||
-      ua.includes("samsungbrowser");
-
-    if (isSafari) {
-      setPlatform("ios");
-    } else if (isChromium) {
-      setPlatform("android");
-    } else {
-      setPlatform("android");
-    }
-
-    const onInstalled = () => {
-      setIsStandalone(true);
-      setInstallEvent(null);
-    };
-    window.addEventListener("appinstalled", onInstalled);
-    return () => window.removeEventListener("appinstalled", onInstalled);
-  }, []);
-
-  const showInstallCTA = useMemo(() => {
-    return !isStandalone;
-  }, [isStandalone]);
-
   const handleInstallClick = async () => {
-    if (platform === "android" && installEvent) {
-      try {
-        installEvent.prompt();
-        const choice = await installEvent.userChoice;
-        if (choice?.outcome === "accepted") {
-          showSuccess("Instalasi dimulai");
-          setInstallEvent(null);
-        } else {
-          showError("Instalasi dibatalkan");
-        }
-      } catch (e) {
-        showError("Gagal memulai instalasi");
+    try {
+      const result = await install();
+      if (result?.success) {
+        showSuccess(
+          platform === "android"
+            ? "Instalasi dimulai"
+            : "Buka menu Share dan pilih Add to Home Screen"
+        );
+        return;
       }
-    } else if (platform === "ios") {
-      try {
-        if (navigator.share) {
-          await navigator.share({
-            title: "CTS Merchant",
-            text: "Pasang CTS Merchant ke layar utama",
-            url: window.location.href,
-          });
-        } else {
-          showError("Gunakan Share → Add to Home Screen untuk memasang");
+      if (platform === "android") {
+        if (result?.outcome === "unavailable") {
+          showError(
+            "Instal tidak tersedia: pastikan origin aman dan PWA aktif atau gunakan ikon Install di address bar"
+          );
+          return;
         }
-      } catch (e) {
-        showError("Buka menu Share lalu pilih Add to Home Screen");
+        showError("Instalasi dibatalkan");
+        return;
       }
-    } else {
-      showError("Klik ikon install di address bar untuk memasang aplikasi");
+      if (platform === "ios") {
+        if (result?.outcome === "share_unavailable") {
+          showError("Buka menu Share lalu pilih Add to Home Screen");
+          return;
+        }
+        showError("Instalasi dibatalkan");
+        return;
+      }
+      showError("Instalasi dibatalkan");
+    } catch (e) {
+      showError(
+        platform === "android"
+          ? "Gagal memulai instalasi"
+          : "Gunakan Share → Add to Home Screen untuk memasang"
+      );
     }
   };
 
