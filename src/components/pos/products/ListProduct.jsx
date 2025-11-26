@@ -217,6 +217,9 @@ export default function ListProduct() {
     );
   }, [initialLoading, accumulatedData, totalStocks]);
 
+  const redirectTo =
+    activeTab === "Produk" ? "/pos/tambah-produk" : "/pos/tambah-kategori";
+
   const renderElementsButtons = (redirectTo) => (
     <FloatingButton
       handleOnClick={() => navigate(redirectTo, { replace: true })}
@@ -232,10 +235,8 @@ export default function ListProduct() {
       return <NoData text="Tidak ada produk" />;
     }
 
-    return (
-      <div className="relative">
-        {renderCatalogProducts}
-
+    const elements = () => {
+      return (
         <div className="grid grid-cols-2 gap-2 mt-2">
           {accumulatedData.map((product, index) => {
             const productPrice = getProductPrice(product);
@@ -258,7 +259,13 @@ export default function ListProduct() {
             );
           })}
         </div>
+      );
+    };
 
+    return (
+      <div className="relative">
+        {renderCatalogProducts}
+        {elements()}
         {!initialLoading && !productsError && hasMoreProducts && (
           <LoadMoreButton
             data={accumulatedData}
@@ -267,7 +274,6 @@ export default function ListProduct() {
             handleLoadMore={() => loadMoreProducts({ per_page: LIMIT_DATA })}
           />
         )}
-        {renderElementsButtons("/pos/tambah-produk")}
       </div>
     );
   };
@@ -281,8 +287,8 @@ export default function ListProduct() {
       return <NoData text="Tidak ada kategori" />;
     }
 
-    return (
-      <div className="relative pb-16">
+    const elements = () => {
+      return (
         <div className="space-y-2">
           {subCategories.map((sub) => {
             return (
@@ -327,6 +333,12 @@ export default function ListProduct() {
             );
           })}
         </div>
+      );
+    };
+
+    return (
+      <div className="relative pb-16">
+        {elements()}
         {showDeleteModal && selectedCategory && (
           <SimpleModal
             onClose={() => setShowDeleteModal(false)}
@@ -337,7 +349,6 @@ export default function ListProduct() {
             isLoading={isLoading}
           />
         )}
-        {renderElementsButtons("/pos/tambah-kategori")}
       </div>
     );
   };
@@ -347,6 +358,7 @@ export default function ListProduct() {
       <div className="flex flex-col gap-3">
         {activeTab === "Produk" && renderElementsProducts()}
         {activeTab === "Kategori" && renderElementsCategories()}
+        {renderElementsButtons(redirectTo)}
       </div>
     );
   }, [
