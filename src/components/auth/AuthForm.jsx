@@ -230,8 +230,12 @@ export default function AuthForm({ formMode = "login" }) {
     return isDark ? "/images/logo-cts.svg" : "/images/logo-cts-blue.svg";
   }, [isDark]);
 
-  const getImageIcon = useMemo(() => {
+  const getIconAndroid = useMemo(() => {
     return "/icons/icon-android.svg";
+  }, []);
+
+  const getIconIos = useMemo(() => {
+    return "/icons/icon-ios.svg";
   }, []);
 
   return (
@@ -367,7 +371,11 @@ export default function AuthForm({ formMode = "login" }) {
                       : "Jika tombol tidak memulai install, gunakan ikon Install Chrome"
                   }
                 >
-                  <img src={getImageIcon} className="w-8 h-12" />
+                  <img
+                    src={getIconAndroid}
+                    className="w-8 h-12"
+                    alt="Install on Android"
+                  />
                   <div className="flex items-center leading-tight">
                     <span className="text-lg font-semibold">
                       Install On Android
@@ -378,13 +386,15 @@ export default function AuthForm({ formMode = "login" }) {
               {platform === "ios" && (
                 <button
                   onClick={handleInstallClick}
-                  className="w-full h-14 rounded-xl bg-black text-white flex items-center px-4 gap-3 shadow-md hover:opacity-90"
-                  aria-label="Download on the App Store"
+                  className="w-full h-14 rounded-xl bg-white text-black flex items-center px-4 gap-3 shadow-md hover:opacity-90"
+                  aria-label="Download on the IOS"
                   title="Lihat cara pasang di layar utama untuk iOS"
                 >
-                  <div className="w-8 h-8 flex items-center justify-center">
-                    <Apple className="w-7 h-7" />
-                  </div>
+                  <img
+                    src={getIconIos}
+                    className="w-8 h-12"
+                    alt="Install on iOS"
+                  />
                   <div className="flex justify-center items-center leading-tight">
                     <span className="text-lg font-semibold">
                       Install On IOS
