@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState, useRef, useEffect } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { usePosStore } from "../../../store/posStore";
 import { useProductStore } from "../../../store/productStore";
