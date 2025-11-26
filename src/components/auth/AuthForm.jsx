@@ -7,7 +7,6 @@ import SimpleInput from "../customs/form/SimpleInput";
 import CustomToast from "../customs/toast/CustomToast";
 import { useCustomToast } from "../../hooks/useCustomToast";
 import PrimaryButton from "../customs/button/PrimaryButton";
-import SimpleModal from "../customs/modal/SimpleModal";
 import { Apple } from "lucide-react";
 
 export default function AuthForm({ formMode = "login" }) {
@@ -38,7 +37,6 @@ export default function AuthForm({ formMode = "login" }) {
   const [installEvent, setInstallEvent] = useState(null);
   const [isStandalone, setIsStandalone] = useState(false);
   const [platform, setPlatform] = useState("web");
-  const [showInstallModal, setShowInstallModal] = useState(false);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -121,17 +119,24 @@ export default function AuthForm({ formMode = "login" }) {
       } catch (e) {
         showError("Gagal memulai instalasi");
       }
+    } else if (platform === "ios") {
+      try {
+        if (navigator.share) {
+          await navigator.share({
+            title: "CTS Merchant",
+            text: "Pasang CTS Merchant ke layar utama",
+            url: window.location.href,
+          });
+        } else {
+          showError("Gunakan Share → Add to Home Screen untuk memasang");
+        }
+      } catch (e) {
+        showError("Buka menu Share lalu pilih Add to Home Screen");
+      }
     } else {
-      setShowInstallModal(true);
+      showError("Klik ikon install di address bar untuk memasang aplikasi");
     }
   };
-
-  const installHelpText = useMemo(() => {
-    if (platform === "ios") {
-      return "Pada perangkat iOS (Safari), ketuk ikon Share lalu pilih Add to Home Screen untuk memasang CTS Merchant.";
-    }
-    return "Di Google Chrome/Chromium, klik ikon Install di address bar atau pilih Install app dari menu untuk memasang CTS Merchant.";
-  }, [platform]);
 
   const validateForm = () => {
     const errors = {};
@@ -401,7 +406,7 @@ export default function AuthForm({ formMode = "login" }) {
               )}
               {platform === "ios" && (
                 <button
-                  onClick={() => setShowInstallModal(true)}
+                  onClick={handleInstallClick}
                   className="w-full h-14 rounded-xl bg-black text-white flex items-center px-4 gap-3 shadow-md hover:opacity-90"
                   aria-label="Download on the App Store"
                   title="Lihat cara pasang di layar utama untuk iOS"
@@ -409,7 +414,7 @@ export default function AuthForm({ formMode = "login" }) {
                   <div className="w-8 h-8 flex items-center justify-center">
                     <Apple className="w-7 h-7" />
                   </div>
-                  <div className="flex flex-col leading-tight">
+                  <div className="flex justify-center items-center leading-tight">
                     <span className="text-lg font-semibold">
                       Install On IOS
                     </span>
@@ -419,13 +424,6 @@ export default function AuthForm({ formMode = "login" }) {
             </div>
           )}
         </div>
-        {showInstallModal && (
-          <SimpleModal
-            onClose={() => setShowInstallModal(false)}
-            title="Pasang Aplikasi"
-            content={installHelpText}
-          />
-        )}
       </div>
     </div>
   );
