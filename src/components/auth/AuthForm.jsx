@@ -230,6 +230,10 @@ export default function AuthForm({ formMode = "login" }) {
     return isDark ? "/images/logo-cts.svg" : "/images/logo-cts-blue.svg";
   }, [isDark]);
 
+  const getImageIcon = useMemo(() => {
+    return "/icons/icon-android.svg";
+  }, []);
+
   return (
     <div className="mt-8 flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-md rounded-lg p-8">
@@ -363,10 +367,7 @@ export default function AuthForm({ formMode = "login" }) {
                       : "Jika tombol tidak memulai install, gunakan ikon Install Chrome"
                   }
                 >
-                  <img
-                    src="../public/icons/icon-android.svg"
-                    className="w-8 h-12"
-                  />
+                  <img src={getImageIcon} className="w-8 h-12" />
                   <div className="flex items-center leading-tight">
                     <span className="text-lg font-semibold">
                       Install On Android
