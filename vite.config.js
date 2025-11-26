@@ -4,12 +4,14 @@ import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-
   return {
     plugins: [
       react(),
       VitePWA({
         registerType: "autoUpdate",
+        devOptions: {
+          enabled: true,
+        },
         includeAssets: ["favicon.ico", "apple-touch-icon.png", "mask-icon.svg"],
         manifest: {
           name: "CTS Soundbox Merchant",
