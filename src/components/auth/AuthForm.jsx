@@ -363,40 +363,10 @@ export default function AuthForm({ formMode = "login" }) {
                       : "Jika tombol tidak memulai install, gunakan ikon Install Chrome"
                   }
                 >
-                  <svg
-                    className="w-8 h-8"
-                    viewBox="0 0 512 512"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <defs>
-                      <linearGradient id="gp1" x1="0" x2="1" y1="0" y2="1">
-                        <stop offset="0%" stopColor="#00A0FF" />
-                        <stop offset="100%" stopColor="#00E3FF" />
-                      </linearGradient>
-                      <linearGradient id="gp2" x1="0" x2="1" y1="1" y2="0">
-                        <stop offset="0%" stopColor="#FFE000" />
-                        <stop offset="100%" stopColor="#FF9C00" />
-                      </linearGradient>
-                      <linearGradient id="gp3" x1="0" x2="1" y1="0" y2="1">
-                        <stop offset="0%" stopColor="#FF3A44" />
-                        <stop offset="100%" stopColor="#C31162" />
-                      </linearGradient>
-                      <linearGradient id="gp4" x1="0" x2="1" y1="1" y2="0">
-                        <stop offset="0%" stopColor="#32A071" />
-                        <stop offset="100%" stopColor="#00D38C" />
-                      </linearGradient>
-                    </defs>
-                    <path d="M47 86l228 170L47 426z" fill="url(#gp1)" />
-                    <path
-                      d="M474 256L275 171 208 220l67 49 199-13z"
-                      fill="url(#gp2)"
-                    />
-                    <path
-                      d="M474 256L275 341 208 292l67-49 199 13z"
-                      fill="url(#gp3)"
-                    />
-                    <path d="M47 86l228 170-67 49L47 86z" fill="url(#gp4)" />
-                  </svg>
+                  <img
+                    src="../public/icons/icon-android.svg"
+                    className="w-8 h-12"
+                  />
                   <div className="flex items-center leading-tight">
                     <span className="text-lg font-semibold">
                       Install On Android
