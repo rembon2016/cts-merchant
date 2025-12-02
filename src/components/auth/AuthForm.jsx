@@ -147,11 +147,17 @@ export default function AuthForm({ formMode = "login" }) {
     }
 
     setValidationErrors({});
+
+    const defaultFormValue = {
+      email: formData.email,
+      password: formData.password,
+      firebase_token: sessionStorage?.getItem("firebaseToken") || "",
+    };
+
     try {
       if (isLoginMode) {
         const result = await login({
-          email: formData.email,
-          password: formData.password,
+          ...defaultFormValue,
         });
         if (!result?.success) {
           setError(result?.error || "Gagal melakukan login");
@@ -159,8 +165,7 @@ export default function AuthForm({ formMode = "login" }) {
       } else {
         const payload = {
           name: formData.name,
-          email: formData.email,
-          password: formData.password,
+          ...defaultFormValue,
           password_confirmation: formData.confirmPassword,
         };
         const result = await register(payload);

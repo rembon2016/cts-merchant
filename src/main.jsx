@@ -1,11 +1,26 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
+import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
 import "react-toastify/dist/ReactToastify.css";
 import "boxicons/css/boxicons.min.css";
 
-ReactDOM.createRoot(document.getElementById("root")).render(
+// Import registerSW dari vite-plugin-pwa
+import { registerSW } from "virtual:pwa-register";
+
+// Registrasi Service Worker untuk PWA
+const updateSW = registerSW({
+  onNeedRefresh() {
+    if (confirm("Konten baru tersedia. Refresh?")) {
+      updateSW(true);
+    }
+  },
+  onOfflineReady() {
+    console.log("App siap bekerja offline");
+  },
+});
+
+createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>
