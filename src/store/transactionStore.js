@@ -137,7 +137,7 @@ const useTransactionStore = create((set, get) => ({
     } else if (type === "year") {
       queryParams = `${params?.startDate}=${value}-01-01&${params?.endDate}=${value}-12-31`;
     } else {
-      queryParams = `${params?.startDate}=${defaultDateStart}&${params?.endDate}=${yearNow}-${monthNow}-${lastDate}`;
+      queryParams = `${params?.startDate}=${defaultDateStart}&${params?.endDate}=${defaultDateStart}`;
     }
 
     try {
