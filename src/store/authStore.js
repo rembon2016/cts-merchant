@@ -233,6 +233,8 @@ export const useAuthStore = create((set, get) => ({
     const FIVE_MINUTES = 5 * 60 * 1000;
     const timeUntilRefresh = timeUntilExpiry - FIVE_MINUTES;
 
+    console.log("Token Expired At:", tokenExpiredAt);
+
     // Clear existing timers
     get().clearAutoLogoutTimer();
 
