@@ -142,11 +142,14 @@ export const useAuthStore = create((set, get) => ({
 
       // Hitung timestamp expiry (expires_in biasanya dalam detik)
       const expiryTimestamp = Date.now() + EXPIRED_IN * 1000;
+      const calculateTImeRefresh =
+        import.meta.env.VITE_REFRESH_USER_TOKEN_TIMER * 1000;
 
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(userData?.data));
       sessionStorage.setItem(USER_ID, JSON.stringify(userData?.data?.id));
       sessionStorage.setItem(TOKEN_KEY, TOKEN);
       sessionStorage.setItem(EXPIRED_KEY, expiryTimestamp.toString());
+      sessionStorage.setItem(EXPIRED_TOKEN_KEY, calculateTImeRefresh);
       sessionStorage.setItem(TOKEN_POS_KEY, result?.data?.pos?.auth?.token);
       sessionStorage.setItem(
         BRANCH_ACTIVE,
@@ -169,14 +172,14 @@ export const useAuthStore = create((set, get) => ({
       // Mulai penjadwalan auto-refresh dan auto-logout berdasarkan expiry
       get().setupAutoLogout();
 
-      return { success: true };
+      return { success: true, isLoading: false };
     } catch (error) {
       set({
         error: error?.message,
         isLoading: false,
         isLoggedIn: false,
       });
-      return { success: false, error: error?.message };
+      return { success: false, error: error?.message, isLoading: false };
     }
   },
 
@@ -397,6 +400,8 @@ export const useAuthStore = create((set, get) => ({
 
   // Refresh token ketika sesi habis
   refreshToken: async () => {
+    if (get()?.isLogout) return;
+
     try {
       const currentToken = sessionStorage.getItem(TOKEN_POS_KEY);
 
@@ -424,7 +429,7 @@ export const useAuthStore = create((set, get) => ({
         });
         // Jika gagal refresh, lakukan auto logout
         // get().handleAutoLogout();
-        return { success: false, error: result?.message };
+        return { success: false, error: result?.message, isLoading: false };
       }
 
       const newPosToken = result?.data?.token || null;
@@ -432,7 +437,11 @@ export const useAuthStore = create((set, get) => ({
       if (!newPosToken) {
         set({ isLoading: false, error: "Invalid refresh response" });
         get().handleAutoLogout();
-        return { success: false, error: "Invalid refresh response" };
+        return {
+          success: false,
+          error: "Invalid refresh response",
+          isLoading: false,
+        };
       }
 
       const newExpiry =
@@ -458,11 +467,11 @@ export const useAuthStore = create((set, get) => ({
       );
       set({ refreshTimer: nextRefreshTimer });
 
-      return { success: true };
+      return { success: true, isLoading: false };
     } catch (error) {
       set({ isLoading: false, error: error?.message });
       // get().handleAutoLogout();
-      return { success: false, error: error?.message };
+      return { success: false, error: error?.message, isLoading: false };
     }
   },
 }));

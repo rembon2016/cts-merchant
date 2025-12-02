@@ -7,7 +7,7 @@ import {
 import { useAuthStore } from "./store/authStore";
 import { useEffect } from "react";
 import { useRegisterSW } from "virtual:pwa-register/react";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import MainLayout from "./layouts/MainLayout";
 import Home from "./pages/Home";
@@ -54,10 +54,29 @@ import PPOBPdam from "./pages/ppob/PPOBPdam";
 import PPOBPascabayar from "./pages/ppob/PPOBPascabayar";
 import PPOBBPJS from "./pages/ppob/PPOBBPJS";
 import PPOBWithdraw from "./pages/ppob/PPOBWithdraw";
+import { requestForToken, subscribeOnMessage } from "./firebase-config";
+import { useCustomToast } from "./hooks/useCustomToast";
+import CustomToast from "./components/customs/toast/CustomToast";
 
 function App() {
   const { isDark } = useThemeStore();
   const { isLoggedIn, setupAutoLogout, clearAutoLogoutTimer } = useAuthStore();
+  const { toast, success: showSuccess, hideToast } = useCustomToast();
+
+  useEffect(() => {
+    requestForToken();
+    const unsubscribe = subscribeOnMessage((payload) => {
+      showSuccess(
+        <div className="flex flex-col gap-2 justify-center items-center">
+          <h3 className="font-bold text-lg">{payload.notification.title}</h3>
+          <p className="text-sm text-center">{payload.notification.body}</p>
+        </div>
+      );
+    });
+    return () => {
+      if (typeof unsubscribe === "function") unsubscribe();
+    };
+  }, []);
 
   const {
     needRefresh: [needRefresh],
@@ -91,6 +110,13 @@ function App() {
           <button onClick={() => updateServiceWorker(true)}>Reload</button>
         </div>
       )}
+      <CustomToast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+        duration={toast.duration}
+      />
       <ToastContainer
         position="top-center"
         autoClose={2000}
