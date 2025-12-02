@@ -113,18 +113,31 @@ const useTransactionStore = create((set, get) => ({
     const monthNow = new Date().getMonth() + 1;
     const dayNow = new Date().getDate();
 
-    const defaultDateStart = "2020-01-01";
+    // const defaultDateStart = new Date().toISOString().split("T")[0];
+    const defaultDateStart = "";
+
+    // Get the last date of the given month
+    const getLastDateOfMonth = (year, month) => {
+      return new Date(year, month, 0).getDate();
+    };
+
+    // Ensure value is a valid number before passing to getLastDateOfMonth
+    const monthValue = Number(value);
+    const lastDate = getLastDateOfMonth(
+      yearNow,
+      Number.isNaN(monthValue) ? 1 : monthValue
+    );
 
     let queryParams;
 
     if (type === "range") {
       queryParams = `${params?.startDate}=${value?.from}&${params?.endDate}=${value?.to}`;
     } else if (type === "month") {
-      queryParams = `${params?.startDate}=${defaultDateStart}&${params?.endDate}=${yearNow}-${value}-01`;
+      queryParams = `${params?.startDate}=${yearNow}-${value}-01&${params?.endDate}=${yearNow}-${value}-${lastDate}`;
     } else if (type === "year") {
-      queryParams = `${params?.startDate}=${defaultDateStart}&${params?.endDate}=${value}-${monthNow}-01`;
+      queryParams = `${params?.startDate}=${value}-01-01&${params?.endDate}=${value}-12-31`;
     } else {
-      queryParams = `${params?.startDate}=${defaultDateStart}&${params?.endDate}=${yearNow}-${monthNow}-${dayNow}`;
+      queryParams = `${params?.startDate}=${defaultDateStart}&${params?.endDate}=${yearNow}-${monthNow}-${lastDate}`;
     }
 
     try {
