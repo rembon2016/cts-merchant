@@ -4,10 +4,15 @@ import { getMessaging, getToken, onMessage } from "firebase/messaging";
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSANGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "cts-merchant-9629f",
+  storageBucket:
+    import.meta.env.VITE_FIREBASE_STORAGE_BUCKET ||
+    "cts-merchant-9629f.firebasestorage.app",
+  messagingSenderId:
+    import.meta.env.VITE_FIREBASE_MESSANGING_SENDER_ID || "796404841178",
+  appId:
+    import.meta.env.VITE_FIREBASE_APP_ID ||
+    "1:796404841178:web:b5007292b794ada3ab83e3",
 };
 
 // Initialize Firebase
