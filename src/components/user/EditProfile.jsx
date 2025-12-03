@@ -5,11 +5,11 @@ import SimpleInput from "../customs/form/SimpleInput";
 import BackButton from "../customs/button/BackButton";
 import CustomToast from "../customs/toast/CustomToast";
 import { useCustomToast } from "../../hooks/useCustomToast";
-
-const ROOT_API = import.meta.env.VITE_API_ROUTES;
+import { usePosStore } from "../../store/posStore";
 
 export default function EditProfile() {
-  const { user: userInfo, logout } = useAuthStore();
+  const { user: userInfo, logout, updateProfileUser } = useAuthStore();
+  const { updatePasswordPOS } = usePosStore();
   const [loading, setLoading] = useState(false);
 
   const {
@@ -31,12 +31,6 @@ export default function EditProfile() {
   });
 
   const [errors, setErrors] = useState({});
-
-  const headersApi = {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-    Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -80,12 +74,16 @@ export default function EditProfile() {
 
     setDisabledButton(true);
 
+    const passwordFields = {
+      password: formData.password,
+      password_confirmation: formData.confirmPassword,
+    };
+
     const updateData = {
       name: formData.name,
       email: formData.email,
       ...(isEditPassword && {
-        password: formData.password,
-        password_confirmation: formData.confirmPassword,
+        ...passwordFields,
       }),
       // ...(formData.password && { password: formData.password }),
       // ...(formData.password && { password_confirmation: formData.password }),
@@ -93,15 +91,16 @@ export default function EditProfile() {
 
     setLoading(true);
 
-    const response = await fetch(`${ROOT_API}/v1/user/update`, {
-      method: "POST",
-      headers: headersApi,
-      body: JSON.stringify(updateData),
-    });
+    const [response, responsePOS] = await Promise.all([
+      updateProfileUser(updateData),
+      updatePasswordPOS(passwordFields),
+    ]);
 
-    if (response?.ok === true) {
+    if (response?.success === true && responsePOS?.success === true) {
       showSuccess("Profil Berhasil Diperbarui");
-      setTimeout(() => logout(), 1000);
+      setTimeout(() => {
+        logout();
+      }, 2000);
     } else {
       showError("Gagal Memperbarui Profil");
     }

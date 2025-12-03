@@ -218,6 +218,40 @@ const usePosStore = create((set, get) => ({
     return get().getTotalVariantStock(product) > 0;
   },
 
+  // update password user
+  updatePasswordPOS: async (formData) => {
+    const token = sessionStorage.getItem("authPosToken");
+
+    try {
+      set({ error: null });
+
+      const apiProperties = {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      };
+
+      const response = await fetch(`${ROOT_API}/user/password`, {
+        ...apiProperties,
+      });
+
+      if (!response?.ok) {
+        set({ error: `Gagal mengupdate password` });
+        throw new Error(`HTTP error! status: ${response?.status}`);
+      }
+
+      const result = await response.json();
+
+      return result;
+    } catch (error) {
+      return error;
+    }
+  },
+
   // Clear error
   clearError: () => set({ error: null }),
 
