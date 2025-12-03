@@ -280,10 +280,12 @@ export const useAuthStore = create((set, get) => ({
 
     // Jika waktu menuju refresh sudah lewat atau tepat, lakukan refresh segera
     if (timeUntilRefresh <= 0) {
-      get().refreshToken();
+      get().handleAutoLogout();
+      // get().refreshToken();
     } else {
       const refreshTimer = setTimeout(() => {
-        get().refreshToken();
+        get().handleAutoLogout();
+        // get().refreshToken();
       }, timeUntilRefresh);
       set({ refreshTimer });
     }
