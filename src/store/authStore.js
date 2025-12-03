@@ -356,7 +356,7 @@ export const useAuthStore = create((set, get) => ({
 
       const result = await response?.json();
 
-      if (!response.ok || !responseApiPOS.ok) {
+      if (!response.ok) {
         set({ error: result?.message, isLoading: false });
         throw new Error("Logout failed");
       }
@@ -377,7 +377,7 @@ export const useAuthStore = create((set, get) => ({
         isLogout: true,
       });
 
-      if (response.ok && responseApiPOS.ok) {
+      if (response.ok || responseApiPOS.ok) {
         setTimeout(() => {
           set({ isLogout: false });
         }, 3000);
