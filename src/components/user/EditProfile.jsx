@@ -91,18 +91,28 @@ export default function EditProfile() {
 
     setLoading(true);
 
-    const [response, responsePOS] = await Promise.all([
-      updateProfileUser(updateData),
-      updatePasswordPOS(passwordFields),
-    ]);
-
-    if (response?.success === true && responsePOS?.success === true) {
-      showSuccess("Profil Berhasil Diperbarui");
-      setTimeout(() => {
-        logout();
-      }, 2000);
+    if (isEditPassword) {
+      const [response, responsePOS] = await Promise.all([
+        updateProfileUser(updateData),
+        updatePasswordPOS(passwordFields),
+      ]);
+      if (response?.success === true && responsePOS?.success === true) {
+        showSuccess("Profil Berhasil Diperbarui");
+        setTimeout(() => {
+          logout();
+        }, 2000);
+      } else {
+        showError("Gagal Memperbarui Profil");
+      }
     } else {
-      showError("Gagal Memperbarui Profil");
+      const response = await updateProfileUser(updateData);
+      sessionStorage.setItem("authUser", JSON.stringify(response?.data));
+      if (response?.success === true) {
+        showSuccess("Profil Berhasil Diperbarui");
+        window.location.reload();
+      } else {
+        showError("Gagal Memperbarui Profil");
+      }
     }
 
     setLoading(false);
