@@ -183,6 +183,42 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  updateProfileUser: async (formData) => {
+    const token = sessionStorage.getItem("authToken");
+
+    try {
+      set({ isLoading: true, error: null });
+
+      const apiProperties = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      };
+
+      const response = await fetch(`${ROOT_API}/v1/user/update`, {
+        ...apiProperties,
+      });
+
+      if (!response?.ok) {
+        set({
+          error: "Gagal mengubah profile",
+          isLoading: false,
+        });
+        throw new Error(result?.message || "Gagal mengubah profile");
+      }
+
+      const result = await response.json();
+
+      return result;
+    } catch (error) {
+      return error;
+    }
+  },
+
   getUser: async (tokenParams) => {
     try {
       const response = await fetch(`${ROOT_API}/v1/user`, {
@@ -232,8 +268,6 @@ export const useAuthStore = create((set, get) => ({
     const timeUntilExpiry = expiredTimestamp - currentTime;
     const FIVE_MINUTES = 5 * 60 * 1000;
     const timeUntilRefresh = timeUntilExpiry - FIVE_MINUTES;
-
-    console.log("Token Expired At:", tokenExpiredAt);
 
     // Clear existing timers
     get().clearAutoLogoutTimer();
