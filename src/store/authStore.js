@@ -77,8 +77,10 @@ export const useAuthStore = create((set, get) => ({
 
       // Hitung timestamp expiry (expires_in biasanya dalam detik)
       const expiryTimestamp = Date.now() + EXPIRED_IN * 1000;
+      // const expiryTimestamp = Date.now() + 2 * 1000;
       const calculateTImeRefresh =
         import.meta.env.VITE_REFRESH_USER_TOKEN_TIMER * 1000;
+      // const calculateTImeRefresh = 2 * 1000;
 
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(userData?.data));
       sessionStorage.setItem(USER_ID, result?.data?.id);
