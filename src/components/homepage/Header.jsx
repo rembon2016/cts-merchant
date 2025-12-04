@@ -149,6 +149,7 @@ const Header = () => {
     toggleTheme,
     isDark,
     getUserInfo,
+    cart,
   ]);
 
   return (
