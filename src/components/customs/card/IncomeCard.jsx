@@ -95,8 +95,10 @@ const IncomeCard = () => {
       errors.to = "Wajib di isi";
     }
 
-    if (dateRange?.from > dateRange?.to) {
-      showError("Tanggal awal harus lebih kecil dari tanggal akhir");
+    if (dateRange.from && dateRange.to) {
+      if (dateRange?.from > dateRange?.to) {
+        showError("Tanggal awal harus lebih kecil dari tanggal akhir");
+      }
     }
 
     return errors;
@@ -145,6 +147,7 @@ const IncomeCard = () => {
   const handleRangeClear = () => {
     setDateRange({ from: "", to: "" });
     setShowPopover(null);
+    setValidationErrors({});
   };
 
   const resetData = () => {
