@@ -4,15 +4,20 @@ import { useTransactionStore } from "../../../store/transactionStore";
 import { formatCurrency } from "../../../helper/currency";
 import { RefreshCcw } from "lucide-react";
 import { formatDate } from "../../../helper/format-date";
+import SimpleInput from "../form/SimpleInput";
+import { useCustomToast } from "../../../hooks/useCustomToast";
+import CustomToast from "../toast/CustomToast";
 
 const IncomeCard = () => {
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
+  const [validationErrors, setValidationErrors] = useState({});
   const [activeItem, setActiveItem] = useState("");
   const [activeChip, setActiveChip] = useState("");
   const [showPopover, setShowPopover] = useState(null);
   const { updateIncomeAmount } = useUserStore();
   const { getStatisticTransaction, statistic, isLoading } =
     useTransactionStore();
+  const { toast, error: showError, hideToast } = useCustomToast();
 
   const chips = [
     { id: "month", label: "Bulan" },
@@ -79,6 +84,24 @@ const IncomeCard = () => {
     (currentYear - 3 + i).toString()
   );
 
+  const validateForm = () => {
+    const errors = {};
+
+    if (!dateRange.from) {
+      errors.from = "Wajib di isi";
+    }
+
+    if (!dateRange.to) {
+      errors.to = "Wajib di isi";
+    }
+
+    if (dateRange?.from > dateRange?.to) {
+      showError("Tanggal awal harus lebih kecil dari tanggal akhir");
+    }
+
+    return errors;
+  };
+
   const handleChipClick = (chipId) => {
     setActiveChip(chipId);
     setShowPopover(showPopover === chipId ? null : chipId);
@@ -105,7 +128,16 @@ const IncomeCard = () => {
   };
 
   const handleRangeApply = () => {
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+
+    setValidationErrors({});
+
     if (dateRange.from && dateRange.to) {
+      if (dateRange.from > dateRange.to) return;
       handleOptionClick(dateRange, "range");
     }
   };
@@ -128,6 +160,13 @@ const IncomeCard = () => {
 
   return (
     <section className="px-4 mt-4">
+      <CustomToast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+        duration={toast.duration}
+      />
       <div className="income-card  bg-[var(--c-primary)] text-white p-5 rounded-3xl shadow-soft">
         <div className="content">
           <h2 className="flex items-center justify-between text-base font-semibold">
@@ -213,46 +252,51 @@ const IncomeCard = () => {
           {/* Range Popover */}
           {showPopover === "range" && (
             <div className="mt-3 rounded-2xl border border-slate-200 bg-white shadow-soft p-3 text-slate-700">
-              <p className="text-xs text-slate-500 mb-2">
-                Pilih Rentang Tanggal
-              </p>
               <div className="grid grid-cols-2 gap-2 text-sm">
-                <label className="text-xs text-slate-600">
-                  Dari
-                  <input
-                    type="date"
-                    value={dateRange.from}
-                    onChange={(e) =>
-                      setDateRange((prev) => ({
-                        ...prev,
-                        from: e.target.value,
-                      }))
-                    }
-                    className="mt-1 w-full rounded-xl border-slate-200 focus:border-primary focus:ring-primary/30"
-                  />
-                </label>
-                <label className="text-xs text-slate-600">
-                  Sampai
-                  <input
-                    type="date"
-                    value={dateRange.to}
-                    onChange={(e) =>
-                      setDateRange((prev) => ({ ...prev, to: e.target.value }))
-                    }
-                    className="mt-1 w-full rounded-xl border-slate-200 focus:border-primary focus:ring-primary/30"
-                  />
-                </label>
+                <SimpleInput
+                  name="from"
+                  type="date"
+                  label="Dari"
+                  value={dateRange.from}
+                  handleChange={(e) => {
+                    setDateRange((prev) => ({ ...prev, from: e.target.value }));
+                    setValidationErrors({
+                      ...validationErrors,
+                      from: "",
+                    });
+                  }}
+                  isDefaultSize={false}
+                  errors={validationErrors.from}
+                />
+                <SimpleInput
+                  name="to"
+                  type="date"
+                  label="Sampai"
+                  value={dateRange.to}
+                  handleChange={(e) => {
+                    setDateRange((prev) => ({ ...prev, to: e.target.value }));
+                    setValidationErrors({
+                      ...validationErrors,
+                      to: "",
+                    });
+                  }}
+                  isDefaultSize={false}
+                  errors={validationErrors.to}
+                />
               </div>
+              <p className="text-xs text-red-500 mt-2">
+                {validationErrors.ranges}
+              </p>
               <div className="mt-3 flex justify-end gap-2">
                 <button
                   onClick={handleRangeClear}
-                  className="px-3 py-1.5 rounded-xl text-sm bg-slate-100 text-slate-700"
+                  className="px-3 py-1.5 rounded-lg text-sm bg-slate-100 text-slate-700"
                 >
                   Reset
                 </button>
                 <button
                   onClick={handleRangeApply}
-                  className="px-3 py-1.5 rounded-xl text-sm bg-white text-[var(--c-primary)] font-semibold"
+                  className="px-3 py-1.5 rounded-lg text-sm bg-[var(--c-primary)] text-white font-semibold"
                 >
                   Terapkan
                 </button>

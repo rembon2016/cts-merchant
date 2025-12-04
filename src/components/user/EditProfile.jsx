@@ -173,6 +173,7 @@ export default function EditProfile() {
                 errors={errors.password}
                 handleChange={handleChange}
                 disabled={!isEditPassword}
+                changeInputType={true}
               />
               <SimpleInput
                 name="confirmPassword"
@@ -182,6 +183,7 @@ export default function EditProfile() {
                 errors={errors.confirmPassword}
                 handleChange={handleChange}
                 disabled={!isEditPassword}
+                changeInputType={true}
               />
             </>
           )}

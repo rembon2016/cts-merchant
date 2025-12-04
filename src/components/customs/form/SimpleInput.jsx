@@ -100,9 +100,9 @@ export default function SimpleInput({
           }
         >
           {dynamicType === "password" ? (
-            <Eye className="w-6 h-6" />
-          ) : (
             <EyeOff className="w-6 h-6" />
+          ) : (
+            <Eye className="w-6 h-6" />
           )}
         </button>
       )}
