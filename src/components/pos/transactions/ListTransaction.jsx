@@ -2,6 +2,8 @@ import VariantModal from "../../customs/modal/VariantModal";
 import SearchInput from "../../customs/form/SearchInput";
 import LoadingSkeletonList from "../../customs/loading/LoadingSkeletonList";
 import { formatCurrency } from "../../../helper/currency";
+import { formatDate } from "../../../helper/format-date";
+import { formatTime24 } from "../../../helper/format-time";
 import { useTransactionStore } from "../../../store/transactionStore";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -49,10 +51,12 @@ export default function ListTransaction() {
               <section key={group.date_group}>
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-md font-medium text-gray-700">
-                    {group.date_group}
+                    {group?.date_group === "Today"
+                      ? "Hari Ini"
+                      : formatDate(group?.date_group)}
                   </h3>
                   <span className="text-sm text-gray-500">
-                    {group.transactions.length} transaksi
+                    {group?.transactions.length} transaksi
                   </span>
                 </div>
 
@@ -75,7 +79,8 @@ export default function ListTransaction() {
                                 {trx.code}
                               </div>
                               <div className="text-xs text-[var(--c-primary)] font-semibold">
-                                • {trx.time}
+                                • {formatTime24(trx.time)}•{" "}
+                                {formatTime24(trx.time)}
                               </div>
                             </div>
                             <div className="text-xs text-gray-500 mt-1 text-start truncate">
