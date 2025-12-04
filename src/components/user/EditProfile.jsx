@@ -109,7 +109,10 @@ export default function EditProfile() {
       sessionStorage.setItem("authUser", JSON.stringify(response?.data));
       if (response?.success === true) {
         showSuccess("Profil Berhasil Diperbarui");
-        window.location.reload();
+        setTimeout(() => {
+          navigate("/account-information");
+          globalThis.location.reload();
+        }, 2000);
       } else {
         showError("Gagal Memperbarui Profil");
       }

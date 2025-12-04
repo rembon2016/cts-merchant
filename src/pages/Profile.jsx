@@ -8,7 +8,7 @@ import CustomCheckbox from "../components/customs/form/CustomCheckbox";
 import DangerButton from "../components/customs/button/DangerButton";
 
 const Profile = () => {
-  const { isDark, setTheme, toggleTheme } = useThemeStore();
+  const { isDark, setTheme } = useThemeStore();
   const { user, logout, isLoading } = useAuthStore();
   const {
     total,
@@ -118,8 +118,6 @@ const Profile = () => {
       ),
     },
   ];
-
-  const handleLogout = () => logout();
 
   const userStatus = user?.business_account?.status;
 
