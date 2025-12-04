@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { useUserDataStore } from "./userDataStore";
+import { useEffect } from "react";
 
 // custom hooks for checking authentication
 const TAX = "tax";
@@ -17,6 +18,9 @@ const TOTAL_PAYMENT = "totalPayment";
 const CART_ITEM_ID = "cartItemId";
 const ROOT_API = import.meta.env?.VITE_API_ROUTES;
 const ROOT_API_POS = import.meta.env?.VITE_API_POS_ROUTES;
+const TIME_REFRESH_TOKEN = Number(
+  import.meta.env.VITE_REFRESH_USER_TOKEN_TIMER
+);
 
 export const useAuthStore = create((set, get) => ({
   user: JSON.parse(sessionStorage.getItem(SESSION_KEY)),
@@ -77,10 +81,10 @@ export const useAuthStore = create((set, get) => ({
 
       // Hitung timestamp expiry (expires_in biasanya dalam detik)
       const expiryTimestamp = Date.now() + EXPIRED_IN * 1000;
-      // const expiryTimestamp = Date.now() + 2 * 1000;
-      const calculateTImeRefresh =
-        import.meta.env.VITE_REFRESH_USER_TOKEN_TIMER * 1000;
-      // const calculateTImeRefresh = 2 * 1000;
+
+      // 20,000 menit (sekitar 13,88 hari)
+      // const expiryTimestamp = Date.now() + 6 * 60 * 1000; // 6 menit dari sekarang
+      const calculateTImeRefresh = TIME_REFRESH_TOKEN * 1000;
 
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(userData?.data));
       sessionStorage.setItem(USER_ID, result?.data?.id);
@@ -283,12 +287,11 @@ export const useAuthStore = create((set, get) => ({
     // Jika waktu menuju refresh sudah lewat atau tepat, lakukan refresh segera
     if (timeUntilRefresh <= 0) {
       get().handleAutoLogout();
-      // get().refreshToken();
     } else {
-      const refreshTimer = setTimeout(() => {
-        get().handleAutoLogout();
-        // get().refreshToken();
-      }, timeUntilRefresh);
+      const refreshTimer = setTimeout(
+        () => get().handleAutoLogout(),
+        timeUntilRefresh
+      );
       set({ refreshTimer });
     }
 
@@ -328,6 +331,8 @@ export const useAuthStore = create((set, get) => ({
 
   // Handle auto logout (tanpa API call)
   handleAutoLogout: async () => {
+    console.log("Running Auto logout");
+
     // Clear timers
     get().clearAutoLogoutTimer();
     get().clearSession();
@@ -484,9 +489,7 @@ export const useAuthStore = create((set, get) => ({
         };
       }
 
-      const newExpiry =
-        Date.now() +
-        Number(import.meta.env.VITE_REFRESH_USER_TOKEN_TIMER) * 1000;
+      const newExpiry = Date.now() + TIME_REFRESH_TOKEN * 1000;
 
       sessionStorage.setItem(EXPIRED_KEY, newExpiry.toString());
       if (newPosToken) {
