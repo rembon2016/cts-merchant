@@ -45,7 +45,7 @@ const ProductCard = forwardRef((props) => {
   return (
     <button
       ref={observerRef}
-      className={`border rounded-lg shadow hover:shadow-lg transition flex flex-col text-start overflow-hidden ${
+      className={`border dark:border-none dark:bg-slate-700 rounded-lg shadow hover:shadow-lg transition flex flex-col text-start overflow-hidden ${
         disabled ? "opacity-50" : "cursor-pointer"
       }`}
       onClick={onClick}
@@ -121,18 +121,7 @@ ProductCard.propTypes = {
   disabled: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
   handleProductClick: PropTypes.func,
-  loadMoreProducts: PropTypes.func,
   showButtonCart: PropTypes.bool,
-  loading: PropTypes.bool,
-  isLastProduct: PropTypes.bool,
-  hasMoreProducts: PropTypes.bool,
-  selectedSub: PropTypes.string,
-  subCategories: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-    })
-  ),
 };
 
 export default ProductCard;

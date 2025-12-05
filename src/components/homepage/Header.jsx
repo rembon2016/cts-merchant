@@ -28,7 +28,7 @@ const Header = () => {
     return (
       <>
         <div className="flex items-center gap-3">
-          <div className="size-9 rounded-full bg-[rgba(0,47,108,0.08)] text-primary dark:bg-slate-700 dark:text-blue-500 grid place-items-center font-semibold">
+          <div className="size-9 rounded-full bg-[rgba(0,47,108,0.08)] text-primary dark:bg-slate-700 dark:text-blue-300 grid place-items-center font-semibold">
             {user?.name[0]}
           </div>
           <div className="text-sm leading-tight">
@@ -91,21 +91,21 @@ const Header = () => {
                 >
                   <path
                     d="M4 19C4 19.5304 4.21071 20.0391 4.58579 20.4142C4.96086 20.7893 5.46957 21 6 21C6.53043 21 7.03914 20.7893 7.41421 20.4142C7.78929 20.0391 8 19.5304 8 19C8 18.4696 7.78929 17.9609 7.41421 17.5858C7.03914 17.2107 6.53043 17 6 17C5.46957 17 4.96086 17.2107 4.58579 17.5858C4.21071 17.9609 4 18.4696 4 19ZM15 19C15 19.5304 15.2107 20.0391 15.5858 20.4142C15.9609 20.7893 16.4696 21 17 21C17.5304 21 18.0391 20.7893 18.4142 20.4142C18.7893 20.0391 19 19.5304 19 19C19 18.4696 18.7893 17.9609 18.4142 17.5858C18.0391 17.2107 17.5304 17 17 17C16.4696 17 15.9609 17.2107 15.5858 17.5858C15.2107 17.9609 15 18.4696 15 19Z"
-                    stroke="black"
+                    stroke={isDark ? "#ddd" : "black"}
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                   <path
                     d="M17 17H6V3H4"
-                    stroke="black"
+                    stroke={isDark ? "#ddd" : "black"}
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                   <path
                     d="M6 5L20 6L19 13H6"
-                    stroke="black"
+                    stroke={isDark ? "#ddd" : "black"}
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"

@@ -7,6 +7,7 @@ import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 import { formatCurrency } from "../../helper/currency";
 import NoData from "../customs/element/NoData";
 import { formatDate } from "../../helper/format-date";
+import { useThemeStore } from "../../store/themeStore";
 
 // Define action types
 const SET_FILTER = "SET_FILTER";
@@ -49,6 +50,7 @@ function reducer(state, action) {
 export default function Transaction() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { data, totalData, loading, error, fetchData } = useFetchDataStore();
+  const { isDark } = useThemeStore();
   const [accumulatedData, setAccumulatedData] = useState([]);
 
   // Debounce search query with 500ms delay
@@ -125,7 +127,7 @@ export default function Transaction() {
             <div className="flex gap-2 flex-col justify-between">
               <div className="flex items-center gap-3">
                 <div
-                  className={`size-10 rounded-xl grid place-items-center bg-blue-100 dark:bg-green-900/30`}
+                  className={`size-10 rounded-xl grid place-items-center bg-blue-100 dark:bg-slate-500`}
                 >
                   <svg
                     width="20"
@@ -137,14 +139,14 @@ export default function Transaction() {
                   >
                     <path
                       d="M16.75 9.25V8.75C16.75 4.979 16.75 3.093 15.578 1.922C14.406 0.751 12.521 0.75 8.75 0.75C4.979 0.75 3.093 0.75 1.922 1.922C0.751 3.094 0.75 4.979 0.75 8.75V13.25C0.75 16.537 0.75 18.181 1.658 19.288C1.82467 19.4907 2.00933 19.6753 2.212 19.842C3.32 20.75 4.962 20.75 8.25 20.75M4.75 5.75H12.75M4.75 9.75H8.75"
-                      stroke="blue"
+                      stroke={isDark ? "lightskyblue" : "blue"}
                       strokeWidth="1.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                     <path
                       d="M15.75 17.25L14.25 16.7V14.25M9.75 16.25C9.75 16.8409 9.8664 17.4261 10.0925 17.9721C10.3187 18.518 10.6502 19.0141 11.068 19.432C11.4859 19.8498 11.982 20.1813 12.5279 20.4075C13.0739 20.6336 13.6591 20.75 14.25 20.75C14.8409 20.75 15.4261 20.6336 15.9721 20.4075C16.518 20.1813 17.0141 19.8498 17.432 19.432C17.8498 19.0141 18.1813 18.518 18.4075 17.9721C18.6336 17.4261 18.75 16.8409 18.75 16.25C18.75 15.0565 18.2759 13.9119 17.432 13.068C16.5881 12.2241 15.4435 11.75 14.25 11.75C13.0565 11.75 11.9119 12.2241 11.068 13.068C10.2241 13.9119 9.75 15.0565 9.75 16.25Z"
-                      stroke="blue"
+                      stroke={isDark ? "lightskyblue" : "blue"}
                       strokeWidth="1.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -179,7 +181,7 @@ export default function Transaction() {
         ))}
       </div>
     );
-  }, [accumulatedData, loading, error]);
+  }, [accumulatedData, loading, error, isDark]);
 
   return (
     <div className="px-4 py-6">

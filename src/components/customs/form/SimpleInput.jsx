@@ -57,7 +57,7 @@ export default function SimpleInput({
         className={`${
           label !== ""
             ? `block text-sm font-semibold ${
-                errors ? "text-red-500" : "text-gray-700"
+                errors ? "text-red-500" : "text-gray-700 dark:text-gray-300"
               } mb-2`
             : "hidden"
         }`}

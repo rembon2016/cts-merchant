@@ -12,6 +12,7 @@ import {
   Filler,
 } from "chart.js";
 import { Bar, Line, Pie, Doughnut } from "react-chartjs-2";
+import { useThemeStore } from "../../../store/themeStore";
 
 ChartJS.register(
   CategoryScale,
@@ -42,6 +43,7 @@ function UniversalChart({
   isLoading = false,
   emptyText = "Tidak ada data",
 }) {
+  const { isDark } = useThemeStore();
   const defaultOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -65,6 +67,70 @@ function UniversalChart({
       },
     },
     ...customOptions,
+  };
+
+  const textColor = isDark ? "#e5e7eb" : "#374151";
+  const gridColor = isDark ? "rgba(148,163,184,0.15)" : "rgba(209,213,219,0.3)";
+  const borderColor = isDark
+    ? "rgba(148,163,184,0.3)"
+    : "rgba(209,213,219,0.6)";
+
+  defaultOptions.plugins = {
+    ...(defaultOptions.plugins || {}),
+    legend: {
+      ...(defaultOptions.plugins?.legend || {}),
+      labels: {
+        ...(defaultOptions.plugins?.legend?.labels || {}),
+        color: textColor,
+      },
+    },
+    title: {
+      ...(defaultOptions.plugins?.title || {}),
+      color: textColor,
+    },
+    tooltip: {
+      backgroundColor: isDark
+        ? "rgba(30,41,59,0.95)"
+        : "rgba(255,255,255,0.95)",
+      titleColor: textColor,
+      bodyColor: textColor,
+      borderColor,
+      borderWidth: 1,
+    },
+  };
+
+  defaultOptions.scales = {
+    ...(defaultOptions.scales || {}),
+    x: {
+      ...(defaultOptions.scales?.x || {}),
+      ticks: {
+        ...(defaultOptions.scales?.x?.ticks || {}),
+        color: textColor,
+      },
+      grid: {
+        ...(defaultOptions.scales?.x?.grid || {}),
+        color: gridColor,
+      },
+      border: {
+        ...(defaultOptions.scales?.x?.border || {}),
+        color: borderColor,
+      },
+    },
+    y: {
+      ...(defaultOptions.scales?.y || {}),
+      ticks: {
+        ...(defaultOptions.scales?.y?.ticks || {}),
+        color: textColor,
+      },
+      grid: {
+        ...(defaultOptions.scales?.y?.grid || {}),
+        color: gridColor,
+      },
+      border: {
+        ...(defaultOptions.scales?.y?.border || {}),
+        color: borderColor,
+      },
+    },
   };
 
   if (isLoading) {
@@ -259,6 +325,7 @@ export function QuickPieChart({
   height,
   isLoading = false,
 }) {
+  const { isDark } = useThemeStore();
   const data = {
     labels,
     datasets: [
@@ -266,7 +333,7 @@ export function QuickPieChart({
         data: values,
         backgroundColor: colors,
         borderWidth: 2,
-        borderColor: "#fff",
+        borderColor: isDark ? "rgba(255,255,255,0.12)" : "#fff",
       },
     ],
   };

@@ -293,7 +293,7 @@ const IncomeCard = () => {
               <div className="mt-3 flex justify-end gap-2">
                 <button
                   onClick={handleRangeClear}
-                  className="px-3 py-1.5 rounded-lg text-sm bg-slate-100 text-slate-700"
+                  className="px-3 py-1.5 rounded-lg text-sm bg-slate-100 text-slate-700 dark:bg-slate-600 dark:text-slate-200"
                 >
                   Reset
                 </button>
