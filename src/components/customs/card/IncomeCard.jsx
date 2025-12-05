@@ -209,15 +209,17 @@ const IncomeCard = () => {
           {/* Month Popover */}
           {showPopover === "month" && (
             <div className="mt-3 rounded-2xl border border-slate-200 bg-white shadow-soft p-3 text-slate-700">
-              <p className="text-xs text-slate-500 mb-2">Pilih Bulan</p>
+              <p className="text-xs text-slate-500 dark:text-slate-200 mb-2">
+                Pilih Bulan
+              </p>
               <div className="grid grid-cols-3 gap-2 text-sm">
                 {months.map((month) => {
                   return (
                     <button
                       key={month.key}
                       onClick={() => handleOptionClick(month?.key, "month")}
-                      className={`p-2 rounded-lg transition-colors ${
-                        activeChip === "month" && month.key === activeItem.key
+                      className={`p-2 rounded-lg hover:bg-[var(--c-accent)] hover:font-semibold dark:hover:text-gray-600 transition-colors ${
+                        activeChip === "month" && month.value === activeItem
                           ? "bg-[var(--c-accent)] text-gray-600 font-semibold"
                           : "hover:bg-slate-100"
                       }`}
@@ -233,13 +235,15 @@ const IncomeCard = () => {
           {/* Year Popover */}
           {showPopover === "year" && (
             <div className="mt-3 rounded-2xl border border-slate-200 bg-white shadow-soft p-3 text-slate-700">
-              <p className="text-xs text-slate-500 mb-2">Pilih Tahun</p>
+              <p className="text-xs text-slate-500 dark:text-slate-200 mb-2">
+                Pilih Tahun
+              </p>
               <div className="grid grid-cols-4 gap-2 text-sm">
                 {years.map((year) => (
                   <button
                     key={year}
                     onClick={() => handleOptionClick(year, "year")}
-                    className={`p-2 rounded-lg transition-colors ${
+                    className={`p-2 rounded-lg hover:bg-[var(--c-accent)] hover:font-semibold dark:hover:text-gray-600 transition-colors ${
                       activeChip === "year" && year === activeItem
                         ? "bg-[var(--c-accent)] text-gray-600 font-semibold"
                         : "hover:bg-slate-100"
