@@ -18,13 +18,20 @@ const MainLayout = () => {
   const [showPermissionBanner, setShowPermissionBanner] = useState(false);
 
   const handlePermissionNotification = async () => {
-    await requestForToken();
-    if (
-      typeof globalThis !== "undefined" &&
-      "Notification" in globalThis &&
-      Notification.permission !== "default"
-    ) {
-      setShowPermissionBanner(false);
+    try {
+      if (
+        typeof globalThis === "undefined" ||
+        !("Notification" in globalThis)
+      ) {
+        return;
+      }
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        await requestForToken();
+      }
+      setShowPermissionBanner(permission === "default" ? true : false);
+    } catch (_) {
+      // noop
     }
   };
 
@@ -53,7 +60,7 @@ const MainLayout = () => {
 
   const renderPermissionBanner = useMemo(() => {
     return (
-      <div className="mx-4 mt-3 mb-2 rounded-xl bg-blue-50 text-blue-900 p-3 shadow-soft relative z-50 pointer-events-auto">
+      <div className="mx-4 mb-2 rounded-xl bg-white dark:bg-gray-700 text-blue-900 dark:text-gray-300 p-3 shadow-soft relative z-50 pointer-events-auto">
         <div className="flex items-center justify-between gap-3">
           <span className="text-sm">Aktifkan izin notifikasi?</span>
           <button
