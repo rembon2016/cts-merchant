@@ -14,9 +14,9 @@ export default defineConfig(({ mode }) => {
         },
         includeAssets: ["favicon.ico", "apple-touch-icon.png", "mask-icon.svg"],
         manifest: {
-          name: "CTS Soundbox Merchant",
+          name: "CTS Merchant",
           short_name: "CTS Merchant",
-          description: "Aplikasi CTS Soundbox Merchant",
+          description: "Aplikasi CTS Merchant",
           theme_color: "#ffffff",
           background_color: "#ffffff",
           display: "standalone",
