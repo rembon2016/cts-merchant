@@ -621,7 +621,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
           isRequired={true}
         />
 
-        <div className="mt-6 p-4 border border-gray-200 rounded-lg">
+        <div className="mt-6 p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
           {/* {editMode && (
             <>
               <h3 className="text-lg font-semibold mb-4">
@@ -740,7 +740,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
         </div>
 
         {/* Variant Section */}
-        <div className="mt-6 p-4 border border-gray-200 rounded-lg">
+        <div className="mt-6 p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
           <h3 className="text-lg font-semibold mb-4">
             Produk ini punya varian?
           </h3>
@@ -891,7 +891,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
         </div>
 
         {/* Bundle Section */}
-        <div className="mt-6 p-4 border border-gray-200 rounded-lg">
+        <div className="mt-6 p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
           <h3 className="text-lg font-semibold mb-4">
             Produk ini punya bundle?
           </h3>

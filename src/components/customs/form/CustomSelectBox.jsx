@@ -71,7 +71,7 @@ export default function CustomSelectBox({
     errors ? "border-2 border-red-500" : "border border-slate-300"
   } rounded-xl focus:ring-2 focus:ring-blue-500  ${
     disabled ? "bg-gray-200 dark:bg-slate-600" : "bg-white dark:bg-slate-600"
-  } dark:text-slate-100 font-semibold`;
+  } dark:text-slate-100 font-semibold dark:border-none`;
 
   const filtered =
     Array.isArray(selectBoxData) &&
@@ -138,7 +138,7 @@ export default function CustomSelectBox({
     <div className="relative rounded-xl" ref={containerRef}>
       {label && (
         <label
-          className={`block text-sm font-semibold text-gray-700 mb-2 ${
+          className={`block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ${
             errors ? "text-red-500" : "text-gray-600"
           }`}
           htmlFor={name}

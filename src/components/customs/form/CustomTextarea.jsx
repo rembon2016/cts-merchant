@@ -62,7 +62,7 @@ const CustomTextarea = forwardRef((props, ref) => {
       <div
         className={`peer-container relative bg-gradient-to-br from-white/60 to-slate-50/60 dark:from-slate-800/40 dark:to-slate-800/30 rounded-2xl shadow-sm p-0.5 border border-transparent hover:shadow-md transition-all duration-200`}
       >
-        <div className="relative px-4 pt-4 pb-1 rounded-2xl  dark:bg-slate-900/60 bg-white">
+        <div className="relative px-4 pt-4 pb-1 rounded-2xl  dark:bg-gray-600 bg-white">
           <textarea
             id={id}
             name={name}

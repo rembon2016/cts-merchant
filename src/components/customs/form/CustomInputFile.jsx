@@ -188,8 +188,8 @@ export default function CustomInputFile({
           ${
             dragActive
               ? "border-indigo-400 shadow-lg"
-              : "border-dashed border-gray-300"
-          } bg-gradient-to-br from-white to-gray-50
+              : "border-dashed border-gray-300 dark:border-gray-500"
+          } bg-gradient-to-br from-white to-gray-50 dark:from-gray-600 dark:to-gray-700
           hover:shadow-md cursor-pointer w-full`}
       >
         {/* Decorative corner gradient */}
@@ -261,7 +261,9 @@ export default function CustomInputFile({
                   d="M7 16v-4a4 4 0 014-4h0a4 4 0 014 4v4m-6 4h6"
                 />
               </svg>
-              <div className="font-medium text-gray-700">{placeholder}</div>
+              <div className="font-medium text-gray-700 dark:text-gray-400">
+                {placeholder}
+              </div>
               <div className="text-xs text-gray-400">
                 {accept ? `Tipe file: ${accept}` : "Semua tipe file"}
               </div>
