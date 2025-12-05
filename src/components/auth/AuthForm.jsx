@@ -197,7 +197,7 @@ export default function AuthForm({ formMode = "login" }) {
   }, []);
 
   return (
-    <div className="mt-8 flex items-center justify-center bg-gray-100">
+    <div className="flex items-center justify-center bg-gray-100 dark:bg-slate-900">
       <div className="w-full max-w-md rounded-lg p-8">
         <div className="flex flex-col mb-6">
           <img src={getImage} alt="CTS" className="w-24 h-24 mx-auto" />
