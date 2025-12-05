@@ -49,7 +49,9 @@ export default function SimpleInput({
     errors ? "border-2 border-red-600" : "border-slate-300"
   } rounded-xl focus:ring-2 focus:ring-blue-500  ${
     disabled ? "bg-gray-200 dark:bg-slate-600" : "bg-white dark:bg-slate-600"
-  } dark:text-slate-100 font-semibold ${errors ? "text-red-500" : ""}`;
+  } dark:text-slate-100 font-semibold ${
+    errors ? "text-red-500" : ""
+  } dark:border-none`;
 
   return (
     <div className="relative w-full">
@@ -57,7 +59,7 @@ export default function SimpleInput({
         className={`${
           label !== ""
             ? `block text-sm font-semibold ${
-                errors ? "text-red-500" : "text-gray-700"
+                errors ? "text-red-500" : "text-gray-700 dark:text-gray-300"
               } mb-2`
             : "hidden"
         }`}

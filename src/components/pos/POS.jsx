@@ -19,15 +19,13 @@ const MAIN_MENU = [
   {
     id: 1,
     name: "TRANSAKSI",
-    iconLight: "/icons/transaction.svg",
-    iconDark: "/icons/transaction-white.svg",
+    icon: "/icons/transaction.svg",
     path: "/pos/transaction",
   },
   {
     id: 2,
     name: "PRODUK",
-    iconLight: "/icons/product.svg",
-    iconDark: "/icons/product-white.svg",
+    icon: "/icons/product.svg",
     path: "/pos/products",
   },
 ];
@@ -160,12 +158,8 @@ export default function POS() {
             className="w-full min-h-[100px] max-h-full flex flex-col justify-center items-center hover:bg-slate-200 dark:hover:bg-slate-600 bg-white  text-slate-600 dark:text-slate-100 rounded-lg font-semibold cursor-pointer text-[12px]"
             onClick={() => navigate(cat?.path, { replace: true })}
           >
-            <div className=" bg-[var(--c-accent)] p-2 rounded-2xl flex items-center justify-center mb-2">
-              <img
-                src={isDark ? cat.iconDark : cat.iconLight}
-                alt={cat.name}
-                className="w-10 h-10"
-              />
+            <div className="bg-[var(--c-accent)] p-2 rounded-2xl flex items-center justify-center mb-2">
+              <img src={cat.icon} alt={cat.name} className="w-10 h-10" />
             </div>
             {cat.name}
           </button>

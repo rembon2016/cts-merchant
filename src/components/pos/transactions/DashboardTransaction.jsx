@@ -8,6 +8,7 @@ import {
 } from "../../customs/chart/chart";
 import SimpleInput from "../../customs/form/SimpleInput";
 import PrimaryButton from "../../customs/button/PrimaryButton";
+import { useThemeStore } from "../../../store/themeStore";
 
 export default function DashboardTransaction() {
   const [formData, setFormData] = useState({
@@ -28,6 +29,8 @@ export default function DashboardTransaction() {
 
   const { getChartSales, getChartOverView, data, dataOverview, isLoading } =
     useDashboardStore();
+
+  const { isDark } = useThemeStore();
 
   const salesKey = {
     day: "day",
@@ -77,7 +80,7 @@ export default function DashboardTransaction() {
           >
             <path
               d="M9 2.125V11.9375H12.25V2.125H9ZM4.5 11.9375H7.75V0H4.5V11.9375ZM0 11.9375H3.25V4.25H0V11.9375Z"
-              fill="black"
+              fill={isDark && typeChart !== "bar" ? "white" : "black"}
             />
           </svg>
         </button>
@@ -96,7 +99,7 @@ export default function DashboardTransaction() {
               fillRule="evenodd"
               clipRule="evenodd"
               d="M11.6914 0.737187L11.0157 0L7.15888 3.53525H2.47978L0 6.01503L0.707094 6.72216L2.89356 4.53525H7.54803L11.6914 0.737187ZM11.4633 4.58806L11.9105 5.48247L8.43481 7.22031L4.15688 6.56194L1.32719 8.76328L0.71325 7.97391L3.88331 5.50831L8.27222 6.18325L11.4633 4.58806ZM0.0201563 10.0352H12.0202V11.3686H0.0202187L0.0201563 10.0352Z"
-              fill="black"
+              fill={isDark && typeChart !== "line" ? "white" : "black"}
             />
           </svg>
         </button>
@@ -113,13 +116,13 @@ export default function DashboardTransaction() {
           >
             <path
               d="M5.4585 6.395L6.2825 1.005C6.01011 0.961549 5.73483 0.938651 5.459 0.9365C2.4435 0.9365 0 3.3805 0 6.395C0 9.41 2.444 11.8535 5.4585 11.8535C8.473 11.8535 10.917 9.4095 10.917 6.395C10.917 6.267 10.907 6.1415 10.898 6.015L5.4585 6.395ZM7.3855 0L6.5615 5.39L12.0005 5.01C11.9138 3.7752 11.4097 2.60659 10.5711 1.69615C9.73242 0.785708 8.60905 0.187573 7.3855 0Z"
-              fill="black"
+              fill={isDark && typeChart !== "pie" ? "white" : "black"}
             />
           </svg>
         </button>
       </div>
     );
-  }, [handleChangeTypeChart]);
+  }, [handleChangeTypeChart, typeChart]);
 
   const renderTabsChart = useMemo(() => {
     return (
@@ -136,7 +139,7 @@ export default function DashboardTransaction() {
             className={`px-3 py-1.5 text-sm ${
               activeRange === btn.key
                 ? "bg-[var(--c-accent)] text-gray-700 rounded-lg font-semibold"
-                : "bg-white text-gray-700"
+                : "bg-white text-gray-700 dark:text-gray-200"
             }`}
           >
             {btn.label}

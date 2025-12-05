@@ -50,12 +50,12 @@ export default function ListTransaction() {
             {transactions.map((group) => (
               <section key={group.date_group}>
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-md font-medium text-gray-700">
+                  <h3 className="text-md font-medium text-gray-700 dark:text-gray-200">
                     {group?.date_group === "Today"
                       ? "Hari Ini"
                       : formatDate(group?.date_group)}
                   </h3>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-500 dark:text-gray-300">
                     {group?.transactions.length} transaksi
                   </span>
                 </div>
@@ -67,33 +67,32 @@ export default function ListTransaction() {
                       onClick={() => navigate(`/pos/transaction/${trx.id}`)}
                       className="w-full"
                     >
-                      <div className="bg-white border border-gray-100 rounded-lg p-3 flex flex-col gap-3 shadow-sm">
+                      <div className="bg-white border border-gray-100 dark:border-none rounded-lg p-3 flex flex-col gap-3 shadow-sm">
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-md flex items-center justify-center font-semibold flex-shrink-0">
+                          <div className="w-12 h-12 bg-indigo-50 dark:bg-slate-500 text-indigo-600 dark:text-indigo-200 rounded-md flex items-center justify-center font-semibold flex-shrink-0">
                             {trx.transaction_type === "sale" ? "S" : "T"}
                           </div>
 
                           <div className="min-w-0">
                             <div className="flex items-center gap-2">
-                              <div className="text-sm font-medium text-gray-800 truncate">
+                              <div className="text-sm font-medium text-gray-800 dark:text-gray-300 truncate">
                                 {trx.code}
                               </div>
-                              <div className="text-xs text-[var(--c-primary)] font-semibold">
-                                • {formatTime24(trx.time)}•{" "}
-                                {formatTime24(trx.time)}
+                              <div className="text-xs text-[var(--c-primary)] dark:text-blue-300 font-semibold">
+                                • {formatTime24(trx.time)}
                               </div>
                             </div>
-                            <div className="text-xs text-gray-500 mt-1 text-start truncate">
+                            <div className="text-xs text-gray-500 dark:text-gray-300 mt-1 text-start truncate">
                               oleh: {trx.created_by} • {trx.item_count} item
                             </div>
                           </div>
                         </div>
                         <div className="flex items-center justify-end gap-1 border-t pt-2">
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-500 dark:text-gray-300">
                             {trx.payment_method?.name}
                           </div>
                           •
-                          <div className="font-semibold text-lg text-[var(--c-primary)]">
+                          <div className="font-semibold text-lg text-[var(--c-primary)] dark:text-gray-200">
                             {formatCurrency(trx.total)}
                           </div>
                         </div>
@@ -120,10 +119,12 @@ export default function ListTransaction() {
 
   return (
     <div className="py-2">
-      <div className="bg-white border border-gray-100 rounded-lg shadow-sm mb-4 p-4">
+      <div className="bg-white border border-gray-100 dark:border-none rounded-lg shadow-sm mb-4 p-4">
         <div className="p-2">
-          <h2 className="text-lg font-semibold text-gray-800">Transaksi POS</h2>
-          <p className="text-xs text-gray-500 mt-1">
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+            Transaksi POS
+          </h2>
+          <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">
             Transaksi terbaru berdasarkan tanggal
           </p>
         </div>
@@ -140,8 +141,8 @@ export default function ListTransaction() {
 
         <div className="mt-4 text-sm text-gray-600">
           <div className="flex items-center justify-between border-t pt-3">
-            <span>Total hari ini</span>
-            <span className="font-semibold text-lg text-[var(--c-primary)]">
+            <span className="dark:text-gray-300">Total hari ini</span>
+            <span className="font-semibold text-lg text-[var(--c-primary)] dark:text-gray-200">
               {formatCurrency(totalToday)}
             </span>
           </div>
