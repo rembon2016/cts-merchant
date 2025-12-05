@@ -357,25 +357,31 @@ const InvoiceForm = () => {
   // Step 3: Preview
   const renderStep3 = () => (
     <div className="flex flex-col gap-4">
-      <div className="bg-white border border-gray-200 rounded-lg p-4">
+      <div className="bg-white border border-gray-200 dark:border-none rounded-lg p-4">
         <h3 className="font-bold text-lg mb-3">Data Customer</h3>
         <div className="flex flex-col gap-2 text-sm">
           <div className="flex justify-between py-2 border-b">
-            <span className="text-gray-600">Nama Customer</span>
+            <span className="text-gray-600 dark:text-gray-300">
+              Nama Customer
+            </span>
             <span className="font-semibold">{selectedData.customer_name}</span>
           </div>
           <div className="flex justify-between py-2 border-b">
-            <span className="text-gray-600">Alamat</span>
+            <span className="text-gray-600 dark:text-gray-300">Alamat</span>
             <span className="font-semibold text-right">
               {selectedData.bill_address}
             </span>
           </div>
           <div className="flex justify-between py-2 border-b">
-            <span className="text-gray-600">Tanggal Penagihan</span>
+            <span className="text-gray-600 dark:text-gray-300">
+              Tanggal Penagihan
+            </span>
             <span className="font-semibold">{selectedData.invoice_date}</span>
           </div>
           <div className="flex justify-between py-2">
-            <span className="text-gray-600">Jatuh Tempo</span>
+            <span className="text-gray-600 dark:text-gray-300">
+              Jatuh Tempo
+            </span>
             <span className="font-semibold">
               {selectedData.invoice_due_date}
             </span>
@@ -383,18 +389,18 @@ const InvoiceForm = () => {
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-lg p-4">
+      <div className="bg-white border border-gray-200 dark:border-none rounded-lg p-4">
         <h3 className="font-bold text-lg mb-3">Daftar Produk</h3>
         <div className="flex flex-col gap-3">
           {selectedData.products.map((product, index) => (
             <div key={index} className="border-b pb-3 last:border-b-0">
               <div className="font-semibold mb-2">{product.product_name}</div>
-              <div className="flex justify-between text-sm text-gray-600">
+              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300">
                 <span>
                   {product.quantity} x{" "}
                   {formatCurrency(parseFloat(product.price) || 0)}
                 </span>
-                <span className="font-semibold text-black">
+                <span className="font-semibold text-black dark:text-gray-200">
                   {formatCurrency(
                     (parseFloat(product.quantity) || 0) *
                       (parseFloat(product.price) || 0)
@@ -405,8 +411,10 @@ const InvoiceForm = () => {
           ))}
         </div>
         <div className="mt-4 pt-4 border-t-2 flex justify-between items-center">
-          <span className="font-bold text-lg">Total Tagihan</span>
-          <span className="font-bold text-xl text-[var(--c-primary)]">
+          <span className="font-bold text-lg dark:text-gray-200">
+            Total Tagihan
+          </span>
+          <span className="font-bold text-xl text-[var(--c-primary)] dark:text-blue-300">
             {formatCurrency(calculateTotal())}
           </span>
         </div>

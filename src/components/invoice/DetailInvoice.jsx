@@ -69,10 +69,10 @@ const DetailInvoice = () => {
             <div className="text-xl font-semibold">
               {invoices ? invoices?.code : "-"}
             </div>
-            <div className="text-sm text-gray-700 mt-1">
+            <div className="text-sm text-gray-700 dark:text-gray-200 mt-1">
               {invoices ? invoices?.customer_name : "-"}
             </div>
-            <div className="text-sm text-gray-500 mt-1">
+            <div className="text-sm text-gray-500 dark:text-gray-300 mt-1">
               {statusBadge(invoices?.status)}
             </div>
           </div>
@@ -80,13 +80,17 @@ const DetailInvoice = () => {
 
         <div className="mt-4 flex justify-between gap-4">
           <div>
-            <div className="text-xs text-gray-500">Tanggal Penagihan</div>
+            <div className="text-xs text-gray-500 dark:text-gray-300">
+              Tanggal Penagihan
+            </div>
             <div className="mt-1">
               {invoices ? formatDate(invoices.invoice_date) : "-"}
             </div>
           </div>
           <div>
-            <div className="text-xs text-gray-500">Tenggat Waktu</div>
+            <div className="text-xs text-gray-500 dark:text-gray-300">
+              Tenggat Waktu
+            </div>
             <div className="mt-1">
               {invoices ? formatDate(invoices.invoice_due_date) : "-"}
             </div>
@@ -94,7 +98,9 @@ const DetailInvoice = () => {
         </div>
 
         <div className="mt-4">
-          <div className="text-xs text-gray-500">Alamat Penagihan</div>
+          <div className="text-xs text-gray-500 dark:text-gray-300">
+            Alamat Penagihan
+          </div>
           <div className="mt-1 text-sm">{invoices?.bill_address || "-"}</div>
         </div>
 
@@ -109,7 +115,9 @@ const DetailInvoice = () => {
                 >
                   <div className="flex items-center gap-1">
                     <div className="truncate">{g.product_name}</div>
-                    <div className="text-sm text-gray-600">x{g.quantity}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300">
+                      x{g.quantity}
+                    </div>
                   </div>
                   <div className="text-sm font-medium">
                     {formatCurrency(g.price)}
@@ -118,12 +126,16 @@ const DetailInvoice = () => {
               ))}
             </ul>
           ) : (
-            <div className="text-sm text-gray-500">No items</div>
+            <div className="text-sm text-gray-500 dark:text-gray-300">
+              No items
+            </div>
           )}
         </div>
 
         <div className="text-right mt-4 border-t pt-4 mb-4">
-          <div className="text-xs text-gray-500">Total Pembayaran</div>
+          <div className="text-xs text-gray-500 dark:text-gray-300">
+            Total Pembayaran
+          </div>
           <div className="text-lg font-medium mt-1">
             {invoices ? formatCurrency(invoices?.invoice_amount) : "-"}
           </div>

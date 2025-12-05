@@ -273,7 +273,7 @@ const Cart = () => {
                   <div className="text-gray-700 dark:text-gray-200 text-md">
                     <h3 className="font-medium">
                       {/* Harga:{" "} */}
-                      <span className="text-gray-500 font-extrabold">
+                      <span className="text-gray-500 dark:text-gray-300 font-extrabold">
                         {formatCurrency(cartItem?.price)}
                       </span>
                     </h3>

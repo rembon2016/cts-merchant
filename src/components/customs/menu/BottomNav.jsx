@@ -277,7 +277,7 @@ const BottomNav = () => {
                 {location.pathname === "/cart" && (
                   <div className="flex flex-col gap-2 mb-4">
                     <div className="flex justify-between items-center">
-                      <h3 className="font-medium text-gray-500 text-md">
+                      <h3 className="font-medium text-gray-500 dark:text-gray-400 text-md">
                         Sub Total
                       </h3>
                       <h3 className="font-bold text-md">
@@ -285,7 +285,7 @@ const BottomNav = () => {
                       </h3>
                     </div>
                     <div className="flex justify-between items-center">
-                      <h3 className="font-medium text-gray-500 text-md">
+                      <h3 className="font-medium text-gray-500 dark:text-gray-400 text-md">
                         Pajak
                       </h3>
                       <h3 className="font-bold text-md">
@@ -299,7 +299,7 @@ const BottomNav = () => {
                       </h3>
                     </div>
                     <div className="flex justify-between items-center">
-                      <h3 className="font-medium text-gray-500 text-md">
+                      <h3 className="font-medium text-gray-500 dark:text-gray-400 text-md">
                         Total
                       </h3>
                       <h3 className="font-bold text-md">

@@ -106,7 +106,7 @@ export default function Checkout() {
   const renderElementsDetailTransaction = useMemo(() => {
     return (
       <div className="bg-white p-4 rounded-xl mb-24">
-        <h3 className="font-semibold text-gray-700 text-lg mb-5">
+        <h3 className="font-semibold text-gray-700 dark:text-gray-200 text-lg mb-5">
           Detail Transaksi
         </h3>
         <div className="flex flex-col gap-2">
@@ -117,32 +117,36 @@ export default function Checkout() {
             <h4 className="font-bold text-gray-700 text-md">BRG-001-2K25</h4>
           </div> */}
           <div className="flex justify-between items-center">
-            <h4 className="font-semibold text-gray-500 text-md">
+            <h4 className="font-semibold text-gray-500 dark:text-gray-400 text-md">
               Harga Barang ({Math.max(getCart?.items?.length > 0) || 0})
             </h4>
-            <h4 className="font-bold text-gray-700 text-md">
+            <h4 className="font-bold text-gray-700 dark:text-gray-200 text-md">
               {formatCurrency(checkoutPrice)}
             </h4>
           </div>
           <div className="flex justify-between items-center">
-            <h4 className="font-semibold text-gray-500 text-md">Diskon</h4>
-            <h4 className="font-bold text-gray-700 text-md">
+            <h4 className="font-semibold text-gray-500 dark:text-gray-400 text-md">
+              Diskon
+            </h4>
+            <h4 className="font-bold text-gray-700 dark:text-gray-200 text-md">
               -{formatCurrency(Math.ceil(getPriceWithDiscount() || 0))}
             </h4>
           </div>
           <div className="flex justify-between items-center">
-            <h4 className="font-semibold text-gray-500 text-md">Pajak</h4>
-            <h4 className="font-bold text-gray-700 text-md">
+            <h4 className="font-semibold text-gray-500 dark:text-gray-400 text-md">
+              Pajak
+            </h4>
+            <h4 className="font-bold text-gray-700 dark:text-gray-200 text-md">
               +{formatCurrency(Math.ceil(TOTAL()?.taxPrice) || 0)} (
               {getAndFormatTax()}
               %)
             </h4>
           </div>
           <div className="flex justify-between items-center border-t-2 border-gray-600 mt-2">
-            <h4 className="font-bold text-gray-700 text-md mt-2">
+            <h4 className="font-bold text-gray-700 dark:text-gray-200 text-md mt-2">
               Total Tagihan
             </h4>
-            <h4 className="font-bold text-gray-700 text-md">
+            <h4 className="font-bold text-gray-700 dark:text-gray-200 text-md">
               {formatCurrency(getTotalPrice())}
             </h4>
           </div>
@@ -188,7 +192,7 @@ export default function Checkout() {
               <div className="text-gray-700 dark:text-gray-200 text-lg">
                 <h3 className="font-medium">
                   Harga:{" "}
-                  <span className="text-[var(--c-primary)] font-extrabold">
+                  <span className="text-[var(--c-primary)] dark:text-blue-300 font-extrabold">
                     {formatCurrency(data?.price)}
                   </span>
                 </h3>

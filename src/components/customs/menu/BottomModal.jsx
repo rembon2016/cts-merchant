@@ -158,7 +158,7 @@ export default function BottomModal(props) {
   const renderVariants = useMemo(() => {
     return (
       <div
-        className={`bg-white dark:bg-gray-800 rounded-lg max-w-md w-full max-h-[80vh] overflow-hidden ${
+        className={`bg-white  rounded-lg max-w-md w-full max-h-[80vh] overflow-hidden ${
           isDark ? "dark" : ""
         }`}
       >
@@ -179,7 +179,7 @@ export default function BottomModal(props) {
                   key={variant.id}
                   className={`p-3 w-full rounded-lg border cursor-pointer transition-colors ${
                     isSelected
-                      ? "border-[var(--c-primary)] bg-blue-50 dark:bg-blue-900/20"
+                      ? "border-[var(--c-primary)] dark:border-blue-300 bg-blue-50 dark:bg-blue-900/20"
                       : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
                   } ${isOutOfStock ? "opacity-50 cursor-not-allowed" : ""}`}
                   onClick={() => !isOutOfStock && handleVariantSelect(variant)}
@@ -197,7 +197,7 @@ export default function BottomModal(props) {
                         )}
                       </div>
                       <div className="flex items-center justify-between mt-1">
-                        <span className="text-sm font-semibold text-[var(--c-primary)]">
+                        <span className="text-sm font-semibold text-[var(--c-primary)] dark:text-blue-300">
                           Rp {price.toLocaleString("id-ID")}
                         </span>
                         <span className="text-xs text-gray-500 dark:text-gray-400">

@@ -167,27 +167,35 @@ const Invoice = () => {
   const renderCatalogInvoice = useMemo(() => {
     return (
       <div className="grid grid-cols-2 gap-1 mt-2">
-        <div className="w-full flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
-          <div className="text-xs text-gray-500">Sudah Lunas</div>
-          <div className="mt-2 text-xl font-medium text-gray-900">
+        <div className="w-full flex-shrink-0 p-4 bg-white border border-gray-50 dark:border-none rounded-lg shadow-sm">
+          <div className="text-xs text-gray-500 dark:text-gray-300">
+            Sudah Lunas
+          </div>
+          <div className="mt-2 text-xl font-medium text-gray-900 dark:text-gray-200">
             {summary.paid || 0}
           </div>
         </div>
-        <div className="w-full flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
-          <div className="text-xs text-gray-500">Belum Bayar</div>
-          <div className="mt-2 text-xl font-medium text-gray-900">
+        <div className="w-full flex-shrink-0 p-4 bg-white border border-gray-50 dark:border-none rounded-lg shadow-sm">
+          <div className="text-xs text-gray-500 dark:text-gray-300">
+            Belum Bayar
+          </div>
+          <div className="mt-2 text-xl font-medium text-gray-900 dark:text-gray-200">
             {summary.unpaid || 0}
           </div>
         </div>
-        <div className="w-full flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
-          <div className="text-xs text-gray-500">Dibatalkan</div>
-          <div className="mt-2 text-xl font-medium text-gray-900">
+        <div className="w-full flex-shrink-0 p-4 bg-white border border-gray-50 dark:border-none rounded-lg shadow-sm">
+          <div className="text-xs text-gray-500 dark:text-gray-300">
+            Dibatalkan
+          </div>
+          <div className="mt-2 text-xl font-medium text-gray-900 dark:text-gray-200">
             {summary.canceled || 0}
           </div>
         </div>
-        <div className="w-full flex-shrink-0 p-4 bg-white border rounded-lg shadow-sm">
-          <div className="text-xs text-gray-500">Kadaluarsa</div>
-          <div className="mt-2 text-xl font-medium text-gray-900">
+        <div className="w-full flex-shrink-0 p-4 bg-white border border-gray-50 dark:border-none rounded-lg shadow-sm">
+          <div className="text-xs text-gray-500 dark:text-gray-300">
+            Kadaluarsa
+          </div>
+          <div className="mt-2 text-xl font-medium text-gray-900 dark:text-gray-200">
             {summary.expired || 0}
           </div>
         </div>
@@ -210,16 +218,16 @@ const Invoice = () => {
               className={`bg-white dark:bg-slate-700 rounded-lg p-4 shadow-soft border border-slate-100 dark:border-slate-600`}
             >
               <div className="flex flex-col gap-1 items-start">
-                <div className="text-sm font-medium text-gray-900 truncate">
+                <div className="text-sm font-medium text-gray-900 dark:text-gray-200 truncate">
                   {inv.code}
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-gray-500 dark:text-gray-300">
                   Mulai: {formatDate(inv.invoice_date)} • Jatuh tempo:{" "}
                   {formatDate(inv.invoice_due_date)}
                 </div>
               </div>
 
-              <div className="text-sm font-medium text-gray-900 flex items-center gap-3 justify-between mt-3">
+              <div className="text-sm font-medium text-gray-900 dark:text-gray-200 flex items-center gap-3 justify-between mt-3">
                 <span
                   className={
                     dataStatus.find((item) => item.id === inv.status)?.color +
@@ -228,7 +236,7 @@ const Invoice = () => {
                 >
                   {dataStatus.find((item) => item.id === inv.status)?.name}
                 </span>
-                <span className="font-semibold text-lg text-[var(--c-primary)]">
+                <span className="font-semibold text-lg text-[var(--c-primary)] dark:text-blue-300">
                   {formatCurrency(inv.invoice_amount)}
                 </span>
               </div>
@@ -248,10 +256,10 @@ const Invoice = () => {
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-gray-200">
               Invoice
             </h1>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Daftar invoice dan detail transaksi
             </p>
           </div>

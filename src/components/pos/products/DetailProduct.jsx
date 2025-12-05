@@ -117,13 +117,17 @@ export default function DetailProduct() {
           </div>
           <div className="flex gap-2">
             <div className="w-full flex flex-col gap-1 justify-center items-start p-4 bg-white rounded-lg">
-              <h4 className="font-medium text-md">Harga Jual</h4>
+              <h4 className="font-medium text-gray-500 dark:text-gray-300 text-md">
+                Harga Jual
+              </h4>
               <h3 className="font-bold text-lg">
                 {formatCurrency(products?.cost_product)}
               </h3>
             </div>
             <div className="w-full flex flex-col gap-1 justify-center items-start p-4 bg-white rounded-lg">
-              <h4 className="font-medium text-md">Harga Beli</h4>
+              <h4 className="font-medium text-gray-500 dark:text-gray-300 text-md">
+                Harga Beli
+              </h4>
               <h3 className="font-bold text-lg">
                 {formatCurrency(products?.price_product)}
               </h3>
