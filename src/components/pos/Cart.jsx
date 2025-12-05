@@ -268,7 +268,7 @@ const Cart = () => {
                 />
                 <div key={cartItem?.id} className="flex flex-col">
                   <div className="font-bold text-base">
-                    {cartItem?.product?.name.slice(0, 20) + "..."}
+                    {cartItem?.product?.name.slice(0, 15) + "..."}
                   </div>
                   <div className="text-gray-700 dark:text-gray-200 text-md">
                     <h3 className="font-medium">
