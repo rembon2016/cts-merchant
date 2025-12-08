@@ -130,27 +130,20 @@ export default function DetailTransaction() {
                 /> */}
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <div>
+                    <div className="flex flex-col gap-1">
                       <div className="text-sm font-medium text-gray-800 dark:text-gray-200">
                         {it.product?.name || "Produk"}
                       </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-300 mt-1">
+                      <div className="text-xs text-gray-500 dark:text-gray-300">
                         Kode: {it.product?.code || "-"}
                       </div>
-                    </div>
-                    <div className="text-sm text-gray-700 dark:text-gray-200">
-                      {formatCurrency(Number(it.price))}
+                      <div className="text-sm text-gray-700 dark:text-gray-200">
+                        {formatCurrency(Number(it.price))} x {it.qty || 0} pcs
+                      </div>
                     </div>
                   </div>
-
-                  <div className="mt-2 flex items-center justify-between text-sm text-gray-600 dark:text-gray-300">
-                    <div>
-                      Jumlah:{" "}
-                      <span className="font-medium text-gray-800 dark:text-gray-200">
-                        {it.qty}
-                      </span>
-                    </div>
-                    <div>
+                  <div className="mt-3 flex items-center justify-between text-sm text-gray-600 dark:text-gray-300">
+                    <div className="w-full">
                       Subtotal:{" "}
                       <span className="font-medium text-gray-800 dark:text-gray-200">
                         {formatCurrency(Number(it.subtotal))}
