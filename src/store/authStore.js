@@ -137,8 +137,15 @@ export const useAuthStore = create((set, get) => ({
       const result = await response?.json();
 
       if (!response.ok) {
-        set({ error: result?.message, isLoading: false });
-        throw new Error(result?.message || "Registration failed");
+        const response500 = result?.code === 500;
+        const responseMessage = response500
+          ? "Terjadi kesalahan pada server"
+          : result?.message;
+        set({
+          error: responseMessage,
+          isLoading: false,
+        });
+        throw new Error(responseMessage);
       }
 
       const TOKEN = result?.data?.soundbox?.auth?.access_token;

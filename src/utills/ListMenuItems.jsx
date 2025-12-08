@@ -117,13 +117,39 @@ export const listMenuItems = (token) => {
     );
   };
 
+  const iconTransaction = () => {
+    return (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.75"
+          d="M3 7h13m0 0-3-3m3 3-3 3M21 17H8m0 0 3-3m-3 3 3 3"
+        />
+      </svg>
+    );
+  };
+
   const DATA_MENU = [
     {
-      id: "soundbox",
-      name: "Soundbox",
-      url: `${import.meta.env.VITE_BASE_URL_DEV}?user_token=${token}`,
-      icon: soundBoxIcon(),
+      id: "transaksi",
+      name: "Transaksi",
+      url: `/transaction`,
+      target: "_blank",
+      icon: iconTransaction(),
     },
+    // {
+    //   id: "soundbox",
+    //   name: "Soundbox",
+    //   url: `${import.meta.env.VITE_BASE_URL_DEV}?user_token=${token}`,
+    //   icon: soundBoxIcon(),
+    // },
     {
       id: "pos",
       name: "POS",
