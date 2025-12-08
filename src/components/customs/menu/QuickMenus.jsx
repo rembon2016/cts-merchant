@@ -40,22 +40,14 @@ const QuickMenus = () => {
       return;
     }
 
-    if (item.url === "/pos") {
-      navigate(item.url, { replace: true });
-      return;
-    }
-
-    if (item.url === "/invoice") {
-      navigate(item.url, { replace: true });
-      return;
-    }
-
-    if (item.url === "/customer-support") {
-      navigate(item.url, { replace: true });
-      return;
-    }
-
-    if (item.url === "/ppob") {
+    const internalPaths = [
+      "/pos",
+      "/transaction",
+      "/invoice",
+      "/customer-support",
+      "/ppob",
+    ];
+    if (internalPaths.includes(item.url)) {
       navigate(item.url, { replace: true });
       return;
     }
