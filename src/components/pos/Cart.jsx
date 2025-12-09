@@ -67,7 +67,8 @@ const Cart = () => {
         product_sku_id: Number.parseInt(itemSku),
         quantity: itemQuantity,
         price,
-        subtotal: price * itemQuantity,
+        subtotal,
+        // subtotal: price * itemQuantity,
       };
       setSelectedCart((prevItems) => [...prevItems, newItem]);
     } else {
@@ -108,7 +109,8 @@ const Cart = () => {
         product_id: item?.product_id ?? String(item?.id),
         name: item.product?.name,
         price: item?.product?.price_product,
-        subtotal: item?.product?.price_product * item?.quantity,
+        subtotal: item?.subtotal,
+        // subtotal: item?.product?.price_product * item?.quantity,
         image: item?.product?.image,
         product_sku_id: Number.parseInt(item?.product?.sku),
         quantity: item?.quantity,
@@ -253,7 +255,7 @@ const Cart = () => {
                   data-cartid={cartItem?.cart_id}
                   data-productid={cartItem?.product_id}
                   data-itemid={cartItem?.id}
-                  // data-subtotal={cartItem?.subtotal}
+                  data-subtotal={cartItem?.subtotal}
                   data-name={cartItem?.product?.name}
                   data-image={cartItem?.product?.image}
                   data-sku={cartItem?.product?.product_sku_id}
