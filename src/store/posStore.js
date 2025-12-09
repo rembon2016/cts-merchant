@@ -162,12 +162,12 @@ const usePosStore = create((set, get) => ({
     }
 
     // If product has general product_prices
-    if (product.product_prices?.length > 0) {
-      return Number.parseFloat(product.product_prices[0].price);
-    }
+    // if (product.product_prices?.length > 0) {
+    //   return Number.parseFloat(product.product_prices[0].price);
+    // }
 
     // Fallback to price_product
-    return Number.parseFloat(product.price_product || 0);
+    return Number.parseFloat(product?.price_product || 0);
   },
 
   // Get product stock

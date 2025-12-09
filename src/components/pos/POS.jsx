@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from "react";
-import { useThemeStore } from "../../store/themeStore";
 import { usePosStore } from "../../store/posStore";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useNavigate } from "react-router-dom";
@@ -40,7 +39,6 @@ export default function POS() {
 
   const LIMIT_DATA = 20;
 
-  const { isDark } = useThemeStore();
   const {
     categories,
     isLoading,
@@ -183,7 +181,7 @@ export default function POS() {
 
     return (
       <div className="grid grid-cols-2 gap-2">
-        {accumulatedData?.map((product, index) => {
+        {accumulatedData?.map((product) => {
           // const isLastProduct = products.length === index + 1;
           const productPrice = getProductPrice(product);
 

@@ -67,7 +67,7 @@ const Cart = () => {
         product_sku_id: Number.parseInt(itemSku),
         quantity: itemQuantity,
         price,
-        subtotal,
+        subtotal: price * itemQuantity,
       };
       setSelectedCart((prevItems) => [...prevItems, newItem]);
     } else {
@@ -107,8 +107,8 @@ const Cart = () => {
         item_id: item?.id, // Store the item ID separately
         product_id: item?.product_id ?? String(item?.id),
         name: item.product?.name,
-        price: item?.price,
-        subtotal: item?.subtotal,
+        price: item?.product?.price_product,
+        subtotal: item?.product?.price_product * item?.quantity,
         image: item?.product?.image,
         product_sku_id: Number.parseInt(item?.product?.sku),
         quantity: item?.quantity,
@@ -249,11 +249,11 @@ const Cart = () => {
                   type="checkbox"
                   name={cartItem?.product?.name}
                   id={cartItem?.product?.id}
-                  data-price={cartItem?.price}
+                  data-price={cartItem?.product?.price_product}
                   data-cartid={cartItem?.cart_id}
                   data-productid={cartItem?.product_id}
                   data-itemid={cartItem?.id}
-                  data-subtotal={cartItem?.subtotal}
+                  // data-subtotal={cartItem?.subtotal}
                   data-name={cartItem?.product?.name}
                   data-image={cartItem?.product?.image}
                   data-sku={cartItem?.product?.product_sku_id}
@@ -274,7 +274,7 @@ const Cart = () => {
                     <h3 className="font-medium">
                       {/* Harga:{" "} */}
                       <span className="text-gray-500 dark:text-gray-300 font-extrabold">
-                        {formatCurrency(cartItem?.price)}
+                        {formatCurrency(cartItem?.product?.price_product)}
                       </span>
                     </h3>
                   </div>
@@ -289,7 +289,9 @@ const Cart = () => {
                       // Ensure selectedCart is updated (add or update) so totals reflect quantity changes
                       setSelectedCart((prevItems) => {
                         const pid = cartItem?.product?.id ?? cartItem?.id;
-                        const price = Number(cartItem?.price ?? 0);
+                        const price = Number(
+                          cartItem?.product?.price_product ?? 0
+                        );
                         const subtotal = price * Number(newQty);
 
                         const matchByPid = (it) =>

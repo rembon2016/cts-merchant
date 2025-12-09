@@ -27,7 +27,7 @@ export default function FloatingButton({
     >
       <button
         onClick={handleOnClick}
-        className={`text-2xl w-16 h-16 bg-[var(--c-primary)] text-white rounded-full font-semibold hover:bg-blue-700  flex items-center justify-center shadow-xl shadow-blue-300/20 hover:shadow-none transition-all duration-500 ease-in-out ${buttonClassName}`}
+        className={`text-2xl w-16 h-16 bg-[var(--c-primary)] text-white rounded-full font-semibold hover:bg-blue-700  flex items-center justify-center shadow-xl shadow-blue-300/20 hover:shadow-none transition-all dark:bg-blue-600 dark:hover:bg-blue-700 duration-500 ease-in-out ${buttonClassName}`}
       >
         {isLoading ? (
           <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
