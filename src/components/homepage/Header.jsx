@@ -3,6 +3,7 @@ import { useThemeStore } from "../../store/themeStore";
 import { useCartStore } from "../../store/cartStore";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useMemo, useCallback } from "react";
+import { getInitials } from "../../helper/initials-name";
 
 const Header = () => {
   const { user } = useAuthStore();
@@ -15,8 +16,7 @@ const Header = () => {
   const detailProduct = location.pathname.includes("/product/");
 
   const getUserInfo = useCallback(() => {
-    const userInfo = JSON.parse(sessionStorage.getItem("authUser"));
-    return userInfo;
+    return JSON.parse(sessionStorage.getItem("authUser"));
   }, []);
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const Header = () => {
       <>
         <div className="flex items-center gap-3">
           <div className="size-9 rounded-full bg-[rgba(0,47,108,0.08)] text-primary dark:bg-slate-700 dark:text-blue-300 grid place-items-center font-semibold">
-            {user?.name[0]}
+            {getInitials(user?.name)}
           </div>
           <div className="text-sm leading-tight">
             <p className="text-slate-500 dark:text-slate-300 text-sm">
