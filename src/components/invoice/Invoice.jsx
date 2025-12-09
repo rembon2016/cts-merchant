@@ -25,7 +25,7 @@ const Invoice = () => {
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  const debouncedSearch = useDebounce(search || "", 500);
+  const debouncedSearch = useDebounce(search || "", 1000);
 
   const location = useLocation();
   const invoicePath = location.pathname.includes("/invoice");

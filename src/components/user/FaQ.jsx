@@ -55,7 +55,7 @@ export default function FaQ() {
   const toggleIndex = (idx) => dispatch({ type: TOGGLE_INDEX, payload: idx });
 
   // Debounce search query with 500ms delay
-  const debouncedSearch = useDebounce(state.searchQuery, 500);
+  const debouncedSearch = useDebounce(state.searchQuery, 1000);
 
   const navigate = useNavigate();
 

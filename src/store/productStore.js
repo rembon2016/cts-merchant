@@ -437,6 +437,17 @@ const useProductStore = create((set, get) => ({
         // delete editedPayload.stocks;
       }
 
+      if (Object.hasOwn(editedPayload, "prices")) {
+        // Map `prices` to `price_updates` and rename field `type` -> `tipe`
+        const priceUpdates = (editedPayload.prices || []).map((s) => {
+          const { type, ...rest } = s || {};
+          return {
+            ...rest,
+          };
+        });
+        editedPayload.price_updates = priceUpdates;
+      }
+
       // Detect if there is any File in the payload values
       const hasFile = Object.values(editedPayload || {}).some(
         (v) =>

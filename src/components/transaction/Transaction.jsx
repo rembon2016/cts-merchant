@@ -54,7 +54,7 @@ export default function Transaction() {
   const [accumulatedData, setAccumulatedData] = useState([]);
 
   // Debounce search query with 500ms delay
-  const debouncedSearch = useDebounce(state.searchQuery, 500);
+  const debouncedSearch = useDebounce(state.searchQuery, 1000);
 
   const headersApi = {
     "Content-Type": "application/json",

@@ -59,7 +59,7 @@ export default function POS() {
   } = usePosStore();
 
   // Debounce search input
-  const debouncedSearch = useDebounce(search, 500);
+  const debouncedSearch = useDebounce(search, 1000);
 
   const navigate = useNavigate();
 
