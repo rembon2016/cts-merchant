@@ -225,15 +225,14 @@ const BottomNav = () => {
       ];
 
       const response = await saveOrder(dataCheckout);
-      const responsePayment = await proccessPayment(dataPayment);
 
-      if (response?.success || responsePayment?.success) {
-        showSuccess("Pesanan berhasil diproses");
+      if (response?.success === true) {
+        await proccessPayment(dataPayment);
         // Clear carts based on unique cart_ids
         if (cartIds && cartIds?.length > 0) {
           await clearMultipleCarts(cartIds);
         }
-
+        showSuccess("Pesanan berhasil diproses");
         setTimeout(() => {
           navigation(`/pos/transaction/${response?.data?.id}`, {
             replace: true,
@@ -244,11 +243,13 @@ const BottomNav = () => {
         sessionStorage.removeItem("discount");
         sessionStorage.removeItem("totalPayment");
         clearDiscountData();
+      } else {
+        showError("Gagal memproses pesanan");
       }
 
       setLoading(false);
     } catch (error) {
-      showError("Gagal memproses pesanan");
+      console.log(error);
       setLoading(false);
     }
   };

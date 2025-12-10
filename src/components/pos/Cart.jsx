@@ -241,6 +241,7 @@ const Cart = () => {
           </div>
         </div>
         {cart?.data?.items?.map((cartItem) => {
+          console.log(cartItem);
           return (
             <div
               className="flex items-center justify-between gap-2 w-full my-6"
@@ -311,10 +312,7 @@ const Cart = () => {
                         // add new selected item (normalize shape)
                         const newItem = {
                           product_id: pid,
-                          product_sku_id:
-                            cartItem?.product_sku_id ??
-                            cartItem?.product?.sku ??
-                            null,
+                          product_sku_id: cartItem?.product_sku_id ?? null,
                           quantity: newQty,
                           name: cartItem?.product?.name || cartItem?.name || "",
                           image:
