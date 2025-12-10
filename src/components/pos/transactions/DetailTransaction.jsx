@@ -18,6 +18,7 @@ export default function DetailTransaction() {
   const pathname = globalThis.location.pathname;
 
   useEffect(() => {
+    if (!getIdFromUrl) return;
     if (pathname !== `/pos/transaction/${getIdFromUrl}`) return;
     getTransactionDetail(getIdFromUrl);
   }, [pathname, getIdFromUrl]);

@@ -139,7 +139,7 @@ const Profile = () => {
               </h2>
               <p className="text-slate-600 dark:text-slate-300">
                 Tenant:{" "}
-                <strong className="text-[var(--c-primary)] py-1 px-3 rounded-full bg-blue-200">
+                <strong className="text-[var(--c-primary)] dark:text-slate-200">
                   {user.tenant || "-"}
                 </strong>
               </p>
