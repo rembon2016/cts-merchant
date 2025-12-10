@@ -16,6 +16,8 @@ const Profile = () => {
     isLoading: loadTransaction,
   } = useTransactionStore();
 
+  console.log("User: ", user);
+
   const pathname = globalThis.location.pathname;
 
   const menuItems = [
@@ -138,12 +140,17 @@ const Profile = () => {
                 {user.name}
               </h2>
               <p className="text-slate-600 dark:text-slate-400">
-                Merchant Premium
+                Tenant:{" "}
+                <strong className="text-[var(--c-primary)] dark:text-blue-400">
+                  {user.tenant || "-"}
+                </strong>
               </p>
               <div className="flex items-center gap-2 mt-2">
-                <div className={`size-2 rounded-full bg-green-500`} />
+                <div
+                  className={`size-2 rounded-full bg-[var(--c-primary)] dark:bg-blue-400`}
+                />
                 <span
-                  className={`text-sm text-green-600 dark:text-green-400 font-medium`}
+                  className={`text-sm text-[var(--c-primary)] dark:text-blue-400 font-medium`}
                 >
                   {userStatus || "pending"}
                 </span>
