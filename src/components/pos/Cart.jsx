@@ -241,7 +241,6 @@ const Cart = () => {
           </div>
         </div>
         {cart?.data?.items?.map((cartItem) => {
-          console.log(cartItem);
           return (
             <div
               className="flex items-center justify-between gap-2 w-full my-6"
