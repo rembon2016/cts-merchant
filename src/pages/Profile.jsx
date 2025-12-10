@@ -16,8 +16,6 @@ const Profile = () => {
     isLoading: loadTransaction,
   } = useTransactionStore();
 
-  console.log("User: ", user);
-
   const pathname = globalThis.location.pathname;
 
   const menuItems = [
