@@ -36,7 +36,16 @@ export default function ProductForm({ editMode = false, productId = null }) {
     barcode: "",
     category_ids: [],
     brand_ids: [],
-    skus: [],
+    skus: [
+      {
+        sku: "",
+        barcode: "",
+        variant_name: "",
+        product_prices: [],
+        product_stocks: [],
+        is_active: "",
+      },
+    ],
     bundle_items: [],
     stocks: [
       {
@@ -57,7 +66,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
     ],
   });
 
-  const [adjustStocks, setAdjustStocks] = useState(false);
+  const adjustStocks = false;
   const [validationErrors, setValidationErrors] = useState({});
 
   const {
@@ -184,6 +193,8 @@ export default function ProductForm({ editMode = false, productId = null }) {
               sku: sku?.sku || "",
               barcode: sku?.barcode || "",
               variant_name: sku?.variant_name || "",
+              stocks: sku?.stocks || "",
+              prices: sku?.prices || "",
               is_active: !!sku?.is_active,
             }))
           : [],
@@ -279,44 +290,38 @@ export default function ProductForm({ editMode = false, productId = null }) {
 
   const validateForm = () => {
     const errors = {};
-    const isEmptyStr = (v) =>
-      v === undefined || v === null || String(v).trim() === "";
-    const isEmptyArr = (v) => !Array.isArray(v) || v.length === 0;
+    const empty = (v) => !v?.toString().trim();
+    const emptyArr = (v) => !Array.isArray(v) || !v.length;
 
-    // Basic required fields
-    if (isEmptyStr(formData.name)) errors.name = "Nama produk wajib diisi";
-    if (isEmptyStr(formData.code)) errors.code = "Kode produk wajib diisi";
-    if (isEmptyStr(formData.type_product_id))
+    // required fields
+    if (empty(formData.name)) errors.name = "Nama produk wajib diisi";
+    if (empty(formData.code)) errors.code = "Kode produk wajib diisi";
+    if (empty(formData.type_product_id))
       errors.type_product_id = "Tipe produk wajib dipilih";
-    if (isEmptyStr(formData.unit_id)) errors.unit_id = "Unit wajib dipilih";
-    if (isEmptyStr(formData.cost_product))
-      errors.cost_product = "Biaya wajib diisi";
-    if (isEmptyStr(formData.price_product))
+    if (empty(formData.unit_id)) errors.unit_id = "Unit wajib dipilih";
+    if (empty(formData.cost_product)) errors.cost_product = "Biaya wajib diisi";
+    if (empty(formData.price_product))
       errors.price_product = "Harga wajib diisi";
-    if (isEmptyStr(formData.minimum_sales_quantity))
+    if (empty(formData.minimum_sales_quantity))
       errors.minimum_sales_quantity = "Jumlah minimum penjualan wajib diisi";
-    if (isEmptyStr(formData.stok_alert))
+    if (empty(formData.stok_alert))
       errors.stok_alert = "Peringatan stok wajib diisi";
 
-    if (isEmptyArr(formData.category_ids))
+    if (emptyArr(formData.category_ids))
       errors.category_ids = "Kategori wajib di pilih";
-    if (isEmptyArr(formData.brand_ids)) errors.brand_ids = "Brand minimal 1";
+    if (emptyArr(formData.brand_ids)) errors.brand_ids = "Brand minimal 1";
 
-    // Prices are constructed from cost/price; above fields cover their requirement
-
-    // Stocks validation only in edit mode when user opts to adjust stocks
+    // stock adjustment (edit mode only)
     if (editMode && adjustStocks) {
-      const stock = Array.isArray(formData.stocks) ? formData.stocks[0] : null;
-      if (!stock) {
+      const stock = formData.stocks?.[0];
+      if (!stock || empty(stock.qty))
         errors["stocks.qty"] = "Data stok wajib diisi";
-      } else {
-        if (isEmptyStr(stock.branch_id))
+      if (stock) {
+        if (empty(stock.branch_id))
           errors["stocks.branch_id"] = "Cabang wajib diisi";
-        if (isEmptyStr(stock.qty))
-          errors["stocks.qty"] = "Kuantitas wajib diisi";
-        if (isEmptyStr(stock.reason))
-          errors["stocks.reason"] = "Alasan wajib diisi";
-        if (isEmptyStr(stock.type))
+        if (empty(stock.qty)) errors["stocks.qty"] = "Kuantitas wajib diisi";
+        if (empty(stock.reason)) errors["stocks.reason"] = "Alasan wajib diisi";
+        if (empty(stock.type))
           errors["stocks.type"] = "Tipe penyesuaian wajib dipilih";
       }
     }
@@ -345,6 +350,8 @@ export default function ProductForm({ editMode = false, productId = null }) {
       sku: sku?.sku || "",
       barcode: sku?.barcode || "",
       variant_name: sku?.variant_name || "",
+      prices: sku.prices || "",
+      stocks: sku.stocks || "",
       is_active: sku?.is_active ? 1 : 0,
     }));
 
@@ -358,6 +365,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
 
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
+      showError("Isi semua field yang wajib diisi");
       setValidationErrors(errors);
       return;
     }
@@ -418,6 +426,148 @@ export default function ProductForm({ editMode = false, productId = null }) {
       name: "Reduction",
     },
   ];
+
+  const elementSKUS = (item, index) => {
+    return (
+      <div className="flex flex-col gap-2 w-full" key={`sku-${index}`}>
+        <SimpleInput
+          name="skus.variant_name"
+          type="text"
+          label={"Nama Varian"}
+          value={item?.variant_name}
+          handleChange={(e) =>
+            handleNestedChange("skus", index, "variant_name", e.target.value)
+          }
+        />
+        <SimpleInput
+          name="skus.sku"
+          type="text"
+          label="SKU"
+          value={item?.sku}
+          handleChange={(e) =>
+            handleNestedChange("skus", index, "sku", e.target.value)
+          }
+        />
+        <SimpleInput
+          name="skus.stocks"
+          type="text"
+          label="Stok"
+          value={item?.stocks}
+          handleChange={(e) =>
+            handleNestedChange("skus", index, "stocks", e.target.value, true)
+          }
+        />
+        <SimpleInput
+          name="skus.prices"
+          type="text"
+          label="Harga"
+          value={item?.prices}
+          handleChange={(e) =>
+            handleNestedChange("skus", index, "prices", e.target.value, true)
+          }
+        />
+
+        <SimpleInput
+          name="skus.barcode"
+          type="text"
+          label="Barcode"
+          value={item?.barcode}
+          handleChange={(e) =>
+            handleNestedChange("skus", index, "barcode", e.target.value)
+          }
+        />
+        {editMode && (
+          <div className="p-4 flex items-center gap-2">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={!!item?.is_active}
+                onChange={() =>
+                  handleNestedChange(
+                    "skus",
+                    index,
+                    "is_active",
+                    !item?.is_active
+                  )
+                }
+                className="w-4 h-4"
+              />
+              <span className="text-sm">
+                Is Active?: {item?.is_active ? "Yes" : "No"}
+              </span>
+            </label>
+          </div>
+        )}
+        <button
+          type="button"
+          className="font-semibold bg-red-500 p-4 rounded-lg w-fit ml-auto mt-2 text-white"
+          onClick={() => handleRemoveItem("skus", index)}
+        >
+          {getTrashIcon}
+        </button>
+      </div>
+    );
+  };
+
+  const elementBundle = (item, index) => {
+    return (
+      <div className="flex flex-col gap-2 w-full" key={`bundle-${index}`}>
+        <SimpleInput
+          name="bundle_items.product_id"
+          type="text"
+          label={"Produk"}
+          value={item?.product_id}
+          handleChange={(e) =>
+            handleNestedChange(
+              "bundle_items",
+              index,
+              "product_id",
+              e.target.value
+            )
+          }
+          isSelectBox={true}
+          selectBoxData={products}
+        />
+        <SimpleInput
+          name="bundle_items.qty"
+          type={"text"}
+          label={"Kuantitas"}
+          value={item?.qty}
+          handleChange={(e) =>
+            handleNestedChange(
+              "bundle_items",
+              index,
+              "qty",
+              e.target.value,
+              true
+            )
+          }
+        />
+        <SimpleInput
+          name="bundle_items.price"
+          type="text"
+          label={"Harga"}
+          value={item?.price}
+          handleChange={(e) =>
+            handleNestedChange(
+              "bundle_items",
+              index,
+              "price",
+              e.target.value,
+              true
+            )
+          }
+        />
+        <button
+          type="button"
+          className="font-semibold bg-red-500 p-4 rounded-lg w-fit ml-auto mt-2 text-white"
+          onClick={() => handleRemoveItem("bundle_items", index)}
+        >
+          {getTrashIcon}
+        </button>
+      </div>
+    );
+  };
 
   const renderForm = useMemo(() => {
     return (
@@ -614,7 +764,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
         <SimpleInput
           name="stok_alert"
           type="text"
-          label={editMode ? "Stock Alert" : "Peringatan Stok"}
+          label={"Peringatan Stok"}
           value={formData?.stok_alert}
           handleChange={handleChange}
           errors={validationErrors.stok_alert}
@@ -622,64 +772,6 @@ export default function ProductForm({ editMode = false, productId = null }) {
         />
 
         <div className="mt-6 p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
-          {/* {editMode && (
-            <>
-              <h3 className="text-lg font-semibold mb-4">
-                Ingin menyesuaikan stok produk?
-              </h3>
-              <div className="flex gap-6 mb-4">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="adjust_stocks"
-                    value="yes"
-                    checked={!!adjustStocks}
-                    onChange={() => {
-                      setAdjustStocks(true);
-                      setFormData((prev) => ({
-                        ...prev,
-                        stocks:
-                          prev.stocks && prev.stocks.length > 0
-                            ? [
-                                {
-                                  branch_id:
-                                    prev.stocks[0]?.branch_id || activeBranch,
-                                  qty: prev.stocks[0]?.qty || "",
-                                  reason: prev.stocks[0]?.reason || "",
-                                  type: prev.stocks[0]?.type || "",
-                                },
-                              ]
-                            : [
-                                {
-                                  branch_id: activeBranch,
-                                  qty: "",
-                                  reason: "",
-                                  type: "",
-                                },
-                              ],
-                      }));
-                    }}
-                    className="w-4 h-4"
-                  />
-                  <span className="text-sm">Ya</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="adjust_stocks"
-                    value="no"
-                    checked={!adjustStocks}
-                    onChange={() => {
-                      setAdjustStocks(false);
-                    }}
-                    className="w-4 h-4"
-                  />
-                  <span className="text-sm">Tidak</span>
-                </label>
-              </div>
-            </>
-          )} */}
-
           <div className="flex flex-col gap-2">
             {formData?.stocks?.slice(0, 1).map((item, index) => (
               <div className="flex flex-col gap-2" key={`stock-${index}`}>
@@ -763,6 +855,8 @@ export default function ProductForm({ editMode = false, productId = null }) {
                               variant_name: "",
                               sku: "",
                               barcode: "",
+                              product_prices: [],
+                              product_stocks: [],
                               is_active: editMode ? false : true,
                             },
                           ],
@@ -793,79 +887,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
 
           {formData?.is_variant && (
             <div className="flex flex-col gap-2 mt-4">
-              {formData?.skus?.map((item, index) => (
-                <div
-                  className="flex flex-col gap-2 w-full"
-                  key={`sku-${index}`}
-                >
-                  <SimpleInput
-                    name="skus.variant_name"
-                    type="text"
-                    label={"Nama Varian"}
-                    value={item?.variant_name}
-                    handleChange={(e) =>
-                      handleNestedChange(
-                        "skus",
-                        index,
-                        "variant_name",
-                        e.target.value
-                      )
-                    }
-                  />
-                  <SimpleInput
-                    name="skus.sku"
-                    type="text"
-                    label="SKU"
-                    value={item?.sku}
-                    handleChange={(e) =>
-                      handleNestedChange("skus", index, "sku", e.target.value)
-                    }
-                  />
-                  <SimpleInput
-                    name="skus.barcode"
-                    type="text"
-                    label="Barcode"
-                    value={item?.barcode}
-                    handleChange={(e) =>
-                      handleNestedChange(
-                        "skus",
-                        index,
-                        "barcode",
-                        e.target.value
-                      )
-                    }
-                  />
-                  {editMode && (
-                    <div className="p-4 flex items-center gap-2">
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={!!item?.is_active}
-                          onChange={() =>
-                            handleNestedChange(
-                              "skus",
-                              index,
-                              "is_active",
-                              !item?.is_active
-                            )
-                          }
-                          className="w-4 h-4"
-                        />
-                        <span className="text-sm">
-                          Is Active?: {item?.is_active ? "Yes" : "No"}
-                        </span>
-                      </label>
-                    </div>
-                  )}
-                  <button
-                    type="button"
-                    className="font-semibold bg-red-500 p-4 rounded-lg w-fit ml-auto mt-2 text-white"
-                    onClick={() => handleRemoveItem("skus", index)}
-                  >
-                    {getTrashIcon}
-                  </button>
-                </div>
-              ))}
+              {formData?.skus?.map((item, index) => elementSKUS(item, index))}
               <button
                 type="button"
                 className="text-white font-semibold bg-[var(--c-primary)] py-4 px-6 rounded-lg w-fit ml-auto mt-4"
@@ -878,13 +900,15 @@ export default function ProductForm({ editMode = false, productId = null }) {
                         variant_name: "",
                         sku: "",
                         barcode: "",
+                        product_prices: [],
+                        product_stocks: [],
                         is_active: editMode ? false : true,
                       },
                     ],
                   }));
                 }}
               >
-                {editMode ? "+ Tambah Variant" : "+ Tambah Varian"}
+                {"+ Tambah Varian"}
               </button>
             </div>
           )}
@@ -943,66 +967,9 @@ export default function ProductForm({ editMode = false, productId = null }) {
 
           {formData?.is_bundle && (
             <div className="flex flex-col gap-2 mt-4">
-              {formData?.bundle_items?.map((item, index) => (
-                <div
-                  className="flex flex-col gap-2 w-full"
-                  key={`bundle-${index}`}
-                >
-                  <SimpleInput
-                    name="bundle_items.product_id"
-                    type="text"
-                    label={"Produk"}
-                    value={item?.product_id}
-                    handleChange={(e) =>
-                      handleNestedChange(
-                        "bundle_items",
-                        index,
-                        "product_id",
-                        e.target.value
-                      )
-                    }
-                    isSelectBox={true}
-                    selectBoxData={products}
-                  />
-                  <SimpleInput
-                    name="bundle_items.qty"
-                    type={"text"}
-                    label={"Kuantitas"}
-                    value={item?.qty}
-                    handleChange={(e) =>
-                      handleNestedChange(
-                        "bundle_items",
-                        index,
-                        "qty",
-                        e.target.value,
-                        true
-                      )
-                    }
-                  />
-                  <SimpleInput
-                    name="bundle_items.price"
-                    type="text"
-                    label={"Harga"}
-                    value={item?.price}
-                    handleChange={(e) =>
-                      handleNestedChange(
-                        "bundle_items",
-                        index,
-                        "price",
-                        e.target.value,
-                        true
-                      )
-                    }
-                  />
-                  <button
-                    type="button"
-                    className="font-semibold bg-red-500 p-4 rounded-lg w-fit ml-auto mt-2 text-white"
-                    onClick={() => handleRemoveItem("bundle_items", index)}
-                  >
-                    {getTrashIcon}
-                  </button>
-                </div>
-              ))}
+              {formData?.bundle_items?.map((item, index) =>
+                elementBundle(item, index)
+              )}
               <button
                 type="button"
                 className="text-white font-semibold bg-[var(--c-primary)] py-4 px-6 rounded-lg w-fit ml-auto mt-4"
