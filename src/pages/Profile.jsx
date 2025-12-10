@@ -16,8 +16,6 @@ const Profile = () => {
     isLoading: loadTransaction,
   } = useTransactionStore();
 
-  console.log("User: ", user);
-
   const pathname = globalThis.location.pathname;
 
   const menuItems = [
@@ -136,24 +134,24 @@ const Profile = () => {
             {user.avatar}
           </div> */}
             <div>
-              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-1">
                 {user.name}
               </h2>
-              <p className="text-slate-600 dark:text-slate-400">
+              <p className="text-slate-600 dark:text-slate-300">
                 Tenant:{" "}
-                <strong className="text-[var(--c-primary)] dark:text-blue-400">
+                <strong className="text-[var(--c-primary)] py-1 px-3 rounded-full bg-blue-200">
                   {user.tenant || "-"}
                 </strong>
               </p>
               <div className="flex items-center gap-2 mt-2">
-                <div
-                  className={`size-2 rounded-full bg-[var(--c-primary)] dark:bg-blue-400`}
-                />
-                <span
-                  className={`text-sm text-[var(--c-primary)] dark:text-blue-400 font-medium`}
+                <p
+                  className={`text-sm text-[var(--c-primary)] dark:text-slate-300 font-medium`}
                 >
-                  {userStatus || "pending"}
-                </span>
+                  Status Pengguna:{" "}
+                  <strong className="text-[var(--c-primary)] dark:text-slate-100">
+                    {userStatus || "Belum Ada Status"}
+                  </strong>
+                </p>
               </div>
             </div>
           </div>

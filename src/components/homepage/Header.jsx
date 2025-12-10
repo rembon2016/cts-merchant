@@ -28,14 +28,14 @@ const Header = () => {
     return (
       <>
         <div className="flex items-center gap-3">
-          <div className="size-9 rounded-full bg-[rgba(0,47,108,0.08)] text-primary dark:bg-slate-700 dark:text-blue-300 grid place-items-center font-semibold">
+          <div className="size-9 rounded-full bg-[rgba(0,47,108,0.08)] text-primary dark:bg-slate-700 dark:text-blue-300 grid place-items-center text-sm font-semibold">
             {getInitials(user?.name)}
           </div>
           <div className="text-sm leading-tight">
             <p className="text-slate-500 dark:text-slate-300 text-sm">
               Selamat Datang
             </p>
-            <p className="font-semibold dark:text-blue-400 text-primary">
+            <p className="font-semibold dark:text-blue-300 text-primary">
               {user?.name}
             </p>
           </div>
