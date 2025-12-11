@@ -72,9 +72,18 @@ export default function Checkout() {
   };
 
   const getTotalPrice = () => {
-    const total = checkoutPrice + TOTAL()?.taxPrice - getPriceWithDiscount();
-    sessionStorage.setItem("totalPayment", Math.ceil(total));
-    return Math.ceil(total);
+    let finalPrice;
+    if (
+      discountData &&
+      discountData?.discount_type === "fixed" &&
+      Number.parseInt(discountData?.discount_value) > checkoutPrice
+    ) {
+      finalPrice = 0;
+    } else {
+      finalPrice = checkoutPrice + TOTAL()?.taxPrice - getPriceWithDiscount();
+    }
+    sessionStorage.setItem("totalPayment", Math.ceil(finalPrice));
+    return Math.ceil(finalPrice);
   };
 
   useEffect(() => {

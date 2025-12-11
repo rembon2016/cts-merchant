@@ -192,7 +192,8 @@ const BottomNav = () => {
     const checkoutValue = {
       branch_id: sessionStorage.getItem("branchActive"),
       user_id: sessionStorage.getItem("userPosId"),
-      sub_total: Math.ceil(subTotalPrice),
+      sub_total: JSON.parse(sessionStorage.getItem("totalPayment")),
+      // sub_total: Math.ceil(subTotalPrice),
       tax_amount: taxAmount,
       discount_amount: discountAmount,
       payment_method_id: selectPaymentMethod,
