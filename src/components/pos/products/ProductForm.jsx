@@ -12,6 +12,7 @@ import { useCustomToast } from "../../../hooks/useCustomToast";
 import CustomToast from "../../customs/toast/CustomToast";
 import PrimaryButton from "../../customs/button/PrimaryButton";
 import BackButton from "../../customs/button/BackButton";
+import { ListStateForm } from "./ListStateForm";
 
 export default function ProductForm({ editMode = false, productId = null }) {
   const navigate = useNavigate();
@@ -19,52 +20,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
   const getToday = new Date().toISOString().split("T")[0];
   const activeBranch = sessionStorage.getItem("branchActive");
 
-  const [formData, setFormData] = useState({
-    code: "",
-    name: "",
-    description: "",
-    image: "",
-    type_product_id: "",
-    unit_id: "",
-    cost_product: "",
-    price_product: "",
-    minimum_sales_quantity: "",
-    stok_alert: "",
-    is_variant: false,
-    is_bundle: false,
-    sku: "",
-    barcode: "",
-    category_ids: [],
-    brand_ids: [],
-    skus: [
-      {
-        sku: "",
-        barcode: "",
-        variant_name: "",
-        product_prices: [],
-        product_stocks: [],
-        is_active: "",
-      },
-    ],
-    bundle_items: [],
-    stocks: [
-      {
-        branch_id: activeBranch,
-        qty: "",
-        reason: "",
-        type: "",
-      },
-    ],
-    prices: [
-      {
-        branch_id: activeBranch,
-        cost: "",
-        price: "",
-        effective_from: "",
-        effective_until: "",
-      },
-    ],
-  });
+  const [formData, setFormData] = useState(ListStateForm);
 
   const adjustStocks = false;
   const [validationErrors, setValidationErrors] = useState({});
@@ -365,7 +321,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
 
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
-      showError("Isi semua field yang wajib diisi");
+      showError("Isi semua inputan yang wajib diisi");
       setValidationErrors(errors);
       return;
     }
@@ -569,6 +525,30 @@ export default function ProductForm({ editMode = false, productId = null }) {
     );
   };
 
+  const handleAutoAddCategory = async (name) => {
+    const payload = {
+      name: name,
+      description: "",
+      image: "",
+    };
+
+    const res = await addCategories(payload);
+
+    if (res?.success) {
+      showSuccess(`Kategori "${name}" berhasil ditambahkan`);
+      await getCategories();
+
+      if (res?.data?.id) {
+        setFormData((prev) => ({
+          ...prev,
+          category_ids: [...(prev.category_ids || []), res.data],
+        }));
+      }
+    } else {
+      showError(res?.error || "Gagal menambahkan kategori");
+    }
+  };
+
   const renderForm = useMemo(() => {
     return (
       <div className="flex flex-col gap-3 mt-3 p-4">
@@ -637,6 +617,8 @@ export default function ProductForm({ editMode = false, productId = null }) {
             multiple={true}
             errors={validationErrors.category_ids}
             isRequired={true}
+            onAddItem={handleAutoAddCategory}
+            inputName="Kategori"
           />
         )}
 

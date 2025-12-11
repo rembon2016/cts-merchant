@@ -285,6 +285,7 @@ export default function POS() {
               ? `${import.meta.env.VITE_API_IMAGE}${selectedProduct.image}`
               : selectedProduct?.image,
           }}
+          isVariant={selectedProduct?.is_variant}
           // Hitung stok sesuai tipe produk (varian vs non-varian)
           stocks={
             selectedProduct?.is_variant

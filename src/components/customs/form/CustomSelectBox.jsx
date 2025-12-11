@@ -26,6 +26,8 @@ export default function CustomSelectBox({
   multiple = true,
   searchable = true,
   isRequired = false,
+  inputName,
+  onAddItem,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -91,6 +93,7 @@ export default function CustomSelectBox({
       else next.push(item);
       // return array of objects
       onChange && onChange(next);
+      setSearch("");
     } else {
       const next =
         selectedObjects.length && selectedObjects[0].id === itemId
@@ -179,19 +182,20 @@ export default function CustomSelectBox({
                   )}
                 </span>
               ))}
-              {(!multiple || selectedItems.length === 0) && searchable && (
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  onClick={(e) => e.stopPropagation()}
-                  placeholder={placeholder || "Pilih..."}
-                  disabled={disabled}
-                  className={`bg-transparent focus:outline-none text-sm w-full ${
-                    disabled ? "opacity-60" : ""
-                  }`}
-                />
-              )}
+              {(!multiple || selectedItems.length === 0 || multiple) &&
+                searchable && (
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
+                    placeholder={placeholder || "Pilih..."}
+                    disabled={disabled}
+                    className={`bg-transparent focus:outline-none text-sm w-full ${
+                      disabled ? "opacity-60" : ""
+                    }`}
+                  />
+                )}
             </div>
           ) : (
             <div className="flex items-center justify-between">
@@ -233,7 +237,22 @@ export default function CustomSelectBox({
           <ul role="listbox" className="p-2">
             {filtered.length === 0 && (
               <li className="px-3 py-2 text-sm text-slate-500">
-                Tidak ada data
+                {search && onAddItem ? (
+                  <button
+                    type="button"
+                    className="w-full text-left text-[var(--c-primary)] dark:text-blue-200 font-medium hover:underline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onAddItem(search);
+                      setIsOpen(false);
+                      setSearch("");
+                    }}
+                  >
+                    + Tambahkan {inputName} "{search}?"
+                  </button>
+                ) : (
+                  "Tidak ada data"
+                )}
               </li>
             )}
             {filtered.map((item, idx) => (
@@ -280,4 +299,7 @@ CustomSelectBox.propTypes = {
   errors: PropTypes.string,
   multiple: PropTypes.bool,
   searchable: PropTypes.bool,
+  onAddItem: PropTypes.func,
+  inputName: PropTypes.string,
+  isRequired: PropTypes.bool,
 };

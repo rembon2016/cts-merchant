@@ -18,6 +18,7 @@ BottomModal.propTypes = {
   data: PropTypes.object,
   isFromDetail: PropTypes.bool,
   mode: PropTypes.oneOf(["cart", "custom"]),
+  isVariant: PropTypes.bool,
   title: PropTypes.string,
   children: PropTypes.node,
 };
@@ -33,6 +34,7 @@ export default function BottomModal(props) {
     mode = "cart",
     title,
     children,
+    isVariant,
   } = props;
 
   const sheetRef = useRef(null);
@@ -119,6 +121,11 @@ export default function BottomModal(props) {
   const handleVariantSelect = (variant) => setSelectedVariant(variant);
 
   const handleAddToCart = async (data, variant, quantity, isFromDetail) => {
+    if (isVariant && selectedVariant === null) {
+      showError("Pilih Varian Produk");
+      return;
+    }
+
     try {
       if (filterLocalCartByProductId?.length > 0) {
         const cartItemId = filterLocalCartByProductId[0]?.cart_id;
