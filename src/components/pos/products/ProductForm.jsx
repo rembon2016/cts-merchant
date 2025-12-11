@@ -149,8 +149,8 @@ export default function ProductForm({ editMode = false, productId = null }) {
               sku: sku?.sku || "",
               barcode: sku?.barcode || "",
               variant_name: sku?.variant_name || "",
-              stocks: sku?.stocks || "",
-              prices: sku?.prices || "",
+              cost: sku?.cost || "",
+              price: sku?.price || "",
               is_active: !!sku?.is_active,
             }))
           : [],
@@ -165,14 +165,16 @@ export default function ProductForm({ editMode = false, productId = null }) {
       stocks:
         products?.stocks && products?.stocks.length > 0
           ? products?.stocks.map((stock) => ({
-              branch_id: stock?.branch_id || activeBranch,
+              branch_id:
+                Number.parseInt(stock?.branch_id) ||
+                Number.parseInt(activeBranch),
               qty: stock?.qty || "",
               reason: stock?.reason || "",
               type: stock?.type || "",
             }))
           : [
               {
-                branch_id: activeBranch,
+                branch_id: Number.parseInt(activeBranch),
                 qty: "",
                 reason: "",
                 type: "",
@@ -181,7 +183,9 @@ export default function ProductForm({ editMode = false, productId = null }) {
       prices:
         products?.prices && products?.prices.length > 0
           ? products?.prices.map((price) => ({
-              branch_id: price?.branch_id || activeBranch,
+              branch_id:
+                Number.parseInt(price?.branch_id) ||
+                Number.parseInt(activeBranch),
               cost: price?.cost || "",
               price: price?.price || "",
               effective_from: price?.effective_from || "",
@@ -189,7 +193,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
             }))
           : [
               {
-                branch_id: activeBranch,
+                branch_id: Number.parseInt(activeBranch),
                 cost: "",
                 price: "",
                 effective_from: "",
@@ -306,9 +310,13 @@ export default function ProductForm({ editMode = false, productId = null }) {
       sku: sku?.sku || "",
       barcode: sku?.barcode || "",
       variant_name: sku?.variant_name || "",
-      prices: sku.prices || "",
-      stocks: sku.stocks || "",
+      price: sku?.price || "",
+      cost: sku?.cost || "",
+      qty: sku?.qty || "",
       is_active: sku?.is_active ? 1 : 0,
+      branch_id: Number.parseInt(activeBranch),
+      effective_from: sku?.effective_from || "",
+      effective_until: sku?.effective_until || "",
     }));
 
     // For add mode, exclude `type` from stocks payload
@@ -339,7 +347,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
       stocks: editMode && adjustStocks ? stocksPayload : formData.stocks,
       prices: [
         {
-          branch_id: activeBranch,
+          branch_id: Number.parseInt(activeBranch),
           cost: formData.cost_product,
           price: formData.price_product,
           effective_from: getToday,
@@ -387,15 +395,6 @@ export default function ProductForm({ editMode = false, productId = null }) {
     return (
       <div className="flex flex-col gap-2 w-full" key={`sku-${index}`}>
         <SimpleInput
-          name="skus.variant_name"
-          type="text"
-          label={"Nama Varian"}
-          value={item?.variant_name}
-          handleChange={(e) =>
-            handleNestedChange("skus", index, "variant_name", e.target.value)
-          }
-        />
-        <SimpleInput
           name="skus.sku"
           type="text"
           label="SKU"
@@ -405,23 +404,75 @@ export default function ProductForm({ editMode = false, productId = null }) {
           }
         />
         <SimpleInput
-          name="skus.stocks"
+          name="skus.variant_name"
+          type="text"
+          label={"Nama Varian"}
+          value={item?.variant_name}
+          handleChange={(e) =>
+            handleNestedChange("skus", index, "variant_name", e.target.value)
+          }
+        />
+        <div className="flex gap-2">
+          <SimpleInput
+            name="skus.cost"
+            type="text"
+            label="Harga Beli"
+            value={item?.cost}
+            handleChange={(e) =>
+              handleNestedChange("skus", index, "cost", e.target.value, true)
+            }
+          />
+          <SimpleInput
+            name="skus.price"
+            type="text"
+            label="Harga Jual"
+            value={item?.price}
+            handleChange={(e) =>
+              handleNestedChange("skus", index, "price", e.target.value, true)
+            }
+          />
+        </div>
+        <SimpleInput
+          name="skus.qty"
           type="text"
           label="Stok"
-          value={item?.stocks}
+          value={item?.qty}
           handleChange={(e) =>
-            handleNestedChange("skus", index, "stocks", e.target.value, true)
+            handleNestedChange("skus", index, "qty", e.target.value, true)
           }
         />
-        <SimpleInput
-          name="skus.prices"
-          type="text"
-          label="Harga"
-          value={item?.prices}
-          handleChange={(e) =>
-            handleNestedChange("skus", index, "prices", e.target.value, true)
-          }
-        />
+        <div className="flex gap-2">
+          <SimpleInput
+            name="skus.effective_from"
+            type="date"
+            label="Berlaku Dari"
+            value={item?.effective_from}
+            handleChange={(e) =>
+              handleNestedChange(
+                "skus",
+                index,
+                "effective_from",
+                e.target.value
+              )
+            }
+            isDefaultSize={false}
+          />
+          <SimpleInput
+            name="skus.effective_until"
+            type="date"
+            label="Berlaku Sampai"
+            value={item?.effective_until}
+            handleChange={(e) =>
+              handleNestedChange(
+                "skus",
+                index,
+                "effective_until",
+                e.target.value
+              )
+            }
+            isDefaultSize={false}
+          />
+        </div>
 
         <SimpleInput
           name="skus.barcode"
@@ -837,8 +888,9 @@ export default function ProductForm({ editMode = false, productId = null }) {
                               variant_name: "",
                               sku: "",
                               barcode: "",
-                              product_prices: [],
-                              product_stocks: [],
+                              price: "",
+                              cost: "",
+                              qty: "",
                               is_active: editMode ? false : true,
                             },
                           ],
@@ -882,8 +934,9 @@ export default function ProductForm({ editMode = false, productId = null }) {
                         variant_name: "",
                         sku: "",
                         barcode: "",
-                        product_prices: [],
-                        product_stocks: [],
+                        price: "",
+                        cost: "",
+                        qty: "",
                         is_active: editMode ? false : true,
                       },
                     ],
