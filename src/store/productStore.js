@@ -656,7 +656,6 @@ const useProductStore = create((set, get) => ({
 
       set({
         isLoading: false,
-        products: result?.data,
         error: null,
         success: true,
       });
@@ -825,7 +824,7 @@ const useProductStore = create((set, get) => ({
         throw new Error(errorMessage);
       }
 
-      set({ data: result?.data, success: true });
+      set({ data: result?.data, success: true, isLoading: false });
       return result;
     } catch (error) {
       set({ error: error.message, isLoading: false });

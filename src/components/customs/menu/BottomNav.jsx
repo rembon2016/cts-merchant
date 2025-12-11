@@ -412,6 +412,7 @@ const BottomNav = () => {
     setShowExitModal(false);
     if (pendingPath) navigation(pendingPath);
     setPendingPath(null);
+    clearDiscountData();
   };
 
   const handleCloseExitModal = () => {

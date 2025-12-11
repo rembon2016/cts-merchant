@@ -51,7 +51,7 @@ export default function Checkout() {
   const getPriceWithDiscount = () => {
     let price;
 
-    if (discountData?.discount_type === "nominal") {
+    if (discountData?.discount_type === "fixed") {
       price = discountData?.discount_value || 0;
     } else {
       price = (checkoutPrice * discountData?.discount_value) / 100 || 0;
@@ -92,7 +92,7 @@ export default function Checkout() {
 
   const checkDiscountCode = async (e) => {
     e?.preventDefault();
-    const response = await checkVoucherDiscount(discountCode);
+    const response = await checkVoucherDiscount(discountCode?.toUpperCase());
 
     if (response?.success) {
       showSuccess("Voucher diskon berhasil ditemukan");
@@ -254,18 +254,6 @@ export default function Checkout() {
       </div>
 
       {renderElementsDetailTransaction}
-
-      {/* {showExitModal && (
-        <SimpleModal
-          onClose={() => setShowExitModal(false)}
-          handleClick={handleConfirmLeave}
-          title={"Konfirmasi Keluar"}
-          content={
-            "Anda yakin ingin meninggalkan halaman checkout? Keranjang sesi akan dihapus."
-          }
-          showButton={true}
-        />
-      )} */}
     </div>
   );
 }

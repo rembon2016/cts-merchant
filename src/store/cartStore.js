@@ -524,8 +524,8 @@ const useCartStore = create((set, get) => ({
 
       const result = await response.json();
 
-      set({ discountData: result?.data, isLoading: false });
-      return result?.data;
+      set({ discountData: result?.data, isLoading: false, success: true });
+      return result;
     } catch (error) {
       console.log(error.message);
       set({ error: error.message, isLoading: false });
