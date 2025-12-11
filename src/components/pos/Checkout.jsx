@@ -73,14 +73,17 @@ export default function Checkout() {
 
   const getTotalPrice = () => {
     let finalPrice;
-    if (
-      discountData &&
-      discountData?.discount_type === "fixed" &&
-      Number.parseInt(discountData?.discount_value) > checkoutPrice
-    ) {
-      finalPrice = 0;
+    if (discountData) {
+      if (
+        discountData?.discount_type === "fixed" &&
+        Number?.parseInt(discountData?.discount_value) > checkoutPrice
+      ) {
+        finalPrice = 0;
+      } else {
+        finalPrice = checkoutPrice + TOTAL()?.taxPrice - getPriceWithDiscount();
+      }
     } else {
-      finalPrice = checkoutPrice + TOTAL()?.taxPrice - getPriceWithDiscount();
+      finalPrice = checkoutPrice + TOTAL()?.taxPrice;
     }
     sessionStorage.setItem("totalPayment", Math.ceil(finalPrice));
     return Math.ceil(finalPrice);

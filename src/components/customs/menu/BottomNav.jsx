@@ -43,7 +43,6 @@ const BottomNav = () => {
   // Read tax and discount directly from sessionStorage here to avoid using
   // possibly-stale values captured earlier in the component lifecycle.
   const currentTax = sessionStorage.getItem("tax");
-  const currentDiscount = sessionStorage.getItem("discount");
 
   const taxAmount = Math.ceil(Number(currentTax || 0));
 
@@ -185,17 +184,14 @@ const BottomNav = () => {
     if (!getCart) return;
 
     setLoading(true);
-    // If discount exists in sessionStorage use its numeric value, otherwise 0
-    const discountAmount =
-      currentDiscount !== null ? Math.ceil(Number(currentDiscount)) : 0;
 
     const checkoutValue = {
       branch_id: sessionStorage.getItem("branchActive"),
       user_id: sessionStorage.getItem("userPosId"),
-      sub_total: JSON.parse(sessionStorage.getItem("totalPayment")),
-      // sub_total: Math.ceil(subTotalPrice),
+      sub_total: Math.ceil(subTotalPrice),
       tax_amount: taxAmount,
-      discount_amount: discountAmount,
+      discount_amount:
+        Math.ceil(Number(sessionStorage.getItem("discount"))) || 0,
       payment_method_id: selectPaymentMethod,
       payment_amount: JSON.parse(sessionStorage.getItem("totalPayment")),
       discount_id: null,
@@ -207,7 +203,8 @@ const BottomNav = () => {
       branch_id: sessionStorage.getItem("branchActive"),
       payment_amount: JSON.parse(sessionStorage.getItem("totalPayment")),
       payment_method_id: selectPaymentMethod,
-      discount_amount: discountAmount,
+      discount_amount:
+        Math.ceil(Number(sessionStorage.getItem("discount"))) || 0,
       tax_amount: taxAmount,
     };
 
