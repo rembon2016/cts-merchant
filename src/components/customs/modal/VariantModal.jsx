@@ -9,7 +9,6 @@ const VariantModal = ({ isOpen, onClose, product, onSelectVariant }) => {
   const [quantity, setQuantity] = useState(1);
   const { isDark } = useThemeStore();
   const { getProductPrice, getProductStock } = usePosStore();
-  const { addToCart, updateCartItem } = useCartStore();
 
   if (!isOpen || !product) return null;
 
