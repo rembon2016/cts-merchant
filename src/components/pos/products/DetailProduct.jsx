@@ -42,11 +42,7 @@ export default function DetailProduct() {
     if (response?.success === true) {
       setShowModal(false);
       showSuccess("Berhasil Menghapus Produk");
-      setTimeout(() => {
-        navigate("/pos/products", {
-          replace: true,
-        });
-      }, 2000);
+      navigate("/pos/products", { replace: true });
     } else {
       showError("Gagal Menghapus Produk");
       setShowModal(false);

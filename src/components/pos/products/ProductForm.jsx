@@ -18,9 +18,9 @@ export default function ProductForm({ editMode = false, productId = null }) {
   const navigate = useNavigate();
 
   const getToday = new Date().toISOString().split("T")[0];
-  const activeBranch = sessionStorage.getItem("branchActive");
+  const activeBranch = Number?.parseInt(sessionStorage?.getItem("branchActive") || 0);
 
-  const [formData, setFormData] = useState(ListStateForm);
+  const [formData, setFormData] = useState(ListStateForm(activeBranch));
 
   const adjustStocks = false;
   const [validationErrors, setValidationErrors] = useState({});
@@ -165,41 +165,22 @@ export default function ProductForm({ editMode = false, productId = null }) {
       stocks:
         products?.stocks && products?.stocks.length > 0
           ? products?.stocks.map((stock) => ({
-              branch_id:
-                Number.parseInt(stock?.branch_id) ||
-                Number.parseInt(activeBranch),
+              branch_id: activeBranch,
               qty: stock?.qty || "",
               reason: stock?.reason || "",
               type: stock?.type || "",
             }))
-          : [
-              {
-                branch_id: Number.parseInt(activeBranch),
-                qty: "",
-                reason: "",
-                type: "",
-              },
-            ],
+          : [],
       prices:
         products?.prices && products?.prices.length > 0
           ? products?.prices.map((price) => ({
-              branch_id:
-                Number.parseInt(price?.branch_id) ||
-                Number.parseInt(activeBranch),
+              branch_id: activeBranch,
               cost: price?.cost || "",
               price: price?.price || "",
               effective_from: price?.effective_from || "",
               effective_until: price?.effective_until || "",
             }))
-          : [
-              {
-                branch_id: Number.parseInt(activeBranch),
-                cost: "",
-                price: "",
-                effective_from: "",
-                effective_until: "",
-              },
-            ],
+          : [],
     };
 
     setFormData(mappedData);
@@ -277,8 +258,6 @@ export default function ProductForm({ editMode = false, productId = null }) {
       if (!stock || empty(stock.qty))
         errors["stocks.qty"] = "Data stok wajib diisi";
       if (stock) {
-        if (empty(stock.branch_id))
-          errors["stocks.branch_id"] = "Cabang wajib diisi";
         if (empty(stock.qty)) errors["stocks.qty"] = "Kuantitas wajib diisi";
         if (empty(stock.reason)) errors["stocks.reason"] = "Alasan wajib diisi";
         if (empty(stock.type))
@@ -314,18 +293,27 @@ export default function ProductForm({ editMode = false, productId = null }) {
       cost: sku?.cost || "",
       qty: sku?.qty || "",
       is_active: sku?.is_active ? 1 : 0,
-      branch_id: Number.parseInt(activeBranch),
+      branch_id: activeBranch,
       effective_from: sku?.effective_from || "",
       effective_until: sku?.effective_until || "",
     }));
 
     // For add mode, exclude `type` from stocks payload
     const stocksPayload = (formData.stocks || []).map((s) => ({
-      branch_id: s?.branch_id,
+      branch_id: activeBranch,
       qty: s?.qty,
       reason: s?.reason,
       ...(editMode ? { type: s?.type } : {}),
     }));
+
+    const pricePayload = [
+        {
+          cost: formData.cost_product,
+          price: formData.price_product,
+          effective_from: getToday,
+          effective_until: "01-01-2026",
+        },
+    ];
 
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
@@ -344,10 +332,10 @@ export default function ProductForm({ editMode = false, productId = null }) {
       is_bundle: formData.is_bundle ? 1 : 0,
       bundle_items: formData.is_bundle ? formData.bundle_items : [],
       skus: formData.is_variant ? skuForm : [],
-      stocks: editMode && adjustStocks ? stocksPayload : formData.stocks,
+      stocks: editMode ? stocksPayload : formData.stocks,
       prices: [
         {
-          branch_id: Number.parseInt(activeBranch),
+          branch_id: activeBranch,
           cost: formData.cost_product,
           price: formData.price_product,
           effective_from: getToday,

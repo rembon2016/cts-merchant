@@ -155,6 +155,13 @@ const BottomNav = () => {
     },
   ];
 
+  const removeSessionStorage = () => {
+    sessionStorage.removeItem("cart");
+    sessionStorage.removeItem("tax");
+    sessionStorage.removeItem("discount");
+    sessionStorage.removeItem("totalPayment");
+  }
+
   const handleSubmit = () => {
     if (pathname === "/cart") {
       processCart();
@@ -230,16 +237,10 @@ const BottomNav = () => {
         if (cartIds && cartIds?.length > 0) {
           await clearMultipleCarts(cartIds);
         }
+        const idProduct = response?.data?.id;
         showSuccess("Pesanan berhasil diproses");
-        setTimeout(() => {
-          navigation(`/pos/transaction/${response?.data?.id}`, {
-            replace: true,
-          });
-        }, 2000);
-        sessionStorage.removeItem("cart");
-        sessionStorage.removeItem("tax");
-        sessionStorage.removeItem("discount");
-        sessionStorage.removeItem("totalPayment");
+        navigation(`/pos/transaction/${idProduct}`, { replace: true });
+        removeSessionStorage()
         clearDiscountData();
       } else {
         showError("Gagal memproses pesanan");
@@ -402,10 +403,7 @@ const BottomNav = () => {
   // Modal confirm handlers
   const handleConfirmExit = () => {
     // clear session cart and selectedCart then navigate
-    sessionStorage.removeItem("cart");
-    sessionStorage.removeItem("discount");
-    sessionStorage.removeItem("tax");
-    sessionStorage.removeItem("totalPayment");
+    removeSessionStorage()
     setSelectedCart([]);
     setShowExitModal(false);
     if (pendingPath) navigation(pendingPath);

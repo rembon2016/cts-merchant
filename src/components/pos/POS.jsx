@@ -53,6 +53,7 @@ export default function POS() {
     getProductPrice,
     getProductStock,
     getTotalVariantStock,
+    getSingleVariantStock,
     hasAvailableStock,
     totalProducts,
     currentPage,
@@ -292,7 +293,7 @@ export default function POS() {
           // Hitung stok sesuai tipe produk (varian vs non-varian)
           stocks={
             selectedProduct?.is_variant
-              ? getTotalVariantStock(selectedProduct)
+              ? getSingleVariantStock(selectedProduct)
               : getProductStock(selectedProduct)
           }
           onItemClick={() => setShowVariantModal(false)}

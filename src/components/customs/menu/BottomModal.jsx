@@ -52,7 +52,7 @@ export default function BottomModal(props) {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [formData, setFormData] = useState({
     kuantitas: 1,
-    harga: data?.price_product || 0,
+    harga: selectedVariant !== null ? selectedVariant?.product_prices[0].price : data?.price_product || 0,
   });
 
   const [quantity, setQuantity] = useState(1);
@@ -154,10 +154,11 @@ export default function BottomModal(props) {
     }
   };
 
+  
   const getVariantPrice = (variant) => {
     return getProductPrice(data, variant?.id);
   };
-
+  
   const getVariantStock = (variant) => {
     return getProductStock(data, variant?.id, isFromDetail);
   };
@@ -239,7 +240,17 @@ export default function BottomModal(props) {
     );
   }, [data, selectedVariant, quantity, isDark]);
 
-  const totalPrice = formatCurrency(formData?.harga * quantity);
+  const totalPrice = useMemo(() => {
+    return data?.is_variant &&selectedVariant !== null ? formatCurrency(selectedVariant?.product_prices[0]?.price * quantity) : data?.is_variant && selectedVariant === null ? 0 : formatCurrency(formData?.harga * quantity)
+  }, [selectedVariant, quantity, formData]);
+
+  const getPriceToDisplay = useMemo(() => {
+    return data?.is_variant && selectedVariant !== null ? formatCurrency(selectedVariant?.product_prices[0]?.price) : data?.is_variant && selectedVariant === null ? 0 : formatCurrency(data?.price_product)
+  }, [data, selectedVariant])
+
+  const getStockToDisplay = useMemo(() => {
+    return data?.is_variant && selectedVariant !== null ? selectedVariant?.product_stocks[0]?.qty : data?.is_variant && selectedVariant === null ? 0 : stocks
+  }, [data, selectedVariant, stocks])
 
   useEffect(() => {
     if (!isOpen) setQuantity(1);
@@ -321,7 +332,7 @@ export default function BottomModal(props) {
                             isDark && "text-blue-300"
                           }`}
                         >
-                          {formatCurrency(data?.price_product)}
+                          {getPriceToDisplay}
                         </span>
                       </h3>
                     </div>
@@ -341,7 +352,7 @@ export default function BottomModal(props) {
                       <ButtonQuantity
                         quantity={quantity}
                         setQuantity={setQuantity}
-                        stocks={stocks}
+                        stocks={getStockToDisplay}
                         style={{
                           marginTop: "20px",
                         }}
