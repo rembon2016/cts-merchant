@@ -4,7 +4,6 @@ import { useProductStore } from "../../store/productStore";
 import { useThemeStore } from "../../store/themeStore";
 import { formatCurrency } from "../../helper/currency";
 import { ShoppingCart } from "lucide-react";
-import CustomLoading from "../customs/loading/CustomLoading";
 import BottomModal from "../customs/menu/BottomModal";
 import BackButton from "../customs/button/BackButton";
 import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";

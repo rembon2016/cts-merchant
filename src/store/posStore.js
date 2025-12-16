@@ -172,9 +172,7 @@ const usePosStore = create((set, get) => ({
     if (!branchId) return 0;
 
     if (!isFromDetail && product?.is_variant && skuId) {
-      const stock = product?.skus?.find(
-        (s) => s?.id === skuId
-      );
+      const stock = product?.skus?.find((s) => s?.id === skuId);
 
       return stock ? stock.product_stocks[0].qty : 0;
     }

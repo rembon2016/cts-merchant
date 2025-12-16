@@ -52,7 +52,10 @@ export default function BottomModal(props) {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [formData, setFormData] = useState({
     kuantitas: 1,
-    harga: selectedVariant !== null ? selectedVariant?.product_prices[0].price : data?.price_product || 0,
+    harga:
+      selectedVariant !== null
+        ? selectedVariant?.product_prices[0].price
+        : data?.price_product || 0,
   });
 
   const [quantity, setQuantity] = useState(1);
@@ -154,11 +157,10 @@ export default function BottomModal(props) {
     }
   };
 
-  
   const getVariantPrice = (variant) => {
     return getProductPrice(data, variant?.id);
   };
-  
+
   const getVariantStock = (variant) => {
     return getProductStock(data, variant?.id, isFromDetail);
   };
@@ -241,16 +243,28 @@ export default function BottomModal(props) {
   }, [data, selectedVariant, quantity, isDark]);
 
   const totalPrice = useMemo(() => {
-    return data?.is_variant &&selectedVariant !== null ? formatCurrency(selectedVariant?.product_prices[0]?.price * quantity) : data?.is_variant && selectedVariant === null ? 0 : formatCurrency(formData?.harga * quantity)
+    return data?.is_variant && selectedVariant !== null
+      ? formatCurrency(selectedVariant?.product_prices[0]?.price * quantity)
+      : data?.is_variant && selectedVariant === null
+      ? 0
+      : formatCurrency(formData?.harga * quantity);
   }, [selectedVariant, quantity, formData]);
 
   const getPriceToDisplay = useMemo(() => {
-    return data?.is_variant && selectedVariant !== null ? formatCurrency(selectedVariant?.product_prices[0]?.price) : data?.is_variant && selectedVariant === null ? 0 : formatCurrency(data?.price_product)
-  }, [data, selectedVariant])
+    return data?.is_variant && selectedVariant !== null
+      ? formatCurrency(selectedVariant?.product_prices[0]?.price)
+      : data?.is_variant && selectedVariant === null
+      ? 0
+      : formatCurrency(data?.price_product);
+  }, [data, selectedVariant]);
 
   const getStockToDisplay = useMemo(() => {
-    return data?.is_variant && selectedVariant !== null ? selectedVariant?.product_stocks[0]?.qty : data?.is_variant && selectedVariant === null ? 0 : stocks
-  }, [data, selectedVariant, stocks])
+    return data?.is_variant && selectedVariant !== null
+      ? selectedVariant?.product_stocks[0]?.qty
+      : data?.is_variant && selectedVariant === null
+      ? 0
+      : stocks;
+  }, [data, selectedVariant, stocks]);
 
   useEffect(() => {
     if (!isOpen) setQuantity(1);
