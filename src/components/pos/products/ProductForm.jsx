@@ -229,10 +229,23 @@ export default function ProductForm({ editMode = false, productId = null }) {
     );
   }, []);
 
+  const tipeData = [
+    {
+      id: "addition",
+      name: "Addition",
+    },
+    {
+      id: "reduction",
+      name: "Reduction",
+    },
+  ];
+
   const validateForm = () => {
     const errors = {};
     const empty = (v) => !v?.toString().trim();
     const emptyArr = (v) => !Array.isArray(v) || !v.length;
+
+    const newArraySKUS = formData?.skus.map(({ is_active, barcode, ...rest }) => rest);
 
     // required fields
     if (empty(formData.name)) errors.name = "Nama produk wajib diisi";
@@ -262,6 +275,15 @@ export default function ProductForm({ editMode = false, productId = null }) {
         if (empty(stock.reason)) errors["stocks.reason"] = "Alasan wajib diisi";
         if (empty(stock.type))
           errors["stocks.type"] = "Tipe penyesuaian wajib dipilih";
+      }
+    }
+
+    if (formData.is_variant) {
+      const hasValidSku = newArraySKUS.every(sku =>
+        Object.values(sku).every(val => !empty(val))
+      );
+      if(!hasValidSku) {
+        errors.skus = "Data SKU wajib di isi"
       }
     }
 
@@ -305,15 +327,6 @@ export default function ProductForm({ editMode = false, productId = null }) {
       reason: s?.reason,
       ...(editMode ? { type: s?.type } : {}),
     }));
-
-    const pricePayload = [
-        {
-          cost: formData.cost_product,
-          price: formData.price_product,
-          effective_from: getToday,
-          effective_until: "01-01-2026",
-        },
-    ];
 
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
@@ -368,17 +381,6 @@ export default function ProductForm({ editMode = false, productId = null }) {
     }
   };
 
-  const tipeData = [
-    {
-      id: "addition",
-      name: "Addition",
-    },
-    {
-      id: "reduction",
-      name: "Reduction",
-    },
-  ];
-
   const elementSKUS = (item, index) => {
     return (
       <div className="flex flex-col gap-2 w-full" key={`sku-${index}`}>
@@ -390,6 +392,8 @@ export default function ProductForm({ editMode = false, productId = null }) {
           handleChange={(e) =>
             handleNestedChange("skus", index, "sku", e.target.value)
           }
+          isRequired={true}
+          errors={validationErrors.sku}
         />
         <SimpleInput
           name="skus.variant_name"
@@ -399,6 +403,8 @@ export default function ProductForm({ editMode = false, productId = null }) {
           handleChange={(e) =>
             handleNestedChange("skus", index, "variant_name", e.target.value)
           }
+          isRequired={true}
+          errors={validationErrors.variant_name}
         />
         <div className="flex gap-2">
           <SimpleInput
@@ -409,6 +415,8 @@ export default function ProductForm({ editMode = false, productId = null }) {
             handleChange={(e) =>
               handleNestedChange("skus", index, "cost", e.target.value, true)
             }
+            isRequired={true}
+            errors={validationErrors.cost}
           />
           <SimpleInput
             name="skus.price"
@@ -418,6 +426,8 @@ export default function ProductForm({ editMode = false, productId = null }) {
             handleChange={(e) =>
               handleNestedChange("skus", index, "price", e.target.value, true)
             }
+            isRequired={true}
+            errors={validationErrors.price}
           />
         </div>
         <SimpleInput
@@ -428,6 +438,8 @@ export default function ProductForm({ editMode = false, productId = null }) {
           handleChange={(e) =>
             handleNestedChange("skus", index, "qty", e.target.value, true)
           }
+          isRequired={true}
+          errors={validationErrors.qty}
         />
         <div className="flex gap-2">
           <SimpleInput
@@ -444,6 +456,8 @@ export default function ProductForm({ editMode = false, productId = null }) {
               )
             }
             isDefaultSize={false}
+            isRequired={true}
+            errors={validationErrors.effective_from}
           />
           <SimpleInput
             name="skus.effective_until"
@@ -459,6 +473,8 @@ export default function ProductForm({ editMode = false, productId = null }) {
               )
             }
             isDefaultSize={false}
+            isRequired={true}
+            errors={validationErrors.effective_until}
           />
         </div>
 

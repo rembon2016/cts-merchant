@@ -200,9 +200,7 @@ const InvoiceForm = () => {
         typeof success === "string" ? success : "Invoices Berhasil Dibuat"
       );
 
-      setTimeout(() => {
-        navigate("/invoice", { replace: true });
-      }, 3000);
+      navigate("/invoice", { replace: true });
 
       setSelectedData({
         customer_name: "",
