@@ -168,10 +168,10 @@ export default function DetailProduct() {
                   </div>
                 </div>
               ))}
+            <h5 className="font-semibold text-gray-500 mt-2">Varian</h5>
             {products?.skus?.length > 0 &&
               products?.skus.map((item) => (
                 <div className="flex flex-col gap-2" key={item?.id}>
-                  <h5 className="font-semibold text-gray-500 mt-2">Varian</h5>
                   <div className="flex justify-between bg-white p-4 rounded-md">
                     <h3 className="font-medium text-md">Nama Variant </h3>
                     <h3 className="font-bold text-md">{item?.variant_name}</h3>
