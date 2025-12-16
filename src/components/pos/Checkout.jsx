@@ -247,6 +247,12 @@ export default function Checkout() {
                 </p>
               )}
             </div>
+            {discountData.length !== 0 && (
+            <div className="flex flex-col gap-2 my-2 p-4 rounded-lg border-2 border-dashed border-blue-300 bg-blue-500/20">
+              <h3 className="font-regular text-sm text-[var(--c-primary)]">Anda mendapatkan diskon sebesar</h3>
+              <h1 className="font-extrabold text-3xl text-[var(--c-primary)]">{discountData?.discount_type === "percentage" ? discountData?.discount_value + "%" : formatCurrency(discountData?.discount_value)}</h1>
+            </div>
+            )}
           </div>
         </div>
       </div>
