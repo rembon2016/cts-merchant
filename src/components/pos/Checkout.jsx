@@ -128,17 +128,35 @@ export default function Checkout() {
             </h4>
             <h4 className="font-bold text-gray-700 text-md">BRG-001-2K25</h4>
           </div> */}
+
           <div className="flex justify-between items-center">
             <h4 className="font-semibold text-gray-500 dark:text-gray-400 text-md">
-              Harga Barang (
-              {Math.max(
-                getCart?.items?.length > 0 ? getCart?.items?.length : 0
-              ) || 0}
-              )
+              Harga Barang
             </h4>
             <h4 className="font-bold text-gray-700 dark:text-gray-200 text-md">
               {formatCurrency(checkoutPrice)}
             </h4>
+          </div>
+          <div className="flex justify-between items-center">
+            <h4 className="font-semibold text-gray-500 dark:text-gray-400 text-md">
+              Jumlah Barang
+            </h4>
+            <h4 className="font-bold text-gray-700 dark:text-gray-200 text-md">
+              {getCart?.items?.length > 0 ? getCart?.items?.length : 0}
+            </h4>
+          </div>
+          <div className="flex justify-center flex-col">
+            <h4 className="font-semibold text-gray-500 dark:text-gray-400 text-md">
+              Daftar Barang
+            </h4>
+            {getCart?.items?.map((item) => (
+              <h4 className="font-semibold text-[var(--c-primary)] dark:text-gray-200 text-sm">
+                {" - "}
+                {item?.name}{" "}
+                {item?.variant_name ? `- ${item?.variant_name}` : ""} x{" "}
+                {item?.quantity}
+              </h4>
+            ))}
           </div>
           <div className="flex justify-between items-center">
             <h4 className="font-semibold text-gray-500 dark:text-gray-400 text-md">
