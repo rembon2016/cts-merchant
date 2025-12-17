@@ -54,7 +54,11 @@ export default function BottomModal(props) {
     kuantitas: 1,
     harga:
       selectedVariant !== null
-        ? selectedVariant?.product_prices[0].price
+        ? !isFromDetail
+          ? selectedVariant?.product_prices?.map(
+              (itemPrice) => itemPrice?.price
+            )
+          : selectedVariant?.productPrices?.map((itemPrice) => itemPrice?.price)
         : data?.price_product || 0,
   });
 
@@ -256,7 +260,15 @@ export default function BottomModal(props) {
 
   const totalPrice = useMemo(() => {
     return data?.is_variant && selectedVariant !== null
-      ? formatCurrency(selectedVariant?.product_prices[0]?.price * quantity)
+      ? formatCurrency(
+          !isFromDetail
+            ? selectedVariant?.product_prices?.map(
+                (itemPrice) => itemPrice?.price * quantity
+              )
+            : selectedVariant?.productPrices?.map(
+                (itemPrice) => itemPrice?.price * quantity
+              )
+        )
       : data?.is_variant && selectedVariant === null
       ? 0
       : formatCurrency(formData?.harga * quantity);
@@ -264,7 +276,15 @@ export default function BottomModal(props) {
 
   const getPriceToDisplay = useMemo(() => {
     return data?.is_variant && selectedVariant !== null
-      ? formatCurrency(selectedVariant?.product_prices[0]?.price)
+      ? formatCurrency(
+          !isFromDetail
+            ? selectedVariant?.product_prices?.map(
+                (itemPrice) => itemPrice?.price
+              )
+            : selectedVariant?.productPrices?.map(
+                (itemPrice) => itemPrice?.price
+              )
+        )
       : data?.is_variant && selectedVariant === null
       ? 0
       : formatCurrency(data?.price_product);
@@ -272,7 +292,9 @@ export default function BottomModal(props) {
 
   const getStockToDisplay = useMemo(() => {
     return data?.is_variant && selectedVariant !== null
-      ? selectedVariant?.product_stocks[0]?.qty
+      ? !isFromDetail
+        ? selectedVariant?.product_stocks?.map((itemStock) => itemStock?.qty)
+        : selectedVariant?.productStocks?.map((itemStock) => itemStock?.qty)
       : data?.is_variant && selectedVariant === null
       ? 0
       : stocks;
