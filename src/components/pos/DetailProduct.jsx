@@ -16,7 +16,9 @@ export default function DetailProduct() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const productStock = products?.stocks?.reduce((a, b) => a + b.qty, 0);
-
+  const variantStock = products?.skus?.map((sku) =>
+    sku?.productStocks?.reduce((a, b) => a + b.qty, 0)
+  );
   const location = useLocation();
   const pathname = location.pathname;
   // For variant products, show total stock across all variants
@@ -91,17 +93,6 @@ export default function DetailProduct() {
               <ShoppingCart className="w-5 h-5" />
               Masukkan Keranjang
             </button>
-            {/* <button
-              className={`w-20 h-16 rounded-full border-2 border-gray-500 flex justify-center items-center transition-colors gap-2`}
-              onClick={() => setIsSheetOpen(true)}
-              disabled={isLoading}
-            >
-              <img
-                src={`${isDark ? "/icons/cart-white.svg" : "/icons/cart.svg"}`}
-                alt="Add to cart"
-                className="w-8 h-8"
-              />
-            </button> */}
           </div>
         </div>
 
@@ -109,7 +100,7 @@ export default function DetailProduct() {
           isOpen={isSheetOpen}
           onClose={() => setIsSheetOpen(false)}
           data={products}
-          stocks={productStock}
+          stocks={products?.is_variant ? variantStock : productStock}
           onItemClick={() => setIsSheetOpen(false)}
           isFromDetail={true}
         />

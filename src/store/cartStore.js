@@ -239,6 +239,8 @@ const useCartStore = create((set, get) => ({
             result?.data?.items?.map((cartItem) => ({
               cart_id: cartItem?.id,
               product_id: cartItem?.product_id,
+              is_variant: cartItem?.product?.is_variant,
+              variant_id: cartItem?.product_sku_id,
             }))
           )
         );
@@ -280,6 +282,8 @@ const useCartStore = create((set, get) => ({
             result?.data?.items?.map((cartItem) => ({
               cart_id: cartItem?.id,
               product_id: cartItem?.product_id,
+              is_variant: cartItem?.product?.is_variant,
+              variant_id: cartItem?.product_sku_id,
             }))
           )
         );

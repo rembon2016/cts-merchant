@@ -105,20 +105,25 @@ const Cart = () => {
     }
 
     if (isChecked) {
-      const allItems = cart?.data?.items?.map((item) => ({
-        cart_id: item?.cart_id, // Use the main cart ID, not item ID
-        item_id: item?.id, // Store the item ID separately
-        product_id: item?.product_id ?? String(item?.id),
-        name: item.product?.name,
-        price: item?.product?.is_variant
-          ? item?.product_sku?.product_prices[0]?.price
-          : item?.product?.price_product,
-        subtotal: item?.subtotal,
-        image: item?.product?.image,
-        product_sku_id: Number.parseInt(item?.product_sku_id) || null,
-        variant_name: item?.product_sku?.variant_name || null,
-        quantity: item?.quantity,
-      }));
+      const allItems = cart?.data?.items?.map((item) => {
+        const variantPrice = item?.product_sku?.product_prices?.map(
+          (priceItem) => priceItem?.price
+        );
+        return {
+          cart_id: item?.cart_id, // Use the main cart ID, not item ID
+          item_id: item?.id, // Store the item ID separately
+          product_id: item?.product_id ?? String(item?.id),
+          name: item.product?.name,
+          price: item?.product?.is_variant
+            ? Number(variantPrice)
+            : item?.product?.price_product,
+          subtotal: item?.subtotal,
+          image: item?.product?.image,
+          product_sku_id: Number.parseInt(item?.product_sku_id) || null,
+          variant_name: item?.product_sku?.variant_name || null,
+          quantity: item?.quantity,
+        };
+      });
       setSelectedCart(allItems);
     } else {
       setSelectedCart([]);
@@ -245,8 +250,11 @@ const Cart = () => {
           </div>
         </div>
         {cart?.data?.items?.map((cartItem) => {
+          const variantPrice = cartItem?.product_sku?.product_prices?.map(
+            (priceItem) => priceItem?.price
+          );
           const priceProduct = cartItem?.product?.is_variant
-            ? cartItem?.product_sku?.product_prices[0]?.price
+            ? variantPrice
             : cartItem?.product?.price_product;
           return (
             <div

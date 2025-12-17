@@ -69,9 +69,16 @@ export default function BottomModal(props) {
     }
   })();
 
-  const filterLocalCartByProductId = cartItemIds.filter(
-    (cartItem) => cartItem?.product_id === data?.id
-  );
+  const filterLocalCartByProductId = cartItemIds.filter((cartItem) => {
+    const cartProductId = cartItem?.product_id === data?.id;
+    const cartVariantId = cartItem?.variant_id === selectedVariant?.id;
+
+    if (data?.is_variant) {
+      return cartProductId && cartVariantId;
+    } else {
+      return cartProductId;
+    }
+  });
 
   useEffect(() => {
     if (isOpen) {

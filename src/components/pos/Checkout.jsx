@@ -130,7 +130,11 @@ export default function Checkout() {
           </div> */}
           <div className="flex justify-between items-center">
             <h4 className="font-semibold text-gray-500 dark:text-gray-400 text-md">
-              Harga Barang ({Math.max(getCart?.items?.length > 0) || 0})
+              Harga Barang (
+              {Math.max(
+                getCart?.items?.length > 0 ? getCart?.items?.length : 0
+              ) || 0}
+              )
             </h4>
             <h4 className="font-bold text-gray-700 dark:text-gray-200 text-md">
               {formatCurrency(checkoutPrice)}

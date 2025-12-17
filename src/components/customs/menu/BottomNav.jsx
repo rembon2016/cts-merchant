@@ -350,15 +350,6 @@ const BottomNav = () => {
                     return;
                   }
 
-                  // if (
-                  //   item.path === "/pos" &&
-                  //   import.meta.env.VITE_API_ROUTES ===
-                  //     "https://dev-soundbox.ctsolution.id/api"
-                  // ) {
-                  //   alert("fitur ini belum tersedia");
-                  //   return;
-                  // }
-
                   navigation(item.path);
                 }}
                 className="group flex flex-col items-center gap-1 py-1"
