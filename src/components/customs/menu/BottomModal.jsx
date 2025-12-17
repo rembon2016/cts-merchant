@@ -141,7 +141,12 @@ export default function BottomModal(props) {
           setTimeout(() => setIsOpen(false), 1600);
         }
       } else {
-        const response = await addToCart(data, variant, quantity, isFromDetail);
+        const response = await addToCart(
+          data,
+          selectedVariant,
+          quantity,
+          isFromDetail
+        );
         if (response?.success === true) {
           showSuccess("Produk Berhasil Ditambahkan");
           setTimeout(() => setIsOpen(false), 1600);

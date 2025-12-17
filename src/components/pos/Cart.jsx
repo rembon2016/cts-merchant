@@ -56,6 +56,7 @@ const Cart = () => {
     const itemImage = checkbox.dataset.image;
     const itemQuantity = checkbox.dataset.quantity;
     const itemSku = checkbox.dataset.sku;
+    const itemVariantName = checkbox.dataset.variant_name;
 
     if (isChecked) {
       const newItem = {
@@ -65,6 +66,7 @@ const Cart = () => {
         name: itemName,
         image: itemImage,
         product_sku_id: Number.parseInt(itemSku),
+        variant_name: itemVariantName,
         quantity: itemQuantity,
         price,
         subtotal,
@@ -108,11 +110,13 @@ const Cart = () => {
         item_id: item?.id, // Store the item ID separately
         product_id: item?.product_id ?? String(item?.id),
         name: item.product?.name,
-        price: item?.product?.price_product,
+        price: item?.product?.is_variant
+          ? item?.product_sku?.product_prices[0]?.price
+          : item?.product?.price_product,
         subtotal: item?.subtotal,
-        // subtotal: item?.product?.price_product * item?.quantity,
         image: item?.product?.image,
-        product_sku_id: Number.parseInt(item?.product?.sku),
+        product_sku_id: Number.parseInt(item?.product_sku_id) || null,
+        variant_name: item?.product_sku?.variant_name || null,
         quantity: item?.quantity,
       }));
       setSelectedCart(allItems);
@@ -241,6 +245,9 @@ const Cart = () => {
           </div>
         </div>
         {cart?.data?.items?.map((cartItem) => {
+          const priceProduct = cartItem?.product?.is_variant
+            ? cartItem?.product_sku?.product_prices[0]?.price
+            : cartItem?.product?.price_product;
           return (
             <div
               className="flex items-center justify-between gap-2 w-full my-6"
@@ -251,14 +258,15 @@ const Cart = () => {
                   type="checkbox"
                   name={cartItem?.product?.name}
                   id={cartItem?.product?.id}
-                  data-price={cartItem?.product?.price_product}
+                  data-price={priceProduct}
                   data-cartid={cartItem?.cart_id}
                   data-productid={cartItem?.product_id}
                   data-itemid={cartItem?.id}
                   data-subtotal={cartItem?.subtotal}
                   data-name={cartItem?.product?.name}
                   data-image={cartItem?.product?.image}
-                  data-sku={cartItem?.product?.product_sku_id}
+                  data-sku={cartItem?.product_sku_id}
+                  data-variant_name={cartItem?.product_sku?.variant_name}
                   data-quantity={cartItem?.quantity}
                   onChange={handleChecked}
                   className="cursor-pointer"
@@ -266,17 +274,24 @@ const Cart = () => {
                 <img
                   src={getImageUrl(cartItem?.product?.image)}
                   alt={cartItem?.product?.name || "Product Image"}
-                  className="w-20 h-20 object-cover rounded-lg"
+                  className="w-24 h-24 object-cover rounded-lg"
                 />
                 <div key={cartItem?.id} className="flex flex-col">
-                  <div className="font-bold text-base">
-                    {cartItem?.product?.name.slice(0, 15) + "..."}
+                  <div className="flex flex-col">
+                    <div className="font-bold text-base">
+                      {cartItem?.product?.name.slice(0, 15) + "..."}
+                    </div>
+                    {cartItem?.product?.is_variant && (
+                      <span className="text-sm font-semibold bg-gray-200 w-fit py-1 px-2 rounded-lg text-gray-500 dark:text-gray-300">
+                        {cartItem?.product_sku?.variant_name}
+                      </span>
+                    )}
                   </div>
                   <div className="text-gray-700 dark:text-gray-200 text-md">
                     <h3 className="font-medium">
                       {/* Harga:{" "} */}
                       <span className="text-gray-500 dark:text-gray-300 font-extrabold">
-                        {formatCurrency(cartItem?.product?.price_product)}
+                        {formatCurrency(priceProduct)}
                       </span>
                     </h3>
                   </div>

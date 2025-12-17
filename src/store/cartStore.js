@@ -36,10 +36,6 @@ const useCartStore = create((set, get) => ({
     const activeBranch = sessionStorage.getItem("branchActive");
     const stock = getProductStock(product, variant?.id, isFromDetail);
 
-    // console.log("Stock: ", stock)
-    // console.log("Quantity: ", quantity)
-    // console.log("Variant ID: ", variant?.id)
-
     if (stock < quantity) {
       return {
         success: false,
@@ -63,7 +59,7 @@ const useCartStore = create((set, get) => ({
             branch_id: Number(activeBranch),
             user_id: Number(userPosId),
             product_id: Number(product?.id),
-            product_sku_id: Number(product?.skus?.id),
+            product_sku_id: Number(variant?.id),
             quantity,
           }),
           redirect: "follow",

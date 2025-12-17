@@ -6,7 +6,6 @@ import { isEmpty } from "../../helper/is-empty";
 import SimpleInput from "../customs/form/SimpleInput";
 import { useCustomToast } from "../../hooks/useCustomToast";
 import CustomToast from "../customs/toast/CustomToast";
-import LoadingSpinner from "../customs/loading/LoadingSpinner";
 
 export default function Checkout() {
   const getCart = JSON.parse(sessionStorage.getItem("cart"));
@@ -198,10 +197,15 @@ export default function Checkout() {
             <img
               src={getImageUrl(data?.image)}
               alt={data?.name || "Product Image"}
-              className="w-24 h-16 object-contain"
+              className="w-24 h-16 object-contain rounded-lg"
             />
             <div key={data?.id} className="flex flex-col">
-              <div className="font-bold text-xl">{data?.name}</div>
+              <div className="font-bold text-lg">{data?.name}</div>
+              {data?.variant_name && (
+                <div className="text-gray-500 dark:text-gray-400 text-sm">
+                  Varian: {data?.variant_name}
+                </div>
+              )}
               <div className="text-gray-700 dark:text-gray-200 text-lg">
                 <h3 className="font-medium">
                   Harga:{" "}

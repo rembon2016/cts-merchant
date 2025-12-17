@@ -11,13 +11,8 @@ import PrimaryButton from "../button/PrimaryButton";
 const BottomNav = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
-  const {
-    saveOrder,
-    proccessPayment,
-    selectPaymentMethod,
-    getPosSettings,
-    posSettingsData,
-  } = useCheckoutStore();
+  const { saveOrder, selectPaymentMethod, getPosSettings, posSettingsData } =
+    useCheckoutStore();
   const {
     cart,
     selectedCart,
@@ -160,7 +155,7 @@ const BottomNav = () => {
     sessionStorage.removeItem("tax");
     sessionStorage.removeItem("discount");
     sessionStorage.removeItem("totalPayment");
-  }
+  };
 
   const handleSubmit = () => {
     if (pathname === "/cart") {
@@ -206,19 +201,19 @@ const BottomNav = () => {
       ...JSON.parse(getCart),
     };
 
-    const paymentValue = {
-      branch_id: sessionStorage.getItem("branchActive"),
-      payment_amount: JSON.parse(sessionStorage.getItem("totalPayment")),
-      payment_method_id: selectPaymentMethod,
-      discount_amount:
-        Math.ceil(Number(sessionStorage.getItem("discount"))) || 0,
-      tax_amount: taxAmount,
-    };
+    // const paymentValue = {
+    //   branch_id: sessionStorage.getItem("branchActive"),
+    //   payment_amount: JSON.parse(sessionStorage.getItem("totalPayment")),
+    //   payment_method_id: selectPaymentMethod,
+    //   discount_amount:
+    //     Math.ceil(Number(sessionStorage.getItem("discount"))) || 0,
+    //   tax_amount: taxAmount,
+    // };
 
-    proccessOrder(checkoutValue, paymentValue);
+    proccessOrder(checkoutValue);
   };
 
-  const proccessOrder = async (dataCheckout, dataPayment) => {
+  const proccessOrder = async (dataCheckout) => {
     try {
       // Extract unique cart_ids from selected items
       // Since all items in the same cart share the same cart_id,
@@ -232,7 +227,7 @@ const BottomNav = () => {
       const response = await saveOrder(dataCheckout);
 
       if (response?.success === true) {
-        await proccessPayment(dataPayment);
+        // await proccessPayment(dataPayment);
         // Clear carts based on unique cart_ids
         if (cartIds && cartIds?.length > 0) {
           await clearMultipleCarts(cartIds);
@@ -240,7 +235,7 @@ const BottomNav = () => {
         const idProduct = response?.data?.id;
         showSuccess("Pesanan berhasil diproses");
         navigation(`/pos/transaction/${idProduct}`, { replace: true });
-        removeSessionStorage()
+        removeSessionStorage();
         clearDiscountData();
       } else {
         showError("Gagal memproses pesanan");
@@ -403,7 +398,7 @@ const BottomNav = () => {
   // Modal confirm handlers
   const handleConfirmExit = () => {
     // clear session cart and selectedCart then navigate
-    removeSessionStorage()
+    removeSessionStorage();
     setSelectedCart([]);
     setShowExitModal(false);
     if (pendingPath) navigation(pendingPath);
