@@ -50,19 +50,31 @@ export default function BottomModal(props) {
   } = useCustomToast();
 
   const [selectedVariant, setSelectedVariant] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+
+  const mappingPriceApiKey = isFromDetail ? "productPrices" : "product_prices";
+  const mappingStockApiKey = isFromDetail ? "productStocks" : "product_stocks";
+
+  const getPriceFunc = (isTotalPrice = false) => {
+    return selectedVariant?.[mappingPriceApiKey]?.map((itemPrice) => {
+      return isTotalPrice ? itemPrice?.price * quantity : itemPrice?.price;
+    });
+  };
+
+  const getStockFunc = () => {
+    return selectedVariant?.[mappingStockApiKey]?.map(
+      (itemStock) => itemStock?.qty
+    );
+  };
+
+  const getProductPriceForDisplay = useMemo(() => {
+    return selectedVariant ? getPriceFunc() : data?.price_product;
+  }, [selectedVariant, data]);
+
   const [formData, setFormData] = useState({
     kuantitas: 1,
-    harga:
-      selectedVariant !== null
-        ? !isFromDetail
-          ? selectedVariant?.product_prices?.map(
-              (itemPrice) => itemPrice?.price
-            )
-          : selectedVariant?.productPrices?.map((itemPrice) => itemPrice?.price)
-        : data?.price_product || 0,
+    harga: getProductPriceForDisplay,
   });
-
-  const [quantity, setQuantity] = useState(1);
 
   const cartItemIds = (() => {
     try {
@@ -73,7 +85,7 @@ export default function BottomModal(props) {
     }
   })();
 
-  const filterLocalCartByProductId = cartItemIds.filter((cartItem) => {
+  const filterLocalCartByProductId = cartItemIds?.filter((cartItem) => {
     const cartProductId = cartItem?.product_id === data?.id;
     const cartVariantId = cartItem?.variant_id === selectedVariant?.id;
 
@@ -181,6 +193,30 @@ export default function BottomModal(props) {
     return getProductStock(data, variant?.id, isFromDetail);
   };
 
+  const totalPrice = useMemo(() => {
+    if (data?.is_variant) {
+      return selectedVariant === null ? 0 : formatCurrency(getPriceFunc(true));
+    } else {
+      return formatCurrency(formData?.harga * quantity);
+    }
+  }, [selectedVariant, data, quantity, formData, getPriceFunc]);
+
+  const getPriceToDisplay = useMemo(() => {
+    if (data?.is_variant) {
+      return selectedVariant === null ? 0 : formatCurrency(getPriceFunc());
+    } else {
+      return formatCurrency(data?.price_product);
+    }
+  }, [data, selectedVariant, getPriceFunc]);
+
+  const getStockToDisplay = useMemo(() => {
+    if (data?.is_variant) {
+      return selectedVariant === null ? 0 : getStockFunc();
+    } else {
+      return stocks;
+    }
+  }, [data, selectedVariant, stocks]);
+
   const renderVariants = useMemo(() => {
     return (
       <div
@@ -257,48 +293,6 @@ export default function BottomModal(props) {
       </div>
     );
   }, [data, selectedVariant, quantity, isDark]);
-
-  const totalPrice = useMemo(() => {
-    return data?.is_variant && selectedVariant !== null
-      ? formatCurrency(
-          !isFromDetail
-            ? selectedVariant?.product_prices?.map(
-                (itemPrice) => itemPrice?.price * quantity
-              )
-            : selectedVariant?.productPrices?.map(
-                (itemPrice) => itemPrice?.price * quantity
-              )
-        )
-      : data?.is_variant && selectedVariant === null
-      ? 0
-      : formatCurrency(formData?.harga * quantity);
-  }, [selectedVariant, quantity, formData]);
-
-  const getPriceToDisplay = useMemo(() => {
-    return data?.is_variant && selectedVariant !== null
-      ? formatCurrency(
-          !isFromDetail
-            ? selectedVariant?.product_prices?.map(
-                (itemPrice) => itemPrice?.price
-              )
-            : selectedVariant?.productPrices?.map(
-                (itemPrice) => itemPrice?.price
-              )
-        )
-      : data?.is_variant && selectedVariant === null
-      ? 0
-      : formatCurrency(data?.price_product);
-  }, [data, selectedVariant]);
-
-  const getStockToDisplay = useMemo(() => {
-    return data?.is_variant && selectedVariant !== null
-      ? !isFromDetail
-        ? selectedVariant?.product_stocks?.map((itemStock) => itemStock?.qty)
-        : selectedVariant?.productStocks?.map((itemStock) => itemStock?.qty)
-      : data?.is_variant && selectedVariant === null
-      ? 0
-      : stocks;
-  }, [data, selectedVariant, stocks]);
 
   useEffect(() => {
     if (!isOpen) setQuantity(1);

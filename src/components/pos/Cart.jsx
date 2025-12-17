@@ -16,6 +16,7 @@ const Cart = () => {
     getCart,
     deleteCartItems,
     clearAllCart,
+    selectedCart,
     setSelectedCart,
     isLoading,
     error,
@@ -70,7 +71,6 @@ const Cart = () => {
         quantity: itemQuantity,
         price,
         subtotal,
-        // subtotal: price * itemQuantity,
       };
       setSelectedCart((prevItems) => [...prevItems, newItem]);
     } else {
@@ -250,9 +250,9 @@ const Cart = () => {
           </div>
         </div>
         {cart?.data?.items?.map((cartItem) => {
-          const variantPrice = cartItem?.product_sku?.product_prices?.map(
-            (priceItem) => priceItem?.price
-          );
+          const variantStock = cartItem?.product_sku?.product_stocks?.[0]?.qty;
+          const variantPrice =
+            cartItem?.product_sku?.product_prices?.[0]?.price;
           const priceProduct = cartItem?.product?.is_variant
             ? variantPrice
             : cartItem?.product?.price_product;
@@ -314,8 +314,10 @@ const Cart = () => {
                       // Ensure selectedCart is updated (add or update) so totals reflect quantity changes
                       setSelectedCart((prevItems) => {
                         const pid = cartItem?.product?.id ?? cartItem?.id;
-                        const price = Number(
-                          cartItem?.product?.price_product ?? 0
+                        const price = Number.parseInt(
+                          cartItem?.product?.is_variant
+                            ? cartItem?.product_sku?.product_prices?.[0]?.price
+                            : cartItem?.product?.price_product ?? 0
                         );
                         const subtotal = price * Number(newQty);
 
@@ -372,7 +374,7 @@ const Cart = () => {
                           selectAllCheckbox.checked = allChecked;
                       }, 0);
                     }}
-                    stocks={cartItem?.stock ?? cartItem?.product?.stock ?? 9999}
+                    stocks={cartItem?.product?.is_variant ? variantStock : 9999}
                   />
                 </div>
               </div>
@@ -408,6 +410,8 @@ const Cart = () => {
       </div>
     );
   }, [cart, isLoading, error, success, showModal]);
+
+  console.log("Selected Cart Items: ", selectedCart);
 
   return (
     <div className="p-6">

@@ -18,12 +18,13 @@ export default function ButtonQuantity(props) {
       <div className="flex items-center my-auto">
         <button
           onClick={() => setQuantity(Math.max(1, quantity - 1))}
+          disabled={quantity <= 1}
           className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700"
         >
           <svg
             className="w-4 h-4"
             fill="none"
-            stroke="currentColor"
+            stroke={quantity <= 1 ? "gray" : "currentColor"}
             viewBox="0 0 24 24"
           >
             <path
@@ -41,12 +42,13 @@ export default function ButtonQuantity(props) {
           onClick={() => {
             setQuantity(Math.min(stocks, quantity + 1));
           }}
+          disabled={quantity >= stocks}
           className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700"
         >
           <svg
             className="w-4 h-4"
             fill="none"
-            stroke="currentColor"
+            stroke={quantity >= stocks ? "gray" : "currentColor"}
             viewBox="0 0 24 24"
           >
             <path

@@ -19,6 +19,7 @@ export default function DetailProduct() {
   const variantStock = products?.skus?.map((sku) =>
     sku?.productStocks?.reduce((a, b) => a + b.qty, 0)
   );
+
   const location = useLocation();
   const pathname = location.pathname;
   // For variant products, show total stock across all variants
