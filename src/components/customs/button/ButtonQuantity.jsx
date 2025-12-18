@@ -24,7 +24,7 @@ export default function ButtonQuantity(props) {
           <svg
             className="w-4 h-4"
             fill="none"
-            stroke={quantity <= 1 ? "gray" : "currentColor"}
+            stroke={quantity >= stocks ? "#999fff" : "currentColor"}
             viewBox="0 0 24 24"
           >
             <path
@@ -48,7 +48,7 @@ export default function ButtonQuantity(props) {
           <svg
             className="w-4 h-4"
             fill="none"
-            stroke={quantity >= stocks ? "gray" : "currentColor"}
+            stroke={quantity >= stocks ? "#999fff" : "currentColor"}
             viewBox="0 0 24 24"
           >
             <path

@@ -411,8 +411,6 @@ const Cart = () => {
     );
   }, [cart, isLoading, error, success, showModal]);
 
-  console.log("Selected Cart Items: ", selectedCart);
-
   return (
     <div className="p-6">
       <CustomToast
