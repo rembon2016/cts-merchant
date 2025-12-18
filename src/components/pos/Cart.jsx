@@ -251,6 +251,7 @@ const Cart = () => {
         </div>
         {cart?.data?.items?.map((cartItem) => {
           const variantStock = cartItem?.product_sku?.product_stocks?.[0]?.qty;
+          const nonVariantStock = cartItem?.product?.product_stocks?.[0]?.qty;
           const variantPrice =
             cartItem?.product_sku?.product_prices?.[0]?.price;
           const priceProduct = cartItem?.product?.is_variant
@@ -376,7 +377,11 @@ const Cart = () => {
                           selectAllCheckbox.checked = allChecked;
                       }, 0);
                     }}
-                    stocks={cartItem?.product?.is_variant ? variantStock : 9999}
+                    stocks={
+                      cartItem?.product?.is_variant
+                        ? variantStock
+                        : nonVariantStock
+                    }
                   />
                 </div>
               </div>
