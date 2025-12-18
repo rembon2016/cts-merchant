@@ -18,7 +18,9 @@ export default function ProductForm({ editMode = false, productId = null }) {
   const navigate = useNavigate();
 
   const getToday = new Date().toISOString().split("T")[0];
-  const activeBranch = Number?.parseInt(sessionStorage?.getItem("branchActive") || 0);
+  const activeBranch = Number?.parseInt(
+    sessionStorage?.getItem("branchActive") || 0
+  );
 
   const [formData, setFormData] = useState(ListStateForm(activeBranch));
 
@@ -146,12 +148,16 @@ export default function ProductForm({ editMode = false, productId = null }) {
       skus:
         products?.skus && products?.skus.length > 0
           ? products?.skus.map((sku) => ({
+              id: sku?.id || "",
               sku: sku?.sku || "",
               barcode: sku?.barcode || "",
               variant_name: sku?.variant_name || "",
-              cost: sku?.cost || "",
-              price: sku?.price || "",
+              cost: Number.parseInt(sku?.productPrices?.[0]?.cost) || "",
+              price: Number.parseInt(sku?.productPrices?.[0]?.price) || "",
               is_active: !!sku?.is_active,
+              qty: sku?.productStocks?.[0]?.qty || 0,
+              effective_from: sku?.productPrices?.[0]?.effective_from || null,
+              effective_until: sku?.productPrices?.[0]?.effective_until || null,
             }))
           : [],
       bundle_items:
@@ -245,7 +251,9 @@ export default function ProductForm({ editMode = false, productId = null }) {
     const empty = (v) => !v?.toString().trim();
     const emptyArr = (v) => !Array.isArray(v) || !v.length;
 
-    const newArraySKUS = formData?.skus.map(({ is_active, barcode, ...rest }) => rest);
+    const newArraySKUS = formData?.skus.map(
+      ({ is_active, barcode, ...rest }) => rest
+    );
 
     // required fields
     if (empty(formData.name)) errors.name = "Nama produk wajib diisi";
@@ -279,11 +287,11 @@ export default function ProductForm({ editMode = false, productId = null }) {
     }
 
     if (formData.is_variant) {
-      const hasValidSku = newArraySKUS.every(sku =>
-        Object.values(sku).every(val => !empty(val))
+      const hasValidSku = newArraySKUS.every((sku) =>
+        Object.values(sku).every((val) => !empty(val))
       );
-      if(!hasValidSku) {
-        errors.skus = "Data SKU wajib di isi"
+      if (!hasValidSku) {
+        errors.skus = "Data SKU wajib di isi";
       }
     }
 
@@ -308,6 +316,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
       : [];
 
     const skuForm = (formData.skus || []).map((sku) => ({
+      id: sku?.id || "",
       sku: sku?.sku || "",
       barcode: sku?.barcode || "",
       variant_name: sku?.variant_name || "",
@@ -382,6 +391,20 @@ export default function ProductForm({ editMode = false, productId = null }) {
   };
 
   const elementSKUS = (item, index) => {
+    const formatDateToInput = (val) => {
+      if (!val) return "";
+      const d = new Date(val);
+      const ts = d.getTime();
+      return !Number.isNaN(ts) ? d.toISOString().split("T")[0] : "";
+    };
+
+    const effectiveFromValue = editMode
+      ? formatDateToInput(item?.effective_from)
+      : item?.effective_from || "";
+    const effectiveUntilValue = editMode
+      ? formatDateToInput(item?.effective_until)
+      : item?.effective_until || "";
+
     return (
       <div className="flex flex-col gap-2 w-full" key={`sku-${index}`}>
         <SimpleInput
@@ -446,7 +469,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
             name="skus.effective_from"
             type="date"
             label="Berlaku Dari"
-            value={item?.effective_from}
+            value={effectiveFromValue}
             handleChange={(e) =>
               handleNestedChange(
                 "skus",
@@ -463,7 +486,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
             name="skus.effective_until"
             type="date"
             label="Berlaku Sampai"
-            value={item?.effective_until}
+            value={effectiveUntilValue}
             handleChange={(e) =>
               handleNestedChange(
                 "skus",
@@ -941,6 +964,8 @@ export default function ProductForm({ editMode = false, productId = null }) {
                         price: "",
                         cost: "",
                         qty: "",
+                        effective_from: null,
+                        effective_until: null,
                         is_active: editMode ? false : true,
                       },
                     ],
