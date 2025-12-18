@@ -7,9 +7,11 @@ import { ShoppingCart } from "lucide-react";
 import BottomModal from "../customs/menu/BottomModal";
 import BackButton from "../customs/button/BackButton";
 import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
+import { usePosStore } from "../../store/posStore";
 
 export default function DetailProduct() {
   const { getDetailProduct, isLoading, products, error } = useProductStore();
+  const { getSingleVariantStock } = usePosStore();
 
   const { isDark } = useThemeStore();
 
@@ -101,7 +103,11 @@ export default function DetailProduct() {
           isOpen={isSheetOpen}
           onClose={() => setIsSheetOpen(false)}
           data={products}
-          stocks={products?.is_variant ? variantStock : productStock}
+          stocks={
+            products?.is_variant
+              ? getSingleVariantStock(products, true)
+              : productStock
+          }
           onItemClick={() => setIsSheetOpen(false)}
           isFromDetail={true}
         />

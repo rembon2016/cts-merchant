@@ -178,10 +178,14 @@ const usePosStore = create((set, get) => ({
     }
 
     if (isFromDetail) {
-      const stock = product?.stocks?.find(
-        (s) => s?.branch_id === Number.parseInt(branchId)
-      );
-      return stock ? stock?.qty : 0;
+      const stock = product?.skus?.find((s) => s?.id === skuId);
+
+      return stock ? stock.productStocks[0].qty : 0;
+
+      // const stock = product?.stocks?.find(
+      //   (s) => s?.branch_id === Number.parseInt(branchId)
+      // );
+      // return stock ? stock?.qty : 0;
     } else {
       const stock = product?.product_stocks?.find(
         (s) => s?.branch_id === Number.parseInt(branchId) && !s?.product_sku_id
@@ -216,7 +220,7 @@ const usePosStore = create((set, get) => ({
   },
 
   // Get total variant stock for products with variants
-  getSingleVariantStock: (product) => {
+  getSingleVariantStock: (product, isFromDetail = false) => {
     const branchId = sessionStorage.getItem("branchActive");
 
     if (!branchId || !product?.is_variant) return 0;
@@ -224,7 +228,11 @@ const usePosStore = create((set, get) => ({
     let productStocks = 0;
 
     if (product.skus && product.skus.length > 0) {
-      productStocks += product?.skus[0]?.product_stocks[0]?.qty;
+      if (!isFromDetail) {
+        productStocks += product?.skus[0]?.product_stocks[0]?.qty;
+      } else {
+        productStocks += product?.skus[0]?.productStocks[0]?.qty;
+      }
     }
 
     return productStocks;
