@@ -335,6 +335,8 @@ const Cart = () => {
 
                         // add new selected item (normalize shape)
                         const newItem = {
+                          item_id: cartItem?.id,
+                          cart_id: cartItem?.cart_id,
                           product_id: pid,
                           product_sku_id: cartItem?.product_sku_id ?? null,
                           quantity: newQty,

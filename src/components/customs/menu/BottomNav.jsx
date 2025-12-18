@@ -185,8 +185,6 @@ const BottomNav = () => {
   const processCheckout = () => {
     if (!getCart) return;
 
-    setLoading(true);
-
     const checkoutValue = {
       branch_id: sessionStorage.getItem("branchActive"),
       user_id: sessionStorage.getItem("userPosId"),
@@ -223,6 +221,8 @@ const BottomNav = () => {
           dataCheckout?.items?.map((item) => item.item_id).filter(Boolean)
         ),
       ];
+
+      setLoading(true);
 
       const response = await saveOrder(dataCheckout);
 
