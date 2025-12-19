@@ -40,9 +40,10 @@ export default function ProductForm({ editMode = false, productId = null }) {
     addProducts,
     editProducts,
     getDetailProduct,
+    products,
+    getProducts,
     isLoading,
   } = useProductStore();
-  const { products, getProducts } = useProductStore();
   const {
     toast,
     success: showSuccess,
@@ -146,8 +147,8 @@ export default function ProductForm({ editMode = false, productId = null }) {
       category_ids: products?.categories || [],
       brand_ids: products?.brands || [],
       skus:
-        products?.skus && products?.skus.length > 0
-          ? products?.skus.map((sku) => ({
+        products?.skus && products?.skus?.length > 0
+          ? products?.skus?.map((sku) => ({
               id: sku?.id || "",
               sku: sku?.sku || "",
               barcode: sku?.barcode || "",
@@ -337,6 +338,17 @@ export default function ProductForm({ editMode = false, productId = null }) {
       ...(editMode ? { type: s?.type } : {}),
     }));
 
+    const pricePayload = [
+      {
+        branch_id: activeBranch,
+        cost: formData.cost_product,
+        price: formData.price_product,
+        effective_from: getToday,
+        effective_until: "01-01-2026",
+        // product_sku_id: editMode ? skuForm[0]?.id : "",
+      },
+    ];
+
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
       showError("Isi semua inputan yang wajib diisi");
@@ -355,15 +367,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
       bundle_items: formData.is_bundle ? formData.bundle_items : [],
       skus: formData.is_variant ? skuForm : [],
       stocks: editMode ? stocksPayload : formData.stocks,
-      prices: [
-        {
-          branch_id: activeBranch,
-          cost: formData.cost_product,
-          price: formData.price_product,
-          effective_from: getToday,
-          effective_until: "01-01-2026",
-        },
-      ],
+      prices: pricePayload,
     };
 
     const response = editMode
@@ -439,7 +443,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
               handleNestedChange("skus", index, "cost", e.target.value, true)
             }
             isRequired={true}
-            errors={validationErrors.cost}
+            errors={validationErrors?.cost}
           />
           <SimpleInput
             name="skus.price"
@@ -966,7 +970,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
                         qty: "",
                         effective_from: null,
                         effective_until: null,
-                        is_active: editMode ? false : true,
+                        is_active: true,
                       },
                     ],
                   }));
