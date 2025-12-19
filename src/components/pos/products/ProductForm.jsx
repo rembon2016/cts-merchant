@@ -966,7 +966,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
                         qty: "",
                         effective_from: null,
                         effective_until: null,
-                        is_active: editMode ? false : true,
+                        is_active: true,
                       },
                     ],
                   }));

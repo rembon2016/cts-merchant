@@ -56,14 +56,14 @@ export default function BottomModal(props) {
   const mappingStockApiKey = isFromDetail ? "productStocks" : "product_stocks";
 
   const getPriceFunc = (isTotalPrice = false) => {
-    return selectedVariant?.[mappingPriceApiKey]?.map((itemPrice) => {
-      return isTotalPrice ? itemPrice?.price * quantity : itemPrice?.price;
+    return selectedVariant?.[mappingPriceApiKey]?.map((item) => {
+      return isTotalPrice ? item?.price * quantity : item?.price;
     });
   };
 
   const getStockFunc = () => {
-    return selectedVariant?.[mappingStockApiKey]?.map(
-      (itemStock) => itemStock?.qty
+    return selectedVariant?.[mappingStockApiKey]?.map((itemStock) =>
+      quantity > itemStock?.qty ? setQuantity(itemStock?.qty) : itemStock?.qty
     );
   };
 
