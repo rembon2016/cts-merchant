@@ -35,6 +35,7 @@ export const ListStateForm = (activeBranch) => {
         qty: "",
         reason: "",
         type: "",
+        product_sku_id: "",
         branch_id: activeBranch,
       },
     ],
@@ -44,8 +45,9 @@ export const ListStateForm = (activeBranch) => {
         price: "",
         effective_from: "",
         effective_until: "",
-        branch_id: activeBranch
+        product_sku_id: "",
+        branch_id: activeBranch,
       },
     ],
   };
-}
+};

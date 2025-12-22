@@ -17,7 +17,6 @@ import { ListStateForm } from "./ListStateForm";
 export default function ProductForm({ editMode = false, productId = null }) {
   const navigate = useNavigate();
 
-  const getToday = new Date().toISOString().split("T")[0];
   const activeBranch = Number?.parseInt(
     sessionStorage?.getItem("branchActive") || 0
   );
@@ -69,6 +68,13 @@ export default function ProductForm({ editMode = false, productId = null }) {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
 
   const formatToNumber = (value) => value?.replaceAll(/\D/g, "");
+
+  const formatDateToInput = (val) => {
+    if (!val) return "";
+    const d = new Date(val);
+    const ts = d.getTime();
+    return !Number.isNaN(ts) ? d.toISOString().split("T")[0] : "";
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -335,6 +341,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
       branch_id: activeBranch,
       qty: s?.qty,
       reason: s?.reason,
+      product_sku_id: formData?.skus?.[0]?.id || "",
       ...(editMode ? { type: s?.type } : {}),
     }));
 
@@ -343,9 +350,9 @@ export default function ProductForm({ editMode = false, productId = null }) {
         branch_id: activeBranch,
         cost: formData.cost_product,
         price: formData.price_product,
-        effective_from: getToday,
-        effective_until: "01-01-2026",
-        // product_sku_id: editMode ? skuForm[0]?.id : "",
+        effective_from: formData.prices[0]?.effective_from,
+        effective_until: formData.prices[0]?.effective_until,
+        product_sku_id: formData?.skus?.[0]?.id || "",
       },
     ];
 
@@ -395,13 +402,6 @@ export default function ProductForm({ editMode = false, productId = null }) {
   };
 
   const elementSKUS = (item, index) => {
-    const formatDateToInput = (val) => {
-      if (!val) return "";
-      const d = new Date(val);
-      const ts = d.getTime();
-      return !Number.isNaN(ts) ? d.toISOString().split("T")[0] : "";
-    };
-
     const effectiveFromValue = editMode
       ? formatDateToInput(item?.effective_from)
       : item?.effective_from || "";
@@ -468,7 +468,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
           isRequired={true}
           errors={validationErrors.qty}
         />
-        <div className="flex gap-2">
+        <div className="flex gap-2 w-full">
           <SimpleInput
             name="skus.effective_from"
             type="date"
@@ -632,6 +632,13 @@ export default function ProductForm({ editMode = false, productId = null }) {
   };
 
   const renderForm = useMemo(() => {
+    const effectiveFromValue = editMode
+      ? formatDateToInput(formData?.prices?.[0]?.effective_from)
+      : formData?.prices?.[0]?.effective_from || "";
+    const effectiveUntilValue = editMode
+      ? formatDateToInput(formData?.prices?.[0]?.effective_until)
+      : formData?.prices?.[0]?.effective_until || "";
+
     return (
       <div className="flex flex-col gap-3 mt-3 p-4">
         <BackButton to="/pos/products" />
@@ -811,6 +818,50 @@ export default function ProductForm({ editMode = false, productId = null }) {
             value={formData?.price_product}
             handleChange={handleChange}
             errors={validationErrors.price_product}
+            isRequired={true}
+          />
+        </div>
+
+        <div className="flex gap-2 w-full">
+          <SimpleInput
+            name="prices.effective_from"
+            type="date"
+            label="Berlaku Dari"
+            value={effectiveFromValue}
+            handleChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                prices: prev.prices.map((price, i) =>
+                  i === 0 ? { ...price, effective_from: e.target.value } : price
+                ),
+              }))
+            }
+            errors={validationErrors["prices.effective_from"]}
+            isDefaultSize={false}
+            isRequired={true}
+          />
+          <SimpleInput
+            name="prices.effective_until"
+            type="date"
+            label="Berlaku Sampai"
+            value={effectiveUntilValue}
+            handleChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                prices: prev.prices.map((price, i) =>
+                  i === 0
+                    ? {
+                        ...price,
+                        effective_until: !editMode
+                          ? e.target.value
+                          : formatDateToInput(e.target.value),
+                      }
+                    : price
+                ),
+              }))
+            }
+            errors={validationErrors["prices.effective_until"]}
+            isDefaultSize={false}
             isRequired={true}
           />
         </div>
@@ -1078,6 +1129,8 @@ export default function ProductForm({ editMode = false, productId = null }) {
     newCategoryErrors,
     addingCategory,
   ]);
+
+  console.log("formData:", formData);
 
   return (
     <>

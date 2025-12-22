@@ -424,23 +424,26 @@ const useProductStore = create((set, get) => ({
 
       // API key change for edit only: rename `stocks` to `stock_adjustments`
       const editedPayload = { ...formData };
+
       if (Object.hasOwn(editedPayload, "stocks")) {
         // Map `stocks` to `stock_adjustments` and rename field `type` -> `tipe`
         const stockAdjustments = (editedPayload.stocks || []).map((s) => {
-          const { type, ...rest } = s || {};
+          const { type, reason, ...rest } = s || {};
+
           return {
             ...rest,
-            ...(type !== undefined ? { type } : {}),
+            type: type || "addition",
+            reason: reason || "deskripsi",
           };
         });
-        editedPayload.stocks = stockAdjustments;
-        // delete editedPayload.stocks;
+        editedPayload.stock_adjustments = stockAdjustments;
       }
 
       if (Object.hasOwn(editedPayload, "prices")) {
         // Map `prices` to `price_updates` and rename field `type` -> `tipe`
         const priceUpdates = (editedPayload.prices || []).map((s) => {
           const { type, ...rest } = s || {};
+
           return {
             ...rest,
           };

@@ -422,7 +422,7 @@ const BottomNav = () => {
         <SimpleModal
           onClose={handleCloseExitModal}
           handleClick={handleConfirmExit}
-          title="Keluar dari Checkout"
+          title="Keluar dari halaman Checkout"
           content="Anda yakin ingin meninggalkan halaman checkout? Data pembelian akan dihapus."
           showButton={true}
         />
