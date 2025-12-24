@@ -254,6 +254,7 @@ export default function ListProduct() {
                 disabled={isOutOfStock}
                 onClick={() => goToProductDetail(product.id)}
                 showButtonCart={false}
+                showButtonDelete={true}
                 loading={initialLoading || productsLoading}
               />
             );

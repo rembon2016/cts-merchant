@@ -1130,8 +1130,6 @@ export default function ProductForm({ editMode = false, productId = null }) {
     addingCategory,
   ]);
 
-  console.log("formData:", formData);
-
   return (
     <>
       <CustomToast
