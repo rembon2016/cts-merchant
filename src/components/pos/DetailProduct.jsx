@@ -78,7 +78,11 @@ export default function DetailProduct() {
           <div className="flex flex-col gap-1">
             <div className="flex gap-1">
               <h3 className="font-medium text-lg">Stok: </h3>
-              <h3 className="font-bold text-lg">{productStock}</h3>
+              <h3 className="font-bold text-lg">
+                {products?.is_variant
+                  ? variantStock?.reduce((a, b) => a + b, 0)
+                  : productStock}
+              </h3>
             </div>
             <div className="flex gap-1">
               <h3 className="font-medium text-lg">Minimum Pembelian: </h3>

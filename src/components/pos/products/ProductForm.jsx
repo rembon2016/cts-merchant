@@ -336,6 +336,14 @@ export default function ProductForm({ editMode = false, productId = null }) {
       effective_until: sku?.effective_until || "",
     }));
 
+    const mapStocksFromSku = (formData?.skus || []).map((sku) => ({
+      branch_id: activeBranch,
+      qty: sku?.qty,
+      reason: sku?.reason,
+      product_sku_id: sku?.id || "",
+      ...(editMode ? { type: sku?.type } : {}),
+    }));
+
     // For add mode, exclude `type` from stocks payload
     const stocksPayload = (formData.stocks || []).map((s) => ({
       branch_id: activeBranch,
@@ -373,7 +381,11 @@ export default function ProductForm({ editMode = false, productId = null }) {
       is_bundle: formData.is_bundle ? 1 : 0,
       bundle_items: formData.is_bundle ? formData.bundle_items : [],
       skus: formData.is_variant ? skuForm : [],
-      stocks: editMode ? stocksPayload : formData.stocks,
+      stocks: !formData?.is_variant
+        ? editMode
+          ? stocksPayload
+          : formData.stocks
+        : mapStocksFromSku,
       prices: pricePayload,
     };
 
