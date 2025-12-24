@@ -151,8 +151,8 @@ const usePosStore = create((set, get) => ({
     });
   },
 
-  getPriceOrCost: (priceData, apiKey, apiName) => {
-    return Number.parseFloat(priceData?.[apiKey]?.[0]?.[apiName] || 0);
+  getPriceOrCost: (filterData, apiKey, apiName) => {
+    return Number.parseFloat(filterData?.[apiKey]?.[0]?.[apiName] || 0);
   },
 
   // Get product price (prioritize product_prices over price_product)

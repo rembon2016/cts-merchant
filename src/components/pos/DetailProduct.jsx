@@ -16,7 +16,6 @@ export default function DetailProduct() {
   const { isDark } = useThemeStore();
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-
   const [selectedVariant, setSelectedVariant] = useState(null);
 
   const productStock = products?.stocks?.reduce((a, b) => a + b.qty, 0);
@@ -56,7 +55,7 @@ export default function DetailProduct() {
     if (products?.is_variant && selectedVariant) {
       return getProductStock(products, selectedVariant?.id, true);
     }
-    return productStock || 0;
+    return products?.qty || 0;
   };
 
   const location = useLocation();
@@ -166,6 +165,7 @@ export default function DetailProduct() {
 
         <BottomModal
           isOpen={isSheetOpen}
+          setIsOpen={setIsSheetOpen}
           onClose={() => setIsSheetOpen(false)}
           data={products}
           stocks={
