@@ -152,17 +152,44 @@ const usePosStore = create((set, get) => ({
   },
 
   // Get product price (prioritize product_prices over price_product)
-  getProductPrice: (product, skuId = null) => {
+  getProductPrice: (product, skuId = null, isFromDetail = false) => {
     // If product has variants and skuId is provided
-    if (product.is_variant && skuId && product.product_prices?.length > 0) {
-      const priceData = product.product_prices.find(
-        (p) => p.product_sku_id === skuId
-      );
-      if (priceData) return Number.parseFloat(priceData.price);
+    if (product?.is_variant) {
+      const priceData = product?.skus?.find((p) => p.id === skuId);
+      if (priceData) {
+        const getPrice = (apiKey) =>
+          Number.parseFloat(priceData?.[apiKey]?.[0]?.price || 0);
+
+        if (isFromDetail) {
+          return getPrice("productPrices");
+        } else {
+          return getPrice("product_prices");
+        }
+      }
     }
 
     // Fallback to price_product
     return Number.parseFloat(product?.price_product || 0);
+  },
+
+  getProductCost: (product, skuId = null, isFromDetail = false) => {
+    // If product has variants and skuId is provided
+    if (product?.is_variant) {
+      const priceData = product?.skus?.find((p) => p.id === skuId);
+      if (priceData) {
+        const getPrice = (apiKey) =>
+          Number.parseFloat(priceData?.[apiKey]?.[0]?.cost || 0);
+
+        if (isFromDetail) {
+          return getPrice("productPrices");
+        } else {
+          return getPrice("product_prices");
+        }
+      }
+    }
+
+    // Fallback to price_product
+    return Number.parseFloat(product?.cost_product || 0);
   },
 
   // Get product stock

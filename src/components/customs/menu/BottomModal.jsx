@@ -21,6 +21,7 @@ BottomModal.propTypes = {
   isVariant: PropTypes.bool,
   title: PropTypes.string,
   children: PropTypes.node,
+  initialSelectedVariant: PropTypes.object,
 };
 
 export default function BottomModal(props) {
@@ -35,6 +36,7 @@ export default function BottomModal(props) {
     title,
     children,
     isVariant,
+    initialSelectedVariant,
   } = props;
 
   const sheetRef = useRef(null);
@@ -116,6 +118,21 @@ export default function BottomModal(props) {
     };
   }, [isOpen]);
 
+  // Initialize selected variant from parent (detail page) or fallback to first variant in data
+  useEffect(() => {
+    if (initialSelectedVariant) {
+      setSelectedVariant(initialSelectedVariant);
+    } else if (
+      data?.is_variant &&
+      Array.isArray(data?.skus) &&
+      data.skus.length > 0
+    ) {
+      setSelectedVariant(data.skus[0]);
+    } else {
+      setSelectedVariant(null);
+    }
+  }, [initialSelectedVariant, data]);
+
   useEffect(() => {
     if (mode !== "cart") return;
     if (success) {
@@ -186,7 +203,7 @@ export default function BottomModal(props) {
   };
 
   const getVariantPrice = (variant) => {
-    return getProductPrice(data, variant?.id);
+    return getProductPrice(data, variant?.id, isFromDetail);
   };
 
   const getVariantStock = (variant) => {
@@ -260,7 +277,7 @@ export default function BottomModal(props) {
                       </div>
                       <div className="flex items-center justify-between mt-1">
                         <span className="text-sm font-semibold text-[var(--c-primary)] dark:text-blue-300">
-                          Rp {price.toLocaleString("id-ID")}
+                          {formatCurrency(price)}
                         </span>
                         <span className="text-xs text-gray-500 dark:text-gray-400">
                           Stok: {stock}
