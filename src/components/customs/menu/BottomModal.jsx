@@ -210,6 +210,13 @@ export default function BottomModal(props) {
     return getProductStock(data, variant?.id, isFromDetail);
   };
 
+  const getStocks = () => {
+    const getApiKey = (apiData, apiKey) => apiData?.[apiKey]?.[0]?.qty;
+    const keyApi = isFromDetail ? "productStocks" : "product_stocks";
+    const keyData = data?.is_variant ? selectedVariant : data;
+    return getApiKey(keyData, keyApi);
+  };
+
   const totalPrice = useMemo(() => {
     if (data?.is_variant) {
       return selectedVariant === null ? 0 : formatCurrency(getPriceFunc(true));
@@ -382,7 +389,7 @@ export default function BottomModal(props) {
                       alt={data?.name}
                       className="w-28 h-20 object-cover object-center rounded-lg"
                     />
-                    <div className="flex flex-col gap-1">
+                    <div className="flex flex-col">
                       <h3 className="font-bold text-lg">{data?.name}</h3>
                       <h3 className="font-medium text-lg">
                         Harga:{" "}
@@ -393,6 +400,9 @@ export default function BottomModal(props) {
                         >
                           {getPriceToDisplay}
                         </span>
+                      </h3>
+                      <h3 className="font-semibold text-md">
+                        Stock: {getStocks()}
                       </h3>
                     </div>
                   </div>
