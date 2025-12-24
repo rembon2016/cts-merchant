@@ -425,30 +425,42 @@ const useProductStore = create((set, get) => ({
       // API key change for edit only: rename `stocks` to `stock_adjustments`
       const editedPayload = { ...formData };
 
-      if (Object.hasOwn(editedPayload, "stocks")) {
-        // Map `stocks` to `stock_adjustments` and rename field `type` -> `tipe`
-        const stockAdjustments = (editedPayload.stocks || []).map((s) => {
-          const { type, reason, ...rest } = s || {};
+      // If the product is a variant (is_variant === 1), do not send stock/price related fields
+      if (formData?.is_variant === 1) {
+        delete editedPayload.stocks;
+        delete editedPayload.prices;
+        delete editedPayload.stock_adjustments;
+        delete editedPayload.price_updates;
+      } else {
+        if (Object.hasOwn(editedPayload, "stocks")) {
+          // Map `stocks` to `stock_adjustments` and rename field `type` -> `tipe`
+          const stockAdjustments = (editedPayload.stocks || []).map((s) => {
+            const { type, reason, ...rest } = s || {};
 
-          return {
-            ...rest,
-            type: type || "addition",
-            reason: reason || "deskripsi",
-          };
-        });
-        editedPayload.stock_adjustments = stockAdjustments;
-      }
+            return {
+              ...rest,
+              type: type || "addition",
+              reason: reason || "deskripsi",
+            };
+          });
+          editedPayload.stock_adjustments = stockAdjustments;
+          // remove original stocks to avoid sending duplicate data
+          delete editedPayload.stocks;
+        }
 
-      if (Object.hasOwn(editedPayload, "prices")) {
-        // Map `prices` to `price_updates` and rename field `type` -> `tipe`
-        const priceUpdates = (editedPayload.prices || []).map((s) => {
-          const { type, ...rest } = s || {};
+        if (Object.hasOwn(editedPayload, "prices")) {
+          // Map `prices` to `price_updates`
+          const priceUpdates = (editedPayload.prices || []).map((s) => {
+            const { type, ...rest } = s || {};
 
-          return {
-            ...rest,
-          };
-        });
-        editedPayload.price_updates = priceUpdates;
+            return {
+              ...rest,
+            };
+          });
+          editedPayload.price_updates = priceUpdates;
+          // remove original prices to avoid sending duplicate data
+          delete editedPayload.prices;
+        }
       }
 
       // Detect if there is any File in the payload values

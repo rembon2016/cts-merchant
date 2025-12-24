@@ -327,6 +327,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
       sku: sku?.sku || "",
       barcode: sku?.barcode || "",
       variant_name: sku?.variant_name || "",
+      reason: sku?.reason || "deskripsi",
       price: sku?.price || "",
       cost: sku?.cost || "",
       qty: sku?.qty || "",
@@ -334,6 +335,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
       branch_id: activeBranch,
       effective_from: sku?.effective_from || "",
       effective_until: sku?.effective_until || "",
+      action: sku?.id ? "update" : "create",
     }));
 
     const mapStocksFromSku = (formData?.skus || []).map((sku) => ({

@@ -41,7 +41,7 @@ export default function BottomModal(props) {
 
   const sheetRef = useRef(null);
   const { isDark } = useThemeStore();
-  const { getProductPrice, getProductStock } = usePosStore();
+  const { getProductStock } = usePosStore();
   const { addToCart, getCart, updateCartItem, success, isLoading } =
     useCartStore();
   const {
@@ -58,9 +58,13 @@ export default function BottomModal(props) {
   const mappingStockApiKey = isFromDetail ? "productStocks" : "product_stocks";
 
   const getPriceFunc = (isTotalPrice = false) => {
-    return selectedVariant?.[mappingPriceApiKey]?.map((item) => {
-      return isTotalPrice ? item?.price * quantity : item?.price;
-    });
+    const mapping = selectedVariant?.[mappingPriceApiKey]?.map(
+      (item) => item?.price
+    );
+
+    return isTotalPrice
+      ? Number?.parseInt(mapping[mapping?.length - 1]) * quantity
+      : Number?.parseInt(mapping[mapping?.length - 1]);
   };
 
   const getStockFunc = () => {
@@ -202,10 +206,6 @@ export default function BottomModal(props) {
     }
   };
 
-  const getVariantPrice = (variant) => {
-    return getProductPrice(data, variant?.id, isFromDetail);
-  };
-
   const getVariantStock = (variant) => {
     return getProductStock(data, variant?.id, isFromDetail);
   };
@@ -311,7 +311,7 @@ export default function BottomModal(props) {
       {!isOpen ? null : (
         <div className="fixed inset-0 z-[9999]">
           {/* Backdrop with blur */}
-          <div
+          <button
             className="absolute inset-0 bg-black/30 backdrop-blur-sm"
             onClick={handleClose}
           />
