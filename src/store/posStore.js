@@ -151,20 +151,18 @@ const usePosStore = create((set, get) => ({
     });
   },
 
+  getPriceOrCost: (priceData, apiKey, apiName) => {
+    return Number.parseFloat(priceData?.[apiKey]?.[0]?.[apiName] || 0);
+  },
+
   // Get product price (prioritize product_prices over price_product)
   getProductPrice: (product, skuId = null, isFromDetail = false) => {
     // If product has variants and skuId is provided
     if (product?.is_variant) {
       const priceData = product?.skus?.find((p) => p.id === skuId);
       if (priceData) {
-        const getPrice = (apiKey) =>
-          Number.parseFloat(priceData?.[apiKey]?.[0]?.price || 0);
-
-        if (isFromDetail) {
-          return getPrice("productPrices");
-        } else {
-          return getPrice("product_prices");
-        }
+        const mapApiKey = isFromDetail ? "productPrices" : "product_prices";
+        return get().getPriceOrCost(priceData, mapApiKey, "price");
       }
     }
 
@@ -177,14 +175,8 @@ const usePosStore = create((set, get) => ({
     if (product?.is_variant) {
       const priceData = product?.skus?.find((p) => p.id === skuId);
       if (priceData) {
-        const getPrice = (apiKey) =>
-          Number.parseFloat(priceData?.[apiKey]?.[0]?.cost || 0);
-
-        if (isFromDetail) {
-          return getPrice("productPrices");
-        } else {
-          return getPrice("product_prices");
-        }
+        const mapApiKey = isFromDetail ? "productPrices" : "product_prices";
+        return get().getPriceOrCost(priceData, mapApiKey, "cost");
       }
     }
 
