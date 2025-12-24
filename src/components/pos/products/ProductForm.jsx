@@ -913,7 +913,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
                     label="Tipe"
                     isSelectBox={true}
                     selectBoxData={tipeData}
-                    value={item?.type}
+                    value={item?.type || "addition"}
                     handleChange={(e) =>
                       handleNestedChange(
                         "stocks",
@@ -1129,8 +1129,6 @@ export default function ProductForm({ editMode = false, productId = null }) {
     newCategoryErrors,
     addingCategory,
   ]);
-
-  console.log("formData:", formData);
 
   return (
     <>
