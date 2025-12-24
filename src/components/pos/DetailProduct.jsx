@@ -55,7 +55,7 @@ export default function DetailProduct() {
     if (products?.is_variant && selectedVariant) {
       return getProductStock(products, selectedVariant?.id, true);
     }
-    return products?.qty || 0;
+    return products?.stocks?.[0]?.qty || 0;
   };
 
   const location = useLocation();
