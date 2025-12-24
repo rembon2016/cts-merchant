@@ -253,9 +253,8 @@ export default function BottomModal(props) {
           <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
             Pilih Varian:
           </h5>
-          <div className="space-y-2">
+          <div className="flex flex-wrap gap-1">
             {data?.skus?.map((variant) => {
-              const price = getVariantPrice(variant);
               const stock = getVariantStock(variant);
               const isSelected = selectedVariant?.id === variant?.id;
               const isOutOfStock = stock <= 0;
@@ -263,51 +262,28 @@ export default function BottomModal(props) {
               return (
                 <button
                   key={variant.id}
-                  className={`p-3 w-full rounded-lg border cursor-pointer transition-colors ${
+                  className={`p-3 rounded-lg border cursor-pointer transition-colors ${
                     isSelected
                       ? "border-[var(--c-primary)] dark:border-blue-300 bg-blue-50 dark:bg-blue-900/20"
                       : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
-                  } ${isOutOfStock ? "opacity-50 cursor-not-allowed" : ""}`}
+                  } ${
+                    isOutOfStock ? "opacity-50 cursor-not-allowed" : ""
+                  }  flex`}
                   onClick={() => !isOutOfStock && handleVariantSelect(variant)}
                 >
                   <div className="flex items-center justify-between relative">
                     <div className="flex-1">
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-2 relative">
                         <span className="font-medium text-gray-900 dark:text-white">
                           {variant.variant_name}
                         </span>
                         {isOutOfStock && (
-                          <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">
+                          <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded absolute top-0 -left-4">
                             Habis
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center justify-between mt-1">
-                        <span className="text-sm font-semibold text-[var(--c-primary)] dark:text-blue-300">
-                          {formatCurrency(price)}
-                        </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                          Stok: {stock}
-                        </span>
-                      </div>
                     </div>
-                    {isSelected && (
-                      <div className="">
-                        <div className="w-5 h-5 bg-[var(--c-primary)] rounded-full flex items-center justify-center absolute top-0 right-0">
-                          <svg
-                            className="w-3 h-3 text-white"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </button>
               );

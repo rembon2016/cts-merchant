@@ -201,7 +201,7 @@ export default function POS() {
               stock={productStock}
               disabled={isOutOfStock}
               onClick={() => goToProductDetail(product.id)}
-              showButtonCart={!isOutOfStock}
+              showButtonCart={true}
               handleProductClick={handleProductClick}
             />
           );
@@ -276,7 +276,6 @@ export default function POS() {
       {selectedProduct && (
         <BottomModal
           isOpen={showVariantModal}
-          setIsOpen={setShowVariantModal}
           onClose={() => {
             setShowVariantModal(false);
             setSelectedProduct(null);
