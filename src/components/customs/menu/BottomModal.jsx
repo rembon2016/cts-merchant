@@ -273,12 +273,12 @@ export default function BottomModal(props) {
                 >
                   <div className="flex items-center justify-between relative">
                     <div className="flex-1">
-                      <div className="flex items-center space-x-2 relative">
+                      <div className="flex items-center relative">
                         <span className="font-medium text-gray-900 dark:text-white">
                           {variant.variant_name}
                         </span>
                         {isOutOfStock && (
-                          <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded absolute top-0 -left-4">
+                          <span className="text-xs bg-red-100/90 text-red-600 rounded absolute top-0 left-0 w-full h-full">
                             Habis
                           </span>
                         )}
