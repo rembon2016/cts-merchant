@@ -335,8 +335,15 @@ const useProductStore = create((set, get) => ({
     try {
       set({ isLoading: true, error: null });
 
+      const editedPayload = { ...formData };
+
+      if (formData?.is_variant === 1) {
+        delete editedPayload.stocks;
+        delete editedPayload.prices;
+      }
+
       // Detect if there is any File in the formData values
-      const hasFile = Object.values(formData || {}).some(
+      const hasFile = Object.values(editedPayload || {}).some(
         (v) =>
           v instanceof File ||
           (Array.isArray(v) && v.some((i) => i instanceof File))
@@ -379,7 +386,7 @@ const useProductStore = create((set, get) => ({
         // NOTE: do NOT set Content-Type header for FormData — browser will set boundary
       } else {
         headers["Content-Type"] = "application/json";
-        body = JSON.stringify(formData);
+        body = JSON.stringify(editedPayload);
       }
 
       const response = await fetch(
