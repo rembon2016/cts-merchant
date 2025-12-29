@@ -29,7 +29,13 @@ export const ListStateForm = (activeBranch) => {
         is_active: 1,
       },
     ],
-    bundle_items: [],
+    bundle_items: [
+      {
+        product_id: "",
+        qty: "",
+        price: "",
+      },
+    ],
     stocks: [
       {
         qty: "",

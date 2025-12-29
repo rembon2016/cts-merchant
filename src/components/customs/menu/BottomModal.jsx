@@ -20,6 +20,7 @@ BottomModal.propTypes = {
   mode: PropTypes.oneOf(["cart", "custom"]),
   isVariant: PropTypes.bool,
   title: PropTypes.string,
+  bodyHeight: PropTypes.string,
   children: PropTypes.node,
   initialSelectedVariant: PropTypes.object,
 };
@@ -34,6 +35,7 @@ export default function BottomModal(props) {
     isFromDetail,
     mode = "cart",
     title,
+    bodyHeight = "70vh",
     children,
     isVariant,
     initialSelectedVariant,
@@ -320,7 +322,7 @@ export default function BottomModal(props) {
           <div className="absolute bottom-0 left-0 right-0 mx-auto max-w-sm w-full px-4 pointer-events-auto">
             <div
               ref={sheetRef}
-              className="rounded-t-3xl bg-white dark:bg-slate-700 shadow-soft p-4 min-h-[70vh] max-h-[80vh] sheet overflow-y-auto relative"
+              className={`rounded-t-3xl bg-white dark:bg-slate-700 shadow-soft p-4 min-h-[${bodyHeight}] max-h-[80vh] sheet overflow-y-auto relative`}
               style={{
                 borderTopLeftRadius: "1.25rem",
                 borderTopRightRadius: "1.25rem",

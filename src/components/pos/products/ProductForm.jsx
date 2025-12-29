@@ -67,6 +67,12 @@ export default function ProductForm({ editMode = false, productId = null }) {
   const [addingCategory, setAddingCategory] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
 
+  // Delete confirmation & undo for SKUs
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [skuToDelete, setSkuToDelete] = useState(null);
+  const [bundleToDelete, setBundleToDelete] = useState(null);
+  const [confirmModalType, setConfirmModalType] = useState(null);
+
   const formatToNumber = (value) => value?.replaceAll(/\D/g, "");
 
   const formatDateToInput = (val) => {
@@ -118,9 +124,77 @@ export default function ProductForm({ editMode = false, productId = null }) {
     }
   };
 
-  const handleRemoveItem = (arrayName, index) => {
+  const handleRemoveItem = (arrayName, indexOrItem) => {
     setFormData((prev) => {
-      const newArray = prev[arrayName].filter((_, i) => i !== index);
+      // Special handling for SKUs: persisted SKUs (have `id`) should be marked
+      // as deleted (action: 'delete') so backend can remove them, but not shown
+      // to the user anymore. New SKUs (no id) should be removed from array.
+      if (arrayName === "skus") {
+        const skus = prev.skus || [];
+        let realIndex = -1;
+
+        if (typeof indexOrItem === "number") {
+          realIndex = indexOrItem;
+        } else {
+          // Try find by id first, then by reference equality
+          if (indexOrItem?.id) {
+            realIndex = skus.findIndex((s) => s?.id === indexOrItem.id);
+          } else {
+            realIndex = skus.findIndex((s) => s === indexOrItem);
+          }
+        }
+
+        if (realIndex === -1) return prev;
+
+        const target = skus[realIndex];
+
+        if (target?.id) {
+          // mark persisted SKU as deleted but keep it in array so it can be
+          // sent to backend with action:'delete'
+          const newSkus = skus.map((s, i) =>
+            i === realIndex ? { ...s, action: "delete" } : s
+          );
+          return { ...prev, skus: newSkus };
+        } else {
+          // remove non-persisted SKU from array
+          const newSkus = skus.filter((_, i) => i !== realIndex);
+          return { ...prev, skus: newSkus };
+        }
+      }
+
+      if (arrayName === "bundle_items") {
+        const bundles = prev.bundle_items || [];
+        let realIndex = -1;
+
+        if (typeof indexOrItem === "number") {
+          realIndex = indexOrItem;
+        } else {
+          // Try find by id first, then by reference equality
+          if (indexOrItem?.id) {
+            realIndex = bundles.findIndex((b) => b?.id === indexOrItem.id);
+          } else {
+            realIndex = bundles.findIndex((b) => b === indexOrItem);
+          }
+        }
+
+        if (realIndex === -1) return prev;
+
+        const target = bundles[realIndex];
+
+        if (target?.id) {
+          // mark persisted bundle item as deleted but keep it in array so it can be sent to backend with action:'delete'
+          const newBundleItems = bundles.map((b, i) =>
+            i === realIndex ? { ...b, action: "delete" } : b
+          );
+          return { ...prev, bundle_items: newBundleItems };
+        } else {
+          // remove non-persisted bundle item from array
+          const newBundleItems = bundles.filter((_, i) => i !== realIndex);
+          return { ...prev, bundle_items: newBundleItems };
+        }
+      }
+
+      const newArray = prev[arrayName].filter((_, i) => i !== indexOrItem);
       const updates = { [arrayName]: newArray };
 
       if (arrayName === "bundle_items" && newArray.length === 0) {
@@ -169,10 +243,11 @@ export default function ProductForm({ editMode = false, productId = null }) {
           : [],
       bundle_items:
         products?.bundle_items && products?.bundle_items.length > 0
-          ? products?.bundle_items.map((item) => ({
-              product_id: item?.product?.id || "",
-              qty: item?.qty || "",
-              price: item?.price || "",
+          ? products?.bundle_items.map((bundle) => ({
+              id: bundle?.id || "",
+              product_id: bundle?.product?.id || "",
+              qty: bundle?.qty || "",
+              price: bundle?.price || "",
             }))
           : [],
       stocks:
@@ -258,9 +333,9 @@ export default function ProductForm({ editMode = false, productId = null }) {
     const empty = (v) => !v?.toString().trim();
     const emptyArr = (v) => !Array.isArray(v) || !v.length;
 
-    const newArraySKUS = formData?.skus.map(
-      ({ is_active, barcode, ...rest }) => rest
-    );
+    const newArraySKUS = (formData?.skus || [])
+      .filter((s) => s?.action !== "delete")
+      .map(({ is_active, barcode, ...rest }) => rest);
 
     // required fields
     if (empty(formData.name)) errors.name = "Nama produk wajib diisi";
@@ -322,29 +397,43 @@ export default function ProductForm({ editMode = false, productId = null }) {
         )
       : [];
 
-    const skuForm = (formData.skus || []).map((sku) => ({
-      id: sku?.id || "",
-      sku: sku?.sku || "",
-      barcode: sku?.barcode || "",
-      variant_name: sku?.variant_name || "",
-      reason: sku?.reason || "deskripsi",
-      price: sku?.price || "",
-      cost: sku?.cost || "",
-      qty: sku?.qty || "",
-      is_active: sku?.is_active ? 1 : 0,
-      branch_id: activeBranch,
-      effective_from: sku?.effective_from || "",
-      effective_until: sku?.effective_until || "",
-      action: sku?.id ? "update" : "create",
-    }));
+    const skuForm = (formData.skus || [])
+      .filter((s) => !(s?.action === "delete" && !s?.id))
+      .map((sku) => ({
+        id: sku?.id || "",
+        sku: sku?.sku || "",
+        barcode: sku?.barcode || "",
+        variant_name: sku?.variant_name || "",
+        reason: sku?.reason || "deskripsi",
+        price: sku?.price || "",
+        cost: sku?.cost || "",
+        qty: sku?.qty || "",
+        is_active: sku?.is_active ? 1 : 0,
+        branch_id: activeBranch,
+        effective_from: sku?.effective_from || "",
+        effective_until: sku?.effective_until || "",
+        action: sku?.action || (sku?.id ? "update" : "create"),
+      }));
 
-    const mapStocksFromSku = (formData?.skus || []).map((sku) => ({
-      branch_id: activeBranch,
-      qty: sku?.qty,
-      reason: sku?.reason,
-      product_sku_id: sku?.id || "",
-      ...(editMode ? { type: sku?.type } : {}),
-    }));
+    const bundleItemsFrom = (formData?.bundle_items || [])
+      .filter((b) => b?.action !== "delete" && !b?.id)
+      .map((bundle) => ({
+        id: bundle?.id || "",
+        qty: bundle?.qty || "",
+        product_id: bundle?.product_id || "",
+        price: bundle?.price || "",
+        action: bundle?.action || (bundle?.id ? "update" : "create"),
+      }));
+
+    const mapStocksFromSku = (formData?.skus || [])
+      .filter((s) => s?.action !== "delete")
+      .map((sku) => ({
+        branch_id: activeBranch,
+        qty: sku?.qty,
+        reason: sku?.reason,
+        product_sku_id: sku?.id || "",
+        ...(editMode ? { type: sku?.type } : {}),
+      }));
 
     // For add mode, exclude `type` from stocks payload
     const stocksPayload = (formData.stocks || []).map((s) => ({
@@ -381,7 +470,7 @@ export default function ProductForm({ editMode = false, productId = null }) {
       brand_ids: brandIds,
       is_variant: formData.is_variant ? 1 : 0,
       is_bundle: formData.is_bundle ? 1 : 0,
-      bundle_items: formData.is_bundle ? formData.bundle_items : [],
+      bundle_items: formData.is_bundle ? bundleItemsFrom : [],
       skus: formData.is_variant ? skuForm : [],
       stocks: !formData?.is_variant
         ? editMode
@@ -390,6 +479,10 @@ export default function ProductForm({ editMode = false, productId = null }) {
         : mapStocksFromSku,
       prices: pricePayload,
     };
+
+    console.log(dataToSubmit);
+
+    return;
 
     const response = editMode
       ? await editProducts(dataToSubmit, productId)
@@ -553,7 +646,11 @@ export default function ProductForm({ editMode = false, productId = null }) {
         <button
           type="button"
           className="font-semibold bg-red-500 p-4 rounded-lg w-fit ml-auto mt-2 text-white"
-          onClick={() => handleRemoveItem("skus", index)}
+          onClick={() => {
+            setSkuToDelete(item);
+            setShowDeleteConfirm(true);
+            setConfirmModalType("varian");
+          }}
         >
           {getTrashIcon}
         </button>
@@ -613,7 +710,11 @@ export default function ProductForm({ editMode = false, productId = null }) {
         <button
           type="button"
           className="font-semibold bg-red-500 p-4 rounded-lg w-fit ml-auto mt-2 text-white"
-          onClick={() => handleRemoveItem("bundle_items", index)}
+          onClick={() => {
+            setBundleToDelete(item);
+            setShowDeleteConfirm(true);
+            setConfirmModalType("bundle");
+          }}
         >
           {getTrashIcon}
         </button>
@@ -645,6 +746,45 @@ export default function ProductForm({ editMode = false, productId = null }) {
     }
   };
 
+  // Delete confirmation and undo helpers for SKUs and Bundle Items
+  const handleConfirmDelete = () => {
+    // require at least one selected target
+    if (!skuToDelete && !bundleToDelete) return;
+
+    if (skuToDelete) {
+      handleRemoveItem("skus", skuToDelete);
+    } else if (bundleToDelete) {
+      handleRemoveItem("bundle_items", bundleToDelete);
+    }
+
+    setSkuToDelete(null);
+    setBundleToDelete(null);
+    setConfirmModalType(null);
+    setShowDeleteConfirm(false);
+  };
+
+  const handleCancelDelete = () => {
+    setSkuToDelete(null);
+    setBundleToDelete(null);
+    setConfirmModalType(null);
+    setShowDeleteConfirm(false);
+  };
+
+  const handleUndoDelete = (item, name) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: (prev[name] || []).map((s) =>
+        s?.id && item?.id
+          ? s.id === item.id
+            ? { ...s, action: "update" }
+            : s
+          : s === item
+          ? { ...s, action: "create" }
+          : s
+      ),
+    }));
+  };
+
   const renderForm = useMemo(() => {
     const effectiveFromValue = editMode
       ? formatDateToInput(formData?.prices?.[0]?.effective_from)
@@ -652,6 +792,14 @@ export default function ProductForm({ editMode = false, productId = null }) {
     const effectiveUntilValue = editMode
       ? formatDateToInput(formData?.prices?.[0]?.effective_until)
       : formData?.prices?.[0]?.effective_until || "";
+
+    const pendingDeletedSkus = (formData?.skus || []).filter(
+      (s) => s?.action === "delete"
+    );
+
+    const pendingDeletedBundles = (formData?.bundle_items || []).filter(
+      (b) => b?.action === "delete"
+    );
 
     return (
       <div className="flex flex-col gap-3 mt-3 p-4">
@@ -1017,7 +1165,37 @@ export default function ProductForm({ editMode = false, productId = null }) {
 
           {formData?.is_variant && (
             <div className="flex flex-col gap-2 mt-4">
-              {formData?.skus?.map((item, index) => elementSKUS(item, index))}
+              {formData?.skus
+                ?.filter((s) => s?.action !== "delete")
+                .map((item, index) => elementSKUS(item, index))}
+
+              {pendingDeletedSkus.length > 0 && (
+                <div className="mt-4 p-4 rounded-lg border border-yellow-300 bg-yellow-50">
+                  <h4 className="font-semibold mb-2">Pending deletions</h4>
+                  <div className="flex flex-col gap-2">
+                    {pendingDeletedSkus.map((s, i) => (
+                      <div
+                        key={`pending-sku-${s?.id || i}`}
+                        className="flex items-center justify-between gap-2 bg-white p-2 rounded"
+                      >
+                        <div className="text-sm">
+                          {s?.product_id || "(Unnamed)"}
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            className="text-sm px-3 py-2 rounded border"
+                            onClick={() => handleUndoDelete(s, "skus")}
+                          >
+                            Undo
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <button
                 type="button"
                 className="text-white font-semibold bg-[var(--c-primary)] py-4 px-6 rounded-lg w-fit ml-auto mt-4"
@@ -1100,9 +1278,37 @@ export default function ProductForm({ editMode = false, productId = null }) {
 
           {formData?.is_bundle && (
             <div className="flex flex-col gap-2 mt-4">
-              {formData?.bundle_items?.map((item, index) =>
-                elementBundle(item, index)
+              {formData?.bundle_items
+                ?.filter((s) => s?.action !== "delete")
+                .map((item, index) => elementBundle(item, index))}
+
+              {pendingDeletedBundles.length > 0 && (
+                <div className="mt-4 p-4 rounded-lg border border-yellow-300 bg-yellow-50">
+                  <h4 className="font-semibold mb-2">Pending deletions</h4>
+                  <div className="flex flex-col gap-2">
+                    {pendingDeletedBundles.map((s, i) => (
+                      <div
+                        key={`pending-sku-${s?.id || i}`}
+                        className="flex items-center justify-between gap-2 bg-white p-2 rounded"
+                      >
+                        <div className="text-sm">
+                          {s?.variant_name || "(Unnamed)"}
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            className="text-sm px-3 py-2 rounded border"
+                            onClick={() => handleUndoDelete(s, "bundle_items")}
+                          >
+                            Undo
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )}
+
               <button
                 type="button"
                 className="text-white font-semibold bg-[var(--c-primary)] py-4 px-6 rounded-lg w-fit ml-auto mt-4"
@@ -1245,6 +1451,42 @@ export default function ProductForm({ editMode = false, productId = null }) {
           </button>
         </div>
       </BottomModal>
+
+      <BottomModal
+        isOpen={showDeleteConfirm}
+        setIsOpen={setShowDeleteConfirm}
+        onClose={handleCancelDelete}
+        mode="custom"
+        title={`Hapus ${confirmModalType}`}
+        bodyHeight={"100px"}
+      >
+        <div className="p-4">
+          <p>
+            Apakah Anda yakin ingin menghapus {confirmModalType} "
+            {confirmModalType === "varian"
+              ? skuToDelete?.variant_name || "(Unnamed)"
+              : "ini"}
+            "?
+          </p>
+          <div className="flex justify-end gap-2 pt-4">
+            <button
+              type="button"
+              className="px-4 py-2 rounded-lg border"
+              onClick={handleCancelDelete}
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              className="px-4 py-2 rounded-lg bg-red-500 text-white"
+              onClick={handleConfirmDelete}
+            >
+              Hapus
+            </button>
+          </div>
+        </div>
+      </BottomModal>
+
       {renderForm}
     </>
   );

@@ -337,10 +337,10 @@ const useProductStore = create((set, get) => ({
 
       const editedPayload = { ...formData };
 
-      if (formData?.is_variant === 1) {
-        delete editedPayload.stocks;
-        delete editedPayload.prices;
-      }
+      // if (formData?.is_variant === 1) {
+      //   delete editedPayload.stocks;
+      //   delete editedPayload.prices;
+      // }
 
       // Detect if there is any File in the formData values
       const hasFile = Object.values(editedPayload || {}).some(
@@ -360,7 +360,7 @@ const useProductStore = create((set, get) => ({
         // Use FormData for file upload
         body = new FormData();
 
-        Object.entries(formData || {}).forEach(([key, value]) => {
+        Object.entries(editedPayload || {}).forEach(([key, value]) => {
           if (value instanceof File) {
             body.append(key, value, value.name);
           } else if (Array.isArray(value)) {
