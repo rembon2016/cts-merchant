@@ -265,7 +265,7 @@ export default function BottomModal(props) {
                   className={`p-3 rounded-lg border cursor-pointer transition-colors ${
                     isSelected
                       ? "border-[var(--c-primary)] dark:border-blue-300 bg-blue-50 dark:bg-blue-900/20"
-                      : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
+                      : "border-gray-300 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
                   } ${
                     isOutOfStock ? "opacity-50 cursor-not-allowed" : ""
                   }  flex`}
