@@ -416,7 +416,8 @@ export default function ProductForm({ editMode = false, productId = null }) {
       }));
 
     const bundleItemsFrom = (formData?.bundle_items || [])
-      .filter((b) => b?.action !== "delete" && !b?.id)
+      // exclude only bundle items that were created locally and then deleted
+      .filter((b) => !(b?.action === "delete" && !b?.id))
       .map((bundle) => ({
         id: bundle?.id || "",
         qty: bundle?.qty || "",
@@ -479,10 +480,6 @@ export default function ProductForm({ editMode = false, productId = null }) {
         : mapStocksFromSku,
       prices: pricePayload,
     };
-
-    console.log(dataToSubmit);
-
-    return;
 
     const response = editMode
       ? await editProducts(dataToSubmit, productId)
