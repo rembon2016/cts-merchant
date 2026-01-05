@@ -13,8 +13,16 @@ import CustomToast from "../../customs/toast/CustomToast";
 import PrimaryButton from "../../customs/button/PrimaryButton";
 import BackButton from "../../customs/button/BackButton";
 import { ListStateForm } from "./ListStateForm";
+import PropTypes from "prop-types";
 
-export default function ProductForm({ editMode = false, productId = null }) {
+ProductForm.propTypes = {
+  editMode: PropTypes.bool,
+  productId: PropTypes.string,
+};
+
+export default function ProductForm(props) {
+  const { editMode = false, productId = null } = props;
+
   const navigate = useNavigate();
 
   const activeBranch = Number?.parseInt(
