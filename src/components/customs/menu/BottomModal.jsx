@@ -149,10 +149,10 @@ export default function BottomModal(props) {
     document.body.style.userSelect = "";
     document.body.style.cursor = "";
     try {
-      window.removeEventListener("touchmove", touchMoveHandler);
-      window.removeEventListener("touchend", touchEndHandler);
-      window.removeEventListener("mousemove", mouseMoveHandler);
-      window.removeEventListener("mouseup", mouseUpHandler);
+      globalThis.removeEventListener("touchmove", touchMoveHandler);
+      globalThis.removeEventListener("touchend", touchEndHandler);
+      globalThis.removeEventListener("mousemove", mouseMoveHandler);
+      globalThis.removeEventListener("mouseup", mouseUpHandler);
     } catch (e) {
       // ignore
     }
