@@ -4,6 +4,7 @@ import { formatCurrency } from "../../../helper/currency";
 import { useCartStore } from "../../../store/cartStore";
 import { usePosStore } from "../../../store/posStore";
 import { useCustomToast } from "../../../hooks/useCustomToast";
+import useResizableModalBox from "../../../hooks/useResizableModalBox";
 import CustomToast from "../toast/CustomToast";
 import SimpleInput from "../form/SimpleInput";
 import ButtonQuantity from "../button/ButtonQuantity";
@@ -53,258 +54,9 @@ export default function BottomModal(props) {
     hideToast,
   } = useCustomToast();
 
-  // --- Swipe / Resize state (height in pixels) ---
-  const [sheetHeight, setSheetHeight] = useState(null); // px
-  const maxHeightRef = useRef(0); // px
-  const hideThresholdRef = useRef(0); // px
-  const startYRef = useRef(0);
-  const startHeightRef = useRef(0);
-  const isDraggingRef = useRef(false);
-
-  // For momentum calculation and snapping
-  const lastPositionsRef = useRef([]); // [{ y, t }]
-  const snapRatios = [0.7, 0.85, 0.95];
-  const snapHeightsRef = useRef([]);
-
-  // parse bodyHeight prop like "70vh" or "400px"
-  const parseBodyHeight = (val) => {
-    try {
-      if (!val) return window.innerHeight * 0.7;
-      if (typeof val === "string" && val.endsWith("vh")) {
-        const num = Number.parseFloat(val.replace("vh", ""));
-        return (window.innerHeight * num) / 100;
-      }
-      if (typeof val === "string" && val.endsWith("px")) {
-        return Number.parseFloat(val.replace("px", ""));
-      }
-      return Number.parseFloat(val) || window.innerHeight * 0.7;
-    } catch {
-      return window.innerHeight * 0.7;
-    }
-  };
-
-  const computeSnapHeights = (wh) => {
-    snapHeightsRef.current = snapRatios.map((r) => Math.floor(wh * r));
-  };
-
-  const initializeHeights = () => {
-    const wh = window.innerHeight;
-    maxHeightRef.current = Math.floor(wh * 0.95); // 95% of viewport
-    hideThresholdRef.current = Math.floor(wh * 0.2); // 20% of viewport
-    computeSnapHeights(wh);
-    const initial = parseBodyHeight(bodyHeight);
-    const boundedInitial = Math.min(initial, maxHeightRef.current);
-    setSheetHeight(boundedInitial);
-
-    if (sheetRef.current) {
-      sheetRef.current.style.height = `${boundedInitial}px`;
-      sheetRef.current.style.maxHeight = `${maxHeightRef.current}px`;
-      sheetRef.current.style.transition = "height 200ms";
-    }
-  };
-
-  useEffect(() => {
-    // update responsive measurements on resize
-    const onResize = () => {
-      const wh = window.innerHeight;
-      const prevMax = maxHeightRef.current || wh;
-      const ratio = sheetHeight ? sheetHeight / prevMax : null;
-      maxHeightRef.current = Math.floor(wh * 0.95);
-      hideThresholdRef.current = Math.floor(wh * 0.2);
-      computeSnapHeights(wh);
-      const newHeight = ratio
-        ? Math.min(
-            Math.floor(maxHeightRef.current * ratio),
-            maxHeightRef.current
-          )
-        : Math.min(parseBodyHeight(bodyHeight), maxHeightRef.current);
-      setSheetHeight(newHeight);
-      if (sheetRef.current)
-        sheetRef.current.style.maxHeight = `${maxHeightRef.current}px`;
-      if (sheetRef.current) sheetRef.current.style.height = `${newHeight}px`;
-    };
-
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bodyHeight, sheetHeight]);
-
-  const onDragStart = (clientY) => {
-    isDraggingRef.current = true;
-    startYRef.current = clientY;
-    startHeightRef.current =
-      sheetHeight ||
-      (sheetRef.current
-        ? sheetRef.current.getBoundingClientRect().height
-        : parseBodyHeight(bodyHeight));
-    lastPositionsRef.current = [{ y: clientY, t: Date.now() }];
-    if (sheetRef.current) sheetRef.current.style.transition = "none";
-    document.body.style.userSelect = "none";
-    document.body.style.cursor = "grabbing";
-  };
-
-  const immediateClose = () => {
-    // stop dragging and cleanup listeners, then close
-    isDraggingRef.current = false;
-    document.body.style.userSelect = "";
-    document.body.style.cursor = "";
-    try {
-      globalThis.removeEventListener("touchmove", touchMoveHandler);
-      globalThis.removeEventListener("touchend", touchEndHandler);
-      globalThis.removeEventListener("mousemove", mouseMoveHandler);
-      globalThis.removeEventListener("mouseup", mouseUpHandler);
-    } catch (e) {
-      // ignore
-    }
-    if (sheetRef.current) {
-      sheetRef.current.style.transition = "height 150ms ease";
-      sheetRef.current.style.height = `0px`;
-    }
-    lastPositionsRef.current = [];
-    setTimeout(() => {
-      handleClose();
-    }, 160);
-  };
-
-  const onDragMove = (clientY) => {
-    if (!isDraggingRef.current) return;
-    const delta = startYRef.current - clientY; // up => positive
-    let newHeight = startHeightRef.current + delta;
-    newHeight = Math.max(0, Math.min(newHeight, maxHeightRef.current));
-    setSheetHeight(newHeight);
-    if (sheetRef.current) sheetRef.current.style.height = `${newHeight}px`;
-
-    // if sheet reduced below threshold while dragging, close immediately
-    if (newHeight <= hideThresholdRef.current) {
-      immediateClose();
-      return;
-    }
-
-    // record last positions for velocity calculation (keep last 6)
-    const positions = lastPositionsRef.current;
-    positions.push({ y: clientY, t: Date.now() });
-    if (positions.length > 6) positions.shift();
-    lastPositionsRef.current = positions;
-  };
-
-  const onDragEnd = () => {
-    if (!isDraggingRef.current) return;
-    isDraggingRef.current = false;
-    document.body.style.userSelect = "";
-    document.body.style.cursor = "";
-
-    // compute velocity (px/ms) from last two recorded positions
-    const positions = lastPositionsRef.current;
-    let velocity = 0;
-    if (positions.length >= 2) {
-      const last = positions[positions.length - 1];
-      const prev = positions[positions.length - 2];
-      const dy = prev.y - last.y; // positive if moving up
-      const dt = last.t - prev.t; // ms
-      if (dt > 0) velocity = dy / dt; // px per ms
-    }
-
-    // apply simple momentum prediction (ms multiplier)
-    const momentumMs = 300; // how long the momentum lasts
-    const predictedDelta = velocity * momentumMs; // pixels
-    let targetHeight = sheetHeight + predictedDelta;
-    targetHeight = Math.max(0, Math.min(targetHeight, maxHeightRef.current));
-
-    // if predicted target below hide threshold => close
-    if (targetHeight <= hideThresholdRef.current) {
-      handleClose();
-      lastPositionsRef.current = [];
-      return;
-    }
-
-    // Decide whether to snap or keep released target
-    const snaps = snapHeightsRef.current.slice();
-    if (!snaps.includes(maxHeightRef.current)) snaps.push(maxHeightRef.current);
-
-    // find nearest snap
-    let nearest = snaps[0];
-    let minDiff = Math.abs(snaps[0] - targetHeight);
-    for (let i = 1; i < snaps.length; i++) {
-      const diff = Math.abs(snaps[i] - targetHeight);
-      if (diff < minDiff) {
-        minDiff = diff;
-        nearest = snaps[i];
-      }
-    }
-
-    // tolerance to decide snapping (4% of viewport height)
-    const snapTolerance = Math.floor(window.innerHeight * 0.04);
-    const velocityThreshold = 0.06; // px per ms
-
-    // If we're close to a snap point OR there was enough flick velocity, consider snapping.
-    // Avoid snapping *down* to a lower snap if the user dragged upwards (they likely want to keep the new size).
-    const movedUp = targetHeight > startHeightRef.current;
-    let shouldSnap =
-      Math.abs(nearest - targetHeight) <= snapTolerance ||
-      Math.abs(velocity) >= velocityThreshold;
-    if (nearest < startHeightRef.current && movedUp) {
-      shouldSnap = false;
-    }
-
-    const finalHeight = shouldSnap ? nearest : Math.round(targetHeight);
-
-    if (sheetRef.current)
-      sheetRef.current.style.transition =
-        "height 350ms cubic-bezier(0.22, 1, 0.36, 1)";
-    setSheetHeight(finalHeight);
-    if (sheetRef.current) sheetRef.current.style.height = `${finalHeight}px`;
-
-    lastPositionsRef.current = [];
-  };
-
-  // mouse handlers (desktop)
-  const mouseMoveHandler = (e) => onDragMove(e.clientY);
-  const mouseUpHandler = () => {
-    onDragEnd();
-    globalThis.removeEventListener("mousemove", mouseMoveHandler);
-    globalThis.removeEventListener("mouseup", mouseUpHandler);
-  };
-
-  // touch handlers (mobile)
-  const touchMoveHandler = (e) => {
-    if (e.touches?.[0]) {
-      e.preventDefault();
-      onDragMove(e.touches[0].clientY);
-    }
-  };
-
-  const touchEndHandler = () => {
-    onDragEnd();
-    globalThis.removeEventListener("touchmove", touchMoveHandler);
-    globalThis.removeEventListener("touchend", touchEndHandler);
-  };
-
-  useEffect(() => {
-    // if open, set initial height
-    if (isOpen) {
-      initializeHeights();
-    }
-    // cleanup on unmount
-    return () => {
-      document.body.style.userSelect = "";
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
-
-  // ensure listeners removed on unmount in any case
-  useEffect(() => {
-    return () => {
-      try {
-        globalThis.removeEventListener("touchmove", touchMoveHandler);
-        globalThis.removeEventListener("touchend", touchEndHandler);
-        globalThis.removeEventListener("mousemove", mouseMoveHandler);
-        globalThis.removeEventListener("mouseup", mouseUpHandler);
-      } catch (e) {
-        // ignore
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // Resizable modal logic moved to hook
+  const { sheetStyle, handleMouseDown, handleTouchStart } =
+    useResizableModalBox({ isOpen, bodyHeight, onClose, sheetRef });
 
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [quantity, setQuantity] = useState(1);
@@ -584,10 +336,7 @@ export default function BottomModal(props) {
               style={{
                 borderTopLeftRadius: "1.25rem",
                 borderTopRightRadius: "1.25rem",
-                height: sheetHeight ? `${sheetHeight}px` : undefined,
-                maxHeight: maxHeightRef.current
-                  ? `${maxHeightRef.current}px`
-                  : undefined,
+                ...sheetStyle,
               }}
             >
               {/* Drag handle (mouse + touch) */}
@@ -595,19 +344,10 @@ export default function BottomModal(props) {
                 className="flex items-center justify-center mb-3 cursor-grab"
                 onMouseDown={(e) => {
                   e.preventDefault();
-                  onDragStart(e.clientY);
-                  globalThis.addEventListener("mousemove", mouseMoveHandler);
-                  globalThis.addEventListener("mouseup", mouseUpHandler);
+                  handleMouseDown(e);
                 }}
                 onTouchStart={(e) => {
-                  if (e.touches?.[0]) {
-                    onDragStart(e.touches[0].clientY);
-                    // attach touchmove listener as non-passive so preventDefault works
-                    globalThis.addEventListener("touchmove", touchMoveHandler, {
-                      passive: false,
-                    });
-                    globalThis.addEventListener("touchend", touchEndHandler);
-                  }
+                  handleTouchStart(e);
                 }}
               >
                 <div className="h-1.5 w-12 rounded-full bg-gray-300 dark:bg-slate-500" />
