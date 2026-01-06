@@ -56,11 +56,16 @@ export default function BottomModal(props) {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [quantity, setQuantity] = useState(1);
 
-  const mappingPriceApiKey = isFromDetail ? "productPrices" : "product_prices";
-  const mappingStockApiKey = isFromDetail ? "productStocks" : "product_stocks";
+  const mappingApiKey = (params) => {
+    if (params?.toLowerCase() === "price") {
+      return isFromDetail ? "productPrices" : "product_prices";
+    } else if (params?.toLowerCase() === "stock") {
+      return isFromDetail ? "productStocks" : "product_stocks";
+    }
+  };
 
   const getPriceFunc = (isTotalPrice = false) => {
-    const mapping = selectedVariant?.[mappingPriceApiKey]?.map(
+    const mapping = selectedVariant?.[mappingApiKey("price")]?.map(
       (item) => item?.price
     );
 
@@ -70,7 +75,7 @@ export default function BottomModal(props) {
   };
 
   const getStockFunc = () => {
-    return selectedVariant?.[mappingStockApiKey]?.map((itemStock) =>
+    return selectedVariant?.[mappingApiKey("stock")]?.map((itemStock) =>
       quantity > itemStock?.qty ? setQuantity(itemStock?.qty) : itemStock?.qty
     );
   };
