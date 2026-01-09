@@ -20,6 +20,7 @@ export default function DetailProduct() {
   } = useCustomToast();
 
   const [showModal, setShowModal] = useState(false);
+  const [fullValue, setFullValue] = useState(null);
 
   const { isDark } = useThemeStore();
 
@@ -168,30 +169,88 @@ export default function DetailProduct() {
                 </div>
               ))}
             <h5 className="font-semibold text-gray-500 mt-2">Varian</h5>
-            {products?.skus?.length > 0 &&
-              products?.skus.map((item) => (
-                <div className="flex flex-col gap-2" key={item?.id}>
-                  <div className="flex justify-between bg-white p-4 rounded-md">
-                    <h3 className="font-medium text-md">Nama Variant </h3>
-                    <h3 className="font-bold text-md">{item?.variant_name}</h3>
+            {products?.skus?.length > 0 && (
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[300px] text-sm text-left bg-white rounded-md divide-y divide-gray-100">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-gray-600">Varian</th>
+                      <th className="px-4 py-3 text-gray-600">SKU</th>
+                      <th className="px-4 py-3 text-gray-600">Aktif</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {products?.skus?.map((item) => (
+                      <tr key={item?.id} className="hover:bg-gray-50">
+                        <td
+                          className="px-4 py-3 font-medium max-w-[140px] sm:max-w-[220px] md:max-w-[320px] truncate cursor-pointer"
+                          title={item?.variant_name || "-"}
+                          onClick={() =>
+                            setFullValue({
+                              label: "Varian",
+                              value: item?.variant_name || "-",
+                            })
+                          }
+                        >
+                          {item?.variant_name || "-"}
+                        </td>
+                        <td
+                          className="px-4 py-3 max-w-[120px] sm:max-w-[180px] md:max-w-[220px] truncate text-xs text-gray-700 cursor-pointer"
+                          title={item?.sku || "-"}
+                          onClick={() =>
+                            setFullValue({
+                              label: "SKU",
+                              value: item?.sku || "-",
+                            })
+                          }
+                        >
+                          {item?.sku || "-"}
+                        </td>
+                        <td className="px-4 py-3 text-sm">
+                          {item?.is_active ? "Ya" : "Tidak"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Overlay for showing full cell values on tap */}
+          {fullValue && (
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+              <button
+                className="absolute inset-0 bg-black/30"
+                onClick={() => setFullValue(null)}
+                aria-hidden
+              />
+              <div
+                role="dialog"
+                aria-modal="true"
+                className="relative bg-white dark:bg-slate-700 rounded-lg p-4 max-w-[92%] mx-4 shadow-lg"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <h4 className="font-semibold mb-2">{fullValue.label}</h4>
+                    <div className="text-sm break-words">{fullValue.value}</div>
                   </div>
-                  <div className="flex justify-between bg-white p-4 rounded-md">
-                    <h3 className="font-medium text-md">SKU </h3>
-                    <h3 className="font-bold text-md">{item?.sku}</h3>
-                  </div>
-                  <div className="flex justify-between bg-white p-4 rounded-md">
-                    <h3 className="font-medium text-md">Aktif?</h3>
-                    <h3 className="font-bold text-md">
-                      {item?.is_active ? "Ya" : "Tidak"}
-                    </h3>
+                  <div className="flex-shrink-0 ml-3">
+                    <button
+                      onClick={() => setFullValue(null)}
+                      className="text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-slate-600 rounded px-3 py-1"
+                    >
+                      Tutup
+                    </button>
                   </div>
                 </div>
-              ))}
-          </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
-  }, [products, isLoading, isDark, error, showModal]);
+  }, [products, isLoading, isDark, error, showModal, fullValue]);
 
   return (
     <div className="px-4">

@@ -4,6 +4,7 @@ import { formatCurrency } from "../../../helper/currency";
 import { useCartStore } from "../../../store/cartStore";
 import { usePosStore } from "../../../store/posStore";
 import { useCustomToast } from "../../../hooks/useCustomToast";
+import useResizableModalBox from "../../../hooks/useResizableModalBox";
 import CustomToast from "../toast/CustomToast";
 import SimpleInput from "../form/SimpleInput";
 import ButtonQuantity from "../button/ButtonQuantity";
@@ -53,14 +54,23 @@ export default function BottomModal(props) {
     hideToast,
   } = useCustomToast();
 
+  // Resizable modal logic moved to hook
+  const { sheetStyle, handleMouseDown, handleTouchStart } =
+    useResizableModalBox({ isOpen, bodyHeight, onClose, sheetRef });
+
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [quantity, setQuantity] = useState(1);
 
-  const mappingPriceApiKey = isFromDetail ? "productPrices" : "product_prices";
-  const mappingStockApiKey = isFromDetail ? "productStocks" : "product_stocks";
+  const mappingApiKey = (params) => {
+    if (params?.toLowerCase() === "price") {
+      return isFromDetail ? "productPrices" : "product_prices";
+    } else if (params?.toLowerCase() === "stock") {
+      return isFromDetail ? "productStocks" : "product_stocks";
+    }
+  };
 
   const getPriceFunc = (isTotalPrice = false) => {
-    const mapping = selectedVariant?.[mappingPriceApiKey]?.map(
+    const mapping = selectedVariant?.[mappingApiKey("price")]?.map(
       (item) => item?.price
     );
 
@@ -70,7 +80,7 @@ export default function BottomModal(props) {
   };
 
   const getStockFunc = () => {
-    return selectedVariant?.[mappingStockApiKey]?.map((itemStock) =>
+    return selectedVariant?.[mappingApiKey("stock")]?.map((itemStock) =>
       quantity > itemStock?.qty ? setQuantity(itemStock?.qty) : itemStock?.qty
     );
   };
@@ -246,13 +256,13 @@ export default function BottomModal(props) {
   const renderVariants = useMemo(() => {
     return (
       <div
-        className={`bg-white  rounded-lg max-w-md w-full max-h-[80vh] overflow-hidden ${
+        className={`bg-white  rounded-lg max-w-md w-full max-h-[95vh] overflow-hidden ${
           isDark ? "dark" : ""
         }`}
       >
         {/* Variants List */}
-        <div className="max-h-60 overflow-y-auto">
-          <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+        <div className="max-h-[95vh] overflow-y-auto mb-3">
+          <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 text-start">
             Pilih Varian:
           </h5>
           <div className="flex flex-wrap gap-1">
@@ -296,6 +306,146 @@ export default function BottomModal(props) {
     );
   }, [data, selectedVariant, quantity, isDark]);
 
+  const renderElement = useMemo(() => {
+    return (
+      <>
+        {mode === "cart" ? (
+          <button
+            className="pb-24"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              handleMouseDown(e);
+            }}
+            onTouchStart={(e) => {
+              handleTouchStart(e);
+            }}
+          >
+            <div className="flex items-center justify-between mb-10">
+              <div className="flex flex-col justify-center items-center w-full">
+                <button className="flex items-center justify-center mb-3 cursor-grab">
+                  <div className="h-1.5 w-12 rounded-full bg-gray-300 dark:bg-slate-500" />
+                </button>
+                <h4 className="font-semibold text-primary dark:text-slate-300">
+                  Detail Produk
+                </h4>
+                {/* Drag handle (mouse + touch) */}
+              </div>
+            </div>
+
+            {/* Grid 3 cols with 3-2-1 layout */}
+            <div className="flex gap-2 mb-4">
+              <img
+                src={data?.image}
+                alt={data?.name}
+                className="w-28 h-20 object-cover object-center rounded-lg"
+              />
+              <div className="flex flex-col justify-center items-start">
+                <h3 className="font-bold text-lg">{data?.name}</h3>
+                <h3 className="font-medium text-lg">
+                  Harga:{" "}
+                  <span
+                    className={`text-[var(--c-primary)] ${
+                      isDark && "text-blue-300"
+                    }`}
+                  >
+                    {getPriceToDisplay}
+                  </span>
+                </h3>
+                <h3 className="font-semibold text-md">Stock: {getStocks()}</h3>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              {data?.is_variant ? renderVariants : null}
+              <div className="flex items-center gap-2 ">
+                <SimpleInput
+                  name="harga"
+                  type="text"
+                  label="Harga Pembelian"
+                  value={totalPrice}
+                  handleChange={handleChange}
+                  disabled={true}
+                />
+                <ButtonQuantity
+                  quantity={quantity}
+                  setQuantity={setQuantity}
+                  stocks={getStockToDisplay}
+                  style={{
+                    marginTop: "20px",
+                  }}
+                />
+              </div>
+            </div>
+            {/* Absolute footer button at the bottom */}
+            <div className="absolute bottom-0 left-0 right-0 p-4 bg-white dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+              <button
+                className={`w-full flex gap-2 justify-center items-center h-16 py-2 rounded-lg transition-colors bg-[var(--c-primary)] text-white hover:bg-blue-700`}
+                onClick={() =>
+                  handleAddToCart(data, null, quantity, isFromDetail)
+                }
+                disabled={isLoading}
+              >
+                <ShoppingCart className="w-5 h-5" />
+                {!isLoading ? "Masukkan Keranjang" : "Memproses..."}
+              </button>
+            </div>
+          </button>
+        ) : (
+          <button
+            className="pb-2"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              handleMouseDown(e);
+            }}
+            onTouchStart={(e) => {
+              handleTouchStart(e);
+            }}
+          >
+            <div className="flex items-center justify-between mb-3 w-full">
+              <h4 className="font-semibold text-primary dark:text-slate-300">
+                {title || "Form"}
+              </h4>
+              {/* Drag handle (mouse + touch) */}
+              <button className="flex items-center justify-center mb-3 cursor-grab">
+                <div className="h-1.5 w-12 rounded-full bg-gray-300 dark:bg-slate-500" />
+              </button>
+              <button
+                onClick={handleClose}
+                className=" text-gray-600 bg-gray-200 rounded-full p-1 hover:text-gray-900 dark:text-gray-300 dark:bg-slate-700 dark:hover:text-white"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="flex flex-col gap-3">{children}</div>
+          </button>
+        )}
+      </>
+    );
+  }, [
+    isFromDetail,
+    data,
+    title,
+    isDark,
+    selectedVariant,
+    stocks,
+    quantity,
+    totalPrice,
+    isLoading,
+  ]);
+
   useEffect(() => {
     if (!isOpen) setQuantity(1);
   }, [isOpen]);
@@ -314,7 +464,7 @@ export default function BottomModal(props) {
         <div className="fixed inset-0 z-[9999]">
           {/* Backdrop with blur */}
           <button
-            className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={handleClose}
           />
 
@@ -322,133 +472,15 @@ export default function BottomModal(props) {
           <div className="absolute bottom-0 left-0 right-0 mx-auto max-w-sm w-full px-4 pointer-events-auto">
             <div
               ref={sheetRef}
-              className={`rounded-t-3xl bg-white dark:bg-slate-700 shadow-soft p-4 min-h-[${bodyHeight}] max-h-[80vh] sheet overflow-y-auto relative`}
+              className={`rounded-t-3xl bg-white dark:bg-slate-700 shadow-soft p-4 max-h-[95vh] sheet overflow-y-auto relative`}
               style={{
                 borderTopLeftRadius: "1.25rem",
                 borderTopRightRadius: "1.25rem",
+                ...sheetStyle,
               }}
             >
-              {/* Drag handle */}
-              <div className="flex items-center justify-center mb-3">
-                <div className="h-1.5 w-12 rounded-full bg-gray-300 dark:bg-slate-500" />
-              </div>
               {/* Content wrapper adds bottom padding so footer doesn't overlap */}
-              {mode === "cart" ? (
-                <div className="pb-24">
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="font-semibold text-primary dark:text-slate-300">
-                      Detail Produk
-                    </h4>
-                    <button
-                      onClick={handleClose}
-                      className="absolute top-4 right-4 text-gray-600 bg-gray-200 rounded-full p-1 hover:text-gray-900 dark:text-gray-300 dark:bg-slate-700 dark:hover:text-white"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-
-                  {/* Grid 3 cols with 3-2-1 layout */}
-                  <div className="flex gap-2 mb-4">
-                    <img
-                      src={data?.image}
-                      alt={data?.name}
-                      className="w-28 h-20 object-cover object-center rounded-lg"
-                    />
-                    <div className="flex flex-col">
-                      <h3 className="font-bold text-lg">{data?.name}</h3>
-                      <h3 className="font-medium text-lg">
-                        Harga:{" "}
-                        <span
-                          className={`text-[var(--c-primary)] ${
-                            isDark && "text-blue-300"
-                          }`}
-                        >
-                          {getPriceToDisplay}
-                        </span>
-                      </h3>
-                      <h3 className="font-semibold text-md">
-                        Stock: {getStocks()}
-                      </h3>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    {data?.is_variant ? renderVariants : null}
-                    <div className="flex items-center gap-2 ">
-                      <SimpleInput
-                        name="harga"
-                        type="text"
-                        label="Harga Pembelian"
-                        value={totalPrice}
-                        handleChange={handleChange}
-                        disabled={true}
-                      />
-                      <ButtonQuantity
-                        quantity={quantity}
-                        setQuantity={setQuantity}
-                        stocks={getStockToDisplay}
-                        style={{
-                          marginTop: "20px",
-                        }}
-                      />
-                    </div>
-                  </div>
-                  {/* Absolute footer button at the bottom */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-white dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
-                    <button
-                      className={`w-full flex gap-2 justify-center items-center h-16 py-2 rounded-lg transition-colors bg-[var(--c-primary)] text-white hover:bg-blue-700`}
-                      onClick={() =>
-                        handleAddToCart(data, null, quantity, isFromDetail)
-                      }
-                      disabled={isLoading}
-                    >
-                      <ShoppingCart className="w-5 h-5" />
-                      {!isLoading ? "Masukkan Keranjang" : "Memproses..."}
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="pb-2">
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="font-semibold text-primary dark:text-slate-300">
-                      {title || "Form"}
-                    </h4>
-                    <button
-                      onClick={handleClose}
-                      className="absolute top-4 right-4 text-gray-600 bg-gray-200 rounded-full p-1 hover:text-gray-900 dark:text-gray-300 dark:bg-slate-700 dark:hover:text-white"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                  <div className="flex flex-col gap-3">{children}</div>
-                </div>
-              )}
+              {renderElement}
             </div>
           </div>
         </div>
