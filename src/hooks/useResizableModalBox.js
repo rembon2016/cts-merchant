@@ -249,7 +249,7 @@ export default function useResizableModalBox({
         globalThis.removeEventListener("mousemove", mouseMoveHandler);
         globalThis.removeEventListener("mouseup", mouseUpHandler);
       } catch (e) {
-        // ignore
+        console.log("Error removing event listener: \n", e);
       }
     };
   }, []);
