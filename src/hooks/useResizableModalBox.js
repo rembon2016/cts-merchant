@@ -91,10 +91,10 @@ export default function useResizableModalBox({
     document.body.style.userSelect = "";
     document.body.style.cursor = "";
     try {
-      window.removeEventListener("touchmove", touchMoveHandler);
-      window.removeEventListener("touchend", touchEndHandler);
-      window.removeEventListener("mousemove", mouseMoveHandler);
-      window.removeEventListener("mouseup", mouseUpHandler);
+      globalThis.removeEventListener("touchmove", touchMoveHandler);
+      globalThis.removeEventListener("touchend", touchEndHandler);
+      globalThis.removeEventListener("mousemove", mouseMoveHandler);
+      globalThis.removeEventListener("mouseup", mouseUpHandler);
     } catch (e) {
       // ignore
     }
@@ -205,8 +205,8 @@ export default function useResizableModalBox({
   const mouseMoveHandler = (e) => onDragMove(e.clientY);
   const mouseUpHandler = () => {
     onDragEnd();
-    window.removeEventListener("mousemove", mouseMoveHandler);
-    window.removeEventListener("mouseup", mouseUpHandler);
+    globalThis.removeEventListener("mousemove", mouseMoveHandler);
+    globalThis.removeEventListener("mouseup", mouseUpHandler);
   };
 
   // touch handlers (mobile)
@@ -219,35 +219,35 @@ export default function useResizableModalBox({
 
   const touchEndHandler = () => {
     onDragEnd();
-    window.removeEventListener("touchmove", touchMoveHandler);
-    window.removeEventListener("touchend", touchEndHandler);
+    globalThis.removeEventListener("touchmove", touchMoveHandler);
+    globalThis.removeEventListener("touchend", touchEndHandler);
   };
 
   // attachers called from component
   const handleMouseDown = (e) => {
     e.preventDefault();
     onDragStart(e.clientY);
-    window.addEventListener("mousemove", mouseMoveHandler);
-    window.addEventListener("mouseup", mouseUpHandler);
+    globalThis.addEventListener("mousemove", mouseMoveHandler);
+    globalThis.addEventListener("mouseup", mouseUpHandler);
   };
 
   const handleTouchStart = (e) => {
     if (e.touches?.[0]) {
       onDragStart(e.touches[0].clientY);
-      window.addEventListener("touchmove", touchMoveHandler, {
+      globalThis.addEventListener("touchmove", touchMoveHandler, {
         passive: false,
       });
-      window.addEventListener("touchend", touchEndHandler);
+      globalThis.addEventListener("touchend", touchEndHandler);
     }
   };
 
   useEffect(() => {
     return () => {
       try {
-        window.removeEventListener("touchmove", touchMoveHandler);
-        window.removeEventListener("touchend", touchEndHandler);
-        window.removeEventListener("mousemove", mouseMoveHandler);
-        window.removeEventListener("mouseup", mouseUpHandler);
+        globalThis.removeEventListener("touchmove", touchMoveHandler);
+        globalThis.removeEventListener("touchend", touchEndHandler);
+        globalThis.removeEventListener("mousemove", mouseMoveHandler);
+        globalThis.removeEventListener("mouseup", mouseUpHandler);
       } catch (e) {
         // ignore
       }

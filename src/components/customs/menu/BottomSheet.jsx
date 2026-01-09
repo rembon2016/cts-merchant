@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import PropTypes from "prop-types";
+import useResizableModalBox from "../../../hooks/useResizableModalBox";
 
 BottomSheet.propTypes = {
   title: PropTypes.string,
@@ -18,8 +19,13 @@ export default function BottomSheet({
   isMenuItems = true,
   data = null,
   renderContent = null,
+  bodyHeight = "300px",
 }) {
   const sheetRef = useRef(null);
+
+  // Resizable modal logic moved to hook
+  const { sheetStyle, handleMouseDown, handleTouchStart } =
+    useResizableModalBox({ isOpen, bodyHeight, onClose, sheetRef });
 
   useEffect(() => {
     if (isOpen) {
@@ -54,42 +60,52 @@ export default function BottomSheet({
     if (data?.length === 0) return;
 
     return (
-      <div className="fixed inset-x-0 bottom-[3.2rem] pointer-events-none z-10">
-        <div className="mx-auto max-w-sm w-full mb-4 px-4 pointer-events-auto">
+      <div className="fixed inset-0 z-[9999]">
+        <button
+          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+          onClick={handleClose}
+          aria-label="Close bottom sheet"
+        />
+        <button
+          className="absolute bottom-0 left-0 right-0 mx-auto max-w-sm w-full px-4 pointer-events-auto"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            handleMouseDown(e);
+          }}
+          onTouchStart={(e) => {
+            handleTouchStart(e);
+          }}
+        >
           <div
             ref={sheetRef}
-            className="rounded-t-3xl bg-white dark:bg-slate-700 shadow-soft p-4 max-h-[400px] h-full mb-10 sheet overflow-y-auto no-scrollbar"
+            className="rounded-t-3xl bg-white dark:bg-slate-700 shadow-soft p-4 max-h-[95vh] sheet overflow-y-auto no-scrollbar"
             style={{
               borderTopLeftRadius: "1.25rem",
               borderTopRightRadius: "1.25rem",
+              ...sheetStyle,
             }}
           >
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="font-semibold text-primary dark:text-slate-300">
-                {title}
-              </h4>
-              <button
-                onClick={handleClose}
-                className="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
-              >
-                Tutup
+            <div className="flex items-center justify-center">
+              <button className="flex flex-col items-center justify-between mb-3">
+                <button className="flex items-center justify-center mb-3 cursor-grab">
+                  <div className="h-1.5 w-12 rounded-full bg-gray-300 dark:bg-slate-500" />
+                </button>
+                <h4 className="font-semibold text-primary dark:text-slate-300">
+                  {title}
+                </h4>
               </button>
             </div>
-
             {renderContent}
           </div>
-        </div>
+        </button>
       </div>
     );
-  }, [data, isMenuItems, sheetRef, handleClose]);
+  }, [data, isMenuItems, handleClose]);
 
   if (!isOpen) return null;
 
   return (
     <>
-      {/* Overlay */}
-      {/* <button className="fixed inset-0 z-40" onClick={handleClose} /> */}
-
       <style>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

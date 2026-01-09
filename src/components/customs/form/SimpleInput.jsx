@@ -58,7 +58,7 @@ export default function SimpleInput({
       <label
         className={`${
           label !== ""
-            ? `block text-sm font-semibold ${
+            ? ` text-sm font-semibold flex justify-start ${
                 errors ? "text-red-500" : "text-gray-700 dark:text-gray-300"
               } mb-2`
             : "hidden"

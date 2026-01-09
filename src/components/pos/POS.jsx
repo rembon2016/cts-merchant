@@ -260,6 +260,7 @@ export default function POS() {
           </div>
         )}
       </div>
+
       {/* Daftar Produk */}
       {renderProducts}
 
@@ -306,6 +307,7 @@ export default function POS() {
         onClose={() => setIsSheetOpen(false)}
         onItemClick={() => setIsSheetOpen(false)}
         renderContent={renderElements}
+        bodyHeight="500px"
       />
     </div>
   );

@@ -29,6 +29,7 @@ export const requestForToken = async () => {
       const token = await getToken(messaging, {
         vapidKey: import.meta.env.VITE_VAPID_KEY, // Masukkan VAPID Key disini
       });
+      console.log(token);
       if (token) {
         sessionStorage.setItem(SESSION_KEY, token);
         return token;
