@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useThemeStore } from "../../../store/themeStore";
 import { usePosStore } from "../../../store/posStore";
-import { toast } from "react-toastify";
-import { useCartStore } from "../../../store/cartStore";
+import { toast } from "sonner";
 
 const VariantModal = ({ isOpen, onClose, product, onSelectVariant }) => {
   const [selectedVariant, setSelectedVariant] = useState(null);

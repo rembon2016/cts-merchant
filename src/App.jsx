@@ -7,7 +7,8 @@ import {
 import { useAuthStore } from "./store/authStore";
 import { useEffect } from "react";
 import { useRegisterSW } from "virtual:pwa-register/react";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import { Toaster } from "sonner";
 import "react-toastify/dist/ReactToastify.css";
 import MainLayout from "./layouts/MainLayout";
 import Home from "./pages/Home";
@@ -129,6 +130,7 @@ function App() {
         pauseOnHover
         theme={isDark ? "dark" : "light"}
       />
+      <Toaster position="top-center" />
       <Router>
         <Routes>
           <Route path="/" element={<MainLayout />}>

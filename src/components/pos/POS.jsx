@@ -3,7 +3,7 @@ import { usePosStore } from "../../store/posStore";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useNavigate } from "react-router-dom";
 import { formatCurrency } from "../../helper/currency";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { XCircle } from "lucide-react";
 import SearchInput from "../customs/form/SearchInput";
 import BottomModal from "../customs/menu/BottomModal";
