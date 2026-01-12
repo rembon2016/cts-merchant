@@ -36,7 +36,7 @@ export const requestForToken = async () => {
     isGettingToken = true;
 
     if (typeof globalThis !== "undefined" && "Notification" in globalThis) {
-      const permission = await Notification.requestPermission();
+      const permission = await Notification?.requestPermission();
       if (permission === "granted") {
         const token = await getToken(messaging, {
           vapidKey: import.meta.env.VITE_VAPID_KEY, // Masukkan VAPID Key disini
@@ -80,7 +80,7 @@ export const detectIosWebPushUnavailable = () => {
 export const ensureNotificationPermission = () => {
   if (typeof globalThis === "undefined") return;
   if (!("Notification" in globalThis)) return;
-  if (Notification.permission === "default") {
+  if (Notification?.permission === "default") {
     const handler = () => {
       requestForToken();
     };
