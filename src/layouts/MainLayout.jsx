@@ -25,13 +25,14 @@ const MainLayout = () => {
       ) {
         return;
       }
-      const permission = await Notification.requestPermission();
+      const permission = await Notification?.requestPermission();
+
       if (permission === "granted") {
         await requestForToken();
       }
-      setShowPermissionBanner(permission === "default" ? true : false);
-    } catch (_) {
-      // noop
+      setShowPermissionBanner(permission === "default");
+    } catch (error) {
+      console.log("Error requesting notification permission: ", error);
     }
   };
 
@@ -39,7 +40,7 @@ const MainLayout = () => {
     const shouldShow =
       typeof globalThis !== "undefined" &&
       "Notification" in globalThis &&
-      Notification.permission === "default" &&
+      Notification?.permission === "default" &&
       !detectIosWebPushUnavailable();
     setShowPermissionBanner(shouldShow);
   }, []);

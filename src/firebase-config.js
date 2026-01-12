@@ -36,14 +36,18 @@ export const requestForToken = async () => {
     isGettingToken = true;
 
     if (typeof globalThis !== "undefined" && "Notification" in globalThis) {
-      const permission = await Notification.requestPermission();
+      const permission = await Notification?.requestPermission();
+
       if (permission === "granted") {
         const token = await getToken(messaging, {
           vapidKey: import.meta.env.VITE_VAPID_KEY, // Masukkan VAPID Key disini
         });
         settingToken(token);
       } else {
-        sessionStorage.removeItem(SESSION_KEY);
+        if (existing) {
+          sessionStorage.removeItem(SESSION_KEY);
+          return null;
+        }
         return null;
       }
     } else {
@@ -69,6 +73,8 @@ export const onMessageListener = () =>
 export const subscribeOnMessage = (callback) => onMessage(messaging, callback);
 
 export const detectIosWebPushUnavailable = () => {
+  if (typeof globalThis === "undefined") return false;
+
   const ua = navigator.userAgent.toLowerCase();
   const isIos = /iphone|ipad|ipod/.test(ua);
   const isStandalone =
@@ -80,10 +86,10 @@ export const detectIosWebPushUnavailable = () => {
 export const ensureNotificationPermission = () => {
   if (typeof globalThis === "undefined") return;
   if (!("Notification" in globalThis)) return;
-  if (Notification.permission === "default") {
+  if (Notification?.permission === "default") {
     const handler = () => {
       requestForToken();
     };
-    globalThis.addEventListener("click", handler, { once: true });
+    globalThis?.addEventListener("click", handler, { once: true });
   }
 };
