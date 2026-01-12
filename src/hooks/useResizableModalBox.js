@@ -96,7 +96,7 @@ export default function useResizableModalBox({
       globalThis.removeEventListener("mousemove", mouseMoveHandler);
       globalThis.removeEventListener("mouseup", mouseUpHandler);
     } catch (e) {
-      // ignore
+      console.log("Error removing event listener: \n", e);
     }
     if (sheetRef?.current) {
       sheetRef.current.style.transition = "height 150ms ease";
@@ -125,6 +125,7 @@ export default function useResizableModalBox({
   const onDragMove = (clientY) => {
     if (!isDraggingRef.current) return;
     const delta = startYRef.current - clientY; // up => positive
+
     let newHeight = startHeightRef.current + delta;
     newHeight = Math.max(0, Math.min(newHeight, maxHeightRef.current));
     setSheetHeight(newHeight);
@@ -200,6 +201,8 @@ export default function useResizableModalBox({
 
     lastPositionsRef.current = [];
   };
+
+  console.log("sheetHeight:", sheetHeight);
 
   // mouse handlers (desktop)
   const mouseMoveHandler = (e) => onDragMove(e.clientY);

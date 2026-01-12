@@ -55,7 +55,7 @@ export default function BottomModal(props) {
   } = useCustomToast();
 
   // Resizable modal logic moved to hook
-  const { sheetStyle, handleMouseDown, handleTouchStart } =
+  const { sheetStyle, sheetHeight, handleMouseDown, handleTouchStart } =
     useResizableModalBox({ isOpen, bodyHeight, onClose, sheetRef });
 
   const [selectedVariant, setSelectedVariant] = useState(null);
