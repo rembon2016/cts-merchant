@@ -17,18 +17,16 @@ const MainLayout = () => {
 
   const [showPermissionBanner, setShowPermissionBanner] = useState(false);
 
+  const hasNotificationSupport =
+    typeof globalThis !== "undefined" && "Notification" in globalThis;
+  const getNotificationPermission = () =>
+    hasNotificationSupport ? globalThis.Notification.permission : null;
+
   const handlePermissionNotification = async () => {
     try {
-      if (
-        typeof globalThis === "undefined" ||
-        !("Notification" in globalThis)
-      ) {
-        return;
-      }
-      const permission = await Notification?.requestPermission();
-      if (permission === "granted") {
-        await requestForToken();
-      }
+      if (!hasNotificationSupport) return;
+      const permission = await globalThis.Notification.requestPermission();
+      if (permission === "granted") await requestForToken();
       setShowPermissionBanner(permission === "default");
     } catch (error) {
       console.log("Error requesting notification permission: ", error);
@@ -37,9 +35,8 @@ const MainLayout = () => {
 
   useEffect(() => {
     const shouldShow =
-      typeof globalThis !== "undefined" &&
-      "Notification" in globalThis &&
-      Notification?.permission === "default" &&
+      hasNotificationSupport &&
+      getNotificationPermission() === "default" &&
       !detectIosWebPushUnavailable();
     setShowPermissionBanner(shouldShow);
   }, []);
@@ -58,7 +55,11 @@ const MainLayout = () => {
     }
   }, [location.pathname, setSelectedCart]);
 
+  const currentNotificationPermission = getNotificationPermission();
   const renderPermissionBanner = useMemo(() => {
+    if (!hasNotificationSupport || currentNotificationPermission === "granted")
+      return null;
+
     return (
       <div className="mx-4 mb-2 rounded-xl bg-white dark:bg-gray-700 text-blue-900 dark:text-gray-300 p-3 shadow-soft relative z-50 pointer-events-auto">
         <div className="flex items-center justify-between gap-3">
@@ -73,7 +74,7 @@ const MainLayout = () => {
         </div>
       </div>
     );
-  }, [Notification?.permission, showPermissionBanner]);
+  }, [currentNotificationPermission, showPermissionBanner]);
 
   return (
     <div className="bg-gray-100 dark:bg-slate-900 min-h-screen">
