@@ -17,28 +17,37 @@ const messaging = getMessaging(app);
 const SESSION_KEY = "firebaseToken";
 let isGettingToken = false;
 
+const settingToken = (token) => {
+  if (!token) return null;
+
+  if (token) {
+    sessionStorage.setItem(SESSION_KEY, token);
+    return token;
+  }
+};
+
 // Fungsi untuk meminta izin dan mendapatkan Token
 export const requestForToken = async () => {
   try {
     if (isGettingToken) return null;
     const existing = sessionStorage.getItem(SESSION_KEY);
+
     if (existing) return existing;
     isGettingToken = true;
-    const permission = await Notification.requestPermission();
-    if (permission === "granted") {
-      const token = await getToken(messaging, {
-        vapidKey: import.meta.env.VITE_VAPID_KEY, // Masukkan VAPID Key disini
-      });
-      console.log(token);
-      if (token) {
-        sessionStorage.setItem(SESSION_KEY, token);
-        return token;
+
+    if (typeof globalThis !== "undefined" && "Notification" in globalThis) {
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        const token = await getToken(messaging, {
+          vapidKey: import.meta.env.VITE_VAPID_KEY, // Masukkan VAPID Key disini
+        });
+        settingToken(token);
       } else {
         sessionStorage.removeItem(SESSION_KEY);
         return null;
       }
     } else {
-      sessionStorage.removeItem(SESSION_KEY);
+      console.log("Notifications are not supported in this environment.");
       return null;
     }
   } catch (error) {

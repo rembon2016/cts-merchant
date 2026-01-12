@@ -73,7 +73,7 @@ const MainLayout = () => {
         </div>
       </div>
     );
-  }, [Notification.permission, showPermissionBanner]);
+  }, [Notification?.permission, showPermissionBanner]);
 
   return (
     <div className="bg-gray-100 dark:bg-slate-900 min-h-screen">
