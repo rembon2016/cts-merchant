@@ -202,8 +202,6 @@ export default function useResizableModalBox({
     lastPositionsRef.current = [];
   };
 
-  console.log("sheetHeight:", sheetHeight);
-
   // mouse handlers (desktop)
   const mouseMoveHandler = (e) => onDragMove(e.clientY);
   const mouseUpHandler = () => {
