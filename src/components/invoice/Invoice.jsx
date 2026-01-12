@@ -162,7 +162,7 @@ const Invoice = () => {
         </div>
       </>
     );
-  }, [isLoading, formData]);
+  }, [isLoading, formData, statusOptions, dueDateOptions, handleChange]);
 
   const renderCatalogInvoice = useMemo(() => {
     return (
@@ -315,7 +315,7 @@ const Invoice = () => {
         />
       )}
       <BottomSheet
-        title="Filter"
+        title="Filter Invoice"
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
         onItemClick={() => setIsSheetOpen(false)}

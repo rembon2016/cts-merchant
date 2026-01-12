@@ -20,7 +20,7 @@ const MainLayout = () => {
   const hasNotificationSupport =
     typeof globalThis !== "undefined" && "Notification" in globalThis;
   const getNotificationPermission = () =>
-    hasNotificationSupport ? globalThis.Notification?.permission : null;
+    hasNotificationSupport ? globalThis?.Notification?.permission : null;
 
   const handlePermissionNotification = async () => {
     try {

@@ -226,6 +226,19 @@ export default function useResizableModalBox({
 
   // attachers called from component
   const handleMouseDown = (e) => {
+    const closestInteractive = e?.target?.closest
+      ? e.target.closest('input,textarea,select,button,a,[role="button"]')
+      : null;
+
+    // If an interactive child was clicked (not the wrapper itself), don't start dragging
+    if (
+      closestInteractive &&
+      closestInteractive !== e.currentTarget &&
+      e.currentTarget.contains(closestInteractive)
+    ) {
+      return;
+    }
+
     e.preventDefault();
     onDragStart(e.clientY);
     globalThis.addEventListener("mousemove", mouseMoveHandler);
@@ -233,6 +246,20 @@ export default function useResizableModalBox({
   };
 
   const handleTouchStart = (e) => {
+    const target = e?.target || (e.touches?.[0] && e.touches[0].target);
+    const closestInteractive = target?.closest
+      ? target.closest('input,textarea,select,button,a,[role="button"]')
+      : null;
+
+    // If interactive child tapped (not the wrapper itself), skip dragging
+    if (
+      closestInteractive &&
+      closestInteractive !== e.currentTarget &&
+      e.currentTarget.contains(closestInteractive)
+    ) {
+      return;
+    }
+
     if (e.touches?.[0]) {
       onDragStart(e.touches[0].clientY);
       globalThis.addEventListener("touchmove", touchMoveHandler, {
