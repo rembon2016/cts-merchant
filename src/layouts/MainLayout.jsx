@@ -26,7 +26,6 @@ const MainLayout = () => {
         return;
       }
       const permission = await Notification?.requestPermission();
-
       if (permission === "granted") {
         await requestForToken();
       }
