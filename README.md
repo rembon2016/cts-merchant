@@ -38,19 +38,7 @@ Aplikasi dashboard merchant modern yang dibangun dengan React, Vite, dan Tailwin
 
 4. Buka browser di `http://localhost:3000`
 
-## 📁 Struktur Proyek
-
-```
-src/
-├── components/         # Komponen UI reusable
-├── layouts/            # Layout Aplikasi
-├── pages/              # Halaman aplikasi
-├── services/           # API services
-├── store/              # State management
-├── App.jsx             # Root component
-├── main.jsx            # Entry point
-└── index.css           # Global styles
-```
+````
 
 ## 🎨 Kustomisasi Tema
 
@@ -61,30 +49,9 @@ Aplikasi menggunakan CSS custom properties untuk tema:
   --c-primary: #3b82f6; /* Warna utama */
   --c-accent: #10b981; /* Warna aksen */
 }
-```
+````
 
 Untuk mengubah warna tema, edit file `src/index.css`.
-
-## 📱 Halaman & Fitur
-
-### 🏠 Dashboard (Home)
-
-- Kartu pendapatan dengan filter periode
-- Quick menu untuk akses cepat
-- Slider promo dan penawaran
-
-### 💰 Transaksi (About)
-
-- Riwayat transaksi lengkap
-- Filter berdasarkan jenis transaksi
-- Detail waktu dan kategori
-
-### 👤 Profil (Profile)
-
-- Informasi merchant
-- Statistik transaksi
-- Pengaturan tema
-- Menu pengaturan lainnya
 
 ## 🔧 Konfigurasi
 
@@ -120,31 +87,6 @@ Kustomisasi Tailwind di `tailwind.config.js`:
    ```
 
 3. Deploy folder `dist/` ke hosting pilihan Anda
-
-## 🔄 State Management
-
-Menggunakan Zustand untuk state management:
-
-- **userStore**: Data user, income, dan transaksi
-- **themeStore**: Pengaturan tema dengan localStorage persistence
-
-## 📊 Mock Data
-
-Aplikasi menggunakan mock data di `userService.js` untuk:
-
-- Data user dan profil
-- Riwayat transaksi
-- Statistik pendapatan
-- Dashboard metrics
-
-## 🎯 Pengembangan Selanjutnya
-
-- [ ] Integrasi dengan API backend real
-- [ ] Fitur notifikasi push
-- [ ] Export laporan transaksi
-- [ ] Multi-language support
-- [ ] PWA capabilities
-- [ ] Real-time updates
 
 ## 📄 Scripts
 
