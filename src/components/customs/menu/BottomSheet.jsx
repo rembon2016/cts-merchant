@@ -27,6 +27,15 @@ export default function BottomSheet({
   const { sheetStyle, handleMouseDown, handleTouchStart } =
     useResizableModalBox({ isOpen, bodyHeight, onClose, sheetRef });
 
+  const handleClose = () => {
+    if (sheetRef.current) {
+      sheetRef.current.classList.remove("open");
+    }
+    setTimeout(() => {
+      if (typeof onClose === "function") onClose();
+    }, 260);
+  };
+
   useEffect(() => {
     if (isOpen) {
       document.body.classList.add("overflow-hidden");
@@ -47,14 +56,17 @@ export default function BottomSheet({
     };
   }, [isOpen]);
 
-  const handleClose = () => {
-    if (sheetRef.current) {
-      sheetRef.current.classList.remove("open");
-    }
-    setTimeout(() => {
-      onClose();
-    }, 260);
-  };
+  // Close on Escape key when sheet is open
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") {
+        handleClose();
+      }
+    };
+    globalThis.addEventListener("keydown", onKeyDown);
+    return () => globalThis.removeEventListener("keydown", onKeyDown);
+  }, [isOpen, handleClose]);
 
   const renderElements = useMemo(() => {
     if (data?.length === 0) return;
@@ -67,9 +79,9 @@ export default function BottomSheet({
           aria-label="Close bottom sheet"
         />
         <button
+          type="button"
           className="absolute bottom-0 left-0 right-0 mx-auto max-w-sm w-full px-4 pointer-events-auto"
           onMouseDown={(e) => {
-            e.preventDefault();
             handleMouseDown(e);
           }}
           onTouchStart={(e) => {
@@ -86,21 +98,32 @@ export default function BottomSheet({
             }}
           >
             <div className="flex items-center justify-center">
-              <button className="flex flex-col items-center justify-between mb-3">
-                <button className="flex items-center justify-center mb-3 cursor-grab">
+              <div
+                className="flex flex-col items-center justify-between mb-3"
+                aria-hidden="true"
+              >
+                <div className="flex items-center justify-center mb-3 cursor-grab">
                   <div className="h-1.5 w-12 rounded-full bg-gray-300 dark:bg-slate-500" />
-                </button>
+                </div>
                 <h4 className="font-semibold text-primary dark:text-slate-300">
                   {title}
                 </h4>
-              </button>
+              </div>
             </div>
             {renderContent}
           </div>
         </button>
       </div>
     );
-  }, [data, isMenuItems, handleClose]);
+  }, [
+    data,
+    isMenuItems,
+    handleClose,
+    handleMouseDown,
+    handleTouchStart,
+    title,
+    renderContent,
+  ]);
 
   if (!isOpen) return null;
 

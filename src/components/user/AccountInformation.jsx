@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/authStore";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import BackButton from "../customs/button/BackButton";
 
 export default function AccountInformation() {

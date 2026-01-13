@@ -114,58 +114,12 @@ export default function BottomModal(props) {
     }
   });
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.classList.add("overflow-hidden");
-      setTimeout(() => {
-        if (sheetRef.current) {
-          sheetRef.current.classList.add("open");
-        }
-      }, 10);
-    } else {
-      document.body.classList.remove("overflow-hidden");
-      if (sheetRef.current) {
-        sheetRef.current.classList.remove("open");
-      }
-    }
-
-    return () => {
-      document.body.classList.remove("overflow-hidden");
-    };
-  }, [isOpen]);
-
-  // Initialize selected variant from parent (detail page) or fallback to first variant in data
-  useEffect(() => {
-    if (initialSelectedVariant) {
-      setSelectedVariant(initialSelectedVariant);
-    } else if (
-      data?.is_variant &&
-      Array.isArray(data?.skus) &&
-      data.skus.length > 0
-    ) {
-      setSelectedVariant(data.skus[0]);
-    } else {
-      setSelectedVariant(null);
-    }
-  }, [initialSelectedVariant, data]);
-
-  useEffect(() => {
-    if (mode !== "cart") return;
-    if (success) {
-      setTimeout(() => {
-        getCart();
-        onClose();
-      }, 1060);
-      return () => clearTimeout();
-    }
-  }, [success, mode]);
-
   const handleClose = () => {
     if (sheetRef.current) {
       sheetRef.current.classList.remove("open");
     }
     setTimeout(() => {
-      onClose();
+      if (typeof onClose === "function") onClose();
     }, 260);
   };
 
@@ -310,19 +264,15 @@ export default function BottomModal(props) {
     return (
       <>
         {mode === "cart" ? (
-          <button
-            className="pb-24"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              handleMouseDown(e);
-            }}
-            onTouchStart={(e) => {
-              handleTouchStart(e);
-            }}
-          >
+          <div className="pb-24">
             <div className="flex items-center justify-between mb-10">
               <div className="flex flex-col justify-center items-center w-full">
-                <button className="flex items-center justify-center mb-3 cursor-grab">
+                <button
+                  type="button"
+                  className="flex items-center justify-center mb-3 cursor-grab"
+                  onMouseDown={(e) => handleMouseDown(e)}
+                  onTouchStart={(e) => handleTouchStart(e)}
+                >
                   <div className="h-1.5 w-12 rounded-full bg-gray-300 dark:bg-slate-500" />
                 </button>
                 <h4 className="font-semibold text-primary dark:text-slate-300">
@@ -389,24 +339,20 @@ export default function BottomModal(props) {
                 {!isLoading ? "Masukkan Keranjang" : "Memproses..."}
               </button>
             </div>
-          </button>
+          </div>
         ) : (
-          <button
-            className="pb-2"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              handleMouseDown(e);
-            }}
-            onTouchStart={(e) => {
-              handleTouchStart(e);
-            }}
-          >
+          <div className="pb-2">
             <div className="flex items-center justify-between mb-3 w-full">
               <h4 className="font-semibold text-primary dark:text-slate-300">
                 {title || "Form"}
               </h4>
               {/* Drag handle (mouse + touch) */}
-              <button className="flex items-center justify-center mb-3 cursor-grab">
+              <button
+                type="button"
+                className="flex items-center justify-center mb-3 cursor-grab"
+                onMouseDown={(e) => handleMouseDown(e)}
+                onTouchStart={(e) => handleTouchStart(e)}
+              >
                 <div className="h-1.5 w-12 rounded-full bg-gray-300 dark:bg-slate-500" />
               </button>
               <button
@@ -430,7 +376,7 @@ export default function BottomModal(props) {
               </button>
             </div>
             <div className="flex flex-col gap-3">{children}</div>
-          </button>
+          </div>
         )}
       </>
     );
@@ -445,6 +391,62 @@ export default function BottomModal(props) {
     totalPrice,
     isLoading,
   ]);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add("overflow-hidden");
+      setTimeout(() => {
+        if (sheetRef.current) {
+          sheetRef.current.classList.add("open");
+        }
+      }, 10);
+    } else {
+      document.body.classList.remove("overflow-hidden");
+      if (sheetRef.current) {
+        sheetRef.current.classList.remove("open");
+      }
+    }
+
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, [isOpen]);
+
+  // Close on Escape key
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") handleClose();
+    };
+    globalThis.addEventListener("keydown", onKeyDown);
+    return () => globalThis.removeEventListener("keydown", onKeyDown);
+  }, [isOpen, handleClose]);
+
+  // Initialize selected variant from parent (detail page) or fallback to first variant in data
+  useEffect(() => {
+    if (initialSelectedVariant) {
+      setSelectedVariant(initialSelectedVariant);
+    } else if (
+      data?.is_variant &&
+      Array.isArray(data?.skus) &&
+      data.skus.length > 0
+    ) {
+      setSelectedVariant(data.skus[0]);
+    } else {
+      setSelectedVariant(null);
+    }
+  }, [initialSelectedVariant, data]);
+
+  useEffect(() => {
+    if (mode !== "cart") return;
+    if (success) {
+      setTimeout(() => {
+        getCart();
+        onClose();
+      }, 1060);
+      return () => clearTimeout();
+    }
+  }, [success, mode]);
 
   useEffect(() => {
     if (!isOpen) setQuantity(1);
