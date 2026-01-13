@@ -298,6 +298,7 @@ export default function POS() {
           }
           onItemClick={() => setShowVariantModal(false)}
           isFromDetail={false}
+          renderContent={renderElements}
         />
       )}
 
