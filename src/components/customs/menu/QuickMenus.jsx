@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { toast } from "sonner";
 import IframeModal from "../modal/IframeModal";
 import BottomSheet from "../menu/BottomSheet";
@@ -19,52 +19,61 @@ const QuickMenus = () => {
   const { token, generateToken } = useGenerateToken();
   const { user } = useAuthStore();
 
+  // Only generate token when it's needed and doesn't exist
   useEffect(() => {
-    generateToken();
-  }, [token, modalData]);
-
-  const menuItems = listMenuItems(token);
-
-  const handleItemClick = (item) => {
-    if (item.url === "#") {
-      toast.info(`Fitur ${item?.label} Segera Hadir`, {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-      return;
+    if (!token) {
+      generateToken();
     }
+  }, []); // Only run once on mount
 
-    const internalPaths = [
-      "/pos",
-      "/transaction",
-      "/invoice",
-      "/customer-support",
-      "/ppob",
-    ];
-    if (internalPaths.includes(item.url)) {
-      navigate(item.url, { replace: true });
-      return;
-    }
+  const menuItems = useMemo(() => listMenuItems(token), [token]);
 
-    if (item.target === "_blank") {
-      window.open(item.url, "_blank");
-    }
-
-    if (item.target !== "_blank") {
-      if (item.id === "soundbox" && user?.business_account !== null) {
+  const handleItemClick = useCallback(
+    (item) => {
+      if (item.url === "#") {
+        toast.info(`Fitur ${item?.label} Segera Hadir`, {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
         return;
       }
-      setModalData({ isOpen: true, url: item.url, title: item.label });
-    }
-  };
 
-  const closeModal = () => setModalData({ isOpen: false, url: "", title: "" });
+      const internalPaths = [
+        "/pos",
+        "/transaction",
+        "/invoice",
+        "/customer-support",
+        "/ppob",
+      ];
+      if (internalPaths.includes(item.url)) {
+        navigate(item.url, { replace: true });
+        return;
+      }
+
+      if (item.target === "_blank") {
+        window.open(item.url, "_blank");
+      }
+
+      if (item.target !== "_blank") {
+        if (item.id === "soundbox" && user?.business_account !== null) {
+          return;
+        }
+        setModalData({ isOpen: true, url: item.url, title: item.label });
+      }
+    },
+    [navigate, user?.business_account],
+  );
+
+  const closeModal = useCallback(
+    () => setModalData({ isOpen: false, url: "", title: "" }),
+    [],
+  );
 
   const renderElements = useMemo(() => {
     return (
@@ -87,7 +96,7 @@ const QuickMenus = () => {
         })}
       </div>
     );
-  }, [menuItems]);
+  }, [menuItems, handleItemClick]);
 
   return (
     <>

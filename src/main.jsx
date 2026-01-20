@@ -20,8 +20,14 @@ const updateSW = registerSW({
   },
 });
 
+// Initialize performance monitoring
+// if (import.meta.env.DEV) {
+//   initializePerformanceMonitoring();
+//   optimizeLongTasks();
+// }
+
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>
+  </React.StrictMode>,
 );

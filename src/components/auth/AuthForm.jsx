@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, lazy } from "react";
 import { useAuthStore } from "../../store/authStore";
 import { useThemeStore } from "../../store/themeStore";
 import SimpleAlert from "../customs/alert/SimpleAlert";
@@ -59,14 +59,14 @@ export default function AuthForm({ formMode = "login" }) {
         showSuccess(
           platform === "android"
             ? "Instalasi dimulai"
-            : "Buka menu Share dan pilih Add to Home Screen"
+            : "Buka menu Share dan pilih Add to Home Screen",
         );
         return;
       }
       if (platform === "android") {
         if (result?.outcome === "unavailable") {
           showError(
-            "Instal tidak tersedia: pastikan origin aman dan PWA aktif atau gunakan ikon Install di address bar"
+            "Instal tidak tersedia: pastikan origin aman dan PWA aktif atau gunakan ikon Install di address bar",
           );
           return;
         }
@@ -86,7 +86,7 @@ export default function AuthForm({ formMode = "login" }) {
       showError(
         platform === "android"
           ? "Gagal memulai instalasi"
-          : "Gunakan Share → Add to Home Screen untuk memasang"
+          : "Gunakan Share → Add to Home Screen untuk memasang",
       );
     }
   };
@@ -179,7 +179,7 @@ export default function AuthForm({ formMode = "login" }) {
         err?.message ||
           (isLoginMode
             ? "Terjadi error saat login"
-            : "Terjadi error saat registrasi")
+            : "Terjadi error saat registrasi"),
       );
     }
   };
@@ -200,7 +200,12 @@ export default function AuthForm({ formMode = "login" }) {
     <div className="flex items-center justify-center bg-gray-100 dark:bg-slate-900">
       <div className="w-full max-w-md rounded-lg p-8">
         <div className="flex flex-col mb-6">
-          <img src={getImage} alt="CTS" className="w-24 h-24 mx-auto" />
+          <img
+            src={getImage}
+            alt="CTS"
+            className="w-24 h-24 mx-auto"
+            loading="lazy"
+          />
           <h3 className="font-bold text-4xl text-center">Merchant</h3>
         </div>
 
@@ -333,6 +338,7 @@ export default function AuthForm({ formMode = "login" }) {
                     src={getIconAndroid}
                     className="w-8 h-12"
                     alt="Install on Android"
+                    loading="lazy"
                   />
                   <div className="flex items-center leading-tight">
                     <span className="text-lg font-semibold">
@@ -352,6 +358,7 @@ export default function AuthForm({ formMode = "login" }) {
                     src={getIconIos}
                     className="w-8 h-12"
                     alt="Install on iOS"
+                    loading="lazy"
                   />
                   <div className="flex justify-center items-center leading-tight">
                     <span className="text-lg font-semibold">

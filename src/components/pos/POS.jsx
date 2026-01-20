@@ -1,18 +1,19 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { usePosStore } from "../../store/posStore";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useNavigate } from "react-router-dom";
 import { formatCurrency } from "../../helper/currency";
 import { toast } from "sonner";
 import { XCircle } from "lucide-react";
-import SearchInput from "../customs/form/SearchInput";
 import BottomModal from "../customs/menu/BottomModal";
 import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
 import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 import BottomSheet from "../customs/menu/BottomSheet";
 import NoData from "../customs/element/NoData";
-import ProductCard from "../customs/card/ProductCard";
 import LoadMoreButton from "../customs/button/LoadMoreButton";
+const ButtonFilter = lazy(() => import("../customs/button/ButtonFilter"));
+const ProductCard = lazy(() => import("../customs/card/ProductCard"));
+const SearchInput = lazy(() => import("../customs/form/SearchInput"));
 
 const MAIN_MENU = [
   {
@@ -194,16 +195,21 @@ export default function POS() {
           const isOutOfStock = !hasAvailableStock(product);
 
           return (
-            <ProductCard
+            <Suspense
               key={product.id}
-              product={product}
-              price={formatCurrency(productPrice)}
-              stock={productStock}
-              disabled={isOutOfStock}
-              onClick={() => goToProductDetail(product.id)}
-              showButtonCart={true}
-              handleProductClick={handleProductClick}
-            />
+              fallback={<LoadingSkeletonCard items={[1]} />}
+            >
+              <ProductCard
+                key={product.id}
+                product={product}
+                price={formatCurrency(productPrice)}
+                stock={productStock}
+                disabled={isOutOfStock}
+                onClick={() => goToProductDetail(product.id)}
+                showButtonCart={true}
+                handleProductClick={handleProductClick}
+              />
+            </Suspense>
           );
         })}
       </div>
@@ -218,33 +224,15 @@ export default function POS() {
       {/* {renderCategories} */}
       <div className="flex flex-col gap-2 mb-4">
         <div className="flex gap-2 w-full">
-          <SearchInput
-            value={search}
-            onChange={(value) => setSearch(value)}
-            placeholder="Cari produk..."
-            propsData="historiProduk"
-          />
-          <button
-            onClick={() => setIsSheetOpen(true)}
-            className="bg-[var(--c-primary)] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1"
-          >
-            <svg
-              width="17"
-              height="12"
-              viewBox="0 0 17 12"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M0.75 0.75H15.75M3.25 5.75H13.25M6.25 10.75H10.25"
-                stroke="white"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            Filter
-          </button>
+          <Suspense fallback={<div>Loading...</div>}>
+            <SearchInput
+              value={search}
+              onChange={(value) => setSearch(value)}
+              placeholder="Cari produk..."
+              propsData="historiProduk"
+            />
+          </Suspense>
+          <ButtonFilter setIsSheetOpen={setIsSheetOpen} />
         </div>
         {selectedSub !== null && !productsLoading && (
           <div className="flex items-center gap-2  mb-4 font-semibold">
