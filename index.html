@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
@@ -6,12 +6,37 @@
     <meta name="description" content="Aplikasi CTS untuk merchant" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#ffffff" />
+
+    <!-- Performance Optimization: Preconnect to critical domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://firebaseauth.googleapis.com" />
+    <link rel="dns-prefetch" href="https://firestore.googleapis.com" />
+
+    <!-- Resource hints for faster loading -->
+    <link rel="prefetch" href="/assets/vendor-react.js" as="script" />
+    <link rel="prefetch" href="/assets/vendor-ui.js" as="script" />
+
     <title>CTS Merchant</title>
+
+    <!-- Google Fonts with swap for better font loading -->
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Prevent layout shift during font loading -->
+    <style>
+      @font-face {
+        font-family: "Inter";
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url("https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQA.woff2")
+          format("woff2");
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

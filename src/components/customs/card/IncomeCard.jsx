@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useUserStore } from "../../../store/userStore";
 import { useTransactionStore } from "../../../store/transactionStore";
 import { formatCurrency } from "../../../helper/currency";
@@ -7,6 +7,27 @@ import { formatDate } from "../../../helper/format-date";
 import SimpleInput from "../form/SimpleInput";
 import { useCustomToast } from "../../../hooks/useCustomToast";
 import CustomToast from "../toast/CustomToast";
+
+const CHIPS = [
+  { id: "month", label: "Bulan" },
+  { id: "year", label: "Tahun" },
+  { id: "range", label: "Rentang Waktu" },
+];
+
+const MONTHS = [
+  { key: "01", value: "Januari" },
+  { key: "02", value: "Februari" },
+  { key: "03", value: "Maret" },
+  { key: "04", value: "April" },
+  { key: "05", value: "Mei" },
+  { key: "06", value: "Juni" },
+  { key: "07", value: "Juli" },
+  { key: "08", value: "Agustus" },
+  { key: "09", value: "September" },
+  { key: "10", value: "Oktober" },
+  { key: "11", value: "November" },
+  { key: "12", value: "Desember" },
+];
 
 const IncomeCard = () => {
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
@@ -19,72 +40,20 @@ const IncomeCard = () => {
     useTransactionStore();
   const { toast, error: showError, hideToast } = useCustomToast();
 
-  const chips = [
-    { id: "month", label: "Bulan" },
-    { id: "year", label: "Tahun" },
-    { id: "range", label: "Rentang Waktu" },
-  ];
+  // Memoize years array to prevent recreation on every render
+  const years = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    return Array.from({ length: 4 }, (_, i) =>
+      (currentYear - 3 + i).toString(),
+    );
+  }, []);
 
-  const AMOUNT = formatCurrency(Number.parseFloat(statistic.amount || 0));
-
-  const months = [
-    {
-      key: "01",
-      value: "Januari",
-    },
-    {
-      key: "02",
-      value: "Februari",
-    },
-    {
-      key: "03",
-      value: "Maret",
-    },
-    {
-      key: "04",
-      value: "April",
-    },
-    {
-      key: "05",
-      value: "Mei",
-    },
-    {
-      key: "06",
-      value: "Juni",
-    },
-    {
-      key: "07",
-      value: "Juli",
-    },
-    {
-      key: "08",
-      value: "Agustus",
-    },
-    {
-      key: "09",
-      value: "September",
-    },
-    {
-      key: "10",
-      value: "Oktober",
-    },
-    {
-      key: "11",
-      value: "November",
-    },
-    {
-      key: "12",
-      value: "Desember",
-    },
-  ];
-
-  // build an array of 4 years as strings: [currentYear-3, currentYear-2, currentYear-1, currentYear]
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 4 }, (_, i) =>
-    (currentYear - 3 + i).toString()
+  const AMOUNT = useMemo(
+    () => formatCurrency(Number.parseFloat(statistic.amount || 0)),
+    [statistic.amount],
   );
 
-  const validateForm = () => {
+  const validateForm = useCallback(() => {
     const errors = {};
 
     if (!dateRange.from) {
@@ -102,34 +71,36 @@ const IncomeCard = () => {
     }
 
     return errors;
-  };
+  }, [dateRange, showError]);
 
-  const handleChipClick = (chipId) => {
+  const handleChipClick = useCallback((chipId) => {
     setActiveChip(chipId);
-    setShowPopover(showPopover === chipId ? null : chipId);
-  };
+    setShowPopover((prev) => (prev === chipId ? null : chipId));
+  }, []);
 
-  const handleOptionClick = (value, type) => {
-    const valueMonth = months.find((m) => m.key === value);
-    const valueRange = `${formatDate(value?.from)} - ${formatDate(value?.to)}`;
+  const handleOptionClick = useCallback(
+    (value, type) => {
+      const valueMonth = MONTHS.find((m) => m.key === value);
+      const valueRange = `${formatDate(value?.from)} - ${formatDate(value?.to)}`;
 
-    setActiveItem(
-      activeChip === "month"
-        ? valueMonth.value
-        : activeChip === "range"
-        ? valueRange
-        : value
-    );
+      setActiveItem(
+        activeChip === "month"
+          ? valueMonth.value
+          : activeChip === "range"
+            ? valueRange
+            : value,
+      );
 
-    // Simulate income update based on selection
-    const amounts = {
-      [type]: getStatisticTransaction(value, type),
-    };
-    updateIncomeAmount(amounts || amounts?.range);
-    setShowPopover(null);
-  };
+      const amounts = {
+        [type]: getStatisticTransaction(value, type),
+      };
+      updateIncomeAmount(amounts || amounts?.range);
+      setShowPopover(null);
+    },
+    [activeChip, getStatisticTransaction, updateIncomeAmount],
+  );
 
-  const handleRangeApply = () => {
+  const handleRangeApply = useCallback(() => {
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors);
@@ -142,20 +113,20 @@ const IncomeCard = () => {
       if (dateRange.from > dateRange.to) return;
       handleOptionClick(dateRange, "range");
     }
-  };
+  }, [dateRange, validateForm, handleOptionClick]);
 
-  const handleRangeClear = () => {
+  const handleRangeClear = useCallback(() => {
     setDateRange({ from: "", to: "" });
     setShowPopover(null);
     setValidationErrors({});
-  };
+  }, []);
 
-  const resetData = () => {
+  const resetData = useCallback(() => {
     setActiveChip("");
     setActiveItem("");
     setDateRange({ from: "", to: "" });
     getStatisticTransaction();
-  };
+  }, [getStatisticTransaction]);
 
   useEffect(() => {
     getStatisticTransaction();
@@ -193,7 +164,7 @@ const IncomeCard = () => {
 
           {/* Chips */}
           <div className="mt-6 flex items-center gap-2">
-            {chips.map((chip) => (
+            {CHIPS.map((chip) => (
               <button
                 key={chip.id}
                 onClick={() => handleChipClick(chip.id)}
@@ -213,7 +184,7 @@ const IncomeCard = () => {
                 Pilih Bulan
               </p>
               <div className="grid grid-cols-3 gap-2 text-sm">
-                {months.map((month) => {
+                {MONTHS.map((month) => {
                   return (
                     <button
                       key={month.key}

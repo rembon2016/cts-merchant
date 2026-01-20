@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, memo } from "react";
 import useFetchDataStore from "../../store/fetchDataStore";
 import PromoDetailModal from "./PromoDetailModal";
 
 const ROOT_API = import.meta.env.VITE_API_ROUTES;
+const INTERVAL = 4200;
 
-const PromoSlider = () => {
+const PromoSlider = memo(() => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [selectedPromoId, setSelectedPromoId] = useState(null);
@@ -14,61 +15,72 @@ const PromoSlider = () => {
 
   const { data, fetchData } = useFetchDataStore();
 
-  const handlePromoClick = (promoId) => {
+  const handlePromoClick = useCallback((promoId) => {
     setSelectedPromoId(promoId);
-  };
+  }, []);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setSelectedPromoId(null);
-  };
+  }, []);
 
-  const fetchBanner = (page = 1) => {
+  const fetchBanner = useCallback(() => {
     fetchData(`${ROOT_API}/v1/merchant/information-banner`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
-        // "Content-Type": "application/json",
         Accept: "application/json",
       },
     });
-  };
+  }, [fetchData]);
 
-  const INTERVAL = 4200;
+  const goToSlide = useCallback(
+    (index) => {
+      if (!data?.faqs?.length) return;
+      const newIndex = (index + data.faqs.length) % data.faqs.length;
+      setCurrentIndex(newIndex);
+      if (trackRef.current) {
+        trackRef.current.style.transition =
+          "transform 420ms cubic-bezier(0.2, 0.9, 0.2, 1)";
+        trackRef.current.style.transform = `translateX(-${newIndex * 100}%)`;
+      }
+    },
+    [data?.faqs?.length],
+  );
 
-  const goToSlide = (index) => {
-    const newIndex = (index + data?.faqs?.length) % data?.faqs?.length;
-    setCurrentIndex(newIndex);
-    if (trackRef.current) {
-      trackRef.current.style.transition =
-        "transform 420ms cubic-bezier(0.2, 0.9, 0.2, 1)";
-      trackRef.current.style.transform = `translateX(-${newIndex * 100}%)`;
-    }
-  };
+  const nextSlide = useCallback(() => {
+    setCurrentIndex((prev) => {
+      if (!data?.faqs?.length) return prev;
+      const newIndex = (prev + 1) % data.faqs.length;
+      if (trackRef.current) {
+        trackRef.current.style.transition =
+          "transform 420ms cubic-bezier(0.2, 0.9, 0.2, 1)";
+        trackRef.current.style.transform = `translateX(-${newIndex * 100}%)`;
+      }
+      return newIndex;
+    });
+  }, [data?.faqs?.length]);
 
-  const nextSlide = () => {
-    goToSlide(currentIndex + 1);
-  };
-
-  const startTimer = () => {
+  const startTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(nextSlide, INTERVAL);
-  };
+  }, [nextSlide]);
 
-  const resetTimer = () => {
+  const resetTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
     startTimer();
-  };
+  }, [startTimer]);
 
+  // Fetch banner and start timer only once on mount
   useEffect(() => {
     fetchBanner();
     startTimer();
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [currentIndex]);
+  }, [fetchBanner, startTimer]);
 
   // Touch/Mouse events for drag functionality
-  const handlePointerDown = (e) => {
+  const handlePointerDown = useCallback((e) => {
     setIsDragging(true);
     startXRef.current = e.type.startsWith("touch")
       ? e.touches[0].clientX
@@ -77,39 +89,45 @@ const PromoSlider = () => {
       trackRef.current.style.transition = "none";
     }
     if (timerRef.current) clearInterval(timerRef.current);
-  };
+  }, []);
 
-  const handlePointerMove = (e) => {
-    if (!isDragging || !trackRef.current) return;
-    const clientX = e.type.startsWith("touch")
-      ? e.touches[0].clientX
-      : e.clientX;
-    const delta = clientX - startXRef.current;
-    const width = trackRef.current.parentElement.offsetWidth;
-    trackRef.current.style.transform = `translateX(${
-      -currentIndex * width + delta
-    }px)`;
-  };
-
-  const handlePointerUp = (e) => {
-    if (!isDragging) return;
-    setIsDragging(false);
-    const clientX =
-      e.changedTouches && e.changedTouches[0]
-        ? e.changedTouches[0].clientX
+  const handlePointerMove = useCallback(
+    (e) => {
+      if (!isDragging || !trackRef.current) return;
+      const clientX = e.type.startsWith("touch")
+        ? e.touches[0].clientX
         : e.clientX;
-    const delta = clientX - startXRef.current;
-    const threshold = 50;
+      const delta = clientX - startXRef.current;
+      const width = trackRef.current.parentElement.offsetWidth;
+      trackRef.current.style.transform = `translateX(${
+        -currentIndex * width + delta
+      }px)`;
+    },
+    [isDragging, currentIndex],
+  );
 
-    if (delta < -threshold) {
-      goToSlide(currentIndex + 1);
-    } else if (delta > threshold) {
-      goToSlide(currentIndex - 1);
-    } else {
-      goToSlide(currentIndex);
-    }
-    startTimer();
-  };
+  const handlePointerUp = useCallback(
+    (e) => {
+      if (!isDragging) return;
+      setIsDragging(false);
+      const clientX =
+        e.changedTouches && e.changedTouches[0]
+          ? e.changedTouches[0].clientX
+          : e.clientX;
+      const delta = clientX - startXRef.current;
+      const threshold = 50;
+
+      if (delta < -threshold) {
+        goToSlide(currentIndex + 1);
+      } else if (delta > threshold) {
+        goToSlide(currentIndex - 1);
+      } else {
+        goToSlide(currentIndex);
+      }
+      startTimer();
+    },
+    [isDragging, currentIndex, goToSlide, startTimer],
+  );
 
   return (
     <section className="px-4 mt-6">
@@ -142,8 +160,12 @@ const PromoSlider = () => {
               <img
                 src={slide.thumbnail}
                 alt={slide.title}
-                className="w-fit h-44 object-cover rounded-2xl shadow-soft"
+                className="w-full h-44 object-cover rounded-2xl shadow-soft"
                 draggable={false}
+                loading="lazy"
+                width="340"
+                height="176"
+                decoding="async"
               />
             </button>
           ))}
@@ -174,6 +196,6 @@ const PromoSlider = () => {
       )}
     </section>
   );
-};
+});
 
-export default PromoSlider;
+export default memo(PromoSlider);

@@ -1,33 +1,27 @@
-import { useMemo } from "react";
+import { useMemo, memo, useCallback } from "react";
 import PropTypes from "prop-types";
 
-PromoDetailModal.propTypes = {
-  promoId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  onClose: PropTypes.func.isRequired,
-  promoData: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-      thumbnail: PropTypes.string,
-      title: PropTypes.string,
-      description: PropTypes.string,
-    })
-  ),
-};
-
-export default function PromoDetailModal({ promoId, onClose, promoData }) {
+const PromoDetailModal = memo(function PromoDetailModal({
+  promoId,
+  onClose,
+  promoData,
+}) {
   const promoDetail = useMemo(() => {
     if (!promoId || !promoData) return null;
     return promoData.find((item) => item.id === promoId);
   }, [promoId, promoData]);
 
-  const handleClose = () => onClose();
+  const handleClose = useCallback(() => onClose(), [onClose]);
 
   // Handle click outside to close
-  const handleOutsideClick = (e) => {
-    if (e.target.id === "promo-detail-modal-backdrop") {
-      handleClose();
-    }
-  };
+  const handleOutsideClick = useCallback(
+    (e) => {
+      if (e.target.id === "promo-detail-modal-backdrop") {
+        handleClose();
+      }
+    },
+    [handleClose],
+  );
 
   if (!promoId) return null;
 
@@ -45,6 +39,10 @@ export default function PromoDetailModal({ promoId, onClose, promoData }) {
                 src={promoDetail.thumbnail}
                 alt={promoDetail.title}
                 className="w-full h-48 object-cover rounded-lg mb-4"
+                loading="lazy"
+                width="416"
+                height="192"
+                decoding="async"
               />
               <h2 className="text-2xl font-bold mb-2 text-primary dark:text-white">
                 {promoDetail.title}
@@ -67,8 +65,8 @@ export default function PromoDetailModal({ promoId, onClose, promoData }) {
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-6 w-6"
-            fill="none"
             viewBox="0 0 24 24"
+            fill="none"
             stroke="currentColor"
           >
             <path
@@ -82,4 +80,19 @@ export default function PromoDetailModal({ promoId, onClose, promoData }) {
       </div>
     </div>
   );
-}
+});
+
+PromoDetailModal.propTypes = {
+  promoId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  onClose: PropTypes.func.isRequired,
+  promoData: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      thumbnail: PropTypes.string,
+      title: PropTypes.string,
+      description: PropTypes.string,
+    }),
+  ),
+};
+
+export default PromoDetailModal;

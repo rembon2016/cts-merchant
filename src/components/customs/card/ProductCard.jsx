@@ -117,6 +117,9 @@ const ProductCard = forwardRef((props) => {
               onError={(e) => {
                 e.target.src = "/images/placeholder.jpg";
               }}
+              width="400"
+              height="200"
+              loading="lazy"
             />
 
             {disabled && (
