@@ -12,8 +12,12 @@ import { useDebounce } from "../../hooks/useDebounce";
 
 const Invoice = () => {
   const navigate = useNavigate();
-
   const { invoices, getInvoices, isLoading } = useInvoiceStore();
+
+  // Pagination & optimization
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10); // Show 10 items per page
+  const initialLoadDone = useRef(false);
 
   // Filter states
   const [formData, setFormData] = useState({
@@ -22,7 +26,6 @@ const Invoice = () => {
     reset: false,
   });
   const [search, setSearch] = useState("");
-
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const debouncedSearch = useDebounce(search || "", 1000);
@@ -30,12 +33,21 @@ const Invoice = () => {
   const location = useLocation();
   const invoicePath = location.pathname.includes("/invoice");
 
+  // Optimize: Only fetch on mount and when search/filter changes
+  useEffect(() => {
+    if (!invoicePath || initialLoadDone.current === true) return;
+
+    // Initial load only
+    initialLoadDone.current = true;
+    getInvoices({ search: "", page: 1, limit });
+  }, [invoicePath, getInvoices, limit]);
+
+  // Fetch when search changes
   useEffect(() => {
     if (!invoicePath) return;
-
-    // Selalu fetch data ketika komponen di-mount atau navigasi ke halaman invoice
-    getInvoices({ search: debouncedSearch });
-  }, [invoicePath, getInvoices, debouncedSearch]);
+    setPage(1); // Reset to first page on search
+    getInvoices({ search: debouncedSearch, page: 1, limit });
+  }, [debouncedSearch, invoicePath, getInvoices, limit]);
 
   const dataStatus = [
     { id: "paid", name: "Dibayar", color: "bg-green-300 text-green-800" },
@@ -57,7 +69,7 @@ const Invoice = () => {
     const [paid, unpaid, canceled, expired] = dataStatus.map(
       (s) =>
         Array.isArray(invoices) &&
-        invoices?.filter((inv) => inv.status === s.id).length
+        invoices?.filter((inv) => inv.status === s.id).length,
     );
 
     return { total, paid, unpaid, canceled, expired };
@@ -67,7 +79,7 @@ const Invoice = () => {
   const dueDateOptions = useMemo(() => {
     if (!Array.isArray(invoices)) return [];
     const unique = Array.from(
-      new Set(invoices.map((inv) => inv?.invoice_due_date).filter(Boolean))
+      new Set(invoices.map((inv) => inv?.invoice_due_date).filter(Boolean)),
     );
     return unique.map((d) => ({ id: d, name: formatDate(d) }));
   }, [invoices]);
@@ -81,38 +93,56 @@ const Invoice = () => {
     ];
   }, []);
 
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  }, []);
 
-  const applyFilter = () => {
-    getInvoices({ ...formData });
+  const applyFilter = useCallback(() => {
+    getInvoices({ status: formData.status, end_date: formData.end_date });
     resetFilter();
-  };
+  }, [formData, getInvoices]);
 
-  const resetFilter = () => {
+  const resetFilter = useCallback(() => {
     setFormData({
       status: "",
       end_date: "",
       reset: true,
     });
     setIsSheetOpen(false);
-  };
+  }, []);
 
   const renderLoading = () => {
     return (
-      <div className="flex flex-col gap-2">
-        <div className="grid grid-cols-2 gap-1">
-          <div className="col-span-2 w-1/2 h-[25px] bg-gray-200 rounded-lg animate-pulse mb-2"></div>
-          <div className="w-full h-[75px] bg-gray-200 rounded-lg animate-pulse"></div>
-          <div className="w-full h-[75px] bg-gray-200 rounded-lg animate-pulse"></div>
-          <div className="w-full h-[75px] bg-gray-200 rounded-lg animate-pulse"></div>
-          <div className="w-full h-[75px] bg-gray-200 rounded-lg animate-pulse"></div>
+      <div className="flex flex-col gap-4">
+        {/* Header skeleton - fixed height */}
+        <div className="space-y-2 mb-6">
+          <div className="w-1/3 h-[32px] bg-slate-200 dark:bg-slate-600 rounded-lg animate-pulse"></div>
+          <div className="w-1/2 h-[16px] bg-slate-200 dark:bg-slate-600 rounded-lg animate-pulse"></div>
         </div>
-        <div className="grid grid-cols-1 gap-2">
-          <div className="w-full h-[125px] bg-gray-200 rounded-lg animate-pulse"></div>
-          <div className="w-full h-[125px] bg-gray-200 rounded-lg animate-pulse"></div>
+
+        {/* Summary cards skeleton - fixed height matches actual */}
+        <div className="grid grid-cols-2 gap-1">
+          <div className="h-[92px] bg-slate-200 dark:bg-slate-600 rounded-lg animate-pulse"></div>
+          <div className="h-[92px] bg-slate-200 dark:bg-slate-600 rounded-lg animate-pulse"></div>
+          <div className="h-[92px] bg-slate-200 dark:bg-slate-600 rounded-lg animate-pulse"></div>
+          <div className="h-[92px] bg-slate-200 dark:bg-slate-600 rounded-lg animate-pulse"></div>
+        </div>
+
+        {/* Search and filter skeleton - fixed height */}
+        <div className="flex gap-2 mb-4 h-[42px]">
+          <div className="flex-1 bg-slate-200 dark:bg-slate-600 rounded-lg animate-pulse"></div>
+          <div className="w-[120px] bg-slate-200 dark:bg-slate-600 rounded-lg animate-pulse"></div>
+        </div>
+
+        {/* List items skeleton - fixed height matches actual */}
+        <div className="flex flex-col gap-3">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="h-[110px] bg-slate-200 dark:bg-slate-600 rounded-lg animate-pulse"
+            ></div>
+          ))}
         </div>
       </div>
     );
@@ -146,14 +176,14 @@ const Invoice = () => {
         </div>
         <div className="flex items-end gap-2">
           <button
-            className="w-full py-4 bg-[var(--c-primary)] text-white rounded-md font-semibold hover:bg-indigo-700 transition-colors duration-200"
+            className="w-full py-4 bg-[var(--c-primary)] text-white rounded-md font-semibold hover:bg-indigo-700 active:bg-indigo-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={applyFilter}
             disabled={conditionDisable}
           >
             Terapkan Filter
           </button>
           <button
-            className="w-full py-4 bg-gray-200 text-gray-700 rounded-md font-semibold hover:bg-gray-300 transition-colors duration-200"
+            className="w-full py-4 bg-gray-200 dark:bg-slate-600 text-gray-700 dark:text-gray-300 rounded-md font-semibold hover:bg-gray-300 dark:hover:bg-slate-500 active:bg-gray-400 dark:active:bg-slate-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={resetFilter}
             disabled={conditionDisable}
           >
@@ -162,52 +192,86 @@ const Invoice = () => {
         </div>
       </>
     );
-  }, [isLoading, formData, statusOptions, dueDateOptions, handleChange]);
+  }, [
+    formData,
+    statusOptions,
+    dueDateOptions,
+    handleChange,
+    applyFilter,
+    resetFilter,
+  ]);
 
   const renderCatalogInvoice = useMemo(() => {
     return (
       <div className="grid grid-cols-2 gap-1 mt-2">
-        <div className="w-full flex-shrink-0 p-4 bg-white border border-gray-50 dark:border-none rounded-lg shadow-sm">
-          <div className="text-xs text-gray-500 dark:text-gray-300">
+        {/* Paid */}
+        <div className="w-full h-[92px] p-4 bg-white dark:bg-slate-700 border border-gray-50 dark:border-slate-600 rounded-lg shadow-sm flex flex-col justify-between">
+          <div className="text-xs text-gray-500 dark:text-gray-400">
             Sudah Lunas
           </div>
-          <div className="mt-2 text-xl font-medium text-gray-900 dark:text-gray-200">
-            {summary.paid || 0}
+          <div className="text-xl font-semibold text-gray-900 dark:text-gray-200">
+            {summary.paid ?? 0}
           </div>
         </div>
-        <div className="w-full flex-shrink-0 p-4 bg-white border border-gray-50 dark:border-none rounded-lg shadow-sm">
-          <div className="text-xs text-gray-500 dark:text-gray-300">
+
+        {/* Unpaid */}
+        <div className="w-full h-[92px] p-4 bg-white dark:bg-slate-700 border border-gray-50 dark:border-slate-600 rounded-lg shadow-sm flex flex-col justify-between">
+          <div className="text-xs text-gray-500 dark:text-gray-400">
             Belum Bayar
           </div>
-          <div className="mt-2 text-xl font-medium text-gray-900 dark:text-gray-200">
-            {summary.unpaid || 0}
+          <div className="text-xl font-semibold text-gray-900 dark:text-gray-200">
+            {summary.unpaid ?? 0}
           </div>
         </div>
-        <div className="w-full flex-shrink-0 p-4 bg-white border border-gray-50 dark:border-none rounded-lg shadow-sm">
-          <div className="text-xs text-gray-500 dark:text-gray-300">
+
+        {/* Canceled */}
+        <div className="w-full h-[92px] p-4 bg-white dark:bg-slate-700 border border-gray-50 dark:border-slate-600 rounded-lg shadow-sm flex flex-col justify-between">
+          <div className="text-xs text-gray-500 dark:text-gray-400">
             Dibatalkan
           </div>
-          <div className="mt-2 text-xl font-medium text-gray-900 dark:text-gray-200">
-            {summary.canceled || 0}
+          <div className="text-xl font-semibold text-gray-900 dark:text-gray-200">
+            {summary.canceled ?? 0}
           </div>
         </div>
-        <div className="w-full flex-shrink-0 p-4 bg-white border border-gray-50 dark:border-none rounded-lg shadow-sm">
-          <div className="text-xs text-gray-500 dark:text-gray-300">
+
+        {/* Expired */}
+        <div className="w-full h-[92px] p-4 bg-white dark:bg-slate-700 border border-gray-50 dark:border-slate-600 rounded-lg shadow-sm flex flex-col justify-between">
+          <div className="text-xs text-gray-500 dark:text-gray-400">
             Kadaluarsa
           </div>
-          <div className="mt-2 text-xl font-medium text-gray-900 dark:text-gray-200">
-            {summary.expired || 0}
+          <div className="text-xl font-semibold text-gray-900 dark:text-gray-200">
+            {summary.expired ?? 0}
           </div>
         </div>
       </div>
     );
   }, [summary]);
 
+  // Pre-calculate paginated data to avoid re-renders
+  const totalPages = useMemo(() => {
+    return Math.ceil((invoices?.length || 0) / limit);
+  }, [invoices?.length, limit]);
+
+  const paginatedInvoices = useMemo(() => {
+    if (!Array.isArray(invoices)) return [];
+    const start = (page - 1) * limit;
+    return invoices.slice(start, start + limit);
+  }, [invoices, page, limit]);
+
+  // Pre-format dates to avoid expensive operations in render
+  const formattedInvoices = useMemo(() => {
+    return paginatedInvoices.map((inv) => ({
+      ...inv,
+      invoice_date_formatted: formatDate(inv.invoice_date),
+      invoice_due_date_formatted: formatDate(inv.invoice_due_date),
+    }));
+  }, [paginatedInvoices]);
+
   const renderInvoiceList = useMemo(() => {
     return (
       <div className="divide-y flex flex-col gap-3">
-        {Array.isArray(invoices) &&
-          invoices?.map((inv) => (
+        {Array.isArray(formattedInvoices) &&
+          formattedInvoices?.map((inv) => (
             <button
               key={inv.id}
               onClick={() =>
@@ -215,28 +279,28 @@ const Invoice = () => {
                   replace: true,
                 })
               }
-              className={`bg-white dark:bg-slate-700 rounded-lg p-4 shadow-soft border border-slate-100 dark:border-slate-600`}
+              className="h-[110px] bg-white dark:bg-slate-700 rounded-lg p-4 shadow-soft border border-slate-100 dark:border-slate-600 flex flex-col justify-between hover:shadow-md transition-shadow duration-200"
             >
               <div className="flex flex-col gap-1 items-start">
-                <div className="text-sm font-medium text-gray-900 dark:text-gray-200 truncate">
+                <div className="text-sm font-semibold text-gray-900 dark:text-gray-200 truncate">
                   {inv.code}
                 </div>
-                <div className="text-xs text-gray-500 dark:text-gray-300">
-                  Mulai: {formatDate(inv.invoice_date)} • Jatuh tempo:{" "}
-                  {formatDate(inv.invoice_due_date)}
+                <div className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
+                  Mulai: {inv.invoice_date_formatted} • Jatuh tempo:{" "}
+                  {inv.invoice_due_date_formatted}
                 </div>
               </div>
 
-              <div className="text-sm font-medium text-gray-900 dark:text-gray-200 flex items-center gap-3 justify-between mt-3">
+              <div className="flex items-center justify-between gap-2">
                 <span
                   className={
                     dataStatus.find((item) => item.id === inv.status)?.color +
-                    " inline-block px-2 py-1 rounded-full text-xs"
+                    " inline-block px-2 py-1 rounded-full text-xs font-medium flex-shrink-0"
                   }
                 >
                   {dataStatus.find((item) => item.id === inv.status)?.name}
                 </span>
-                <span className="font-semibold text-lg text-[var(--c-primary)] dark:text-blue-300">
+                <span className="font-semibold text-lg text-[var(--c-primary)] dark:text-blue-300 flex-shrink-0">
                   {formatCurrency(inv.invoice_amount)}
                 </span>
               </div>
@@ -244,7 +308,34 @@ const Invoice = () => {
           ))}
       </div>
     );
-  }, [invoices]);
+  }, [formattedInvoices, dataStatus, navigate]);
+
+  // Pagination controls
+  const renderPaginationControls = useMemo(() => {
+    if (totalPages <= 1) return null;
+
+    return (
+      <div className="flex items-center justify-center gap-2 mt-6 h-[42px]">
+        <button
+          onClick={() => setPage((p) => Math.max(1, p - 1))}
+          disabled={page === 1}
+          className="px-4 py-2 bg-gray-200 dark:bg-slate-600 text-gray-700 dark:text-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300 dark:hover:bg-slate-500 transition-colors"
+        >
+          Sebelumnya
+        </button>
+        <div className="text-sm text-gray-600 dark:text-gray-400">
+          Halaman {page} dari {totalPages}
+        </div>
+        <button
+          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+          disabled={page === totalPages}
+          className="px-4 py-2 bg-[var(--c-primary)] text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors"
+        >
+          Berikutnya
+        </button>
+      </div>
+    );
+  }, [page, totalPages]);
 
   const renderElements = useMemo(() => {
     if (isLoading) return renderLoading();
@@ -267,10 +358,10 @@ const Invoice = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Summary + list */}
-          <div className="lg:col-span-3 space-y-4">
+          <div className="lg:col-span-3 space-y-4 pb-20">
             {renderCatalogInvoice}
             <div className="flex flex-col gap-2 mb-4">
-              <div className="flex gap-2">
+              <div className="flex gap-2 h-[42px]">
                 <SearchInput
                   value={search || ""}
                   onChange={(value) => setSearch(value)}
@@ -278,7 +369,8 @@ const Invoice = () => {
                 />
                 <button
                   onClick={() => setIsSheetOpen(true)}
-                  className="bg-[var(--c-primary)] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1"
+                  className="bg-[var(--c-primary)] text-white px-4 py-2 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors flex items-center gap-1 flex-shrink-0"
+                  aria-label="Buka filter invoice"
                 >
                   <svg
                     width="17"
@@ -300,11 +392,21 @@ const Invoice = () => {
               </div>
             </div>
             {renderInvoiceList}
+            {renderPaginationControls}
           </div>
         </div>
       </div>
     );
-  }, [isLoading, invoices, summary, navigate, search]);
+  }, [
+    isLoading,
+    invoices,
+    summary,
+    navigate,
+    search,
+    renderCatalogInvoice,
+    renderInvoiceList,
+    renderPaginationControls,
+  ]);
 
   return (
     <div className="p-4 sm:p-6 lg:p-10">
@@ -325,4 +427,4 @@ const Invoice = () => {
   );
 };
 
-export default Invoice;
+export default memo(Invoice);
