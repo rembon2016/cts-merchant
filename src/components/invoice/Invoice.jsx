@@ -9,6 +9,9 @@ import BottomSheet from "../customs/menu/BottomSheet";
 import SearchInput from "../customs/form/SearchInput";
 import SimpleInput from "../customs/form/SimpleInput";
 import { useDebounce } from "../../hooks/useDebounce";
+import ButtonFilter from "../customs/button/ButtonFilter";
+import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
+import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 
 const Invoice = () => {
   const navigate = useNavigate();
@@ -112,42 +115,6 @@ const Invoice = () => {
     setIsSheetOpen(false);
   }, []);
 
-  const renderLoading = () => {
-    return (
-      <div className="flex flex-col gap-4">
-        {/* Header skeleton - fixed height */}
-        <div className="space-y-2 mb-6">
-          <div className="w-1/3 h-[32px] bg-slate-200 dark:bg-slate-600 rounded-lg animate-pulse"></div>
-          <div className="w-1/2 h-[16px] bg-slate-200 dark:bg-slate-600 rounded-lg animate-pulse"></div>
-        </div>
-
-        {/* Summary cards skeleton - fixed height matches actual */}
-        <div className="grid grid-cols-2 gap-1">
-          <div className="h-[92px] bg-slate-200 dark:bg-slate-600 rounded-lg animate-pulse"></div>
-          <div className="h-[92px] bg-slate-200 dark:bg-slate-600 rounded-lg animate-pulse"></div>
-          <div className="h-[92px] bg-slate-200 dark:bg-slate-600 rounded-lg animate-pulse"></div>
-          <div className="h-[92px] bg-slate-200 dark:bg-slate-600 rounded-lg animate-pulse"></div>
-        </div>
-
-        {/* Search and filter skeleton - fixed height */}
-        <div className="flex gap-2 mb-4 h-[42px]">
-          <div className="flex-1 bg-slate-200 dark:bg-slate-600 rounded-lg animate-pulse"></div>
-          <div className="w-[120px] bg-slate-200 dark:bg-slate-600 rounded-lg animate-pulse"></div>
-        </div>
-
-        {/* List items skeleton - fixed height matches actual */}
-        <div className="flex flex-col gap-3">
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="h-[110px] bg-slate-200 dark:bg-slate-600 rounded-lg animate-pulse"
-            ></div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
   const renderElementsFilter = useMemo(() => {
     const conditionDisable =
       formData?.status === "" && formData?.end_date === "";
@@ -176,18 +143,18 @@ const Invoice = () => {
         </div>
         <div className="flex items-end gap-2">
           <button
-            className="w-full py-4 bg-[var(--c-primary)] text-white rounded-md font-semibold hover:bg-indigo-700 active:bg-indigo-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={applyFilter}
-            disabled={conditionDisable}
-          >
-            Terapkan Filter
-          </button>
-          <button
             className="w-full py-4 bg-gray-200 dark:bg-slate-600 text-gray-700 dark:text-gray-300 rounded-md font-semibold hover:bg-gray-300 dark:hover:bg-slate-500 active:bg-gray-400 dark:active:bg-slate-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={resetFilter}
             disabled={conditionDisable}
           >
             Reset
+          </button>
+          <button
+            className="w-full py-4 bg-[var(--c-primary)] text-white rounded-md font-semibold hover:bg-indigo-700 active:bg-indigo-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={applyFilter}
+            disabled={conditionDisable}
+          >
+            Terapkan Filter
           </button>
         </div>
       </>
@@ -310,6 +277,21 @@ const Invoice = () => {
     );
   }, [formattedInvoices, dataStatus, navigate]);
 
+  const renderFilter = useMemo(() => {
+    return (
+      <div className="flex flex-col gap-2 mb-4">
+        <div className="flex gap-2 h-[42px]">
+          <SearchInput
+            value={search || ""}
+            onChange={(value) => setSearch(value)}
+            placeholder="Cari invoice..."
+          />
+          <ButtonFilter setIsSheetOpen={setIsSheetOpen} />
+        </div>
+      </div>
+    );
+  }, [search, setSearch, setIsSheetOpen]);
+
   // Pagination controls
   const renderPaginationControls = useMemo(() => {
     if (totalPages <= 1) return null;
@@ -338,11 +320,6 @@ const Invoice = () => {
   }, [page, totalPages]);
 
   const renderElements = useMemo(() => {
-    if (isLoading) return renderLoading();
-
-    if (!isLoading && invoices?.length === 0)
-      return <NoData text="Tidak ada invoice" />;
-
     return (
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
@@ -360,37 +337,11 @@ const Invoice = () => {
           {/* Summary + list */}
           <div className="lg:col-span-3 space-y-4 pb-20">
             {renderCatalogInvoice}
-            <div className="flex flex-col gap-2 mb-4">
-              <div className="flex gap-2 h-[42px]">
-                <SearchInput
-                  value={search || ""}
-                  onChange={(value) => setSearch(value)}
-                  placeholder="Cari invoice..."
-                />
-                <button
-                  onClick={() => setIsSheetOpen(true)}
-                  className="bg-[var(--c-primary)] text-white px-4 py-2 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors flex items-center gap-1 flex-shrink-0"
-                  aria-label="Buka filter invoice"
-                >
-                  <svg
-                    width="17"
-                    height="12"
-                    viewBox="0 0 17 12"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M0.75 0.75H15.75M3.25 5.75H13.25M6.25 10.75H10.25"
-                      stroke="white"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  Filter
-                </button>
-              </div>
-            </div>
+            {renderFilter}
+            {isLoading && <LoadingSkeletonList items={10} />}
+            {!isLoading && invoices?.length === 0 && (
+              <NoData text="Tidak ada invoice" />
+            )}
             {renderInvoiceList}
             {renderPaginationControls}
           </div>

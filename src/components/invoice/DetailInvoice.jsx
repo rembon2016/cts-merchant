@@ -4,9 +4,8 @@ import { useEffect, useMemo } from "react";
 import { formatDate } from "../../helper/format-date";
 import { formatCurrency } from "../../helper/currency";
 import BackButton from "../customs/button/BackButton";
-import CustomLoading from "../customs/loading/CustomLoading";
 import PrimaryButton from "../customs/button/PrimaryButton";
-import NoData from "../customs/element/NoData";
+import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
 
 const statusBadge = (status) => {
   if (status?.toLowerCase() === "paid") return "Sudah Bayar";
@@ -50,20 +49,10 @@ const DetailInvoice = () => {
   }, []);
 
   const renderElements = useMemo(() => {
-    if (isLoading) {
-      return <CustomLoading />;
-    }
+    if (isLoading) return <LoadingSkeletonCard />;
 
     return (
       <div className="w-full mx-auto bg-white dark:bg-slate-800 p-6 rounded-lg shadow relative">
-        {/* <div className="flex justify-end">
-          <PrimaryButton
-            title="Cetak"
-            isLoading={downloading}
-            handleOnClick={handlePrintInvoices}
-            disableCondition={downloading}
-          />
-        </div> */}
         <div className="flex items-start justify-between mt-2">
           <div>
             <div className="text-xl font-semibold">
@@ -141,12 +130,6 @@ const DetailInvoice = () => {
           </div>
         </div>
 
-        {!invoices && (
-          <NoData
-            message={`Invoice tidak ditemukan untuk ${invoices?.code}"`}
-          />
-        )}
-
         <PrimaryButton
           title="Cetak"
           handleOnClick={handlePrintInvoices}
@@ -155,12 +138,6 @@ const DetailInvoice = () => {
           showIcon={true}
           icon={renderIconPrint}
         />
-
-        {/* <FloatingButton
-          title={renderIconPrint}
-          isLoading={downloading}
-          handleOnClick={handlePrintInvoices}
-        /> */}
       </div>
     );
   }, [isLoading, downloading]);
