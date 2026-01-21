@@ -4,7 +4,7 @@
  * Reduces initial bundle size and improves page load performance
  */
 
-import { lazy, Suspense, Component } from "react";
+import { lazy, Suspense } from "react";
 
 /**
  * Route Loading Fallback Component
@@ -179,6 +179,9 @@ export const LazyTicketDetailPage = lazy(
 );
 export const LazyFeedbackPage = lazy(() => import("../pages/FeedbackPage"));
 
+// Error pages
+export const LazyNotFound = lazy(() => import("../pages/NotFound"));
+
 export default {
   LazyLoadRoute,
   RouteLoadingFallback,
@@ -234,4 +237,6 @@ export default {
   LazyTicketListPage,
   LazyTicketDetailPage,
   LazyFeedbackPage,
+  // Error pages
+  LazyNotFound,
 };

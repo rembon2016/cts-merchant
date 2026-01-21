@@ -13,11 +13,6 @@ export const ListRoutes = () => {
       protectRoute: true,
     },
     {
-      path: "products",
-      element: <LazyRoute.LazyProduct />,
-      protectRoute: true,
-    },
-    {
       path: "profile",
       element: <LazyRoute.LazyProfile />,
       protectRoute: true,
@@ -260,6 +255,11 @@ export const ListRoutes = () => {
     {
       path: "ppob/withdraw",
       element: <LazyRoute.LazyPPOBWithdraw />,
+      protectRoute: true,
+    },
+    {
+      path: "*",
+      element: <LazyRoute.LazyNotFound />,
       protectRoute: true,
     },
   ];
