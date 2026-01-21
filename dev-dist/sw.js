@@ -12,7 +12,7 @@
  */
 
 // If the loader is already loaded, just stop.
-if (!self.define) {
+if (!globalThis.define) {
   let registry = {};
 
   // Used for `eval` and `importScripts` where we can't get script URL by other means.
@@ -24,7 +24,7 @@ if (!self.define) {
     return (
       registry[uri] ||
       new Promise((resolve) => {
-        if ("document" in self) {
+        if ("document" in globalThis) {
           const script = document.createElement("script");
           script.src = uri;
           script.onload = resolve;
@@ -44,10 +44,10 @@ if (!self.define) {
     );
   };
 
-  self.define = (depsNames, factory) => {
+  globalThis.define = (depsNames, factory) => {
     const uri =
       nextDefineUri ||
-      ("document" in self ? document.currentScript.src : "") ||
+      ("document" in globalThis ? document.currentScript.src : "") ||
       location.href;
     if (registry[uri]) {
       // Module is already loading or loaded.
@@ -71,7 +71,7 @@ if (!self.define) {
 define(["./workbox-f5cea9ed"], function (workbox) {
   "use strict";
 
-  self.skipWaiting();
+  globalThis.skipWaiting();
   workbox.clientsClaim();
 
   /**
@@ -83,7 +83,7 @@ define(["./workbox-f5cea9ed"], function (workbox) {
     [
       {
         url: "index.html",
-        revision: "0.nn74l0gst5",
+        revision: "0.o6tgmot869o",
       },
     ],
     {},
