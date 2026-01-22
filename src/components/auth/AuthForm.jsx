@@ -204,7 +204,10 @@ export default function AuthForm({ formMode = "login" }) {
             src={getImage}
             alt="CTS"
             className="w-24 h-24 mx-auto"
-            loading="lazy"
+            fetchpriority="high"
+            width="96"
+            height="96"
+            loading="eager"
           />
           <h3 className="font-bold text-4xl text-center">Merchant</h3>
         </div>
