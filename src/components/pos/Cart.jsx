@@ -9,6 +9,8 @@ import CustomLoading from "../customs/loading/CustomLoading";
 import ButtonQuantity from "../customs/button/ButtonQuantity";
 import SimpleModal from "../customs/modal/SimpleModal";
 import CustomToast from "../customs/toast/CustomToast";
+import CustomImage from "../customs/element/CustomImage";
+import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 
 const Cart = () => {
   const {
@@ -76,15 +78,15 @@ const Cart = () => {
       // Remove by product_id (store uses product_id for selected items)
       setSelectedCart((prevItems) =>
         prevItems.filter(
-          (item) => String(item.product_id) !== String(productId)
-        )
+          (item) => String(item.product_id) !== String(productId),
+        ),
       );
     }
 
     // Update "Pilih Semua" checkbox state after each change
     setTimeout(() => {
       const itemCheckboxes = document.querySelectorAll(
-        'input[type="checkbox"]:not(#select-all)'
+        'input[type="checkbox"]:not(#select-all)',
       );
       const allChecked =
         Array.from(itemCheckboxes).length > 0 &&
@@ -106,7 +108,7 @@ const Cart = () => {
     if (isChecked) {
       const allItems = cart?.data?.items?.map((item) => {
         const variantPrice = item?.product_sku?.product_prices?.map(
-          (priceItem) => priceItem?.price
+          (priceItem) => priceItem?.price,
         );
         return {
           cart_id: item?.cart_id, // Use the main cart ID, not item ID
@@ -188,7 +190,7 @@ const Cart = () => {
     const nullCartData = isEmpty(cart?.data?.items);
 
     if (isLoading) {
-      return <CustomLoading />;
+      return <LoadingSkeletonList />;
     }
 
     if (!isLoading && nullCartData) {
@@ -279,9 +281,16 @@ const Cart = () => {
                   onChange={handleChecked}
                   className="cursor-pointer"
                 />
-                <img
-                  src={getImageUrl(cartItem?.product?.image)}
-                  alt={cartItem?.product?.name || "Product Image"}
+                <CustomImage
+                  imageSource={getImageUrl(cartItem?.product?.image)}
+                  imageWidth={96}
+                  imageHeight={64}
+                  altImage={cartItem?.product?.name || "Product Image"}
+                  onError={(e) => {
+                    e.target.src = "/images/placeholder.jpg";
+                  }}
+                  imageLoad="eager"
+                  imageFetchPriority="high"
                   className="w-24 h-24 object-cover rounded-lg"
                 />
                 <div key={cartItem?.id} className="flex flex-col">
@@ -317,7 +326,7 @@ const Cart = () => {
                         const price = Number.parseInt(
                           cartItem?.product?.is_variant
                             ? cartItem?.product_sku?.product_prices?.[0]?.price
-                            : cartItem?.product?.price_product ?? 0
+                            : (cartItem?.product?.price_product ?? 0),
                         );
                         const subtotal = price * Number(newQty);
 
@@ -329,7 +338,7 @@ const Cart = () => {
                           return prevItems.map((it) =>
                             matchByPid(it)
                               ? { ...it, price, subtotal, quantity: newQty }
-                              : it
+                              : it,
                           );
                         }
 
@@ -353,19 +362,19 @@ const Cart = () => {
                       setTimeout(() => {
                         // checkbox id uses product id in the markup
                         const cb = document.getElementById(
-                          String(cartItem?.product?.id)
+                          String(cartItem?.product?.id),
                         );
                         if (cb && !cb.checked) {
                           cb.checked = true;
                           // Trigger change handler so selectedCart will include item if necessary
                           cb.dispatchEvent(
-                            new Event("change", { bubbles: true })
+                            new Event("change", { bubbles: true }),
                           );
                         }
 
                         // Update select-all state
                         const itemCheckboxes = document.querySelectorAll(
-                          'input[type="checkbox"]:not(#select-all)'
+                          'input[type="checkbox"]:not(#select-all)',
                         );
                         const allChecked =
                           Array.from(itemCheckboxes).length > 0 &&
@@ -389,7 +398,7 @@ const Cart = () => {
                 onClick={() =>
                   handleOpenItemModal(
                     cartItem?.id,
-                    cartItem?.product?.name || cartItem?.name
+                    cartItem?.product?.name || cartItem?.name,
                   )
                 }
               >
@@ -416,6 +425,20 @@ const Cart = () => {
       </div>
     );
   }, [cart, isLoading, error, success, showModal]);
+
+  useEffect(() => {
+    const preloadImage = (src) => {
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "image";
+      link.href = src;
+      document.head.appendChild(link);
+    };
+
+    const mappingImage =
+      cart?.data?.items?.map((item) => item?.product?.image) || [];
+    mappingImage.forEach((src) => preloadImage(src));
+  }, [cart?.data?.items]);
 
   return (
     <div className="p-6">

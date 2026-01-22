@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback, memo } from "react";
 import useFetchDataStore from "../../store/fetchDataStore";
 import PromoDetailModal from "./PromoDetailModal";
+import CustomImage from "../customs/element/CustomImage";
 
 const ROOT_API = import.meta.env.VITE_API_ROUTES;
 const INTERVAL = 4200;
@@ -78,6 +79,19 @@ const PromoSlider = memo(() => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, [fetchBanner, startTimer]);
+
+  useEffect(() => {
+    const preloadImage = (src) => {
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "image";
+      link.href = src;
+      document.head.appendChild(link);
+    };
+
+    const mappingImage = data?.faqs?.map((item) => item.thumbnail) || [];
+    mappingImage.forEach((src) => preloadImage(src));
+  }, [data?.faqs]);
 
   // Touch/Mouse events for drag functionality
   const handlePointerDown = useCallback((e) => {
@@ -157,15 +171,14 @@ const PromoSlider = memo(() => {
               className="slide text-left"
               onClick={() => handlePromoClick(slide.id)}
             >
-              <img
-                src={slide.thumbnail}
-                alt={slide.title}
+              <CustomImage
+                imageSource={slide.thumbnail}
+                imageWidth={340}
+                imageHeight={176}
+                altImage={slide.title}
+                imageLoad="eager"
+                imageFetchPriority="high"
                 className="w-full h-44 object-cover rounded-2xl shadow-soft"
-                draggable={false}
-                loading="lazy"
-                width="340"
-                height="176"
-                decoding="async"
               />
             </button>
           ))}

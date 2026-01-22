@@ -8,6 +8,7 @@ import BackButton from "../../customs/button/BackButton";
 import { useCustomToast } from "../../../hooks/useCustomToast";
 import CustomToast from "../../customs/toast/CustomToast";
 import LoadingSkeletonCard from "../../customs/loading/LoadingSkeletonCard";
+import CustomImage from "../../customs/element/CustomImage";
 
 export default function DetailProduct() {
   const { getDetailProduct, removeProducts, isLoading, products, error } =
@@ -102,9 +103,16 @@ export default function DetailProduct() {
           </div>
         </div>
         <div className="w-full h-full flex flex-col gap-3">
-          <img
-            src={products?.image}
-            alt={products?.name}
+          <CustomImage
+            imageSource={products?.image}
+            imageWidth={96}
+            imageHeight={64}
+            altImage={products?.name}
+            onError={(e) => {
+              e.target.src = "/images/placeholder.jpg";
+            }}
+            imageLoad="eager"
+            imageFetchPriority="high"
             className="w-full max-w-[378px] h-full max-h-[267px] object-cover object-center rounded-lg"
           />
           <div className="flex flex-col gap-1">
@@ -251,6 +259,17 @@ export default function DetailProduct() {
       </div>
     );
   }, [products, isLoading, isDark, error, showModal, fullValue]);
+
+  useEffect(() => {
+    const preloadImage = (src) => {
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "image";
+      link.href = src;
+      document.head.appendChild(link);
+    };
+    preloadImage(products?.image);
+  }, [products?.image]);
 
   return (
     <div className="px-4">

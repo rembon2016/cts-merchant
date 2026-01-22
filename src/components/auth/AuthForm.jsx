@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useEffect, useMemo, useRef, lazy } from "react";
+import { useState, useEffect, useMemo, useRef, memo } from "react";
 import { useAuthStore } from "../../store/authStore";
 import { useThemeStore } from "../../store/themeStore";
 import SimpleAlert from "../customs/alert/SimpleAlert";
@@ -8,8 +8,9 @@ import CustomToast from "../customs/toast/CustomToast";
 import { useCustomToast } from "../../hooks/useCustomToast";
 import { useInstallPWA } from "../../hooks/useInstallPWA";
 import PrimaryButton from "../customs/button/PrimaryButton";
+import CustomImage from "../customs/element/CustomImage";
 
-export default function AuthForm({ formMode = "login" }) {
+const AuthForm = memo(function AuthForm({ formMode = "login" }) {
   const isLoginMode = formMode === "login";
 
   const [formData, setFormData] = useState({
@@ -177,9 +178,7 @@ export default function AuthForm({ formMode = "login" }) {
     } catch (err) {
       setError(
         err?.message ||
-          (isLoginMode
-            ? "Terjadi error saat login"
-            : "Terjadi error saat registrasi"),
+          `Terjadi error saat ${isLoginMode ? "login" : "registrasi"}`,
       );
     }
   };
@@ -196,15 +195,31 @@ export default function AuthForm({ formMode = "login" }) {
     return "/icons/icon-ios.svg";
   }, []);
 
+  // Preload critical images
+  useEffect(() => {
+    const preloadImage = (src) => {
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "image";
+      link.href = src;
+      document.head.appendChild(link);
+    };
+
+    preloadImage(getImage);
+  }, [getImage]);
+
   return (
     <div className="flex items-center justify-center bg-gray-100 dark:bg-slate-900">
       <div className="w-full max-w-md rounded-lg p-8">
         <div className="flex flex-col mb-6">
-          <img
-            src={getImage}
-            alt="CTS"
+          <CustomImage
+            imageSource={getImage}
+            imageWidth={96}
+            imageHeight={96}
+            altImage="CTS"
+            imageLoad="eager"
+            imageFetchPriority="high"
             className="w-24 h-24 mx-auto"
-            loading="lazy"
           />
           <h3 className="font-bold text-4xl text-center">Merchant</h3>
         </div>
@@ -334,11 +349,14 @@ export default function AuthForm({ formMode = "login" }) {
                       : "Jika tombol tidak memulai install, gunakan ikon Install Chrome"
                   }
                 >
-                  <img
-                    src={getIconAndroid}
+                  <CustomImage
+                    imageSource={getIconAndroid}
+                    imageWidth={32}
+                    imageHeight={48}
+                    altImage="Install on Android"
+                    imageLoad="eager"
+                    imageFetchPriority="high"
                     className="w-8 h-12"
-                    alt="Install on Android"
-                    loading="lazy"
                   />
                   <div className="flex items-center leading-tight">
                     <span className="text-lg font-semibold">
@@ -354,11 +372,14 @@ export default function AuthForm({ formMode = "login" }) {
                   aria-label="Download on the IOS"
                   title="Lihat cara pasang di layar utama untuk iOS"
                 >
-                  <img
-                    src={getIconIos}
+                  <CustomImage
+                    imageSource={getIconIos}
+                    imageWidth={32}
+                    imageHeight={48}
+                    altImage="Install on iOS"
+                    imageLoad="eager"
+                    imageFetchPriority="high"
                     className="w-8 h-12"
-                    alt="Install on iOS"
-                    loading="lazy"
                   />
                   <div className="flex justify-center items-center leading-tight">
                     <span className="text-lg font-semibold">
@@ -373,4 +394,8 @@ export default function AuthForm({ formMode = "login" }) {
       </div>
     </div>
   );
-}
+});
+
+AuthForm.displayName = "AuthForm";
+
+export default AuthForm;

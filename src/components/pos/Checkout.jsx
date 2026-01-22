@@ -6,6 +6,7 @@ import { isEmpty } from "../../helper/is-empty";
 import SimpleInput from "../customs/form/SimpleInput";
 import { useCustomToast } from "../../hooks/useCustomToast";
 import CustomToast from "../customs/toast/CustomToast";
+import CustomImage from "../customs/element/CustomImage";
 
 export default function Checkout() {
   const getCart = JSON.parse(sessionStorage.getItem("cart"));
@@ -31,7 +32,7 @@ export default function Checkout() {
 
   const checkoutPrice = getCart?.items?.reduce(
     (a, b) => a + Number.parseInt(b.subtotal),
-    0
+    0,
   );
 
   const TOTAL = () => {
@@ -186,10 +187,23 @@ export default function Checkout() {
     if (discountData) {
       sessionStorage.setItem(
         "discount",
-        JSON.stringify(getPriceWithDiscount())
+        JSON.stringify(getPriceWithDiscount()),
       );
     }
   }, [discountData]);
+
+  useEffect(() => {
+    const preloadImage = (src) => {
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "image";
+      link.href = src;
+      document.head.appendChild(link);
+    };
+
+    const mappingImage = getCart?.items?.map((item) => item?.image) || [];
+    mappingImage.forEach((src) => preloadImage(src));
+  }, [getCart?.items]);
 
   const inputClassName =
     "w-full p-4 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ring-1 ring-slate-600 dark:text-slate-200";
@@ -209,9 +223,16 @@ export default function Checkout() {
           key={data?.product_id}
         >
           <div className="flex gap-2 items-center bg-white w-full p-4 rounded-xl">
-            <img
-              src={getImageUrl(data?.image)}
-              alt={data?.name || "Product Image"}
+            <CustomImage
+              imageSource={getImageUrl(data?.image)}
+              imageWidth={96}
+              imageHeight={64}
+              altImage={data?.name || "Product Image"}
+              onError={(e) => {
+                e.target.src = "/images/placeholder.jpg";
+              }}
+              imageLoad="eager"
+              imageFetchPriority="high"
               className="w-24 h-16 object-contain rounded-lg"
             />
             <div key={data?.id} className="flex flex-col">

@@ -1,5 +1,5 @@
 import { ShoppingCart } from "lucide-react";
-import { forwardRef, useMemo, useRef, useState } from "react";
+import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { PropTypes } from "prop-types";
 import SimpleModal from "../modal/SimpleModal";
 import { useProductStore } from "../../../store/productStore";
@@ -7,6 +7,7 @@ import LoadingSkeletonCard from "../loading/LoadingSkeletonCard";
 import { useCustomToast } from "../../../hooks/useCustomToast";
 import CustomToast from "../toast/CustomToast";
 import { usePosStore } from "../../../store/posStore";
+import CustomImage from "../element/CustomImage";
 
 const ProductCard = forwardRef((props) => {
   const {
@@ -110,16 +111,17 @@ const ProductCard = forwardRef((props) => {
           disabled={disabled}
         >
           <div className="relative w-full">
-            <img
-              src={imageSrc}
-              alt={product?.name || "Product Image"}
-              className="w-full h-[100px] object-cover rounded-t-[10px]"
+            <CustomImage
+              imageSource={imageSrc}
+              imageWidth={400}
+              imageHeight={200}
+              altImage={product?.name || "Product Image"}
               onError={(e) => {
                 e.target.src = "/images/placeholder.jpg";
               }}
-              width="400"
-              height="200"
-              loading="lazy"
+              imageLoad="eager"
+              imageFetchPriority="high"
+              className="w-full h-[100px] object-cover rounded-t-[10px]"
             />
 
             {disabled && (
@@ -187,6 +189,18 @@ const ProductCard = forwardRef((props) => {
     handleCloseModal,
     loading,
   ]);
+
+  useEffect(() => {
+    const preloadImage = (src) => {
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "image";
+      link.href = src;
+      document.head.appendChild(link);
+    };
+
+    preloadImage(imageSrc);
+  }, [imageSrc]);
 
   return (
     <>
