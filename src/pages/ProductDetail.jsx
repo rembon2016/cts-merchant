@@ -1,7 +1,16 @@
-import DetailProductComponent from "../components/pos/DetailProduct";
+import { lazy, Suspense } from "react";
+import LoadingSkeletonList from "../components/customs/loading/LoadingSkeletonList";
+
+const DetailProductComponent = lazy(
+  () => import("../components/pos/DetailProduct"),
+);
 
 const DetailProduct = () => {
-  return <DetailProductComponent />;
+  return (
+    <Suspense fallback={<LoadingSkeletonList />}>
+      <DetailProductComponent />
+    </Suspense>
+  );
 };
 
 export default DetailProduct;
