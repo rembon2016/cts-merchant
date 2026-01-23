@@ -1,11 +1,20 @@
-import DashboardTransaction from "./DashboardTransaction";
-import ListTransaction from "./ListTransaction";
+import { lazy, Suspense, memo } from "react";
+import LoadingSkeletonCard from "../../customs/loading/LoadingSkeletonCard";
 
-export default function Transaction() {
+const DashboardTransaction = lazy(() => import("./DashboardTransaction"));
+const ListTransaction = lazy(() => import("./ListTransaction"));
+
+function Transaction() {
   return (
     <div className="px-4 py-2">
-      <DashboardTransaction />
-      <ListTransaction />
+      <Suspense fallback={<LoadingSkeletonCard />}>
+        <DashboardTransaction />
+      </Suspense>
+      <Suspense fallback={<LoadingSkeletonCard />}>
+        <ListTransaction />
+      </Suspense>
     </div>
   );
 }
+
+export default memo(Transaction);

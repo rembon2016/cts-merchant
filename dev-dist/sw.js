@@ -24,11 +24,7 @@ if (!globalThis.define) {
     return (
       registry[uri] ||
       new Promise((resolve) => {
-<<<<<<< HEAD
         if ("document" in globalThis) {
-=======
-        if ("document" in self) {
->>>>>>> dev
           const script = document.createElement("script");
           script.src = uri;
           script.onload = resolve;
@@ -48,17 +44,10 @@ if (!globalThis.define) {
     );
   };
 
-<<<<<<< HEAD
   globalThis.define = (depsNames, factory) => {
     const uri =
       nextDefineUri ||
       ("document" in globalThis ? document.currentScript.src : "") ||
-=======
-  self.define = (depsNames, factory) => {
-    const uri =
-      nextDefineUri ||
-      ("document" in self ? document.currentScript.src : "") ||
->>>>>>> dev
       location.href;
     if (registry[uri]) {
       // Module is already loading or loaded.
