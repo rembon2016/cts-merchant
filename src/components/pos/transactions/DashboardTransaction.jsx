@@ -1,5 +1,5 @@
 import { formatCurrency } from "../../../helper/currency";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback, memo } from "react";
 import { useDashboardStore } from "../../../store/dashboardStore";
 import {
   QuickBarChart,
@@ -10,7 +10,7 @@ import SimpleInput from "../../customs/form/SimpleInput";
 import PrimaryButton from "../../customs/button/PrimaryButton";
 import { useThemeStore } from "../../../store/themeStore";
 
-export default function DashboardTransaction() {
+function DashboardTransaction() {
   const [formData, setFormData] = useState({
     date: "",
     start_date: "",
@@ -19,13 +19,13 @@ export default function DashboardTransaction() {
   const [activeRange, setActiveRange] = useState("day");
   const [typeChart, setTypeChart] = useState("bar");
 
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
-    });
-  };
+    }));
+  }, []);
 
   const { getChartSales, getChartOverView, data, dataOverview, isLoading } =
     useDashboardStore();
@@ -45,24 +45,27 @@ export default function DashboardTransaction() {
     year: "year",
   }[activeRange];
 
-  const handleChangeTypeChart = (type) => setTypeChart(type);
+  const handleChangeTypeChart = useCallback((type) => setTypeChart(type), []);
 
-  const handleFilterChart = () => {
+  const handleFilterChart = useCallback(() => {
     if (formData?.start_date === "" && formData?.end_date === "") return;
 
     Promise.all([
       getChartSales("sales-by-date-range", true, formData),
       getChartOverView("custom-date", formData),
     ]);
-  };
+  }, [formData, getChartSales, getChartOverView]);
 
-  const renderClassName = (type) => {
-    return `w-8 h-8 ${
-      typeChart === type ? "bg-[var(--c-accent)]" : "bg-white"
-    } border ${
-      typeChart === type ? "border-[var(--c-accent)]" : "border-gray-300"
-    } flex justify-center items-center rounded-md`;
-  };
+  const renderClassName = useCallback(
+    (type) => {
+      return `w-8 h-8 ${
+        typeChart === type ? "bg-[var(--c-accent)]" : "bg-white"
+      } border ${
+        typeChart === type ? "border-[var(--c-accent)]" : "border-gray-300"
+      } flex justify-center items-center rounded-md`;
+    },
+    [typeChart],
+  );
 
   const renderButtonTypeChart = useMemo(() => {
     return (
@@ -286,7 +289,7 @@ export default function DashboardTransaction() {
     if (salesKey && overviewKey) {
       Promise.all([getChartSales(salesKey), getChartOverView(overviewKey)]);
     }
-  }, [activeRange]);
+  }, [activeRange, salesKey, overviewKey, getChartSales, getChartOverView]);
 
   return (
     <div className="py-2">
@@ -302,3 +305,5 @@ export default function DashboardTransaction() {
     </div>
   );
 }
+
+export default memo(DashboardTransaction);
