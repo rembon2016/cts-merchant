@@ -201,24 +201,6 @@ function DashboardTransaction() {
             </h1>
           </div>
         </div>
-        {/* <div className="flex w-full gap-2">
-          <div className="w-full p-4 box-border  flex flex-col gap-1  shadow">
-            <h3 className="font-normal text-white text-md">Total Tax</h3>
-            <h1 className="font-bold text-[1.1rem] text-white">
-              {isLoading
-                ? "..."
-                : formatCurrency(dataOverview?.overview?.total_tax)}
-            </h1>
-          </div>
-          <div className="w-full p-4 box-border  flex flex-col gap-1  shadow">
-            <h3 className="font-normal text-white text-md">Total Refund</h3>
-            <h1 className="font-bold text-[1.1rem] text-white">
-              {isLoading
-                ? "..."
-                : formatCurrency(dataOverview?.overview?.total_refund)}
-            </h1>
-          </div>
-        </div> */}
       </div>
     );
   }, [isLoading, dataOverview]);
