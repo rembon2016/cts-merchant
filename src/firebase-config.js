@@ -1,5 +1,10 @@
 import { initializeApp } from "firebase/app";
-import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import {
+  getMessaging,
+  getToken,
+  onMessage,
+  isSupported,
+} from "firebase/messaging";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -15,24 +20,24 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize messaging only when the browser supports the required APIs
 let messaging = null;
-const supportsMessaging =
-  typeof globalThis !== "undefined" &&
-  typeof navigator !== "undefined" &&
-  "serviceWorker" in navigator &&
-  "PushManager" in globalThis &&
-  "Notification" in globalThis &&
-  globalThis.isSecureContext === true;
 
-if (supportsMessaging) {
-  try {
-    messaging = getMessaging(app);
-  } catch (e) {
-    console.warn("Firebase messaging not supported in this environment:", e);
-    messaging = null;
+const checkMessagingSupport = async () => {
+  const supported = await isSupported();
+  if (supported) {
+    try {
+      messaging = getMessaging(app);
+      return true;
+    } catch (e) {
+      console.warn("Firebase messaging initialization failed:", e);
+      messaging = null;
+      return false;
+    }
   }
-} else {
-  messaging = null;
-}
+  return false;
+};
+
+// Start initial support check
+checkMessagingSupport();
 
 const SESSION_KEY = "firebaseToken";
 let isGettingToken = false;
@@ -50,30 +55,38 @@ const settingToken = (token) => {
 export const requestForToken = async () => {
   try {
     if (isGettingToken) return null;
-    const existing = sessionStorage.getItem(SESSION_KEY);
 
+    // Ensure messaging is initialized if supported
+    if (!messaging) {
+      const supported = await checkMessagingSupport();
+      if (!supported) {
+        console.warn("Messaging unsupported in this browser/environment");
+        return null;
+      }
+    }
+
+    const existing = sessionStorage.getItem(SESSION_KEY);
     if (existing) return existing;
+
     isGettingToken = true;
 
-    if (typeof globalThis !== "undefined" && "Notification" in globalThis) {
+    // Use globalThis.Notification to avoid ReferenceError in environments where Notification is not defined
+    const NotificationObj = globalThis?.Notification;
+
+    if (NotificationObj) {
       // Jika permission saat ini bukan 'granted', segera hapus token yang tersimpan
-      if (Notification?.permission !== "granted") {
+      if (NotificationObj.permission !== "granted") {
         sessionStorage.removeItem(SESSION_KEY);
       }
 
-      const permission = await Notification?.requestPermission();
+      const permission = await NotificationObj.requestPermission();
       if (permission === "granted") {
-        if (!messaging) {
-          console.warn("Messaging unsupported in this browser/environment");
-          sessionStorage.removeItem(SESSION_KEY);
-          return null;
-        }
         const token = await getToken(messaging, {
-          vapidKey: import.meta.env.VITE_VAPID_KEY, // Masukkan VAPID Key disini
+          vapidKey: import.meta.env.VITE_VAPID_KEY,
         });
         settingToken(token);
+        return token;
       } else {
-        // permission is 'default' (user closed prompt) or 'denied' — hapus token jika ada
         sessionStorage.removeItem(SESSION_KEY);
         return null;
       }
@@ -107,11 +120,21 @@ export const subscribeOnMessage = (callback) => {
   return onMessage(messaging, callback);
 };
 
+/**
+ * Detects whether the current environment is an iOS device without standalone
+ * web app mode (i.e., running as a normal web page, not as a standalone web app).
+ *
+ * @returns {boolean} True if the environment is an iOS device without standalone
+ * web app mode, false otherwise.
+ */
 export const detectIosWebPushUnavailable = () => {
   if (typeof globalThis === "undefined") return false;
 
   const ua = navigator.userAgent.toLowerCase();
-  const isIos = /iphone|ipad|ipod|macintosh/.test(ua);
+  // Check for iPhone/iPad/iPod, or Macintosh with touch points (iPad Pro in desktop mode)
+  const isIos =
+    /iphone|ipad|ipod/.test(ua) ||
+    (ua.includes("macintosh") && navigator.maxTouchPoints > 0);
 
   const isStandalone =
     globalThis.matchMedia("(display-mode: standalone)").matches ||
@@ -144,9 +167,10 @@ if (typeof navigator !== "undefined" && "permissions" in navigator) {
 }
 
 export const ensureNotificationPermission = () => {
-  if (typeof globalThis === "undefined") return;
-  if (!("Notification" in globalThis)) return;
-  if (Notification?.permission === "default") {
+  const NotificationObj = globalThis?.Notification;
+  if (!NotificationObj) return;
+
+  if (NotificationObj.permission === "default") {
     const handler = () => {
       requestForToken();
     };
