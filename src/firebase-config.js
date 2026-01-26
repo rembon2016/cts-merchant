@@ -111,10 +111,12 @@ export const detectIosWebPushUnavailable = () => {
   if (typeof globalThis === "undefined") return false;
 
   const ua = navigator.userAgent.toLowerCase();
-  const isIos = /iphone|ipad|ipod/.test(ua);
+  const isIos = /iphone|ipad|ipod|macintosh/.test(ua);
+
   const isStandalone =
     globalThis.matchMedia("(display-mode: standalone)").matches ||
     navigator.standalone === true;
+
   return isIos && !isStandalone;
 };
 

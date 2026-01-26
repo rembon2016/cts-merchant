@@ -35,13 +35,13 @@ export const useInstallPWA = () => {
 
     const isSafariUA =
       /safari/i.test(ua) && !/chrome|crios|fxios|android/i.test(ua);
-    const isAppleVendor = vendor === "Apple Computer, Inc.";
+    // const isAppleVendor = vendor === "Apple Computer, Inc.";
     const isIOSDevice =
-      /iphone|ipad|ipod/i.test(ua) ||
+      /iphone|ipad|ipod|macintosh/i.test(ua) ||
       (globalThis.navigator.userAgentData?.platform === "MacIntel" &&
         globalThis.navigator.maxTouchPoints > 1);
 
-    if (isSafariUA && isAppleVendor && isIOSDevice) {
+    if (isSafariUA && isIOSDevice) {
       setPlatform("ios");
     } else if (isChromium) {
       setPlatform("android");
