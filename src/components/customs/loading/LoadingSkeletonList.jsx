@@ -14,7 +14,7 @@ export default function LoadingSkeletonList({ items = 1, className = "" }) {
     <div className="relative">
       {Array.from({ length: Number(items) || 1 }).map((item) => (
         <div
-          key={item?.id}
+          key={item?.id + Math?.random()}
           className={`border rounded-lg shadow overflow-hidden bg-white dark:bg-slate-800 animate-pulse mb-4 p-4 ${className}`}
           aria-busy="true"
           aria-live="polite"

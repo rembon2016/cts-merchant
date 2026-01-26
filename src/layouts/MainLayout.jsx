@@ -19,14 +19,24 @@ const MainLayout = () => {
 
   const hasNotificationSupport =
     typeof globalThis !== "undefined" && "Notification" in globalThis;
+
   const getNotificationPermission = () =>
     hasNotificationSupport ? globalThis?.Notification?.permission : null;
 
   const handlePermissionNotification = async () => {
     try {
       if (!hasNotificationSupport) return;
-      const permission = await globalThis.Notification?.requestPermission();
-      if (permission === "granted") await requestForToken();
+      const permission = await globalThis?.Notification?.requestPermission();
+      if (permission === "granted") {
+        await requestForToken()
+          .then(() => {
+            console.log("Notification permission granted.");
+            setShowPermissionBanner(false);
+          })
+          .catch((error) => {
+            console.log("Error requesting notification permission: ", error);
+          });
+      }
       setShowPermissionBanner(permission === "default");
     } catch (error) {
       console.log("Error requesting notification permission: ", error);
@@ -56,6 +66,7 @@ const MainLayout = () => {
   }, [location.pathname, setSelectedCart]);
 
   const currentNotificationPermission = getNotificationPermission();
+
   const renderPermissionBanner = useMemo(() => {
     if (!hasNotificationSupport || currentNotificationPermission === "granted")
       return null;
@@ -74,7 +85,7 @@ const MainLayout = () => {
         </div>
       </div>
     );
-  }, [currentNotificationPermission, showPermissionBanner]);
+  }, [hasNotificationSupport, currentNotificationPermission]);
 
   return (
     <div className="bg-gray-100 dark:bg-slate-900 min-h-screen">
