@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef, memo } from "react";
 import { formatCurrency } from "../../helper/currency";
 import { useLocation, useNavigate } from "react-router-dom";
 import { formatDate } from "../../helper/format-date";
@@ -10,7 +10,6 @@ import SearchInput from "../customs/form/SearchInput";
 import SimpleInput from "../customs/form/SimpleInput";
 import { useDebounce } from "../../hooks/useDebounce";
 import ButtonFilter from "../customs/button/ButtonFilter";
-import LoadingSkeletonCard from "../customs/loading/LoadingSkeletonCard";
 import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 
 const Invoice = () => {
