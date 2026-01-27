@@ -6,6 +6,7 @@ import { useEffect, useMemo } from "react";
 import LoadingSkeletonList from "../components/customs/loading/LoadingSkeletonList";
 import CustomCheckbox from "../components/customs/form/CustomCheckbox";
 import DangerButton from "../components/customs/button/DangerButton";
+import { FaMoon, FaPhone, FaQuestion, FaSun, FaUser } from "react-icons/fa";
 
 const Profile = () => {
   const { isDark, setTheme } = useThemeStore();
@@ -24,19 +25,7 @@ const Profile = () => {
       label: "Informasi Akun",
       path: "/account-information",
       icon: (
-        <svg
-          className="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-          />
-        </svg>
+        <FaUser />
       ),
     },
     // {
@@ -82,19 +71,7 @@ const Profile = () => {
       label: "Bantuan",
       path: "/faq",
       icon: (
-        <svg
-          className="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
+        <FaQuestion />
       ),
     },
     {
@@ -102,19 +79,7 @@ const Profile = () => {
       label: "Customer Support",
       path: "/customer-support",
       icon: (
-        <svg
-          className="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"
-          />
-        </svg>
+       <FaPhone />
       ),
     },
   ];
@@ -183,33 +148,9 @@ const Profile = () => {
             <div className="flex items-center gap-3">
               <div className="size-10 rounded-xl bg-[var(--c-accent)] grid place-items-center">
                 {isDark ? (
-                  <svg
-                    className="w-5 h-5 text-slate-700 dark:text-slate-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                    />
-                  </svg>
+                  <FaMoon className="text-gray-600" />
                 ) : (
-                  <svg
-                    className="w-5 h-5 text-slate-700 dark:text-slate-300"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                    />
-                  </svg>
+                  <FaSun />
                 )}
               </div>
               <div>
