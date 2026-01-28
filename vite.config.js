@@ -44,6 +44,9 @@ export default defineConfig(({ mode }) => {
       },
       workbox: {
         // Strategi caching
+        cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

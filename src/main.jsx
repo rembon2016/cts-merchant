@@ -11,14 +11,30 @@ import { registerSW } from "virtual:pwa-register";
 // Registrasi Service Worker untuk PWA
 const updateSW = registerSW({
   onNeedRefresh() {
-    if (confirm("Konten baru tersedia. Refresh?")) {
-      updateSW(true);
-    }
+    // Kita langsung update tanpa konfirmasi untuk memastikan selalu versi terbaru
+    // sessuai permintaan user agar selalu update dengan website
+    updateSW(true);
   },
   onOfflineReady() {
     console.log("App siap bekerja offline");
   },
 });
+
+// Cek update setiap 1 jam atau saat window focused
+if (typeof window !== "undefined") {
+  const checkUpdate = () => {
+    updateSW();
+  };
+
+  // Cek saat pertama kali load
+  checkUpdate();
+
+  // Cek saat focus kembali ke app
+  window.addEventListener("focus", checkUpdate);
+
+  // Interval cek (setiap 1 jam)
+  setInterval(checkUpdate, 60 * 60 * 1000);
+}
 
 // Initialize performance monitoring
 // if (import.meta.env.DEV) {
