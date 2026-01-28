@@ -43,7 +43,7 @@ const usePosStore = create((set, get) => ({
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -207,7 +207,7 @@ const usePosStore = create((set, get) => ({
       // return stock ? stock?.qty : 0;
     } else {
       const stock = product?.product_stocks?.find(
-        (s) => s?.branch_id === Number.parseInt(branchId) && !s?.product_sku_id
+        (s) => s?.branch_id === Number.parseInt(branchId) && !s?.product_sku_id,
       );
       return stock ? stock?.qty : 0;
     }
@@ -226,7 +226,7 @@ const usePosStore = create((set, get) => ({
       product.skus.forEach((sku) => {
         if (sku.product_stocks && sku.product_stocks.length > 0) {
           const stock = sku.product_stocks.find(
-            (s) => s.branch_id === branchIdNum
+            (s) => s.branch_id === branchIdNum,
           );
           if (stock) {
             totalStock += stock.qty;
@@ -287,14 +287,7 @@ const usePosStore = create((set, get) => ({
         ...apiProperties,
       });
 
-      if (!response?.ok) {
-        set({ error: `Gagal mengupdate password` });
-        throw new Error(`HTTP error! status: ${response?.status}`);
-      }
-
-      const result = await response.json();
-
-      return result;
+      return await response?.json();
     } catch (error) {
       return error;
     }

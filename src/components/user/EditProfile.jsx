@@ -9,7 +9,7 @@ import { usePosStore } from "../../store/posStore";
 
 export default function EditProfile() {
   const { user: userInfo, logout, updateProfileUser } = useAuthStore();
-  const { updatePasswordPOS } = usePosStore();
+  const { updatePasswordPOS, responseCode } = usePosStore();
   const [loading, setLoading] = useState(false);
 
   const {
@@ -92,17 +92,19 @@ export default function EditProfile() {
     setLoading(true);
 
     if (isEditPassword) {
-      const [response, responsePOS] = await Promise.all([
-        updateProfileUser(updateData),
-        updatePasswordPOS(passwordFields),
-      ]);
-      if (response?.success === true && responsePOS?.success === true) {
-        showSuccess("Profil Berhasil Diperbarui");
-        setTimeout(() => {
-          logout();
-        }, 2000);
+      const responsePassword = await updatePasswordPOS(passwordFields);
+
+      if (responsePassword?.errors?.password !== undefined) {
+        showError(responsePassword?.errors?.password[0]);
+        setLoading(false);
+        return;
       } else {
-        showError("Gagal Memperbarui Profil");
+        const updatePassword = await updateProfileUser(updateData);
+        if (updatePassword?.success === true) {
+          showSuccess("Berhasil Memperbarui Password");
+          setLoading(false);
+          setTimeout(() => logout(), 2000);
+        }
       }
     } else {
       const response = await updateProfileUser(updateData);
@@ -117,7 +119,6 @@ export default function EditProfile() {
         showError("Gagal Memperbarui Profil");
       }
     }
-
     setLoading(false);
   };
 
