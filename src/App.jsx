@@ -14,11 +14,22 @@ import { ListRoutes } from "./listroutes";
 import MainLayout from "./layouts/MainLayout";
 import CustomToast from "./components/customs/toast/CustomToast";
 import LoadingSkeletonList from "./components/customs/loading/LoadingSkeletonList";
+import { useAppVersion } from "./hooks/useAppVersion";
 
 function App() {
   const { isDark } = useThemeStore();
   const { isLoggedIn, setupAutoLogout, clearAutoLogoutTimer } = useAuthStore();
   const { toast, success: showSuccess, hideToast } = useCustomToast();
+  const { needsUpdate, reload } = useAppVersion();
+
+  // Di file utama App.js atau index.js
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      registrations.forEach((registration) => {
+        registration.update(); // Force update
+      });
+    });
+  }
 
   useEffect(() => {
     requestForToken();
@@ -65,6 +76,12 @@ function App() {
         <div className="update-notification">
           <span>Update tersedia!</span>
           <button onClick={() => updateServiceWorker(true)}>Reload</button>
+        </div>
+      )}
+      {needsUpdate && (
+        <div className="update-notification">
+          Versi baru tersedia!
+          <button onClick={reload}>Refresh Sekarang</button>
         </div>
       )}
       <CustomToast
