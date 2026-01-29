@@ -6,10 +6,17 @@ export const useInstallPWA = () => {
   const [platform, setPlatform] = useState("web");
 
   useEffect(() => {
+    // Gunakan prompt yang sudah ditangkap secara global jika ada
+    if (globalThis.deferredInstallPrompt) {
+      setInstallEvent(globalThis.deferredInstallPrompt);
+      setPlatform("android");
+    }
+
     const handler = (e) => {
       e.preventDefault();
       setInstallEvent(e);
       setPlatform("android");
+      globalThis.deferredInstallPrompt = e;
     };
     globalThis.addEventListener("beforeinstallprompt", handler);
     return () => {
@@ -57,7 +64,14 @@ export const useInstallPWA = () => {
     return () => globalThis.removeEventListener("appinstalled", onInstalled);
   }, []);
 
-  const showInstallCTA = useMemo(() => !isStandalone, [isStandalone]);
+  const showInstallCTA = useMemo(() => {
+    if (isStandalone) return false;
+    // Pada Android/Chromium, pastikan event install sudah tersedia sebelum menampilkan tombol
+    if (platform === "android") {
+      return !!installEvent;
+    }
+    return true;
+  }, [isStandalone, platform, installEvent]);
 
   const install = async () => {
     if (platform === "android") {

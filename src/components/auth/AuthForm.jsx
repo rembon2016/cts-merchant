@@ -66,9 +66,9 @@ const AuthForm = memo(function AuthForm({ formMode = "login" }) {
       }
       if (platform === "android") {
         if (result?.outcome === "unavailable") {
-          showError(
-            "Instal tidak tersedia: pastikan origin aman dan PWA aktif atau gunakan ikon Install di address bar",
-          );
+        showError(
+          "Fitur instalasi belum siap atau sudah terpasang. Jika tombol tidak muncul, gunakan menu browser (Add to Home Screen).",
+        );
           return;
         }
         showError("Instalasi dibatalkan");

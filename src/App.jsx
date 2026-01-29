@@ -80,7 +80,7 @@ function App() {
       )}
       {needsUpdate && (
         <div className="update-notification">
-          Versi baru tersedia!
+          <span>Versi baru tersedia!</span>
           <button onClick={reload}>Refresh Sekarang</button>
         </div>
       )}

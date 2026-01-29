@@ -1,4 +1,11 @@
 import React from "react";
+// Capture PWA install prompt globally to ensure it's not missed before hooks mount
+if (typeof window !== "undefined") {
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    window.deferredInstallPrompt = e;
+  });
+}
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
