@@ -164,7 +164,7 @@ const PromoSlider = memo(() => {
         onTouchMove={handlePointerMove}
         onTouchEnd={handlePointerUp}
       >
-        <div className="carousel-track" ref={trackRef}>
+        <div className="carousel-track aspect-video" ref={trackRef}>
           {data?.faqs?.map((slide) => (
             <button
               key={slide.id}

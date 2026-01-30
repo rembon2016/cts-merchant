@@ -35,16 +35,18 @@ const PromoDetailModal = memo(function PromoDetailModal({
         <div className="p-6">
           {promoDetail ? (
             <>
-              <img
-                src={promoDetail.thumbnail}
-                alt={promoDetail.title}
-                className="w-full h-48 object-cover rounded-lg mb-4"
-                loading="lazy"
-                width="416"
-                height="192"
-                decoding="async"
-              />
-              <h2 className="text-2xl font-bold mb-2 text-primary dark:text-white">
+              <div className="aspect-video">
+                <img
+                  src={promoDetail.thumbnail}
+                  alt={promoDetail.title}
+                  className="w-full h-48 object-cover rounded-lg mb-4"
+                  loading="lazy"
+                  width="416"
+                  height="192"
+                  decoding="async"
+                />
+              </div>
+              <h2 className="text-2xl font-bold my-2 text-primary dark:text-white">
                 {promoDetail.title}
               </h2>
               <div

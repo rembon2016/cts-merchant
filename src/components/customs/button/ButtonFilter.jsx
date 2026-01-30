@@ -1,7 +1,10 @@
-import { Suspense } from "react";
+import { memo, Suspense } from "react";
 import { RouteLoadingFallback } from "../../../utils/routeLoading";
+import PropTypes from "prop-types";
 
-export default function ButtonFilter({ setIsSheetOpen }) {
+const ButtonFilter = memo(function ButtonFilter(props) {
+  const { setIsSheetOpen } = props;
+
   return (
     <Suspense fallback={<RouteLoadingFallback />}>
       <button
@@ -27,4 +30,10 @@ export default function ButtonFilter({ setIsSheetOpen }) {
       </button>
     </Suspense>
   );
-}
+});
+
+ButtonFilter.propTypes = {
+  setIsSheetOpen: PropTypes.func.isRequired,
+};
+
+export default ButtonFilter;
