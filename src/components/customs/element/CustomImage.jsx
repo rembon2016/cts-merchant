@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { memo } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 
 const CustomImage = memo(function CustomImage(props) {
   const {
@@ -7,7 +7,6 @@ const CustomImage = memo(function CustomImage(props) {
     imageWidth,
     imageHeight,
     imageLoad = "lazy",
-    imageFetchPriority = "auto",
     altImage = "",
     className = "",
     srcSet,
@@ -15,46 +14,100 @@ const CustomImage = memo(function CustomImage(props) {
     onLoad,
     onError,
     placeholderUrl,
+    rootMargin = "50px",
+    avifSource,
+    webpSource,
   } = props;
+
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const imgRef = useRef(null);
+
+  const imageStyle = useMemo(
+    () => ({
+      maxWidth: "100%",
+      objectFit: "cover",
+      objectPosition: "center",
+      opacity: isLoaded ? 1 : 0,
+      transition: "opacity 0.3s ease-in-out",
+    }),
+    [isLoaded],
+  );
+
+  const imageFetchPriority = imageLoad === "eager" ? "high" : "auto";
+
+  useEffect(() => {
+    if (imageLoad === "eager" || !imgRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setShouldLoad(true);
+            observer.disconnect();
+          }
+        });
+      },
+      { rootMargin },
+    );
+
+    observer.observe(imgRef.current);
+
+    return () => observer.disconnect();
+  }, [imageLoad, rootMargin]);
 
   if (!imageSource) return null;
 
-  // Determine fetch priority - "high" for above-the-fold, "auto" for below
-  const priority = imageFetchPriority === "high" ? "high" : "auto";
+  const handleLoad = (e) => {
+    setIsLoaded(true);
+    onLoad?.(e);
+  };
+
+  const handleError = (e) => {
+    setHasError(true);
+    onError?.(e);
+  };
 
   return (
-    <>
-      {placeholderUrl && imageLoad === "lazy" && (
+    <div style={{ position: "relative", display: "inline-block" }} ref={imgRef}>
+      {placeholderUrl && imageLoad === "lazy" && !isLoaded && !hasError && (
         <img
           src={placeholderUrl}
           className={`${className} blur-sm`}
-          alt={altImage}
+          alt=""
           width={imageWidth || 32}
           height={imageHeight || 48}
           aria-hidden="true"
-          style={{ position: "absolute", pointerEvents: "none" }}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
         />
       )}
-      <img
-        src={imageSource}
-        srcSet={srcSet}
-        sizes={sizes}
-        className={className}
-        alt={altImage}
-        width={imageWidth || 32}
-        height={imageHeight || 48}
-        loading={imageLoad}
-        fetchpriority={priority}
-        decoding="async"
-        onLoad={onLoad}
-        onError={onError}
-        style={{
-          maxWidth: "100%",
-          height: "auto",
-          willChange: imageFetchPriority === "high" ? "opacity" : "auto",
-        }}
-      />
-    </>
+      <picture>
+        {avifSource && <source srcSet={avifSource} type="image/avif" />}
+        {webpSource && <source srcSet={webpSource} type="image/webp" />}
+        <img
+          src={imageSource}
+          srcSet={srcSet}
+          sizes={sizes}
+          className={className}
+          alt={altImage}
+          width={imageWidth || 32}
+          height={imageHeight || 48}
+          loading={imageLoad}
+          fetchPriority={imageFetchPriority}
+          decoding="async"
+          onLoad={handleLoad}
+          onError={handleError}
+          style={imageStyle}
+        />
+      </picture>
+    </div>
   );
 });
 
@@ -62,8 +115,7 @@ CustomImage.propTypes = {
   imageSource: PropTypes.string.isRequired,
   imageWidth: PropTypes.number,
   imageHeight: PropTypes.number,
-  imageLoad: PropTypes.oneOf(["lazy", "eager"]),
-  imageFetchPriority: PropTypes.oneOf(["high", "auto", "low"]),
+  imageLoad: PropTypes.string,
   altImage: PropTypes.string,
   className: PropTypes.string,
   srcSet: PropTypes.string,
@@ -71,8 +123,9 @@ CustomImage.propTypes = {
   onLoad: PropTypes.func,
   onError: PropTypes.func,
   placeholderUrl: PropTypes.string,
+  rootMargin: PropTypes.string,
+  avifSource: PropTypes.string,
+  webpSource: PropTypes.string,
 };
-
-CustomImage.displayName = "CustomImage";
 
 export default CustomImage;

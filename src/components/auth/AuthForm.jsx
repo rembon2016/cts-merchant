@@ -66,9 +66,9 @@ const AuthForm = memo(function AuthForm({ formMode = "login" }) {
       }
       if (platform === "android") {
         if (result?.outcome === "unavailable") {
-        showError(
-          "Fitur instalasi belum siap atau sudah terpasang. Jika tombol tidak muncul, gunakan menu browser (Add to Home Screen).",
-        );
+          showError(
+            "Fitur instalasi belum siap atau sudah terpasang. Jika tombol tidak muncul, gunakan menu browser (Add to Home Screen).",
+          );
           return;
         }
         showError("Instalasi dibatalkan");

@@ -116,12 +116,12 @@ const ProductCard = forwardRef((props) => {
               imageWidth={400}
               imageHeight={200}
               altImage={product?.name || "Product Image"}
+              placeholderUrl="/images/blur-placeholder.jpg"
+              imageLoad="eager" // Ubah ke lazy untuk performa
+              className="rounded-t-[10px] h-[120px] object-cover"
               onError={(e) => {
                 e.target.src = "/images/placeholder.jpg";
               }}
-              imageLoad="eager"
-              imageFetchPriority="high"
-              className="w-full h-[100px] object-cover rounded-t-[10px]"
             />
 
             {disabled && (

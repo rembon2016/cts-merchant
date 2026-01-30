@@ -219,39 +219,37 @@ export default function Checkout() {
       />
       {getCart?.items?.map((data) => (
         <div
-          className="flex items-center justify-between gap-2 w-full"
+          className="flex bg-white p-4 rounded-xl w-full gap-3"
           key={data?.product_id}
         >
-          <div className="flex gap-2 items-center bg-white w-full p-4 rounded-xl">
-            <CustomImage
-              imageSource={getImageUrl(data?.image)}
-              imageWidth={96}
-              imageHeight={64}
-              altImage={data?.name || "Product Image"}
-              onError={(e) => {
-                e.target.src = "/images/placeholder.jpg";
-              }}
-              imageLoad="eager"
-              imageFetchPriority="high"
-              className="w-24 h-16 object-contain rounded-lg"
-            />
-            <div key={data?.id} className="flex flex-col">
-              <div className="font-bold text-lg">{data?.name}</div>
-              {data?.variant_name && (
-                <div className="text-gray-500 dark:text-gray-400 text-sm">
-                  Varian: {data?.variant_name}
-                </div>
-              )}
-              <div className="text-gray-700 dark:text-gray-200 text-lg">
-                <h3 className="font-medium">
-                  Harga:{" "}
-                  <span className="text-[var(--c-primary)] dark:text-blue-300 font-extrabold">
-                    {formatCurrency(data?.price)}
-                  </span>
-                </h3>
+          <CustomImage
+            imageSource={getImageUrl(data?.image)}
+            imageWidth={96}
+            imageHeight={64}
+            altImage={data?.name || "Product Image"}
+            onError={(e) => {
+              e.target.src = "/images/placeholder.jpg";
+            }}
+            imageLoad="eager"
+            imageFetchPriority="high"
+            className="w-24 h-16 rounded-lg"
+          />
+          <div key={data?.id} className="flex flex-col w-full justify-center">
+            <div className="font-bold text-lg">{data?.name}</div>
+            {data?.variant_name && (
+              <div className="text-gray-500 dark:text-gray-400 text-sm">
+                Varian: {data?.variant_name}
               </div>
-              {/* <div className="text-xs text-gray-400">{notif.date}</div> */}
+            )}
+            <div className="text-gray-700 dark:text-gray-200 text-lg">
+              <h3 className="font-medium">
+                Harga:{" "}
+                <span className="text-[var(--c-primary)] dark:text-blue-300 font-extrabold">
+                  {formatCurrency(data?.price)}
+                </span>
+              </h3>
             </div>
+            {/* <div className="text-xs text-gray-400">{notif.date}</div> */}
           </div>
         </div>
       ))}

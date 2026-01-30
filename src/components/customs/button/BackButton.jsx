@@ -1,4 +1,7 @@
+import { memo, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
+import { RouteLoadingFallback } from "../../../utils/routeLoading";
 
 /**
  * BackButton Component - Reusable back navigation button
@@ -10,13 +13,9 @@ import { useNavigate } from "react-router-dom";
  * @param {Function} props.onClick - Custom onClick handler (optional, overrides navigation)
  * @param {string} props.label - Optional text label to show next to icon
  */
-export default function BackButton({
-  to,
-  replace = true,
-  className = "",
-  onClick,
-  label = "",
-}) {
+const BackButton = memo(function BackButton(props) {
+  const { to, replace = true, className = "", onClick, label = "" } = props;
+
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -30,25 +29,37 @@ export default function BackButton({
   };
 
   return (
-    <button
-      onClick={handleClick}
-      className={`flex items-center gap-2 mb-4 text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors ${className}`}
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
+    <Suspense fallback={<RouteLoadingFallback />}>
+      <button
+        onClick={handleClick}
+        className={`flex items-center gap-2 mb-4 text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors ${className}`}
       >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M15 19l-7-7 7-7"
-        />
-      </svg>
-      {label && <span>{label}</span>}
-    </button>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+        {label && <span>{label}</span>}
+      </button>
+    </Suspense>
   );
-}
+});
+
+BackButton.propTypes = {
+  to: PropTypes.string,
+  replace: PropTypes.bool,
+  className: PropTypes.string,
+  onClick: PropTypes.func,
+  label: PropTypes.string,
+};
+
+export default BackButton;

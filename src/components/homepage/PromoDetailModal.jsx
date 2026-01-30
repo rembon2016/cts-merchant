@@ -29,7 +29,7 @@ const PromoDetailModal = memo(function PromoDetailModal({
     <div
       id="promo-detail-modal-backdrop"
       onClick={handleOutsideClick}
-      className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4"
+      className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4 aspect-video"
     >
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto relative">
         <div className="p-6">

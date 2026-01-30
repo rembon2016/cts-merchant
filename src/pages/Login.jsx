@@ -1,10 +1,11 @@
 import { lazy, Suspense } from "react";
+import { RouteLoadingFallback } from "../utils/routeLoading";
 
 const AuthForm = lazy(() => import("../components/auth/AuthForm"));
 
 const Login = () => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<RouteLoadingFallback />}>
       <AuthForm formMode="login" />
     </Suspense>
   );
