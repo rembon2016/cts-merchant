@@ -296,7 +296,7 @@ const Cart = () => {
                 <div key={cartItem?.id} className="flex flex-col">
                   <div className="flex flex-col">
                     <div className="font-bold text-base">
-                      {cartItem?.product?.name.slice(0, 15) + "..."}
+                      {cartItem?.product?.name.slice(0, 10) + "..."}
                     </div>
                     {cartItem?.product?.is_variant && (
                       <span className="text-sm font-semibold bg-gray-200 w-fit py-1 px-2 rounded-lg text-gray-500 dark:text-gray-300">
