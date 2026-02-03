@@ -154,37 +154,39 @@ const PromoSlider = memo(() => {
         </a> */}
       </div>
 
-      <div
-        className="carousel bg-transparent"
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerLeave={handlePointerUp}
-        onTouchStart={handlePointerDown}
-        onTouchMove={handlePointerMove}
-        onTouchEnd={handlePointerUp}
-      >
-        <div className="carousel-track aspect-video" ref={trackRef}>
-          {data?.faqs?.map((slide) => (
-            <button
-              key={slide.id}
-              className="slide text-left"
-              onClick={() => handlePromoClick(slide.id)}
-            >
-              <CustomImage
-                imageSource={slide.thumbnail}
-                imageWidth={340}
-                imageHeight={176}
-                altImage={slide.title}
-                imageLoad="eager"
-                imageFetchPriority="high"
-                className="w-full h-44 object-cover rounded-2xl shadow-soft"
-              />
-            </button>
-          ))}
+      <div className="flex flex-col gap-3">
+        <div
+          className="carousel bg-transparent"
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerLeave={handlePointerUp}
+          onTouchStart={handlePointerDown}
+          onTouchMove={handlePointerMove}
+          onTouchEnd={handlePointerUp}
+        >
+          <div className="carousel-track aspect-video" ref={trackRef}>
+            {data?.faqs?.map((slide) => (
+              <button
+                key={slide.id}
+                className="slide text-left"
+                onClick={() => handlePromoClick(slide.id)}
+              >
+                <CustomImage
+                  imageSource={slide.thumbnail}
+                  imageWidth={340}
+                  imageHeight={176}
+                  altImage={slide.title}
+                  imageLoad="eager"
+                  imageFetchPriority="high"
+                  className="w-full h-full object-cover rounded-2xl shadow-soft"
+                />
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="mt-3 flex items-center justify-center">
+        <div className="flex items-center justify-center">
           <div className="carousel-dots">
             {data?.faqs?.map((slide, index) => (
               <button
