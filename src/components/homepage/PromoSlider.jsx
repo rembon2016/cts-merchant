@@ -168,15 +168,15 @@ const PromoSlider = memo(() => {
           <div className="carousel-track aspect-video" ref={trackRef}>
             {data?.faqs?.map((slide) => (
               <button
-                key={slide.id}
+                key={slide?.id}
                 className="slide text-left"
-                onClick={() => handlePromoClick(slide.id)}
+                onClick={() => handlePromoClick(slide?.id)}
               >
                 <CustomImage
-                  imageSource={slide.thumbnail}
+                  imageSource={slide?.thumbnail}
                   imageWidth={340}
                   imageHeight={176}
-                  altImage={slide.title}
+                  altImage={slide?.title}
                   imageLoad="eager"
                   imageFetchPriority="high"
                   className="w-full h-full object-cover rounded-2xl shadow-soft"
@@ -190,7 +190,7 @@ const PromoSlider = memo(() => {
           <div className="carousel-dots">
             {data?.faqs?.map((slide, index) => (
               <button
-                key={slide.id}
+                key={slide?.id}
                 onClick={() => {
                   goToSlide(index);
                   resetTimer();
