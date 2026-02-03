@@ -14,12 +14,6 @@ const PromoSlider = memo(() => {
   const startXRef = useRef(0);
   const timerRef = useRef(null);
 
-  const DATA_IMAGES = [
-    { id: 1, images: "/images/gambar-1.jpg" },
-    { id: 2, images: "/images/gambar-2.jpg" },
-    { id: 3, images: "/images/gambar-3.png" },
-  ];
-
   const { data, fetchData } = useFetchDataStore();
 
   const handlePromoClick = useCallback((promoId) => {
