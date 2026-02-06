@@ -66,15 +66,13 @@ export const useInstallPWA = () => {
 
   const showInstallCTA = useMemo(() => {
     if (isStandalone) return false;
-    // Pada Android/Chromium, pastikan event install sudah tersedia sebelum menampilkan tombol
-    if (platform === "android") {
-      return !!installEvent;
-    }
     return true;
-  }, [isStandalone, platform, installEvent]);
+  }, [isStandalone]);
 
-  const install = async () => {
-    if (platform === "android") {
+  const install = async (targetPlatform) => {
+    const activePlatform = targetPlatform || platform;
+
+    if (activePlatform === "android") {
       if (installEvent) {
         installEvent.prompt();
         const choice = await installEvent.userChoice;
@@ -86,7 +84,7 @@ export const useInstallPWA = () => {
       }
       return { success: false, outcome: "unavailable" };
     }
-    if (platform === "ios") {
+    if (activePlatform === "ios") {
       if (globalThis.navigator?.share) {
         await globalThis.navigator.share({
           title: "CTS Merchant",

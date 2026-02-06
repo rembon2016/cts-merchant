@@ -53,18 +53,18 @@ const AuthForm = memo(function AuthForm({ formMode = "login" }) {
     }
   }, [isLogout]);
 
-  const handleInstallClick = async () => {
+  const handleInstallClick = async (targetPlatform) => {
     try {
-      const result = await install();
+      const result = await install(targetPlatform);
       if (result?.success) {
         showSuccess(
-          platform === "android"
+          targetPlatform === "android"
             ? "Instalasi dimulai"
             : "Buka menu Share dan pilih Add to Home Screen",
         );
         return;
       }
-      if (platform === "android") {
+      if (targetPlatform === "android") {
         if (result?.outcome === "unavailable") {
           showError(
             "Fitur instalasi belum siap atau sudah terpasang. Jika tombol tidak muncul, gunakan menu browser (Add to Home Screen).",
@@ -74,7 +74,7 @@ const AuthForm = memo(function AuthForm({ formMode = "login" }) {
         showError("Instalasi dibatalkan");
         return;
       }
-      if (platform === "ios") {
+      if (targetPlatform === "ios") {
         if (result?.outcome === "share_unavailable") {
           showError("Buka menu Share lalu pilih Add to Home Screen");
           return;
@@ -85,7 +85,7 @@ const AuthForm = memo(function AuthForm({ formMode = "login" }) {
       showError("Instalasi dibatalkan");
     } catch (e) {
       showError(
-        platform === "android"
+        targetPlatform === "android"
           ? "Gagal memulai instalasi"
           : "Gunakan Share → Add to Home Screen untuk memasang",
       );
@@ -335,8 +335,57 @@ const AuthForm = memo(function AuthForm({ formMode = "login" }) {
             </Link>
           </h6>
           {showInstallCTA && (
-            <div className="flex flex-col gap-2 mt-2">
-              {platform === "android" && (
+            <div className="flex flex-col gap-4 mt-5">
+              <h4 className="font-bold text-md text-center">
+                Install CTS Merchant
+              </h4>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleInstallClick("android")}
+                  className={
+                    "w-full h-14 rounded-xl bg-black text-white flex justify-center items-center px-4 gap-2 shadow-md hover:opacity-90"
+                  }
+                  aria-label="Install on Android"
+                  title={
+                    installEvent
+                      ? "Install aplikasi CTS Merchant"
+                      : "Jika tombol tidak memulai install, gunakan ikon Install Chrome"
+                  }
+                >
+                  <CustomImage
+                    imageSource={getIconAndroid}
+                    imageWidth={32}
+                    imageHeight={48}
+                    altImage="Install on Android"
+                    imageLoad="eager"
+                    imageFetchPriority="high"
+                    className="w-8 h-8"
+                  />
+                  <div className="flex items-center leading-tight">
+                    <span className="text-md font-semibold">Android</span>
+                  </div>
+                </button>
+                <button
+                  onClick={() => handleInstallClick("ios")}
+                  className="w-full h-14 rounded-xl bg-white text-black flex items-center justify-center px-4 gap-2 shadow-md hover:opacity-90"
+                  aria-label="Download on the IOS"
+                  title="Lihat cara pasang di layar utama untuk iOS"
+                >
+                  <CustomImage
+                    imageSource={getIconIos}
+                    imageWidth={32}
+                    imageHeight={48}
+                    altImage="Install on iOS"
+                    imageLoad="eager"
+                    imageFetchPriority="high"
+                    className="w-8 h-8"
+                  />
+                  <div className="flex justify-center items-center leading-tight">
+                    <span className="text-md font-semibold">IOS</span>
+                  </div>
+                </button>
+              </div>
+              {/* {platform === "android" && (
                 <button
                   onClick={handleInstallClick}
                   className={
@@ -387,7 +436,7 @@ const AuthForm = memo(function AuthForm({ formMode = "login" }) {
                     </span>
                   </div>
                 </button>
-              )}
+              )} */}
             </div>
           )}
         </div>
