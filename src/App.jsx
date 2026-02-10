@@ -73,15 +73,25 @@ function App() {
   return (
     <div className={isDark ? "dark" : ""}>
       {needRefresh && (
-        <div className="update-notification">
-          <span>Update tersedia!</span>
-          <button onClick={() => updateServiceWorker(true)}>Reload</button>
+        <div className="flex gap-1 p-5 justify-center items-center">
+          <span className="w-full">Update tersedia!</span>
+          <button
+            onClick={() => updateServiceWorker(true)}
+            className="py-1 px-3 bg-[var(--c-primary)] text-white rounded-full"
+          >
+            Refresh
+          </button>
         </div>
       )}
       {needsUpdate && (
-        <div className="update-notification">
-          <span>Versi baru tersedia!</span>
-          <button onClick={reload}>Refresh Sekarang</button>
+        <div className="flex gap-1 p-5 justify-center items-center">
+          <span className="w-full">Versi baru tersedia!</span>
+          <button
+            onClick={reload}
+            className="py-1 px-3 bg-[var(--c-primary)] text-white rounded-full"
+          >
+            Refresh
+          </button>
         </div>
       )}
       <CustomToast

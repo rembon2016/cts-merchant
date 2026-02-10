@@ -7,14 +7,14 @@ export const useAppVersion = () => {
   useEffect(() => {
     const checkForUpdates = async () => {
       try {
-        const res = await fetch("/meta.json?" + Date.now(), {
+        const res = await fetch("/version.json?" + Date.now(), {
           cache: "no-cache",
         });
         const meta = await res.json();
 
         const localVersion = localStorage.getItem("app_version");
 
-        if (localVersion && localVersion !== meta.version) {
+        if (localVersion && localVersion !== meta?.version) {
           setNeedsUpdate(true);
         }
 
