@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef, useCallback, memo } from "react";
+import { useState, useEffect, useRef, useCallback, memo, useMemo } from "react";
 import useFetchDataStore from "../../store/fetchDataStore";
 import PromoDetailModal from "./PromoDetailModal";
 import CustomImage from "../customs/element/CustomImage";
+import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 
 const ROOT_API = import.meta.env.VITE_API_ROUTES;
 const INTERVAL = 4200;
@@ -14,7 +15,7 @@ const PromoSlider = memo(() => {
   const startXRef = useRef(0);
   const timerRef = useRef(null);
 
-  const { data, fetchData } = useFetchDataStore();
+  const { data, loading, fetchData } = useFetchDataStore();
 
   const handlePromoClick = useCallback((promoId) => {
     setSelectedPromoId(promoId);
@@ -143,86 +144,101 @@ const PromoSlider = memo(() => {
     [isDragging, currentIndex, goToSlide, startTimer],
   );
 
-  if (data?.faqs?.length === 0) {
+  const renderELement = useMemo(() => {
+    if (loading) return <LoadingSkeletonList />;
+
+    if (!loading && data?.faqs?.length === 0) {
+      return (
+        <section className="px-4 mt-6">
+          <div className="flex items-center justify-center py-10">
+            <p className="text-lg max-w-[300px] text-center text-slate-500 dark:text-slate-400">
+              Tidak ada promo yang tersedia saat ini.
+            </p>
+          </div>
+        </section>
+      );
+    }
+
     return (
       <section className="px-4 mt-6">
-        <div className="flex items-center justify-center py-10">
-          <p className="text-lg max-w-[300px] text-center text-slate-500 dark:text-slate-400">
-            Tidak ada promo yang tersedia saat ini.
-          </p>
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-base font-semibold text-primary dark:text-slate-300">
+            Promo Hari Ini
+          </h3>
         </div>
+
+        <div className="flex flex-col gap-3">
+          <div
+            className="carousel bg-transparent"
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerLeave={handlePointerUp}
+            onTouchStart={handlePointerDown}
+            onTouchMove={handlePointerMove}
+            onTouchEnd={handlePointerUp}
+          >
+            <div className="carousel-track aspect-video" ref={trackRef}>
+              {data?.faqs?.map((slide) => (
+                <button
+                  key={slide?.id}
+                  className="slide text-left"
+                  onClick={() => handlePromoClick(slide?.id)}
+                >
+                  <CustomImage
+                    imageSource={slide?.thumbnail}
+                    imageWidth={340}
+                    imageHeight={176}
+                    altImage={slide?.title}
+                    imageLoad="eager"
+                    imageFetchPriority="high"
+                    className="w-full h-full object-cover rounded-2xl shadow-soft"
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center justify-center">
+            <div className="carousel-dots">
+              {data?.faqs?.map((slide, index) => (
+                <button
+                  key={slide?.id}
+                  onClick={() => {
+                    goToSlide(index);
+                    resetTimer();
+                  }}
+                  className={`dot ${index === currentIndex ? "active" : ""}`}
+                  aria-label={`Slide ${index + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+        {selectedPromoId && (
+          <PromoDetailModal
+            promoId={selectedPromoId}
+            onClose={handleCloseModal}
+            promoData={data?.faqs}
+          />
+        )}
       </section>
     );
-  }
+  }, [
+    data?.faqs,
+    currentIndex,
+    handleCloseModal,
+    handlePointerDown,
+    handlePointerMove,
+    handlePointerUp,
+    handlePromoClick,
+    goToSlide,
+    resetTimer,
+    selectedPromoId,
+    loading,
+  ]);
 
-  return (
-    <section className="px-4 mt-6">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-base font-semibold text-primary dark:text-slate-300">
-          Promo Hari Ini
-        </h3>
-        {/* <a href="#" className="text-xs text-slate-500 dark:text-slate-400">
-          Lihat semua
-        </a> */}
-      </div>
-
-      <div className="flex flex-col gap-3">
-        <div
-          className="carousel bg-transparent"
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerLeave={handlePointerUp}
-          onTouchStart={handlePointerDown}
-          onTouchMove={handlePointerMove}
-          onTouchEnd={handlePointerUp}
-        >
-          <div className="carousel-track aspect-video" ref={trackRef}>
-            {data?.faqs?.map((slide) => (
-              <button
-                key={slide?.id}
-                className="slide text-left"
-                onClick={() => handlePromoClick(slide?.id)}
-              >
-                <CustomImage
-                  imageSource={slide?.thumbnail}
-                  imageWidth={340}
-                  imageHeight={176}
-                  altImage={slide?.title}
-                  imageLoad="eager"
-                  imageFetchPriority="high"
-                  className="w-full h-full object-cover rounded-2xl shadow-soft"
-                />
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex items-center justify-center">
-          <div className="carousel-dots">
-            {data?.faqs?.map((slide, index) => (
-              <button
-                key={slide?.id}
-                onClick={() => {
-                  goToSlide(index);
-                  resetTimer();
-                }}
-                className={`dot ${index === currentIndex ? "active" : ""}`}
-                aria-label={`Slide ${index + 1}`}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-      {selectedPromoId && (
-        <PromoDetailModal
-          promoId={selectedPromoId}
-          onClose={handleCloseModal}
-          promoData={data?.faqs}
-        />
-      )}
-    </section>
-  );
+  return <>{renderELement}</>;
 });
 
 export default memo(PromoSlider);

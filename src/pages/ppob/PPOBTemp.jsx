@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
 import { toast } from "react-toastify";
@@ -13,9 +13,9 @@ import { formatCurrency } from "../../helper/currency";
 
 const PPOBTemp = () => {
   const navigate = useNavigate();
-  const { balance, commission, stats } = usePPOBStore();
   const { categories } = usePPOBProductStore();
   const { transactions } = usePPOBTransactionStore();
+  const { balance, commission, stats } = usePPOBStore();
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
 
@@ -25,14 +25,54 @@ const PPOBTemp = () => {
   // Get recent transactions (last 5)
   const recentTransactions = transactions.slice(0, 5);
 
-  const handleCategoryClick = (categoryId) => {
-    navigate(`/ppob/${categoryId}`);
-  };
+  const handleCategoryClick = (categoryId) => navigate(`/ppob/${categoryId}`);
 
   const handleTransactionClick = (transaction) => {
     setSelectedTransaction(transaction);
     setShowDetailModal(true);
   };
+
+  const renderPopularProductsElements = useMemo(() => {
+    return (
+      <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4">
+        {popularCategories?.map((category) => (
+          <button
+            key={category.id}
+            onClick={() => handleCategoryClick(category.id)}
+            className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200 text-center flex flex-col items-center w-full"
+          >
+            <div className="mb-2 flex justify-center">
+              <PPOBIcon type={category.id} size="xl" />
+            </div>
+            <p className="text-sm font-medium text-primary dark:text-white max-w-[50px] text-center">
+              {category.name}
+            </p>
+          </button>
+        ))}
+      </div>
+    );
+  }, [popularCategories, handleCategoryClick]);
+
+  const renderAllServicesElements = useMemo(() => {
+    return (
+      <div>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+          Semua Layanan
+        </h2>
+        <div className="grid grid-cols-3 gap-3">
+          {categories?.map((category) => (
+            <PPOBCard
+              key={category.id}
+              type={category.id}
+              title={category.name}
+              popular={category.popular}
+              onClick={() => handleCategoryClick(category.id)}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }, [categories, handleCategoryClick]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
@@ -55,42 +95,11 @@ const PPOBTemp = () => {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
             Produk Populer
           </h2>
-          <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4">
-            {popularCategories.map((category) => (
-              <div key={category.id} className="flex-shrink-0 w-32">
-                <button
-                  onClick={() => handleCategoryClick(category.id)}
-                  className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200 text-center w-full"
-                >
-                  <div className="mb-2 flex justify-center">
-                    <PPOBIcon type={category.id} size="xl" />
-                  </div>
-                  <p className="text-sm font-medium text-primary dark:text-white">
-                    {category.name}
-                  </p>
-                </button>
-              </div>
-            ))}
-          </div>
+          {renderPopularProductsElements}
         </div>
 
         {/* All Services */}
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-            Semua Layanan
-          </h2>
-          <div className="grid grid-cols-3 gap-3">
-            {categories.map((category) => (
-              <PPOBCard
-                key={category.id}
-                type={category.id}
-                title={category.name}
-                popular={category.popular}
-                onClick={() => handleCategoryClick(category.id)}
-              />
-            ))}
-          </div>
-        </div>
+        {renderAllServicesElements}
 
         {/* Recent Transactions */}
         <div>
@@ -152,16 +161,16 @@ const PPOBTemp = () => {
                     selectedTransaction.status === "success"
                       ? "bg-green-100 dark:bg-green-900/30"
                       : selectedTransaction.status === "failed"
-                      ? "bg-red-100 dark:bg-red-900/30"
-                      : "bg-yellow-100 dark:bg-yellow-900/30"
+                        ? "bg-red-100 dark:bg-red-900/30"
+                        : "bg-yellow-100 dark:bg-yellow-900/30"
                   }`}
                 >
                   <span className="text-3xl">
                     {selectedTransaction.status === "success"
                       ? "✓"
                       : selectedTransaction.status === "failed"
-                      ? "✗"
-                      : "⏱"}
+                        ? "✗"
+                        : "⏱"}
                   </span>
                 </div>
                 <h4
@@ -169,15 +178,15 @@ const PPOBTemp = () => {
                     selectedTransaction.status === "success"
                       ? "text-green-600 dark:text-green-400"
                       : selectedTransaction.status === "failed"
-                      ? "text-red-600 dark:text-red-400"
-                      : "text-yellow-600 dark:text-yellow-400"
+                        ? "text-red-600 dark:text-red-400"
+                        : "text-yellow-600 dark:text-yellow-400"
                   }`}
                 >
                   {selectedTransaction.status === "success"
                     ? "Transaksi Berhasil"
                     : selectedTransaction.status === "failed"
-                    ? "Transaksi Gagal"
-                    : "Menunggu"}
+                      ? "Transaksi Gagal"
+                      : "Menunggu"}
                 </h4>
               </div>
 
@@ -223,7 +232,7 @@ const PPOBTemp = () => {
                   </span>
                   <span className="text-sm font-medium text-gray-900 dark:text-white">
                     {new Date(selectedTransaction.timestamp).toLocaleString(
-                      "id-ID"
+                      "id-ID",
                     )}
                   </span>
                 </div>

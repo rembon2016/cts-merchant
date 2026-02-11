@@ -1,4 +1,4 @@
-# CTS Merchant - React Dashboard
+# CTS Merchant
 
 Aplikasi dashboard merchant modern yang dibangun dengan React, Vite, dan Tailwind CSS. Aplikasi ini menyediakan interface yang intuitif untuk mengelola transaksi, melihat pendapatan, dan mengatur profil merchant.
 

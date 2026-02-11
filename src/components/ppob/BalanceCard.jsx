@@ -1,10 +1,10 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { formatCurrency } from '../../helper/currency';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { formatCurrency } from "../../helper/currency";
 
 const BalanceCard = ({ balance, commission, stats }) => {
   const navigate = useNavigate();
-  
+
   return (
     <div className="bg-[var(--c-primary)] rounded-xl p-5 text-white shadow-lg">
       <div className="flex justify-between items-start mb-4">
@@ -14,8 +14,8 @@ const BalanceCard = ({ balance, commission, stats }) => {
         </div>
         {/* Hidden buttons - DO NOT DELETE */}
         <div className="hidden gap-2">
-          <button 
-            onClick={() => navigate('/ppob/withdraw')}
+          <button
+            onClick={() => navigate("/ppob/withdraw")}
             className="bg-white/20 hover:bg-white/30 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
           >
             Tarik Saldo
