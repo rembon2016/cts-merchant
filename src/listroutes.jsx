@@ -27,11 +27,6 @@ export const ListRoutes = () => {
       element: <LazyRoute.LazyEditProfile />,
       protectRoute: true,
     },
-    // {
-    //   path: "merchant/edit/:id",
-    //   element: <LazyRoute.LazyEditMerchant />,
-    //   protectRoute: true,
-    // },
     {
       path: "account-information",
       element: <LazyRoute.LazyAccountInformation />,
@@ -92,11 +87,6 @@ export const ListRoutes = () => {
       element: <LazyRoute.LazyLogin />,
       protectRoute: false,
     },
-    // {
-    //   path: "register",
-    //   element: <LazyRoute.LazyRegister />,
-    //   protectRoute: false,
-    // },
     {
       path: "notification",
       element: <LazyRoute.LazyNotification />,
