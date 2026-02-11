@@ -164,26 +164,24 @@ export default function AccountInformation() {
       id: "bank",
       label: "Informasi Bank",
       content: (
-        <>
-          <div className="space-y-1">
-            {renderElement(
-              "Akun Bank",
-              userInfo?.business_account?.bank_information?.account_name,
-            )}
-            {renderElement(
-              "Nomor Akun",
-              userInfo?.business_account?.bank_information?.account_number,
-            )}
-            {renderElement(
-              "Nama Bank",
-              userInfo?.business_account?.bank_information?.bank_name,
-            )}
-            {renderElement(
-              "Kode Bank",
-              userInfo?.business_account?.bank_information?.bank_code,
-            )}
-          </div>
-        </>
+        <div className="space-y-1">
+          {renderElement(
+            "Akun Bank",
+            userInfo?.business_account?.bank_information?.account_name,
+          )}
+          {renderElement(
+            "Nomor Akun",
+            userInfo?.business_account?.bank_information?.account_number,
+          )}
+          {renderElement(
+            "Nama Bank",
+            userInfo?.business_account?.bank_information?.bank_name,
+          )}
+          {renderElement(
+            "Kode Bank",
+            userInfo?.business_account?.bank_information?.bank_code,
+          )}
+        </div>
       ),
     },
   ];
