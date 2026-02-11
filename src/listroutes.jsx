@@ -92,11 +92,11 @@ export const ListRoutes = () => {
       element: <LazyRoute.LazyLogin />,
       protectRoute: false,
     },
-    {
-      path: "register",
-      element: <LazyRoute.LazyRegister />,
-      protectRoute: false,
-    },
+    // {
+    //   path: "register",
+    //   element: <LazyRoute.LazyRegister />,
+    //   protectRoute: false,
+    // },
     {
       path: "notification",
       element: <LazyRoute.LazyNotification />,
