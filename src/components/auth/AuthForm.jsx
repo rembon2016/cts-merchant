@@ -324,7 +324,7 @@ const AuthForm = memo(function AuthForm({ formMode = "login" }) {
             disableCondition={isLoginMode ? isLoading : !checked || isLoading}
           />
 
-          <h6 className="flex justify-center gap-1">
+          {/* <h6 className="flex justify-center gap-1">
             {isLoginMode ? "Belum Punya Akun?" : "Sudah Punya Akun?"}
             <Link
               to={isLoginMode ? "/register" : "/login"}
@@ -333,7 +333,7 @@ const AuthForm = memo(function AuthForm({ formMode = "login" }) {
               {" "}
               {isLoginMode ? "Daftar" : "Masuk"}
             </Link>
-          </h6>
+          </h6> */}
           {showInstallCTA && (
             <div className="flex flex-col gap-2 mt-2">
               {platform === "android" && (
