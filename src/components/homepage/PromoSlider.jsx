@@ -143,6 +143,18 @@ const PromoSlider = memo(() => {
     [isDragging, currentIndex, goToSlide, startTimer],
   );
 
+  if (data?.faqs?.length === 0) {
+    return (
+      <section className="px-4 mt-6">
+        <div className="flex items-center justify-center py-10">
+          <p className="text-lg max-w-[300px] text-center text-slate-500 dark:text-slate-400">
+            Tidak ada promo yang tersedia saat ini.
+          </p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="px-4 mt-6">
       <div className="flex items-center justify-between mb-2">
