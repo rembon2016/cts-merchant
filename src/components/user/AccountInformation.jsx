@@ -11,7 +11,11 @@ export default function AccountInformation() {
 
   const getStatusColor = (value, isStatus) => {
     if (!isStatus) return "text-slate-600";
-    return value === "pending" ? "text-orange-400" : "text-green-400";
+    return value === "pending"
+      ? "text-orange-400"
+      : value === "rejected"
+        ? "text-red-400"
+        : "text-green-400";
   };
 
   const renderElement = (label, value, isStatus = false) => {
