@@ -156,12 +156,10 @@ export default function AccountInformation() {
       id: "manajer",
       label: "Manajer",
       content: (
-        <>
-          <div className="space-y-1">
-            {renderElement("Nama Lengkap", userInfo?.name)}
-            {renderElement("Email", userInfo?.email)}
-          </div>
-        </>
+        <div className="space-y-1">
+          {renderElement("Nama Lengkap", userInfo?.name)}
+          {renderElement("Email", userInfo?.email)}
+        </div>
       ),
     },
     {
