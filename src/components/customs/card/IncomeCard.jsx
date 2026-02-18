@@ -7,6 +7,8 @@ import { formatDate } from "../../../helper/format-date";
 import SimpleInput from "../form/SimpleInput";
 import { useCustomToast } from "../../../hooks/useCustomToast";
 import CustomToast from "../toast/CustomToast";
+import { FaArrowRight, FaPhone } from "react-icons/fa";
+import { IoIosArrowForward } from "react-icons/io";
 
 const CHIPS = [
   { id: "month", label: "Bulan" },
@@ -51,6 +53,21 @@ const IncomeCard = () => {
   const AMOUNT = useMemo(
     () => formatCurrency(Number.parseFloat(statistic.amount || 0)),
     [statistic.amount],
+  );
+
+  const TOTAL_AMOUNT = useMemo(
+    () => formatCurrency(Number.parseFloat(statistic.total_amount || 0)),
+    [statistic.total_amount],
+  );
+
+  const SUBSCRIPTION_FEE = useMemo(
+    () => formatCurrency(Number.parseFloat(statistic.subscription_fee || 0)),
+    [statistic.subscription_fee],
+  );
+
+  const SUBSCRIPTION_DAYS = useMemo(
+    () => statistic.subscription_days || 0,
+    [statistic.subscription_days],
   );
 
   const validateForm = useCallback(() => {
@@ -143,27 +160,62 @@ const IncomeCard = () => {
       />
       <div className="income-card  bg-[var(--c-primary)] text-white p-5 rounded-3xl shadow-soft">
         <div className="content">
-          <h2 className="flex items-center justify-between text-base font-semibold">
-            Pendapatan {!activeItem && "Hari Ini"}
-            <button
-              onClick={() => resetData()}
-              className="p-2 text-white rounded-xl items-end w-fit ml-auto"
-            >
-              <RefreshCcw className="w-4 h-4" />
-            </button>
+          <div className="flex justify-between w-full mb-3">
+            <p className="flex items-center justify-between font-semibold text-sm gap-1">
+              Durasi Langganan:{" "}
+              <span className="font-bold">{SUBSCRIPTION_DAYS} Hari</span>
+            </p>
+            <div className="flex justify-center items-center">
+              <button className="flex gap-2 justify-center items-center py-1 px-2 bg-white text-black rounded-lg">
+                Filter
+                <IoIosArrowForward className="w-3 h-3" />
+              </button>
+              <button
+                onClick={() => resetData()}
+                className="p-2 text-white rounded-xl items-end w-fit"
+              >
+                <RefreshCcw className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+          <h2 className="flex items-start justify-between flex-col gap-2 text-base font-semibold">
+            Pendapatan {activeItem || "Hari ini"}
+            <span className="text-[2rem] font-extrabold tracking-tight text-white">
+              {isLoading ? "..." : AMOUNT}
+            </span>
           </h2>
 
-          <div className="mt-2">
-            <p className="text-[1.7rem] font-extrabold tracking-tight text-white">
-              <span>{isLoading ? "..." : AMOUNT}</span>
+          <div className="flex flex-col mt-3">
+            <p className="flex gap-1 text-sm">
+              Biaya Langganan: <strong>{SUBSCRIPTION_FEE}</strong>
             </p>
-            <p className="mt-2 text-sm text-slate-200/80">
-              Data: {activeItem || "Hari Ini"}
+            <p className="flex gap-1 text-sm">
+              Biaya Yang Bisa Dicairkan: <strong>{TOTAL_AMOUNT}</strong>
             </p>
           </div>
 
+          {/* <div className="grid grid-cols-2 mt-2">
+            <div className="flex flex-col gap-2">
+              <span className="text-md">
+                Biaya <br /> Langganan
+              </span>
+              <p className="text-lg font-extrabold tracking-tight text-white">
+                <span>{isLoading ? "..." : SUBSCRIPTION_FEE}</span>
+              </p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <span className="text-md">
+                Biaya Yang
+                <br /> Bisa Dicairkan
+              </span>
+              <p className="text-lg font-extrabold tracking-tight text-white">
+                <span>{isLoading ? "..." : TOTAL_AMOUNT}</span>
+              </p>
+            </div>
+          </div> */}
+
           {/* Chips */}
-          <div className="mt-6 flex items-center gap-2">
+          {/* <div className="mt-6 flex items-center gap-2">
             {CHIPS.map((chip) => (
               <button
                 key={chip.id}
@@ -175,7 +227,7 @@ const IncomeCard = () => {
                 {chip.label}
               </button>
             ))}
-          </div>
+          </div> */}
 
           {/* Month Popover */}
           {showPopover === "month" && (

@@ -1,3 +1,6 @@
+import { FaHeadphones, FaPhone, FaQuestion } from "react-icons/fa";
+import CustomImage from "../components/customs/element/CustomImage";
+
 export const listMenuItems = (token) => {
   const soundBoxIcon = () => {
     return (
@@ -38,6 +41,23 @@ export const listMenuItems = (token) => {
         />
         <path d="M3 10h18" strokeWidth="1.75" />
       </svg>
+    );
+  };
+
+  const sosmedIcon = () => {
+    return (
+      <CustomImage
+        imageSource="/images/logo-merchant-no-bg.png"
+        imageWidth={30}
+        imageHeight={5}
+        altImage={"Sosial Media Icon"}
+        placeholderUrl="/images/blur-placeholder.jpg"
+        imageLoad="eager" // Ubah ke lazy untuk performa
+        className="rounded-t-[10px] object-cover"
+        onError={(e) => {
+          e.target.src = "/images/placeholder.jpg";
+        }}
+      />
     );
   };
 
@@ -151,18 +171,24 @@ export const listMenuItems = (token) => {
     //   icon: soundBoxIcon(),
     // },
     {
-      id: "pos",
-      name: "POS",
+      id: "sosial-media",
+      name: "Sosial Media",
       url: "/pos",
       target: "_blank",
-      icon: posIcon(),
+      icon: sosmedIcon(),
     },
     {
-      id: "nobank",
-      name: "Uang Saku",
-      url: "https://nobank.id/",
-      icon: nobankIcon(),
+      id: "bantuan",
+      name: "Bantuan",
+      url: "/customer-support",
+      icon: <FaHeadphones />,
     },
+    // {
+    //   id: "nobank",
+    //   name: "Uang Saku",
+    //   url: "https://nobank.id/",
+    //   icon: nobankIcon(),
+    // },
     {
       id: "invoice",
       name: "Invoice",
