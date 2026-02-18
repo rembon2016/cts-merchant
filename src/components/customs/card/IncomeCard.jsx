@@ -8,7 +8,7 @@ import SimpleInput from "../form/SimpleInput";
 import { useCustomToast } from "../../../hooks/useCustomToast";
 import CustomToast from "../toast/CustomToast";
 import { FaArrowRight, FaPhone } from "react-icons/fa";
-import { IoIosArrowForward } from "react-icons/io";
+import { IoIosArrowDown } from "react-icons/io";
 
 const CHIPS = [
   { id: "month", label: "Bulan" },
@@ -37,6 +37,7 @@ const IncomeCard = () => {
   const [activeItem, setActiveItem] = useState("");
   const [activeChip, setActiveChip] = useState("");
   const [showPopover, setShowPopover] = useState(null);
+  const [filterOpen, setFilterOpen] = useState(false);
   const { updateIncomeAmount } = useUserStore();
   const { getStatisticTransaction, statistic, isLoading } =
     useTransactionStore();
@@ -166,10 +167,42 @@ const IncomeCard = () => {
               <span className="font-bold">{SUBSCRIPTION_DAYS} Hari</span>
             </p>
             <div className="flex justify-center items-center">
-              <button className="flex gap-2 justify-center items-center py-1 px-2 bg-white text-black rounded-lg">
-                Filter
-                <IoIosArrowForward className="w-3 h-3" />
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setFilterOpen((p) => !p)}
+                  className="flex gap-2 justify-center items-center py-1 px-2 bg-white text-black rounded-lg"
+                >
+                  Filter
+                  <IoIosArrowDown className="w-3 h-3" />
+                </button>
+
+                {filterOpen && (
+                  <div className="absolute right-0 mt-2 w-44 rounded-2xl border border-slate-200 bg-white shadow-soft p-3 text-slate-700 z-50">
+                    <p className="text-xs text-slate-500 mb-2">Filter</p>
+                    <div className="flex flex-col gap-2">
+                      {CHIPS.map((chip) => (
+                        <button
+                          key={chip.id}
+                          onClick={() => {
+                            handleChipClick(chip.id);
+                            setFilterOpen(false);
+                          }}
+                          className={`text-sm p-2 rounded-lg text-left transition-colors ${{
+                            true: "",
+                          }} ${
+                            activeChip === chip.id
+                              ? "bg-amber-400 text-black font-semibold"
+                              : "hover:bg-slate-100"
+                          }`}
+                        >
+                          {chip.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <button
                 onClick={() => resetData()}
                 className="p-2 text-white rounded-xl items-end w-fit"
@@ -214,20 +247,7 @@ const IncomeCard = () => {
             </div>
           </div> */}
 
-          {/* Chips */}
-          {/* <div className="mt-6 flex items-center gap-2">
-            {CHIPS.map((chip) => (
-              <button
-                key={chip.id}
-                onClick={() => handleChipClick(chip.id)}
-                className={`chip ${
-                  activeChip === chip.id ? "active" : "inactive"
-                }`}
-              >
-                {chip.label}
-              </button>
-            ))}
-          </div> */}
+          <div className="mt-6" />
 
           {/* Month Popover */}
           {showPopover === "month" && (
