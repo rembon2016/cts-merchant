@@ -74,7 +74,7 @@ const CustomImage = memo(function CustomImage(props) {
         <img
           src={placeholderUrl}
           className={`${className} blur-sm`}
-          alt=""
+          alt={altImage}
           width={imageWidth || 32}
           height={imageHeight || 48}
           aria-hidden="true"
@@ -100,7 +100,7 @@ const CustomImage = memo(function CustomImage(props) {
           width={imageWidth || 32}
           height={imageHeight || 48}
           loading={imageLoad}
-          fetchPriority={imageFetchPriority}
+          fetchpriority={imageFetchPriority}
           decoding="async"
           onLoad={handleLoad}
           onError={handleError}
@@ -112,7 +112,14 @@ const CustomImage = memo(function CustomImage(props) {
 });
 
 CustomImage.propTypes = {
-  imageSource: PropTypes.string.isRequired,
+  imageSource: PropTypes.oneOfType([
+    PropTypes.any.isRequired,
+    PropTypes.shape({
+      src: PropTypes.string.isRequired,
+      srcSet: PropTypes.string,
+      sizes: PropTypes.string,
+    }),
+  ]),
   imageWidth: PropTypes.number,
   imageHeight: PropTypes.number,
   imageLoad: PropTypes.string,

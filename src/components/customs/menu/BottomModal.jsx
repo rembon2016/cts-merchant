@@ -16,7 +16,7 @@ BottomModal.propTypes = {
   setIsOpen: PropTypes.func,
   onClose: PropTypes.func,
   stocks: PropTypes.number,
-  data: PropTypes.object,
+  data: PropTypes.any,
   isFromDetail: PropTypes.bool,
   mode: PropTypes.oneOf(["cart", "custom"]),
   isVariant: PropTypes.bool,
@@ -71,7 +71,7 @@ export default function BottomModal(props) {
 
   const getPriceFunc = (isTotalPrice = false) => {
     const mapping = selectedVariant?.[mappingApiKey("price")]?.map(
-      (item) => item?.price
+      (item) => item?.price,
     );
 
     return isTotalPrice
@@ -81,7 +81,7 @@ export default function BottomModal(props) {
 
   const getStockFunc = () => {
     return selectedVariant?.[mappingApiKey("stock")]?.map((itemStock) =>
-      quantity > itemStock?.qty ? setQuantity(itemStock?.qty) : itemStock?.qty
+      quantity > itemStock?.qty ? setQuantity(itemStock?.qty) : itemStock?.qty,
     );
   };
 
@@ -155,7 +155,7 @@ export default function BottomModal(props) {
           data,
           selectedVariant,
           quantity,
-          isFromDetail
+          isFromDetail,
         );
         if (response?.success === true) {
           showSuccess("Produk Berhasil Ditambahkan");
@@ -348,7 +348,6 @@ export default function BottomModal(props) {
               </h4>
               {/* Drag handle (mouse + touch) */}
               <button
-                type="button"
                 className="flex items-center justify-center mb-3 cursor-grab"
                 onMouseDown={(e) => handleMouseDown(e)}
                 onTouchStart={(e) => handleTouchStart(e)}

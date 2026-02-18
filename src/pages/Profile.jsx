@@ -21,12 +21,10 @@ const Profile = () => {
 
   const menuItems = [
     {
-      id: "account",
+      id: 1,
       label: "Informasi Akun",
       path: "/account-information",
-      icon: (
-        <FaUser />
-      ),
+      icon: <FaUser />,
     },
     // {
     //   id: "security",
@@ -67,20 +65,16 @@ const Profile = () => {
     //   ),
     // },
     {
-      id: "help",
+      id: 2,
       label: "Bantuan",
       path: "/faq",
-      icon: (
-        <FaQuestion />
-      ),
+      icon: <FaQuestion />,
     },
     {
-      id: "customer-support",
+      id: 3,
       label: "Customer Support",
       path: "/customer-support",
-      icon: (
-       <FaPhone />
-      ),
+      icon: <FaPhone />,
     },
   ];
 
@@ -147,11 +141,7 @@ const Profile = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="size-10 rounded-xl bg-[var(--c-accent)] grid place-items-center">
-                {isDark ? (
-                  <FaMoon className="text-gray-600" />
-                ) : (
-                  <FaSun />
-                )}
+                {isDark ? <FaMoon className="text-gray-600" /> : <FaSun />}
               </div>
               <div>
                 <p className="font-medium dark:text-slate-100 text-slatte-600">
@@ -168,8 +158,8 @@ const Profile = () => {
 
         {/* Menu Items */}
         <div className="space-y-2">
-          {menuItems.map((item) => (
-            <Link to={item.path} key={item.id}>
+          {menuItems?.map((item) => (
+            <Link to={item.path} key={item?.id}>
               <button
                 key={item.id}
                 // onClick={() => handleMenuClick(item.id)}

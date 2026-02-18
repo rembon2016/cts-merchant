@@ -64,7 +64,7 @@ const ButtonQuantity = memo(function ButtonQuantity(props) {
 ButtonQuantity.propTypes = {
   quantity: PropTypes.number.isRequired,
   setQuantity: PropTypes.func.isRequired,
-  stocks: PropTypes.number.isRequired,
+  stocks: PropTypes.any,
   style: PropTypes.object,
 };
 

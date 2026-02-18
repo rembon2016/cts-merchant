@@ -144,7 +144,7 @@ const IncomeCard = () => {
       <div className="income-card  bg-[var(--c-primary)] text-white p-5 rounded-3xl shadow-soft">
         <div className="content">
           <h2 className="flex items-center justify-between text-base font-semibold">
-            Pendapatan
+            Pendapatan {!activeItem && "Hari Ini"}
             <button
               onClick={() => resetData()}
               className="p-2 text-white rounded-xl items-end w-fit ml-auto"

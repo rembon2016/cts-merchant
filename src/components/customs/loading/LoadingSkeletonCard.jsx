@@ -1,14 +1,24 @@
-import React from "react";
+import PropTypes from "prop-types";
 
-export default function LoadingSkeletonCard({ items = 1, className = "" }) {
+LoadingSkeletonCard.propTypes = {
+  items: PropTypes.array,
+  key: PropTypes.any,
+  className: PropTypes.string,
+};
+
+export default function LoadingSkeletonCard(props) {
+  const { items = 1, className = "", key } = props;
+
+  if (key === undefined) return;
+
   return (
     <div
       className={`border  rounded-lg shadow overflow-hidden bg-white dark:bg-slate-800 animate-pulse mb-4 ${className}`}
       aria-busy="true"
       aria-live="polite"
     >
-      {Array.from({ length: Number(items) || 1 }).map((item) => (
-        <div key={item?.id}>
+      {Array?.from({ length: Number(items) || 1 })?.map((item) => (
+        <div key={key}>
           <div className="relative w-full">
             <div className="w-full h-[100px] bg-gray-200 dark:bg-slate-700" />
           </div>

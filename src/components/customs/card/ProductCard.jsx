@@ -1,5 +1,5 @@
 import { ShoppingCart } from "lucide-react";
-import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { PropTypes } from "prop-types";
 import SimpleModal from "../modal/SimpleModal";
 import { useProductStore } from "../../../store/productStore";
@@ -9,7 +9,7 @@ import CustomToast from "../toast/CustomToast";
 import { usePosStore } from "../../../store/posStore";
 import CustomImage from "../element/CustomImage";
 
-const ProductCard = forwardRef((props) => {
+const ProductCard = (props) => {
   const {
     product,
     price,
@@ -102,13 +102,22 @@ const ProductCard = forwardRef((props) => {
             {deleteIcon}
           </button>
         )}
-        <button
+        <div
           ref={observerRef}
+          role="button"
+          tabIndex={disabled ? -1 : 0}
           className={`border dark:border-none dark:bg-slate-700 rounded-lg shadow hover:shadow-lg transition flex flex-col text-start overflow-hidden w-full ${
             disabled ? "opacity-50" : "cursor-pointer"
           }`}
-          onClick={onClick}
-          disabled={disabled}
+          onClick={(e) => !disabled && onClick && onClick(e)}
+          onKeyDown={(e) => {
+            if (disabled) return;
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onClick && onClick(e);
+            }
+          }}
+          aria-disabled={disabled}
         >
           <div className="relative w-full">
             <CustomImage
@@ -172,7 +181,7 @@ const ProductCard = forwardRef((props) => {
               ) : null}
             </div>
           </div>
-        </button>
+        </div>
       </div>
     );
   }, [
@@ -223,9 +232,7 @@ const ProductCard = forwardRef((props) => {
       {renderElementsCard}
     </>
   );
-});
-
-ProductCard.displayName = "ProductCard";
+};
 
 ProductCard.propTypes = {
   product: PropTypes.object.isRequired,

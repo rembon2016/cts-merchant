@@ -170,7 +170,7 @@ export default function POS() {
 
   const renderProducts = useMemo(() => {
     if (productsLoading) {
-      return <LoadingSkeletonCard items={products} />;
+      return <LoadingSkeletonCard items={products?.map((key) => key?.id)} />;
     }
 
     if (productsError) {

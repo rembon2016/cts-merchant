@@ -6,7 +6,7 @@ SimpleInput.propTypes = {
   label: PropTypes.string,
   type: PropTypes.string,
   name: PropTypes.string,
-  value: PropTypes.string,
+  value: PropTypes.any,
   errors: PropTypes.string,
   min: PropTypes.number,
   max: PropTypes.number,
@@ -92,7 +92,7 @@ export default function SimpleInput({
           onClick={() => {
             if (disabled) return;
             setDynamicType((prev) =>
-              prev === "password" ? "text" : "password"
+              prev === "password" ? "text" : "password",
             );
           }}
           aria-label={
@@ -112,15 +112,13 @@ export default function SimpleInput({
         <div className="relative">
           <select
             name={name}
-            value={value}
+            value={value ?? ""}
             onChange={handleChange}
             className={`${inputClassName} appearance-none`}
             disabled={disabled}
             placeholder={placeholder || "Pilih..."}
           >
-            <option defaultValue selected>
-              Pilih
-            </option>
+            <option value="">Pilih</option>
             {Array?.isArray(selectBoxData) &&
               selectBoxData?.map((item) => (
                 <option key={item?.id} value={item?.id}>
