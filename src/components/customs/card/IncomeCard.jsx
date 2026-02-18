@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useUserStore } from "../../../store/userStore";
 import { useTransactionStore } from "../../../store/transactionStore";
 import { formatCurrency } from "../../../helper/currency";
@@ -7,8 +7,7 @@ import { formatDate } from "../../../helper/format-date";
 import SimpleInput from "../form/SimpleInput";
 import { useCustomToast } from "../../../hooks/useCustomToast";
 import CustomToast from "../toast/CustomToast";
-import { FaArrowRight, FaPhone } from "react-icons/fa";
-import { IoIosArrowForward } from "react-icons/io";
+import { IoIosArrowDown } from "react-icons/io";
 
 const CHIPS = [
   { id: "month", label: "Bulan" },
@@ -37,6 +36,7 @@ const IncomeCard = () => {
   const [activeItem, setActiveItem] = useState("");
   const [activeChip, setActiveChip] = useState("");
   const [showPopover, setShowPopover] = useState(null);
+  const [filterOpen, setFilterOpen] = useState(false);
   const { updateIncomeAmount } = useUserStore();
   const { getStatisticTransaction, statistic, isLoading } =
     useTransactionStore();
@@ -100,9 +100,11 @@ const IncomeCard = () => {
       const valueMonth = MONTHS.find((m) => m.key === value);
       const valueRange = `${formatDate(value?.from)} - ${formatDate(value?.to)}`;
 
+      const currentYear = new Date().getFullYear();
+
       setActiveItem(
         activeChip === "month"
-          ? valueMonth.value
+          ? `${valueMonth?.value || ""} ${currentYear}`.trim()
           : activeChip === "range"
             ? valueRange
             : value,
@@ -138,15 +140,38 @@ const IncomeCard = () => {
     setValidationErrors({});
   }, []);
 
+  const getResultText = useMemo(() => {
+    return activeItem || "Hari ini";
+  }, [activeItem]);
+
+  const resetLockRef = useRef(false);
+  const resetTimeoutRef = useRef(null);
+
   const resetData = useCallback(() => {
+    if (resetLockRef.current) return;
+    resetLockRef.current = true;
+
     setActiveChip("");
     setActiveItem("");
     setDateRange({ from: "", to: "" });
     getStatisticTransaction();
+
+    resetTimeoutRef.current = setTimeout(() => {
+      resetLockRef.current = false;
+      resetTimeoutRef.current = null;
+    }, 3000);
   }, [getStatisticTransaction]);
 
   useEffect(() => {
     getStatisticTransaction();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (resetTimeoutRef.current) {
+        clearTimeout(resetTimeoutRef.current);
+      }
+    };
   }, []);
 
   return (
@@ -166,10 +191,41 @@ const IncomeCard = () => {
               <span className="font-bold">{SUBSCRIPTION_DAYS} Hari</span>
             </p>
             <div className="flex justify-center items-center">
-              <button className="flex gap-2 justify-center items-center py-1 px-2 bg-white text-black rounded-lg">
-                Filter
-                <IoIosArrowForward className="w-3 h-3" />
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setFilterOpen((p) => !p)}
+                  className="flex gap-2 justify-center items-center py-1 px-2 bg-white text-black rounded-lg"
+                >
+                  Filter
+                  <IoIosArrowDown className="w-3 h-3" />
+                </button>
+
+                {filterOpen && (
+                  <div className="absolute right-0 mt-2 w-44 rounded-2xl border border-slate-200 bg-white shadow-soft p-3 text-slate-700 z-50">
+                    <div className="flex flex-col gap-2">
+                      {CHIPS.map((chip) => (
+                        <button
+                          key={chip.id}
+                          onClick={() => {
+                            handleChipClick(chip.id);
+                            setFilterOpen(false);
+                          }}
+                          className={`text-sm p-2 rounded-lg text-left transition-colors ${{
+                            true: "",
+                          }} ${
+                            activeChip === chip.id
+                              ? "bg-amber-400 text-black font-semibold"
+                              : "hover:bg-slate-100"
+                          }`}
+                        >
+                          {chip.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <button
                 onClick={() => resetData()}
                 className="p-2 text-white rounded-xl items-end w-fit"
@@ -179,7 +235,7 @@ const IncomeCard = () => {
             </div>
           </div>
           <h2 className="flex items-start justify-between flex-col gap-2 text-base font-semibold">
-            Pendapatan {activeItem || "Hari ini"}
+            Pendapatan: {getResultText}
             <span className="text-[2rem] font-extrabold tracking-tight text-white">
               {isLoading ? "..." : AMOUNT}
             </span>
@@ -214,20 +270,7 @@ const IncomeCard = () => {
             </div>
           </div> */}
 
-          {/* Chips */}
-          {/* <div className="mt-6 flex items-center gap-2">
-            {CHIPS.map((chip) => (
-              <button
-                key={chip.id}
-                onClick={() => handleChipClick(chip.id)}
-                className={`chip ${
-                  activeChip === chip.id ? "active" : "inactive"
-                }`}
-              >
-                {chip.label}
-              </button>
-            ))}
-          </div> */}
+          <div className="mt-6" />
 
           {/* Month Popover */}
           {showPopover === "month" && (

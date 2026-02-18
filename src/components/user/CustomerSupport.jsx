@@ -14,7 +14,7 @@ export default function CustomerSupport() {
   };
 
   const handleGoBack = () => {
-    navigate(-1);
+    navigate("/"); // Jika tidak ada halaman sebelumnya, arahkan ke homepage
   };
 
   return (
@@ -51,7 +51,7 @@ export default function CustomerSupport() {
             onClick={handleGoBack}
             className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105"
           >
-            Kembali
+            Kembali ke Beranda
           </button>
         </div>
       </div>
