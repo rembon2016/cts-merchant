@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useReducer, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import useFetchDataStore from "../../store/fetchDataStore";
 import { useDebounce } from "../../hooks/useDebounce";
 import SearchInput from "../customs/form/SearchInput";
@@ -52,6 +53,7 @@ export default function Transaction() {
   const { data, totalData, loading, error, fetchData } = useFetchDataStore();
   const { isDark } = useThemeStore();
   const [accumulatedData, setAccumulatedData] = useState([]);
+  const navigate = useNavigate();
 
   // Debounce search query with 500ms delay
   const debouncedSearch = useDebounce(state.searchQuery, 1000);
@@ -120,9 +122,10 @@ export default function Transaction() {
     return (
       <div className="space-y-3">
         {accumulatedData.map((item, idx) => (
-          <div
+          <button
             key={`${item.id}-${idx}`}
-            className="bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600"
+            onClick={() => navigate(`/transaction/${item.id}`)}
+            className="w-full bg-white dark:bg-slate-700 rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-600 cursor-pointer hover:shadow-md dark:hover:shadow-slate-600/30 transition-shadow text-left"
           >
             <div className="flex gap-2 flex-col justify-between">
               <div className="flex items-center gap-3">
@@ -177,7 +180,7 @@ export default function Transaction() {
                 </p>
               </div>
             </div>
-          </div>
+          </button>
         ))}
       </div>
     );

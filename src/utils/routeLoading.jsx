@@ -100,6 +100,9 @@ export const withLazyRoute = (LazyComponent) => {
 // Main pages
 export const LazyHome = lazy(() => import("../pages/Home"));
 export const LazyTransaction = lazy(() => import("../pages/Transaction"));
+export const LazyTransactionDetail = lazy(
+  () => import("../pages/TransactionDetail"),
+);
 export const LazyProfile = lazy(() => import("../pages/Profile"));
 export const LazyFaQ = lazy(() => import("../pages/FaQ"));
 export const LazyNotification = lazy(() => import("../pages/Notification"));
@@ -190,6 +193,7 @@ export default {
   // Main pages
   LazyHome,
   LazyTransaction,
+  LazyTransactionDetail,
   LazyProfile,
   LazyFaQ,
   LazyNotification,

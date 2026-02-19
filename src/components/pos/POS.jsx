@@ -11,6 +11,7 @@ import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 import BottomSheet from "../customs/menu/BottomSheet";
 import NoData from "../customs/element/NoData";
 import LoadMoreButton from "../customs/button/LoadMoreButton";
+import CustomImage from "../customs/element/CustomImage";
 const ButtonFilter = lazy(() => import("../customs/button/ButtonFilter"));
 const ProductCard = lazy(() => import("../customs/card/ProductCard"));
 const SearchInput = lazy(() => import("../customs/form/SearchInput"));
@@ -123,14 +124,18 @@ export default function POS() {
               onClick={() => handleItemClick(item)}
               className="sheet-item bg-slate-50 dark:bg-slate-600 rounded-xl p-3 flex flex-col items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-500 transition-colors"
             >
-              <img
-                src={
-                  item.image
+              <CustomImage
+                imageSource={
+                  item?.image
                     ? `${import.meta.env.VITE_API_IMAGE}${item.image}`
-                    : "/images/image-placeholder.png"
+                    : "/images/image-placeholder.jpg"
                 }
-                alt={item.name || "Product Image"}
-                className="w-full h-[60px] object-cover rounded-lg"
+                imageWidth={400}
+                imageHeight={200}
+                altImage={item?.name || "Product Image"}
+                placeholderUrl="/images/blur-placeholder.jpg"
+                imageLoad="eager" // Ubah ke lazy untuk performa
+                className="rounded-t-[10px] h-[60px] object-cover"
                 onError={(e) => {
                   e.target.src = "/images/placeholder.jpg";
                 }}

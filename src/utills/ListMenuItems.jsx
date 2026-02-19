@@ -1,4 +1,5 @@
-import { FaHeadphones, FaPhone, FaQuestion } from "react-icons/fa";
+import { FaQuestion } from "react-icons/fa";
+import { RiCustomerService2Line } from "react-icons/ri";
 import CustomImage from "../components/customs/element/CustomImage";
 
 export const listMenuItems = (token) => {
@@ -171,17 +172,16 @@ export const listMenuItems = (token) => {
     //   icon: soundBoxIcon(),
     // },
     {
-      id: "sosial-media",
-      name: "Sosial Media",
-      url: "/pos",
-      target: "_blank",
-      icon: sosmedIcon(),
-    },
-    {
       id: "bantuan",
       name: "Bantuan",
+      url: "/faq",
+      icon: <FaQuestion />,
+    },
+    {
+      id: "customer-service",
+      name: "Customer Service",
       url: "/customer-support",
-      icon: <FaHeadphones />,
+      icon: <RiCustomerService2Line />,
     },
     // {
     //   id: "nobank",

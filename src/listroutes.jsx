@@ -13,6 +13,11 @@ export const ListRoutes = () => {
       protectRoute: true,
     },
     {
+      path: "transaction/:id",
+      element: <LazyRoute.LazyTransactionDetail />,
+      protectRoute: true,
+    },
+    {
       path: "profile",
       element: <LazyRoute.LazyProfile />,
       protectRoute: true,

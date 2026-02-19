@@ -54,7 +54,7 @@ const PPOBHistory = () => {
           trx.id.toLowerCase().includes(query) ||
           trx.target.toLowerCase().includes(query) ||
           trx.product.toLowerCase().includes(query) ||
-          (trx.customerName && trx.customerName.toLowerCase().includes(query))
+          (trx.customerName && trx.customerName.toLowerCase().includes(query)),
       );
     }
 
@@ -111,11 +111,11 @@ const PPOBHistory = () => {
     const totalTrx = filteredTransactions.length;
     const totalAmount = filteredTransactions.reduce(
       (sum, trx) => sum + trx.price,
-      0
+      0,
     );
     const totalCommission = filteredTransactions.reduce(
       (sum, trx) => sum + trx.commission,
-      0
+      0,
     );
 
     return { totalTrx, totalAmount, totalCommission };
@@ -290,16 +290,16 @@ const PPOBHistory = () => {
                     selectedTransaction.status === "success"
                       ? "bg-green-100 dark:bg-green-900/30"
                       : selectedTransaction.status === "failed"
-                      ? "bg-red-100 dark:bg-red-900/30"
-                      : "bg-yellow-100 dark:bg-yellow-900/30"
+                        ? "bg-red-100 dark:bg-red-900/30"
+                        : "bg-yellow-100 dark:bg-yellow-900/30"
                   }`}
                 >
                   <span className="text-3xl">
                     {selectedTransaction.status === "success"
                       ? "✓"
                       : selectedTransaction.status === "failed"
-                      ? "✗"
-                      : "⏱"}
+                        ? "✗"
+                        : "⏱"}
                   </span>
                 </div>
                 <h4
@@ -307,15 +307,15 @@ const PPOBHistory = () => {
                     selectedTransaction.status === "success"
                       ? "text-green-600 dark:text-green-400"
                       : selectedTransaction.status === "failed"
-                      ? "text-red-600 dark:text-red-400"
-                      : "text-yellow-600 dark:text-yellow-400"
+                        ? "text-red-600 dark:text-red-400"
+                        : "text-yellow-600 dark:text-yellow-400"
                   }`}
                 >
                   {selectedTransaction.status === "success"
                     ? "Transaksi Berhasil"
                     : selectedTransaction.status === "failed"
-                    ? "Transaksi Gagal"
-                    : "Menunggu"}
+                      ? "Transaksi Gagal"
+                      : "Menunggu"}
                 </h4>
               </div>
 
@@ -361,7 +361,7 @@ const PPOBHistory = () => {
                   </span>
                   <span className="text-sm font-medium text-gray-900 dark:text-white">
                     {new Date(selectedTransaction.timestamp).toLocaleString(
-                      "id-ID"
+                      "id-ID",
                     )}
                   </span>
                 </div>

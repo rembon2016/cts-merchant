@@ -45,7 +45,7 @@ const QuickMenus = () => {
       }
 
       const internalPaths = [
-        "/pos",
+        "/faq",
         "/transaction",
         "/invoice",
         "/customer-support",

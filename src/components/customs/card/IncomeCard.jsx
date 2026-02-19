@@ -8,7 +8,6 @@ import SimpleInput from "../form/SimpleInput";
 import { useCustomToast } from "../../../hooks/useCustomToast";
 import CustomToast from "../toast/CustomToast";
 import { IoIosArrowDown } from "react-icons/io";
-import { FaCircle, FaCross } from "react-icons/fa";
 
 const CHIPS = [
   { id: "month", label: "Bulan" },
@@ -205,13 +204,13 @@ const IncomeCard = () => {
           <div className="flex justify-between w-full mb-3">
             <p className="flex items-center justify-between font-semibold text-sm gap-1">
               Durasi Langganan:{" "}
-              <span className="font-bold">{SUBSCRIPTION_DAYS} Hari</span>
+              <span className="font-semibold">{SUBSCRIPTION_DAYS} Hari</span>
             </p>
             <div className="flex justify-center items-center">
               <div className="relative">
                 <button
                   onClick={() => setFilterOpen((p) => !p)}
-                  className="flex gap-2 justify-center items-center py-0.5 px-1.5 bg-white text-black rounded-lg"
+                  className="flex gap-2 justify-center items-center py-0.5 px-1.5 bg-white dark:bg-gray-300 text-black rounded-lg"
                 >
                   Filter
                   <IoIosArrowDown className="w-3 h-3" />
@@ -251,8 +250,10 @@ const IncomeCard = () => {
               </button>
             </div>
           </div>
-          <h2 className="flex items-start justify-between flex-col gap-2 text-base font-semibold">
-            Pendapatan: {getResultText}
+          <h2 className="flex items-start justify-between flex-col gap-2 text-base">
+            <p className="flex gap-1">
+              Pendapatan: <span className="font-semibold">{getResultText}</span>
+            </p>
             <span className="text-[2rem] font-extrabold tracking-tight text-white">
               {isLoading ? "..." : AMOUNT}
             </span>
@@ -260,10 +261,12 @@ const IncomeCard = () => {
 
           <div className="flex flex-col mt-3">
             <p className="flex gap-1 text-sm">
-              Biaya Langganan: <strong>{SUBSCRIPTION_FEE}</strong>
+              Biaya Langganan:{" "}
+              <span className="font-semibold">{SUBSCRIPTION_FEE}</span>
             </p>
             <p className="flex gap-1 text-sm">
-              Biaya Yang Bisa Dicairkan: <strong>{TOTAL_AMOUNT}</strong>
+              Biaya Yang Bisa Dicairkan:{" "}
+              <span className="font-semibold">{TOTAL_AMOUNT}</span>
             </p>
           </div>
 
