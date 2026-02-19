@@ -8,6 +8,7 @@ import SimpleInput from "../form/SimpleInput";
 import { useCustomToast } from "../../../hooks/useCustomToast";
 import CustomToast from "../toast/CustomToast";
 import { IoIosArrowDown } from "react-icons/io";
+import { FaCircle, FaCross } from "react-icons/fa";
 
 const CHIPS = [
   { id: "month", label: "Bulan" },
@@ -138,6 +139,21 @@ const IncomeCard = () => {
     setDateRange({ from: "", to: "" });
     setShowPopover(null);
     setValidationErrors({});
+  }, []);
+
+  const deleteButton = useMemo(() => {
+    return (
+      <button
+        className="bg-slate-200 text-black shadow-lg w-6 h-6 flex justify-center items-center rounded-full text-xs"
+        onClick={() => {
+          setActiveItem("");
+          setActiveChip("");
+          setShowPopover(null);
+        }}
+      >
+        X
+      </button>
+    );
   }, []);
 
   const getResultText = useMemo(() => {
@@ -275,9 +291,12 @@ const IncomeCard = () => {
           {/* Month Popover */}
           {showPopover === "month" && (
             <div className="mt-3 rounded-2xl border border-slate-200 bg-white shadow-soft p-3 text-slate-700">
-              <p className="text-xs text-slate-500 dark:text-slate-200 mb-2">
-                Pilih Bulan
-              </p>
+              <div className="flex justify-between items-center mb-3">
+                <p className="text-xs text-slate-500 dark:text-slate-200 mb-2">
+                  Pilih Bulan
+                </p>
+                {deleteButton}
+              </div>
               <div className="grid grid-cols-3 gap-2 text-sm">
                 {MONTHS.map((month) => {
                   return (
@@ -301,9 +320,12 @@ const IncomeCard = () => {
           {/* Year Popover */}
           {showPopover === "year" && (
             <div className="mt-3 rounded-2xl border border-slate-200 bg-white shadow-soft p-3 text-slate-700">
-              <p className="text-xs text-slate-500 dark:text-slate-200 mb-2">
-                Pilih Tahun
-              </p>
+              <div className="flex justify-between items-center mb-3">
+                <p className="text-xs text-slate-500 dark:text-slate-200 mb-2">
+                  Pilih Tahun
+                </p>
+                {deleteButton}
+              </div>
               <div className="grid grid-cols-4 gap-2 text-sm">
                 {years.map((year) => (
                   <button
@@ -325,6 +347,12 @@ const IncomeCard = () => {
           {/* Range Popover */}
           {showPopover === "range" && (
             <div className="mt-3 rounded-2xl border border-slate-200 bg-white shadow-soft p-3 text-slate-700">
+              <div className="flex justify-between items-center mb-3">
+                <p className="text-xs text-slate-500 dark:text-slate-200 mb-2">
+                  Pilih Tanggal
+                </p>
+                {deleteButton}
+              </div>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <SimpleInput
                   name="from"
