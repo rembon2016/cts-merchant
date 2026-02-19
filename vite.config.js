@@ -10,6 +10,7 @@ export default defineConfig(({ mode }) => {
     react(),
     VitePWA({
       registerType: "autoUpdate",
+      injectRegister: "auto",
       devOptions: {
         enabled: true,
       },
@@ -43,7 +44,6 @@ export default defineConfig(({ mode }) => {
         ],
       },
       workbox: {
-        // Strategi caching
         cleanupOutdatedCaches: true,
         skipWaiting: true,
         clientsClaim: true,
@@ -55,24 +55,22 @@ export default defineConfig(({ mode }) => {
               cacheName: "google-fonts-cache",
               expiration: {
                 maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 tahun
+                maxAgeSeconds: 60 * 60 * 24 * 365,
               },
             },
           },
         ],
       },
     }),
-    // Gzip compression for production
     mode === "production" &&
       compression({
         verbose: true,
         disable: false,
-        threshold: 10240, // Only compress files > 10KB
+        threshold: 10240,
         algorithm: "gzip",
         ext: ".gz",
         deleteOriginFile: false,
       }),
-    // Bundle visualization
     mode === "production" &&
       visualizer({
         open: false,
