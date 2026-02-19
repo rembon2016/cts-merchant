@@ -169,6 +169,7 @@ const IncomeCard = () => {
 
     setActiveChip("");
     setActiveItem("");
+    setShowPopover(null);
     setDateRange({ from: "", to: "" });
     getStatisticTransaction();
 
@@ -210,7 +211,7 @@ const IncomeCard = () => {
               <div className="relative">
                 <button
                   onClick={() => setFilterOpen((p) => !p)}
-                  className="flex gap-2 justify-center items-center py-1 px-2 bg-white text-black rounded-lg"
+                  className="flex gap-2 justify-center items-center py-0.5 px-1.5 bg-white text-black rounded-lg"
                 >
                   Filter
                   <IoIosArrowDown className="w-3 h-3" />
