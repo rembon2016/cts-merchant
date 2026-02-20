@@ -35,7 +35,7 @@ const AuthForm = memo(function AuthForm({ formMode = "login" }) {
     hideToast,
   } = useCustomToast();
 
-  const { platform, showInstallCTA, installEvent, install } = useInstallPWA();
+  const { showInstallCTA, installEvent, install } = useInstallPWA();
 
   useEffect(() => {
     if (isLoggedIn) {
