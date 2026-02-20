@@ -374,58 +374,6 @@ const AuthForm = memo(function AuthForm({ formMode = "login" }) {
                   </div>
                 </button>
               </div>
-              {/* {platform === "android" && (
-                <button
-                  onClick={handleInstallClick}
-                  className={
-                    "w-full h-14 rounded-xl bg-black text-white flex justify-center items-center px-4 gap-3 shadow-md hover:opacity-90"
-                  }
-                  aria-label="Install on Android"
-                  title={
-                    installEvent
-                      ? "Install aplikasi CTS Merchant"
-                      : "Jika tombol tidak memulai install, gunakan ikon Install Chrome"
-                  }
-                >
-                  <CustomImage
-                    imageSource={getIconAndroid}
-                    imageWidth={32}
-                    imageHeight={48}
-                    altImage="Install on Android"
-                    imageLoad="eager"
-                    imageFetchPriority="high"
-                    className="w-8 h-12"
-                  />
-                  <div className="flex items-center leading-tight">
-                    <span className="text-lg font-semibold">
-                      Install on Android
-                    </span>
-                  </div>
-                </button>
-              )}
-              {platform === "ios" && (
-                <button
-                  onClick={handleInstallClick}
-                  className="w-full h-14 rounded-xl bg-white text-black flex items-center justify-center px-4 gap-3 shadow-md hover:opacity-90"
-                  aria-label="Download on the IOS"
-                  title="Lihat cara pasang di layar utama untuk iOS"
-                >
-                  <CustomImage
-                    imageSource={getIconIos}
-                    imageWidth={32}
-                    imageHeight={48}
-                    altImage="Install on iOS"
-                    imageLoad="eager"
-                    imageFetchPriority="high"
-                    className="w-8 h-12"
-                  />
-                  <div className="flex justify-center items-center leading-tight">
-                    <span className="text-lg font-semibold">
-                      Install on IOS
-                    </span>
-                  </div>
-                </button>
-              )} */}
             </div>
           )}
         </div>
