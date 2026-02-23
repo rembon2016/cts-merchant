@@ -29,6 +29,12 @@ const BottomNav = () => {
   const navigation = useNavigate();
   const pathname = location.pathname;
   const getCart = sessionStorage.getItem("cart");
+  let parsedCart = null;
+  try {
+    parsedCart = getCart ? JSON.parse(getCart) : null;
+  } catch (e) {
+    parsedCart = null;
+  }
 
   const checkTax = async () => await getPosSettings();
 
@@ -43,11 +49,11 @@ const BottomNav = () => {
 
   const subTotalPrice = selectedCart?.reduce(
     (a, b) => a + Number.parseFloat(b.subtotal),
-    0
+    0,
   );
 
   const totalPrice = Math.ceil(
-    (subTotalPrice || 0) + Number.parseFloat(taxAmount || 0)
+    (subTotalPrice || 0) + Number.parseFloat(taxAmount || 0),
   );
 
   const showButtonFromPath = ["/cart", "/checkout"];
@@ -218,7 +224,7 @@ const BottomNav = () => {
       // we only need unique cart_ids
       const cartIds = [
         ...new Set(
-          dataCheckout?.items?.map((item) => item.item_id).filter(Boolean)
+          dataCheckout?.items?.map((item) => item.item_id).filter(Boolean),
         ),
       ];
 
@@ -252,10 +258,10 @@ const BottomNav = () => {
     const renderElementCart = () => {
       return (
         <>
-          {cart?.data?.items?.length > 0 && (
+          {(cart?.data?.items?.length > 0 || parsedCart?.items?.length > 0) && (
             <div
               className={`rounded-xl bg-white dark:bg-slate-700 shadow-soft border border-slate-100 dark:border-slate-600 ${
-                showButtonFromPath.includes(location.pathname)
+                showButtonFromPath.some((p) => location.pathname.includes(p))
                   ? "p-2 mx-4 mb-2"
                   : ""
               }`}
@@ -287,8 +293,8 @@ const BottomNav = () => {
                         +{" "}
                         {formatCurrency(
                           Math.ceil(
-                            (subTotalPrice * posSettingsData?.tax) / 100
-                          ) || 0
+                            (subTotalPrice * posSettingsData?.tax) / 100,
+                          ) || 0,
                         )}{" "}
                         ({Number.parseInt(posSettingsData?.tax)})%
                       </h3>
@@ -301,26 +307,32 @@ const BottomNav = () => {
                         {formatCurrency(
                           subTotalPrice +
                             Math.ceil(
-                              (subTotalPrice * posSettingsData?.tax) / 100
-                            ) || 0
+                              (subTotalPrice * posSettingsData?.tax) / 100,
+                            ) || 0,
                         )}
                       </h3>
                     </div>
                   </div>
                 )}
               </div>
-              {showButtonFromPath.includes(location.pathname) && (
+              {showButtonFromPath?.some((p) =>
+                location.pathname.includes(p),
+              ) && (
                 <PrimaryButton
                   isLoading={loading}
                   handleOnClick={handleSubmit}
                   title={
                     loading
                       ? "Memproses..."
-                      : ObjectTitle.find(
-                          (item) => item.path === location.pathname
-                        ).title
+                      : ObjectTitle.find((item) =>
+                          location.pathname.includes(item.path),
+                        )?.title || "Proses Pesanan"
                   }
-                  disableCondition={loading || selectedCart.length === 0}
+                  disableCondition={
+                    loading ||
+                    (selectedCart?.length || parsedCart?.items?.length || 0) ===
+                      0
+                  }
                 />
               )}
             </div>
