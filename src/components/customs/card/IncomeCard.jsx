@@ -253,7 +253,7 @@ const IncomeCard = () => {
             <p className="flex gap-1">
               Pendapatan: <span className="font-semibold">{getResultText}</span>
             </p>
-            <span className="text-[2rem] font-extrabold tracking-tight text-white">
+            <span className="text-[1.5rem] font-extrabold tracking-tight text-white">
               {isLoading ? "..." : AMOUNT}
             </span>
           </h2>
@@ -268,7 +268,7 @@ const IncomeCard = () => {
           <div className="flex flex-col mt-3">
             <h2 className="flex items-start justify-between flex-col gap-2 text-base">
               <p className="flex gap-1">Dana Yang Bisa Dicairkan</p>
-              <span className="text-[2rem] font-extrabold tracking-tight text-white">
+              <span className="text-[1.5rem] font-extrabold tracking-tight text-white">
                 {isLoading ? "..." : TOTAL_AMOUNT}
               </span>
             </h2>
