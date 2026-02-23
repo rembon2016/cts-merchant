@@ -19,7 +19,7 @@ export default function AccountInformation() {
 
   const renderElement = (label, value, isStatus = false) => {
     return (
-      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all rounded-lg ease-in p-3 mb-2">
+      <div className="flex flex-col gap-2 sm:gap-0 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all rounded-lg ease-in p-3 mb-2">
         <span className="text-sm sm:text-base font-regular text-slate-500 dark:text-slate-400 sm:w-[180px]">
           {label}
         </span>
