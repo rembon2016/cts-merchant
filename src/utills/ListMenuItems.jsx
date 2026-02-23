@@ -196,10 +196,10 @@ export const listMenuItems = (token) => {
       icon: invoiceIcon(),
     },
     {
-      id: "cs",
-      name: "CS",
-      url: "/customer-support",
-      icon: iconCS(),
+      id: "pos",
+      name: "POS",
+      url: "/pos",
+      icon: posIcon(),
     },
     {
       id: "ppob",

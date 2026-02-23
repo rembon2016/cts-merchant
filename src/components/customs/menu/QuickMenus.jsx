@@ -50,6 +50,7 @@ const QuickMenus = () => {
         "/invoice",
         "/customer-support",
         "/ppob",
+        "/pos",
       ];
       if (internalPaths.includes(item.url)) {
         navigate(item.url, { replace: true });
