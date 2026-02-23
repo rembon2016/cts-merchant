@@ -201,54 +201,53 @@ const IncomeCard = () => {
       />
       <div className="income-card  bg-[var(--c-primary)] text-white p-5 rounded-3xl shadow-soft">
         <div className="content">
+          <div className="flex justify-end items-center mb-3">
+            <div className="relative">
+              <button
+                onClick={() => setFilterOpen((p) => !p)}
+                className="flex gap-2 justify-center items-center py-0.5 px-1.5 bg-[--c-accent] dark:bg-gray-300 text-black rounded-lg font-semibold"
+              >
+                Filter Waktu
+                <IoIosArrowDown className="w-3 h-3" />
+              </button>
+              {filterOpen && (
+                <div className="absolute right-0 mt-2 w-44 rounded-2xl border border-slate-200 bg-white shadow-soft p-3 text-slate-700 z-50">
+                  <div className="flex flex-col gap-2">
+                    {CHIPS.map((chip) => (
+                      <button
+                        key={chip.id}
+                        onClick={() => {
+                          handleChipClick(chip.id);
+                          setFilterOpen(false);
+                        }}
+                        className={`text-sm p-2 rounded-lg text-left transition-colors ${{
+                          true: "",
+                        }} ${
+                          activeChip === chip.id
+                            ? "bg-amber-400 text-black font-semibold"
+                            : "hover:bg-slate-100"
+                        }`}
+                      >
+                        {chip.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <button
+              onClick={() => resetData()}
+              className="p-2 text-white rounded-xl items-end w-fit"
+            >
+              <RefreshCcw className="w-4 h-4" />
+            </button>
+          </div>
           <div className="flex justify-between w-full mb-3">
             <p className="flex items-center justify-between font-semibold text-sm gap-1">
               Durasi Langganan:{" "}
               <span className="font-semibold">{SUBSCRIPTION_DAYS} Hari</span>
             </p>
-            <div className="flex justify-center items-center">
-              <div className="relative">
-                <button
-                  onClick={() => setFilterOpen((p) => !p)}
-                  className="flex gap-2 justify-center items-center py-0.5 px-1.5 bg-white dark:bg-gray-300 text-black rounded-lg"
-                >
-                  Filter
-                  <IoIosArrowDown className="w-3 h-3" />
-                </button>
-
-                {filterOpen && (
-                  <div className="absolute right-0 mt-2 w-44 rounded-2xl border border-slate-200 bg-white shadow-soft p-3 text-slate-700 z-50">
-                    <div className="flex flex-col gap-2">
-                      {CHIPS.map((chip) => (
-                        <button
-                          key={chip.id}
-                          onClick={() => {
-                            handleChipClick(chip.id);
-                            setFilterOpen(false);
-                          }}
-                          className={`text-sm p-2 rounded-lg text-left transition-colors ${{
-                            true: "",
-                          }} ${
-                            activeChip === chip.id
-                              ? "bg-amber-400 text-black font-semibold"
-                              : "hover:bg-slate-100"
-                          }`}
-                        >
-                          {chip.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <button
-                onClick={() => resetData()}
-                className="p-2 text-white rounded-xl items-end w-fit"
-              >
-                <RefreshCcw className="w-4 h-4" />
-              </button>
-            </div>
           </div>
           <h2 className="flex items-start justify-between flex-col gap-2 text-base">
             <p className="flex gap-1">
@@ -259,36 +258,21 @@ const IncomeCard = () => {
             </span>
           </h2>
 
-          <div className="flex flex-col mt-3">
-            <p className="flex gap-1 text-sm">
-              Biaya Langganan:{" "}
-              <span className="font-semibold">{SUBSCRIPTION_FEE}</span>
-            </p>
-            <p className="flex gap-1 text-sm">
-              Biaya Yang Bisa Dicairkan:{" "}
-              <span className="font-semibold">{TOTAL_AMOUNT}</span>
-            </p>
-          </div>
+          <p className="flex gap-1 items-center mt-1">
+            Biaya Berlangganan:{" "}
+            <span className="font-semibold">
+              {isLoading ? "..." : SUBSCRIPTION_FEE}
+            </span>
+          </p>
 
-          {/* <div className="grid grid-cols-2 mt-2">
-            <div className="flex flex-col gap-2">
-              <span className="text-md">
-                Biaya <br /> Langganan
+          <div className="flex flex-col mt-3">
+            <h2 className="flex items-start justify-between flex-col gap-2 text-base">
+              <p className="flex gap-1">Dana Yang Bisa Dicairkan</p>
+              <span className="text-[2rem] font-extrabold tracking-tight text-white">
+                {isLoading ? "..." : TOTAL_AMOUNT}
               </span>
-              <p className="text-lg font-extrabold tracking-tight text-white">
-                <span>{isLoading ? "..." : SUBSCRIPTION_FEE}</span>
-              </p>
-            </div>
-            <div className="flex flex-col gap-2">
-              <span className="text-md">
-                Biaya Yang
-                <br /> Bisa Dicairkan
-              </span>
-              <p className="text-lg font-extrabold tracking-tight text-white">
-                <span>{isLoading ? "..." : TOTAL_AMOUNT}</span>
-              </p>
-            </div>
-          </div> */}
+            </h2>
+          </div>
 
           <div className="mt-6" />
 
