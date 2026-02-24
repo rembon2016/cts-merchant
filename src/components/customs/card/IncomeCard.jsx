@@ -240,7 +240,6 @@ const IncomeCard = () => {
                 </div>
               )}
             </div>
-
             <button
               onClick={() => {
                 resetData();

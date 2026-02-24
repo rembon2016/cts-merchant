@@ -19,7 +19,7 @@ const CART_ITEM_ID = "cartItemId";
 const ROOT_API = import.meta.env?.VITE_API_ROUTES;
 const ROOT_API_POS = import.meta.env?.VITE_API_POS_ROUTES;
 const TIME_REFRESH_TOKEN = Number(
-  import.meta.env.VITE_REFRESH_USER_TOKEN_TIMER
+  import.meta.env.VITE_REFRESH_USER_TOKEN_TIMER,
 );
 
 export const useAuthStore = create((set, get) => ({
@@ -70,7 +70,7 @@ export const useAuthStore = create((set, get) => ({
         throw new Error(
           Response401
             ? "Username atau password salah"
-            : result?.message || "Login failed"
+            : result?.message || "Login failed",
         );
       }
 
@@ -166,7 +166,7 @@ export const useAuthStore = create((set, get) => ({
       sessionStorage.setItem(TOKEN_POS_KEY, result?.data?.pos?.auth?.token);
       sessionStorage.setItem(
         BRANCH_ACTIVE,
-        result?.data?.pos?.auth?.branches?.[0]?.pivot?.branch_id
+        result?.data?.pos?.auth?.branches?.[0]?.pivot?.branch_id,
       );
 
       const { setUserData } = useUserDataStore.getState();
@@ -297,7 +297,7 @@ export const useAuthStore = create((set, get) => ({
     } else {
       const refreshTimer = setTimeout(
         () => get().handleAutoLogout(),
-        timeUntilRefresh
+        timeUntilRefresh,
       );
       set({ refreshTimer });
     }
@@ -513,7 +513,7 @@ export const useAuthStore = create((set, get) => ({
       const FIVE_MINUTES = 50 * 60 * 1000;
       const nextRefreshTimer = setTimeout(
         () => get().refreshToken(),
-        FIVE_MINUTES
+        FIVE_MINUTES,
       );
       set({ refreshTimer: nextRefreshTimer });
 
