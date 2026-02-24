@@ -208,7 +208,11 @@ const IncomeCard = () => {
                 className="flex gap-2 justify-center items-center py-0.5 px-1.5 bg-[--c-accent] dark:bg-gray-300 text-black rounded-lg font-semibold"
               >
                 Filter Waktu
-                <IoIosArrowDown className="w-3 h-3" />
+                {filterOpen ? (
+                  <IoIosArrowDown className="w-3 h-3" />
+                ) : (
+                  <IoIosArrowDown className="w-3 h-3 -rotate-90 transition-all ease-in 500" />
+                )}
               </button>
               {filterOpen && (
                 <div className="absolute right-0 mt-2 w-44 rounded-2xl border border-slate-200 bg-white shadow-soft p-3 text-slate-700 z-50">
