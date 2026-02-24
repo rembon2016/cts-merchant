@@ -199,7 +199,7 @@ const IncomeCard = () => {
         onClose={hideToast}
         duration={toast.duration}
       />
-      <div className="income-card  bg-[var(--c-primary)] text-white p-5 rounded-3xl shadow-soft">
+      <div className="income-card  bg-[var(--c-primary)] text-white p-5 rounded-3xl shadow-soft min-h-[168px]">
         <div className="content">
           <div className="flex justify-end items-center mb-3">
             <div className="relative">
