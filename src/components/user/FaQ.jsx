@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import useFetchDataStore from "../../store/fetchDataStore";
 import { useDebounce } from "../../hooks/useDebounce";
 import SearchInput from "../customs/form/SearchInput";
@@ -113,33 +113,38 @@ export default function FaQ() {
         filteredData = Array.isArray(categoryData) ? categoryData : [];
       }
 
-      // Filter berdasarkan search query
-      if (debouncedSearch) {
-        filteredData = filteredData.filter(
-          (item) =>
-            item.question
-              .toLowerCase()
-              .includes(debouncedSearch.toLowerCase()) ||
-            item.answer.toLowerCase().includes(debouncedSearch.toLowerCase()),
-        );
-      }
-
       setAccumulatedData(filteredData);
     }
-  }, [data, state.selectedCategory, debouncedSearch]);
+  }, [data, state.selectedCategory]);
 
   // Function to fetch data
-  const fetchFaqs = () => {
-    fetchData(`${ROOT_API}/v1/merchant/faq`, {
-      method: "GET",
-      headers: headersApi,
-    });
-  };
+  const fetchFaqs = useCallback(
+    (search = "") => {
+      const searchParams = new URLSearchParams();
+      if (search) {
+        searchParams.append("search", search);
+      }
+
+      fetchData(
+        `${ROOT_API}/v1/merchant/faq${searchParams.toString() ? "?" + searchParams.toString() : ""}`,
+        {
+          method: "GET",
+          headers: headersApi,
+        },
+      );
+    },
+    [fetchData, headersApi],
+  );
 
   // Fetch data when component mounts
   useEffect(() => {
     fetchFaqs();
   }, []);
+
+  // Fetch data when search query changes
+  useEffect(() => {
+    fetchFaqs(debouncedSearch);
+  }, [debouncedSearch, fetchFaqs]);
 
   const renderElement = useMemo(() => {
     if (loading) {
