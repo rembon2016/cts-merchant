@@ -148,6 +148,7 @@ const IncomeCard = () => {
           setActiveItem("");
           setActiveChip("");
           setShowPopover(null);
+          setFilterOpen(false);
         }}
       >
         X
@@ -241,7 +242,10 @@ const IncomeCard = () => {
             </div>
 
             <button
-              onClick={() => resetData()}
+              onClick={() => {
+                resetData();
+                setFilterOpen(false);
+              }}
               className="p-2 text-white rounded-xl items-end w-fit"
             >
               <RefreshCcw className="w-4 h-4" />
