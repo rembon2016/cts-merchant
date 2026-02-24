@@ -2,25 +2,44 @@ import { useEffect, useMemo, useReducer, useState } from "react";
 import useFetchDataStore from "../../store/fetchDataStore";
 import { useDebounce } from "../../hooks/useDebounce";
 import SearchInput from "../customs/form/SearchInput";
-import LoadMoreButton from "../customs/button/LoadMoreButton";
 import { XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 
+// Hide scrollbar CSS
+const hideScrollbarStyle = `
+  .hide-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
 const ROOT_API = import.meta.env.VITE_API_ROUTES;
+
+// Categories data - will be populated from API
+const getCategoriesFromData = (data) => {
+  if (!data?.faqs) return [{ name: "Semua" }];
+  return [
+    { name: "Semua" },
+    ...Object.keys(data.faqs).map((category) => ({ name: category })),
+  ];
+};
 
 // Define action types
 const TOGGLE_INDEX = "TOGGLE_INDEX";
 const SET_SEARCH_QUERY = "SET_SEARCH_QUERY";
-
-// Define action types
 const SET_PAGE = "SET_PAGE";
+const SET_CATEGORY = "SET_CATEGORY";
 
 // Initial state
 const initialState = {
   openIndex: null,
   searchQuery: "",
   currentPage: 1,
+  selectedCategory: "Semua", // Default to "Semua"
 };
 
 // Reducer function
@@ -42,6 +61,12 @@ function reducer(state, action) {
         ...state,
         currentPage: action.payload,
       };
+    case SET_CATEGORY:
+      return {
+        ...state,
+        selectedCategory: action.payload,
+        currentPage: 1, // Reset page when changing category
+      };
     default:
       return state;
   }
@@ -53,11 +78,16 @@ export default function FaQ() {
   const [accumulatedData, setAccumulatedData] = useState([]);
 
   const toggleIndex = (idx) => dispatch({ type: TOGGLE_INDEX, payload: idx });
+  const selectCategory = (categoryName) =>
+    dispatch({ type: SET_CATEGORY, payload: categoryName });
 
   // Debounce search query with 500ms delay
   const debouncedSearch = useDebounce(state.searchQuery, 1000);
 
   const navigate = useNavigate();
+
+  // Get categories from data
+  const categories = useMemo(() => getCategoriesFromData(data), [data]);
 
   const headersApi = {
     "Content-Type": "application/json",
@@ -68,39 +98,48 @@ export default function FaQ() {
   // Effect untuk mengelola accumulated data ketika data berubah
   useEffect(() => {
     if (data?.faqs) {
-      if (state.currentPage > 1) {
-        setAccumulatedData((prev) => [...prev, ...data.faqs]);
+      // Filter data berdasarkan kategori yang dipilih
+      let filteredData = [];
+      if (state.selectedCategory === "Semua") {
+        // Gabungkan semua kategori
+        Object.values(data.faqs).forEach((items) => {
+          if (Array.isArray(items)) {
+            filteredData = [...filteredData, ...items];
+          }
+        });
       } else {
-        setAccumulatedData(data.faqs);
+        // Filter berdasarkan kategori yang dipilih
+        const categoryData = data.faqs[state.selectedCategory];
+        filteredData = Array.isArray(categoryData) ? categoryData : [];
       }
+
+      // Filter berdasarkan search query
+      if (debouncedSearch) {
+        filteredData = filteredData.filter(
+          (item) =>
+            item.question
+              .toLowerCase()
+              .includes(debouncedSearch.toLowerCase()) ||
+            item.answer.toLowerCase().includes(debouncedSearch.toLowerCase()),
+        );
+      }
+
+      setAccumulatedData(filteredData);
     }
-  }, [data]);
+  }, [data, state.selectedCategory, debouncedSearch]);
 
   // Function to fetch data
-  const fetchFaqs = (page = 1) => {
-    const searchParams = new URLSearchParams({
-      page: page.toString(),
-      per_page: "10",
-      ...(debouncedSearch && { search: debouncedSearch }),
-    });
-
-    fetchData(`${ROOT_API}/v1/merchant/faq?${searchParams.toString()}`, {
+  const fetchFaqs = () => {
+    fetchData(`${ROOT_API}/v1/merchant/faq`, {
       method: "GET",
       headers: headersApi,
     });
   };
 
-  // Fetch data when component mounts or when search changes
+  // Fetch data when component mounts
   useEffect(() => {
-    fetchFaqs(1);
-  }, [debouncedSearch]);
-
-  // Handle load more
-  const handleLoadMore = () => {
-    const nextPage = state.currentPage + 1;
-    dispatch({ type: SET_PAGE, payload: nextPage });
-    fetchFaqs(nextPage);
-  };
+    fetchFaqs();
+  }, []);
 
   const renderElement = useMemo(() => {
     if (loading) {
@@ -114,7 +153,7 @@ export default function FaQ() {
         <div className="flex flex-col items-center text-center py-4">
           <XCircle className="w-16 h-16 mb-2 text-gray-400" />
           <div className="flex gap-2">
-            {state.searchQuery ? (
+            {state.searchQuery || state.selectedCategory !== "Semua" ? (
               <div className="flex flex-col items-center gap-2">
                 FAQ tidak ditemukan{" "}
                 <button
@@ -173,11 +212,40 @@ export default function FaQ() {
         ))}
       </div>
     );
-  }, [accumulatedData, loading, error, state.openIndex]);
+  }, [
+    accumulatedData,
+    loading,
+    error,
+    state.openIndex,
+    state.selectedCategory,
+  ]);
 
   return (
     <div className="p-4 max-w-xl mx-auto">
+      <style>{hideScrollbarStyle}</style>
       <h1 className="text-2xl font-bold mb-6">Butuh Bantuan?</h1>
+
+      {/* Category Filter Section */}
+      {categories.length > 1 && (
+        <div className="mb-6">
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-4 px-4 hide-scrollbar">
+            {categories.map((category) => (
+              <button
+                key={category.name}
+                onClick={() => selectCategory(category.name)}
+                className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0 ${
+                  state.selectedCategory === category.name
+                    ? "bg-[--c-primary] text-white shadow-md"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+              >
+                <span>{category.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="mb-6">
         <SearchInput
           value={state.searchQuery}
@@ -188,17 +256,6 @@ export default function FaQ() {
         />
       </div>
       {renderElement}
-      {accumulatedData.length > 0 &&
-        accumulatedData.length < totalData &&
-        !loading &&
-        !error && (
-          <LoadMoreButton
-            data={accumulatedData}
-            totalData={totalData}
-            loading={loading}
-            handleLoadMore={handleLoadMore}
-          />
-        )}
     </div>
   );
 }

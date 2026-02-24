@@ -35,10 +35,18 @@ const PromoSlider = memo(() => {
     });
   }, [fetchData]);
 
+  const getPromoData = useCallback(() => {
+    // Ensure data.faqs is an array
+    if (Array.isArray(data?.faqs)) return data.faqs;
+    return [];
+  }, [data?.faqs]);
+
+  const promoData = useMemo(() => getPromoData(), [getPromoData]);
+
   const goToSlide = useCallback(
     (index) => {
-      if (!data?.faqs?.length) return;
-      const newIndex = (index + data.faqs.length) % data.faqs.length;
+      if (!promoData?.length) return;
+      const newIndex = (index + promoData.length) % promoData.length;
       setCurrentIndex(newIndex);
       if (trackRef.current) {
         trackRef.current.style.transition =
@@ -46,13 +54,13 @@ const PromoSlider = memo(() => {
         trackRef.current.style.transform = `translateX(-${newIndex * 100}%)`;
       }
     },
-    [data?.faqs?.length],
+    [promoData?.length],
   );
 
   const nextSlide = useCallback(() => {
     setCurrentIndex((prev) => {
-      if (!data?.faqs?.length) return prev;
-      const newIndex = (prev + 1) % data.faqs.length;
+      if (!promoData?.length) return prev;
+      const newIndex = (prev + 1) % promoData.length;
       if (trackRef.current) {
         trackRef.current.style.transition =
           "transform 420ms cubic-bezier(0.2, 0.9, 0.2, 1)";
@@ -60,7 +68,7 @@ const PromoSlider = memo(() => {
       }
       return newIndex;
     });
-  }, [data?.faqs?.length]);
+  }, [promoData?.length]);
 
   const startTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -90,9 +98,9 @@ const PromoSlider = memo(() => {
       document.head.appendChild(link);
     };
 
-    const mappingImage = data?.faqs?.map((item) => item.thumbnail) || [];
+    const mappingImage = promoData?.map((item) => item.thumbnail) || [];
     mappingImage.forEach((src) => preloadImage(src));
-  }, [data?.faqs]);
+  }, [promoData]);
 
   // Touch/Mouse events for drag functionality
   const handlePointerDown = useCallback((e) => {
@@ -108,7 +116,7 @@ const PromoSlider = memo(() => {
 
   const handlePointerMove = useCallback(
     (e) => {
-      if (!isDragging || !trackRef.current) return;
+      if (!isDragging || !trackRef.current || !promoData?.length) return;
       const clientX = e.type.startsWith("touch")
         ? e.touches[0].clientX
         : e.clientX;
@@ -118,7 +126,7 @@ const PromoSlider = memo(() => {
         -currentIndex * width + delta
       }px)`;
     },
-    [isDragging, currentIndex],
+    [isDragging, currentIndex, promoData?.length],
   );
 
   const handlePointerUp = useCallback(
@@ -147,7 +155,7 @@ const PromoSlider = memo(() => {
   const renderELement = useMemo(() => {
     if (loading) return <LoadingSkeletonList />;
 
-    if (!loading && data?.faqs?.length === 0) {
+    if (!loading && promoData?.length === 0) {
       return (
         <section className="px-4 mt-6">
           <div className="flex items-center justify-center py-10">
@@ -179,29 +187,30 @@ const PromoSlider = memo(() => {
             onTouchEnd={handlePointerUp}
           >
             <div className="carousel-track aspect-video" ref={trackRef}>
-              {data?.faqs?.map((slide) => (
-                <button
-                  key={slide?.id}
-                  className="slide text-left"
-                  onClick={() => handlePromoClick(slide?.id)}
-                >
-                  <CustomImage
-                    imageSource={slide?.thumbnail}
-                    imageWidth={340}
-                    imageHeight={176}
-                    altImage={slide?.title}
-                    imageLoad="eager"
-                    imageFetchPriority="high"
-                    className="w-full h-full object-cover rounded-2xl shadow-soft"
-                  />
-                </button>
-              ))}
+              {Array.isArray(promoData) &&
+                promoData?.map((slide) => (
+                  <button
+                    key={slide?.id}
+                    className="slide text-left"
+                    onClick={() => handlePromoClick(slide?.id)}
+                  >
+                    <CustomImage
+                      imageSource={slide?.thumbnail}
+                      imageWidth={340}
+                      imageHeight={176}
+                      altImage={slide?.title}
+                      imageLoad="eager"
+                      imageFetchPriority="high"
+                      className="w-full h-full object-cover rounded-2xl shadow-soft"
+                    />
+                  </button>
+                ))}
             </div>
           </div>
 
           <div className="flex items-center justify-center">
             <div className="carousel-dots">
-              {data?.faqs?.map((slide, index) => (
+              {promoData?.map((slide, index) => (
                 <button
                   key={slide?.id}
                   onClick={() => {
@@ -219,13 +228,13 @@ const PromoSlider = memo(() => {
           <PromoDetailModal
             promoId={selectedPromoId}
             onClose={handleCloseModal}
-            promoData={data?.faqs}
+            promoData={promoData}
           />
         )}
       </section>
     );
   }, [
-    data?.faqs,
+    promoData,
     currentIndex,
     handleCloseModal,
     handlePointerDown,
