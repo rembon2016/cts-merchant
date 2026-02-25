@@ -231,24 +231,38 @@ export default function FaQ() {
       <h1 className="text-2xl font-bold mb-6">Butuh Bantuan?</h1>
 
       {/* Category Filter Section */}
-      {categories.length > 1 && (
+      {loading ? (
         <div className="mb-6">
           <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-4 px-4 hide-scrollbar">
-            {categories.map((category) => (
-              <button
-                key={category.name}
-                onClick={() => selectCategory(category.name)}
-                className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0 ${
-                  state.selectedCategory === category.name
-                    ? "bg-[--c-primary] text-white shadow-md"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                <span>{category.name}</span>
-              </button>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="h-8 w-24 rounded-full bg-gray-200 animate-pulse flex-shrink-0"
+                aria-hidden="true"
+              />
             ))}
           </div>
         </div>
+      ) : (
+        categories.length > 1 && (
+          <div className="mb-6">
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-4 px-4 hide-scrollbar">
+              {categories.map((category) => (
+                <button
+                  key={category.name}
+                  onClick={() => selectCategory(category.name)}
+                  className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0 ${
+                    state.selectedCategory === category.name
+                      ? "bg-[--c-primary] text-white shadow-md"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  <span>{category.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )
       )}
 
       <div className="mb-6">
