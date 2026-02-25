@@ -202,7 +202,7 @@ const IncomeCard = () => {
       />
       <div className="income-card  bg-[var(--c-primary)] text-white p-5 rounded-3xl shadow-soft min-h-[168px]">
         <div className="content">
-          <div className="flex justify-end items-center mb-3">
+          <div className="flex justify-end gap-1 items-center mb-3">
             <div className="relative">
               <button
                 onClick={() => setFilterOpen((p) => !p)}
@@ -245,9 +245,9 @@ const IncomeCard = () => {
                 resetData();
                 setFilterOpen(false);
               }}
-              className="p-2 text-white rounded-xl items-end w-fit"
+              className="py-1 px-3 bg-red-500 text-white rounded-xl items-end w-fit"
             >
-              <RefreshCcw className="w-4 h-4" />
+              Reset
             </button>
           </div>
           <div className="flex justify-between w-full mb-3">
