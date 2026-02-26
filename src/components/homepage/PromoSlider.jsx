@@ -153,7 +153,11 @@ const PromoSlider = memo(() => {
   );
 
   const renderELement = useMemo(() => {
-    if (loading) return <LoadingSkeletonList />;
+    if (loading) {
+      return (
+        <div className="border rounded-lg h-[200px] shadow overflow-hidden bg-white dark:bg-slate-800 animate-pulse mb-4" />
+      );
+    }
 
     if (!loading && promoData?.length === 0) {
       return (
@@ -175,7 +179,7 @@ const PromoSlider = memo(() => {
           </h3>
         </div>
 
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 min-h-[200px]">
           <div
             className="carousel bg-transparent"
             onPointerDown={handlePointerDown}

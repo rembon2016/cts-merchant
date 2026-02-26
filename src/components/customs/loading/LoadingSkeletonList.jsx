@@ -11,7 +11,7 @@ import React from "react";
  */
 export default function LoadingSkeletonList({ items = 1, className = "" }) {
   return (
-    <div className="relative">
+    <div className="relative min-h-[200px]">
       {Array.from({ length: Number(items) || 1 }).map((item) => (
         <div
           key={item?.id + Math?.random()}
