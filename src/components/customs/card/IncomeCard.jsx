@@ -205,7 +205,7 @@ const IncomeCard = () => {
             <div className="relative">
               <button
                 onClick={() => setFilterOpen((p) => !p)}
-                className="flex gap-2 justify-center items-center py-0.5 px-1.5 bg-[--c-accent] dark:bg-gray-300 text-black rounded-lg font-semibold"
+                className="flex gap-2 justify-center items-center py-0.5 px-1.5 bg-[--c-accent] text-black rounded-lg font-semibold"
               >
                 Filter Waktu
                 {filterOpen ? (

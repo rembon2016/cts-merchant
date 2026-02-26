@@ -178,7 +178,7 @@ export default function FaQ() {
               <div className="flex flex-col items-center gap-2">
                 FAQ tidak ditemukan{" "}
                 <button
-                  className="bg-gray-200 px-4 py-2 rounded-md"
+                  className="bg-gray-200 dark:bg-gray-700 px-4 py-2 rounded-md"
                   onClick={() =>
                     navigate("/customer-support", { replace: true })
                   }
