@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, useCallback, memo, useMemo } from "react";
 import useFetchDataStore from "../../store/fetchDataStore";
 import PromoDetailModal from "./PromoDetailModal";
 import CustomImage from "../customs/element/CustomImage";
-import LoadingSkeletonList from "../customs/loading/LoadingSkeletonList";
 
 const ROOT_API = import.meta.env.VITE_API_ROUTES;
 const INTERVAL = 4200;
