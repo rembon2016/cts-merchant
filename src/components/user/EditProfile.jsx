@@ -9,7 +9,7 @@ import { usePosStore } from "../../store/posStore";
 
 export default function EditProfile() {
   const { user: userInfo, logout, updateProfileUser } = useAuthStore();
-  const { updatePasswordPOS, responseCode } = usePosStore();
+  const { updatePasswordPOS } = usePosStore();
   const [loading, setLoading] = useState(false);
 
   const {
@@ -85,8 +85,6 @@ export default function EditProfile() {
       ...(isEditPassword && {
         ...passwordFields,
       }),
-      // ...(formData.password && { password: formData.password }),
-      // ...(formData.password && { password_confirmation: formData.password }),
     };
 
     setLoading(true);

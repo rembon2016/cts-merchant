@@ -1,5 +1,11 @@
-import CartComponent from "../components/pos/Cart";
+import { lazy, Suspense } from "react";
+
+const CartComponent = lazy(() => import("../components/pos/Cart"));
 
 export default function Cart() {
-  return <CartComponent />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CartComponent />
+    </Suspense>
+  );
 }

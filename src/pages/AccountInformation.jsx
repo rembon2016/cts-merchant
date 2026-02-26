@@ -1,5 +1,12 @@
-import AccountInformationComponent from "../components/user/AccountInformation";
+import { lazy, Suspense } from "react";
 
+const AccountInformationComponent = lazy(
+  () => import("../components/user/AccountInformation"),
+);
 export default function AccountInformation() {
-  return <AccountInformationComponent />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AccountInformationComponent />
+    </Suspense>
+  );
 }

@@ -1,7 +1,15 @@
-import TransactionComponent from "../components/transaction/Transaction";
+import { lazy, Suspense } from "react";
+
+const TransactionComponent = lazy(
+  () => import("../components/transaction/Transaction"),
+);
 
 const Transaction = () => {
-  return <TransactionComponent />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TransactionComponent />
+    </Suspense>
+  );
 };
 
 export default Transaction;

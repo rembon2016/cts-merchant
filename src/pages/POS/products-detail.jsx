@@ -1,5 +1,13 @@
-import ProductsDetailComponent from "../../components/pos/products/DetailProduct";
+import { lazy, Suspense } from "react";
+
+const ProductsDetailComponent = lazy(
+  () => import("../../components/pos/products/DetailProduct"),
+);
 
 export default function POSProductsDetail() {
-  return <ProductsDetailComponent />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ProductsDetailComponent />
+    </Suspense>
+  );
 }

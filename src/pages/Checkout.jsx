@@ -1,5 +1,11 @@
-import CheckoutComponent from "../components/pos/Checkout";
+import { lazy, Suspense } from "react";
 
-export default function Cart() {
-  return <CheckoutComponent />;
+const CheckoutComponent = lazy(() => import("../components/pos/Checkout"));
+
+export default function Checkout() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CheckoutComponent />
+    </Suspense>
+  );
 }

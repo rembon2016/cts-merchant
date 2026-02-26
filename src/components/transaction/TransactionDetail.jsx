@@ -13,7 +13,6 @@ export default function TransactionDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data, loading, error, fetchData } = useFetchDataStore();
-  const [isModalOpen, setIsModalOpen] = useState(true);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
 
   const headersApi = {
@@ -51,7 +50,6 @@ export default function TransactionDetail() {
   }, [data, id]);
 
   const handleModalClose = () => {
-    setIsModalOpen(false);
     navigate("/transaction");
   };
 

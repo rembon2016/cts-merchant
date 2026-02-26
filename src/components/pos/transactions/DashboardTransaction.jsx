@@ -205,38 +205,6 @@ function DashboardTransaction() {
     );
   }, [isLoading, dataOverview]);
 
-  const renderFilterInputs = useMemo(() => {
-    return (
-      <div className="flex flex-col gap-2">
-        <div className="inline-flex w-full gap-2">
-          <SimpleInput
-            name="start_date"
-            type="date"
-            label="Date Start"
-            value={formData?.start_date}
-            handleChange={handleChange}
-            isDefaultSize={false}
-          />
-          <SimpleInput
-            name="end_date"
-            type="date"
-            label="Date End"
-            value={formData?.end_date}
-            handleChange={handleChange}
-            isDefaultSize={false}
-          />
-        </div>
-        <div className="flex w-40 ml-auto">
-          <PrimaryButton
-            title="Filter"
-            handleOnClick={handleFilterChart}
-            isLoading={isLoading}
-          />
-        </div>
-      </div>
-    );
-  }, [formData, isLoading]);
-
   const chartConfig = useMemo(() => {
     const titles = {
       day: "Total Penjualan Harian",
@@ -279,7 +247,6 @@ function DashboardTransaction() {
         {renderCardOverview}
         <div className="flex flex-col gap-4 flex-wrap bg-white w-full p-4 items-center my-4 rounded-lg">
           {renderTabsChart}
-          {/* {renderFilterInputs} */}
           {renderButtonTypeChart}
           {renderChartComponent}
         </div>

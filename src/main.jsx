@@ -43,12 +43,6 @@ if (typeof window !== "undefined") {
   setInterval(checkUpdate, 60 * 60 * 1000);
 }
 
-// Initialize performance monitoring
-// if (import.meta.env.DEV) {
-//   initializePerformanceMonitoring();
-//   optimizeLongTasks();
-// }
-
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <App />

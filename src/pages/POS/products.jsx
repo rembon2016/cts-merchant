@@ -1,7 +1,15 @@
-import ProductsComponent from "../../components/pos/products/ListProduct";
+import { lazy, Suspense } from "react";
+
+const POSProductComponent = lazy(
+  () => import("../../components/pos/products/DetailProduct"),
+);
 
 const POSProducts = () => {
-  return <ProductsComponent />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <POSProductComponent />
+    </Suspense>
+  );
 };
 
 export default POSProducts;

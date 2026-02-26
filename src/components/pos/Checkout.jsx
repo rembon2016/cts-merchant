@@ -123,13 +123,6 @@ export default function Checkout() {
           Detail Transaksi
         </h3>
         <div className="flex flex-col gap-2">
-          {/* <div className="flex justify-between items-center">
-            <h4 className="font-semibold text-gray-500 text-md">
-              Kode Transaksi
-            </h4>
-            <h4 className="font-bold text-gray-700 text-md">BRG-001-2K25</h4>
-          </div> */}
-
           <div className="flex justify-between items-center">
             <h4 className="font-semibold text-gray-500 dark:text-gray-400 text-md">
               Total Harga (
@@ -139,19 +132,6 @@ export default function Checkout() {
               {formatCurrency(checkoutPrice)}
             </h4>
           </div>
-          {/* <div className="flex justify-center flex-col">
-            <h4 className="font-semibold text-gray-500 dark:text-gray-400 text-md">
-              Daftar Barang
-            </h4>
-            {getCart?.items?.map((item) => (
-              <h4 className="font-semibold text-[var(--c-primary)] dark:text-gray-200 text-sm">
-                {" - "}
-                {item?.name}{" "}
-                {item?.variant_name ? `- ${item?.variant_name}` : ""} x{" "}
-                {item?.quantity}
-              </h4>
-            ))}
-          </div> */}
           <div className="flex justify-between items-center">
             <h4 className="font-semibold text-gray-500 dark:text-gray-400 text-md">
               Diskon
@@ -319,8 +299,6 @@ export default function Checkout() {
           selectBoxData={paymentData}
           value={selectPaymentMethod}
           handleChange={handleChange}
-          //   errors={errors.password}
-          //   disabled={!isEditPassword}
         />
       </div>
 

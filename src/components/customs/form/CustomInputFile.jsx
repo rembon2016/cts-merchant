@@ -39,27 +39,6 @@ export default function CustomInputFile({
   const [dragActive, setDragActive] = useState(false);
   const inputId = name || "file-input";
 
-  // create previews for image files
-  // useEffect(() => {
-  //   if (initialPreview && files.length === 0) {
-  //     setFiles([
-  //       { preview: initialPreview, name: "preview", size: 0, isRemote: true },
-  //     ]);
-  //   }
-  //   return () => {
-  //     // revoke object URLs created below
-  //     // files.forEach((f) => {
-  //     //   if (f.preview && f.objectUrl) URL.revokeObjectURL(f.preview);
-  //     // });
-
-  //     for (fileData of files) {
-  //       if (fileData.preview && fileData.objectUrl) {
-  //         URL.revokeObjectURL(fileData.preview);
-  //       }
-  //     }
-  //   };
-  // }, []);
-
   useEffect(() => {
     // set initial preview only when initialPreview provided and no files selected yet
     if (initialPreview && files.length === 0) {
@@ -112,7 +91,7 @@ export default function CustomInputFile({
     const next = multiple ? mapped : mapped.slice(0, 1);
     setFiles(next);
     if (onChange) {
-      onChange(multiple ? next.map((m) => m.file) : next[0]?.file ?? null);
+      onChange(multiple ? next.map((m) => m.file) : (next[0]?.file ?? null));
     }
   };
 
@@ -153,7 +132,7 @@ export default function CustomInputFile({
       URL.revokeObjectURL(removed.preview);
     setFiles(next);
     if (onChange)
-      onChange(multiple ? next.map((m) => m.file) : next[0]?.file ?? null);
+      onChange(multiple ? next.map((m) => m.file) : (next[0]?.file ?? null));
   };
 
   return (

@@ -1,5 +1,11 @@
-import OrderComponent from "../components/Order";
+import { lazy, Suspense } from "react";
+
+const OrderComponent = lazy(() => import("../components/Order"));
 
 export default function Order() {
-  return <OrderComponent />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <OrderComponent />
+    </Suspense>
+  );
 }

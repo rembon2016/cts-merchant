@@ -120,15 +120,6 @@ export default function DetailTransaction() {
 
             {items.map((it) => (
               <div key={it.id} className="flex items-center gap-4 p-4 ">
-                {/* <img
-                  src={
-                    it.product?.image
-                      ? `${import.meta.env.VITE_API_IMAGE}/${it.product.image}`
-                      : "/public/images/no-image.png"
-                  }
-                  alt={it.product?.name}
-                  className="w-16 h-16 object-cover rounded"
-                /> */}
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-1">

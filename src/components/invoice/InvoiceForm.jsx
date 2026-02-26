@@ -43,13 +43,6 @@ const StepIndicator = ({ currentStep }) => (
             {step.label}
           </span>
         </div>
-        {/* {idx < 2 && (
-            <div
-              className={`h-1 flex-1 mx-2 transition-colors ${
-                currentStep > step.num ? "bg-[var(--c-primary)]" : "bg-gray-300"
-              }`}
-            />
-          )} */}
       </div>
     ))}
   </div>
@@ -114,7 +107,7 @@ const InvoiceForm = () => {
     }
 
     const hasEmptyProduct = selectedData.products.some(
-      (product) => !product.product_name || !product.quantity || !product.price
+      (product) => !product.product_name || !product.quantity || !product.price,
     );
 
     if (hasEmptyProduct) {
@@ -197,7 +190,7 @@ const InvoiceForm = () => {
 
     if (response?.success === true) {
       showSuccess(
-        typeof success === "string" ? success : "Invoices Berhasil Dibuat"
+        typeof success === "string" ? success : "Invoices Berhasil Dibuat",
       );
 
       navigate("/invoice", { replace: true });
@@ -215,7 +208,7 @@ const InvoiceForm = () => {
       showError(
         typeof error === "string"
           ? "Terjadi Kesalahan Saat Membuat Invoices"
-          : "Terjadi kesalahan"
+          : "Terjadi kesalahan",
       );
     }
   };
@@ -401,7 +394,7 @@ const InvoiceForm = () => {
                 <span className="font-semibold text-black dark:text-gray-200">
                   {formatCurrency(
                     (parseFloat(product.quantity) || 0) *
-                      (parseFloat(product.price) || 0)
+                      (parseFloat(product.price) || 0),
                   )}
                 </span>
               </div>

@@ -36,9 +36,6 @@ const Payment = () => {
           label="Jumlah Barang"
           value={dataCheckout?.length || 0}
           disabled={true}
-          //   errors={errors.password}
-          //   handleChange={handleChange}
-          //   disabled={!isEditPassword}
         />
         <SimpleInput
           name="harga"
@@ -46,28 +43,13 @@ const Payment = () => {
           label="Harga"
           value={dataCheckout?.reduce((a, b) => a + b.price, 0) || 0}
           disabled={true}
-          //   errors={errors.password}
-          //   handleChange={handleChange}
-          //   disabled={!isEditPassword}
         />
-        {/* <SimpleInput
-          name="biayaTambahan"
-          type="number"
-          label="Biaya Tambahan"
-          value={6000}
-          //   errors={errors.password}
-          //   handleChange={handleChange}
-          //   disabled={!isEditPassword}
-        /> */}
         <SimpleInput
           name="JenisPembayaran"
           type="text"
           label="Jenis Pembayaran"
           isSelectBox={true}
           selectBoxData={paymentData}
-          //   errors={errors.password}
-          //   handleChange={handleChange}
-          //   disabled={!isEditPassword}
         />
         <SimpleInput
           name="totalHarga"
@@ -75,9 +57,6 @@ const Payment = () => {
           label="Total Harga"
           value={totalPrice}
           disabled={true}
-          //   errors={errors.password}
-          //   handleChange={handleChange}
-          //   disabled={!isEditPassword}
         />
       </div>
     </div>

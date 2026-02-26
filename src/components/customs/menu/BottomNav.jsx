@@ -205,15 +205,6 @@ const BottomNav = () => {
       ...JSON.parse(getCart),
     };
 
-    // const paymentValue = {
-    //   branch_id: sessionStorage.getItem("branchActive"),
-    //   payment_amount: JSON.parse(sessionStorage.getItem("totalPayment")),
-    //   payment_method_id: selectPaymentMethod,
-    //   discount_amount:
-    //     Math.ceil(Number(sessionStorage.getItem("discount"))) || 0,
-    //   tax_amount: taxAmount,
-    // };
-
     proccessOrder(checkoutValue);
   };
 
@@ -267,14 +258,6 @@ const BottomNav = () => {
               }`}
             >
               <div className="flex flex-col gap-2">
-                {/* <div className="flex justify-between items-center">
-              <h3 className="font-medium text-xl">Sub Total</h3>
-              <h3 className="font-bold text-xl">{Rupiah.format(subTotalPrice)}</h3>
-            </div> */}
-                {/* <div className="flex justify-between items-center">
-              <h3 className="font-medium text-xl">Pajak (+11%)</h3>
-              <h3 className="font-bold text-xl">Rp. 6.000</h3>
-            </div> */}
                 {location.pathname === "/cart" && (
                   <div className="flex flex-col gap-2 mb-4">
                     <div className="flex justify-between items-center">

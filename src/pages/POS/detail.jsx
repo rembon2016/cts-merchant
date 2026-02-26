@@ -1,5 +1,12 @@
-import DetailTransaction from "../../components/pos/transactions/DetailTransaction";
+import { lazy, Suspense } from "react";
 
+const DetailTransaction = lazy(
+  () => import("../../components/pos/transactions/DetailTransaction"),
+);
 export default function Order() {
-  return <DetailTransaction />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <DetailTransaction />
+    </Suspense>
+  );
 }

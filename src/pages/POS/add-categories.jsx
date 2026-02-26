@@ -1,7 +1,14 @@
-import AddCategoriesComponent from "../../components/pos/categories/AddCategories";
+import { lazy, Suspense } from "react";
+const AddCategoriesComponent = lazy(
+  () => import("../../components/pos/categories/AddCategories"),
+);
 
 const POSAddCategories = () => {
-  return <AddCategoriesComponent />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AddCategoriesComponent />
+    </Suspense>
+  );
 };
 
 export default POSAddCategories;

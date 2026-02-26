@@ -20,10 +20,6 @@ export default function DetailProduct() {
   const [selectedVariant, setSelectedVariant] = useState(null);
 
   const productStock = products?.stocks?.reduce((a, b) => a + b.qty, 0);
-  // variantStock not needed after selecting single variant
-  // const variantStock = products?.skus?.map((sku) =>
-  //   sku?.productStocks?.reduce((a, b) => a + b.qty, 0)
-  // );
 
   // Auto-select first variant when product has variants
   useEffect(() => {
@@ -78,12 +74,6 @@ export default function DetailProduct() {
 
     return (
       <div className="w-full h-full mt-3">
-        {/* <button
-          // key={item.id}
-          onClick={() => handleMenuClick(item)}
-          className="bg-white dark:bg-slate-700 rounded-2xl p-3 flex flex-col items-center gap-2 shadow-soft"
-        /> */}
-
         <div className="w-full h-full flex flex-col gap-3">
           <CustomImage
             imageSource={products?.image}

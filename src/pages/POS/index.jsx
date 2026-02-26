@@ -1,7 +1,13 @@
-import POSComponent from "../../components/pos/POS";
+import { lazy, Suspense } from "react";
+
+const POSComponent = lazy(() => import("../../components/pos/POS"));
 
 const POS = () => {
-  return <POSComponent />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <POSComponent />
+    </Suspense>
+  );
 };
 
 export default POS;

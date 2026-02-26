@@ -1,5 +1,13 @@
-import EditProfileComponent from "../components/user/EditProfile";
+import { lazy, Suspense } from "react";
+
+const EditProfileComponent = lazy(
+  () => import("../components/user/EditProfile"),
+);
 
 export default function EditProfile() {
-  return <EditProfileComponent />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <EditProfileComponent />
+    </Suspense>
+  );
 }

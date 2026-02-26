@@ -1,7 +1,15 @@
-import NotificationComponent from "../components/customs/notification/Notification.jsx";
+import { lazy, Suspense } from "react";
+
+const NotificationComponent = lazy(
+  () => import("../components/customs/notification/Notification.jsx"),
+);
 
 const Notification = () => {
-  return <NotificationComponent />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <NotificationComponent />
+    </Suspense>
+  );
 };
 
 export default Notification;
