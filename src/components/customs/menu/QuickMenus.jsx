@@ -45,11 +45,12 @@ const QuickMenus = () => {
       }
 
       const internalPaths = [
-        "/pos",
+        "/faq",
         "/transaction",
         "/invoice",
         "/customer-support",
         "/ppob",
+        "/pos",
       ];
       if (internalPaths.includes(item.url)) {
         navigate(item.url, { replace: true });

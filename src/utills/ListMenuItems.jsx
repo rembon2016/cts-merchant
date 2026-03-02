@@ -1,3 +1,7 @@
+import { FaQuestion } from "react-icons/fa";
+import { RiCustomerService2Line } from "react-icons/ri";
+import CustomImage from "../components/customs/element/CustomImage";
+
 export const listMenuItems = (token) => {
   const soundBoxIcon = () => {
     return (
@@ -38,6 +42,23 @@ export const listMenuItems = (token) => {
         />
         <path d="M3 10h18" strokeWidth="1.75" />
       </svg>
+    );
+  };
+
+  const sosmedIcon = () => {
+    return (
+      <CustomImage
+        imageSource="/images/logo-merchant-no-bg.png"
+        imageWidth={30}
+        imageHeight={5}
+        altImage={"Sosial Media Icon"}
+        placeholderUrl="/images/blur-placeholder.jpg"
+        imageLoad="eager" // Ubah ke lazy untuk performa
+        className="rounded-t-[10px] object-cover"
+        onError={(e) => {
+          e.target.src = "/images/placeholder.jpg";
+        }}
+      />
     );
   };
 
@@ -151,18 +172,23 @@ export const listMenuItems = (token) => {
     //   icon: soundBoxIcon(),
     // },
     {
-      id: "pos",
-      name: "POS",
-      url: "/pos",
-      target: "_blank",
-      icon: posIcon(),
+      id: "bantuan",
+      name: "Bantuan",
+      url: "/faq",
+      icon: <FaQuestion />,
     },
     {
-      id: "nobank",
-      name: "Uang Saku",
-      url: "https://nobank.id/",
-      icon: nobankIcon(),
+      id: "customer-service",
+      name: "Customer Service",
+      url: "/customer-support",
+      icon: <RiCustomerService2Line />,
     },
+    // {
+    //   id: "nobank",
+    //   name: "Uang Saku",
+    //   url: "https://nobank.id/",
+    //   icon: nobankIcon(),
+    // },
     {
       id: "invoice",
       name: "Invoice",
@@ -170,10 +196,10 @@ export const listMenuItems = (token) => {
       icon: invoiceIcon(),
     },
     {
-      id: "cs",
-      name: "CS",
-      url: "/customer-support",
-      icon: iconCS(),
+      id: "pos",
+      name: "POS",
+      url: "/pos",
+      icon: posIcon(),
     },
     {
       id: "ppob",

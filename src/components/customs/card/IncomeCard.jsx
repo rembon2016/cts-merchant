@@ -1,12 +1,12 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useUserStore } from "../../../store/userStore";
 import { useTransactionStore } from "../../../store/transactionStore";
 import { formatCurrency } from "../../../helper/currency";
-import { RefreshCcw } from "lucide-react";
 import { formatDate } from "../../../helper/format-date";
 import SimpleInput from "../form/SimpleInput";
 import { useCustomToast } from "../../../hooks/useCustomToast";
 import CustomToast from "../toast/CustomToast";
+import { IoIosArrowDown } from "react-icons/io";
 
 const CHIPS = [
   { id: "month", label: "Bulan" },
@@ -35,6 +35,7 @@ const IncomeCard = () => {
   const [activeItem, setActiveItem] = useState("");
   const [activeChip, setActiveChip] = useState("");
   const [showPopover, setShowPopover] = useState(null);
+  const [filterOpen, setFilterOpen] = useState(false);
   const { updateIncomeAmount } = useUserStore();
   const { getStatisticTransaction, statistic, isLoading } =
     useTransactionStore();
@@ -51,6 +52,21 @@ const IncomeCard = () => {
   const AMOUNT = useMemo(
     () => formatCurrency(Number.parseFloat(statistic.amount || 0)),
     [statistic.amount],
+  );
+
+  const TOTAL_AMOUNT = useMemo(
+    () => formatCurrency(Number.parseFloat(statistic.total_amount || 0)),
+    [statistic.total_amount],
+  );
+
+  const SUBSCRIPTION_FEE = useMemo(
+    () => formatCurrency(Number.parseFloat(statistic.subscription_fee || 0)),
+    [statistic.subscription_fee],
+  );
+
+  const SUBSCRIPTION_DAYS = useMemo(
+    () => statistic.subscription_days || 0,
+    [statistic.subscription_days],
   );
 
   const validateForm = useCallback(() => {
@@ -83,9 +99,11 @@ const IncomeCard = () => {
       const valueMonth = MONTHS.find((m) => m.key === value);
       const valueRange = `${formatDate(value?.from)} - ${formatDate(value?.to)}`;
 
+      const currentYear = new Date().getFullYear();
+
       setActiveItem(
         activeChip === "month"
-          ? valueMonth.value
+          ? `${valueMonth?.value || ""} ${currentYear}`.trim()
           : activeChip === "range"
             ? valueRange
             : value,
@@ -121,15 +139,55 @@ const IncomeCard = () => {
     setValidationErrors({});
   }, []);
 
+  const deleteButton = useMemo(() => {
+    return (
+      <button
+        className="bg-slate-200 text-black shadow-lg w-6 h-6 flex justify-center items-center rounded-full text-xs"
+        onClick={() => {
+          setActiveItem("");
+          setActiveChip("");
+          setShowPopover(null);
+          setFilterOpen(false);
+        }}
+      >
+        X
+      </button>
+    );
+  }, []);
+
+  const getResultText = useMemo(() => {
+    return activeItem || "Hari ini";
+  }, [activeItem]);
+
+  const resetLockRef = useRef(false);
+  const resetTimeoutRef = useRef(null);
+
   const resetData = useCallback(() => {
+    if (resetLockRef.current) return;
+    resetLockRef.current = true;
+
     setActiveChip("");
     setActiveItem("");
+    setShowPopover(null);
     setDateRange({ from: "", to: "" });
     getStatisticTransaction();
+
+    resetTimeoutRef.current = setTimeout(() => {
+      resetLockRef.current = false;
+      resetTimeoutRef.current = null;
+    }, 3000);
   }, [getStatisticTransaction]);
 
   useEffect(() => {
     getStatisticTransaction();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (resetTimeoutRef.current) {
+        clearTimeout(resetTimeoutRef.current);
+      }
+    };
   }, []);
 
   return (
@@ -141,48 +199,98 @@ const IncomeCard = () => {
         onClose={hideToast}
         duration={toast.duration}
       />
-      <div className="income-card  bg-[var(--c-primary)] text-white p-5 rounded-3xl shadow-soft">
+      <div className="income-card  bg-[var(--c-primary)] text-white p-5 rounded-3xl shadow-soft min-h-[168px]">
         <div className="content">
-          <h2 className="flex items-center justify-between text-base font-semibold">
-            Pendapatan
+          <div className="flex justify-end gap-1 items-center mb-3">
+            <div className="relative">
+              <button
+                onClick={() => setFilterOpen((p) => !p)}
+                className="flex gap-2 justify-center items-center py-0.5 px-1.5 bg-[--c-accent] text-black rounded-lg font-semibold"
+              >
+                Filter Waktu
+                {filterOpen ? (
+                  <IoIosArrowDown className="w-3 h-3" />
+                ) : (
+                  <IoIosArrowDown className="w-3 h-3 -rotate-90 transition-all ease-in 500" />
+                )}
+              </button>
+              {filterOpen && (
+                <div className="absolute right-0 mt-2 w-44 rounded-2xl border border-slate-200 bg-white shadow-soft p-3 text-slate-700 z-50">
+                  <div className="flex flex-col gap-2">
+                    {CHIPS.map((chip) => (
+                      <button
+                        key={chip.id}
+                        onClick={() => {
+                          handleChipClick(chip.id);
+                          setFilterOpen(false);
+                        }}
+                        className={`text-sm p-2 rounded-lg text-left transition-colors ${{
+                          true: "",
+                        }} ${
+                          activeChip === chip.id
+                            ? "bg-amber-400 text-black font-semibold"
+                            : "hover:bg-slate-100"
+                        }`}
+                      >
+                        {chip.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
             <button
-              onClick={() => resetData()}
-              className="p-2 text-white rounded-xl items-end w-fit ml-auto"
+              onClick={() => {
+                resetData();
+                setFilterOpen(false);
+              }}
+              className="py-1 px-3 bg-red-500 text-white rounded-xl items-end w-fit"
             >
-              <RefreshCcw className="w-4 h-4" />
+              Reset
             </button>
+          </div>
+          <div className="flex justify-between w-full mb-3">
+            <p className="flex items-center justify-between font-semibold text-sm gap-1">
+              Durasi Langganan:{" "}
+              <span className="font-semibold">{SUBSCRIPTION_DAYS} Hari</span>
+            </p>
+          </div>
+          <h2 className="flex items-start justify-between flex-col gap-2 text-base">
+            <p className="flex gap-1">
+              Pendapatan: <span className="font-semibold">{getResultText}</span>
+            </p>
+            <span className="text-[1.5rem] font-extrabold tracking-tight text-white">
+              {isLoading ? "..." : AMOUNT}
+            </span>
           </h2>
 
-          <div className="mt-2">
-            <p className="text-[1.7rem] font-extrabold tracking-tight text-white">
-              <span>{isLoading ? "..." : AMOUNT}</span>
-            </p>
-            <p className="mt-2 text-sm text-slate-200/80">
-              Data: {activeItem || "Hari Ini"}
-            </p>
+          <p className="flex gap-1 items-center mt-1">
+            Biaya Berlangganan:{" "}
+            <span className="font-semibold">
+              {isLoading ? "..." : SUBSCRIPTION_FEE}
+            </span>
+          </p>
+
+          <div className="flex flex-col mt-3">
+            <h2 className="flex items-start justify-between flex-col gap-2 text-base">
+              <p className="flex gap-1">Dana Yang Bisa Dicairkan</p>
+              <span className="text-[1.5rem] font-extrabold tracking-tight text-white">
+                {isLoading ? "..." : TOTAL_AMOUNT}
+              </span>
+            </h2>
           </div>
 
-          {/* Chips */}
-          <div className="mt-6 flex items-center gap-2">
-            {CHIPS.map((chip) => (
-              <button
-                key={chip.id}
-                onClick={() => handleChipClick(chip.id)}
-                className={`chip ${
-                  activeChip === chip.id ? "active" : "inactive"
-                }`}
-              >
-                {chip.label}
-              </button>
-            ))}
-          </div>
+          <div className="mt-6" />
 
           {/* Month Popover */}
           {showPopover === "month" && (
             <div className="mt-3 rounded-2xl border border-slate-200 bg-white shadow-soft p-3 text-slate-700">
-              <p className="text-xs text-slate-500 dark:text-slate-200 mb-2">
-                Pilih Bulan
-              </p>
+              <div className="flex justify-between items-center mb-3">
+                <p className="text-xs text-slate-500 dark:text-slate-200 mb-2">
+                  Pilih Bulan
+                </p>
+                {deleteButton}
+              </div>
               <div className="grid grid-cols-3 gap-2 text-sm">
                 {MONTHS.map((month) => {
                   return (
@@ -206,9 +314,12 @@ const IncomeCard = () => {
           {/* Year Popover */}
           {showPopover === "year" && (
             <div className="mt-3 rounded-2xl border border-slate-200 bg-white shadow-soft p-3 text-slate-700">
-              <p className="text-xs text-slate-500 dark:text-slate-200 mb-2">
-                Pilih Tahun
-              </p>
+              <div className="flex justify-between items-center mb-3">
+                <p className="text-xs text-slate-500 dark:text-slate-200 mb-2">
+                  Pilih Tahun
+                </p>
+                {deleteButton}
+              </div>
               <div className="grid grid-cols-4 gap-2 text-sm">
                 {years.map((year) => (
                   <button
@@ -230,6 +341,12 @@ const IncomeCard = () => {
           {/* Range Popover */}
           {showPopover === "range" && (
             <div className="mt-3 rounded-2xl border border-slate-200 bg-white shadow-soft p-3 text-slate-700">
+              <div className="flex justify-between items-center mb-3">
+                <p className="text-xs text-slate-500 dark:text-slate-200 mb-2">
+                  Pilih Tanggal
+                </p>
+                {deleteButton}
+              </div>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <SimpleInput
                   name="from"

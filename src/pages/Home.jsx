@@ -6,9 +6,9 @@ import IncomeCard from "../components/customs/card/IncomeCard";
 const Home = () => {
   return (
     <>
+      <PromoSlider />
       <IncomeCard />
       <QuickMenus />
-      <PromoSlider />
       {/* Below-the-fold content - lazy loaded */}
     </>
   );
