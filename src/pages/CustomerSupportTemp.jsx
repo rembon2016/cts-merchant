@@ -30,7 +30,7 @@ const CustomerSupportTemp = () => {
     const message = encodeURIComponent(
       `Halo, saya ${
         user?.name || "User"
-      } membutuhkan bantuan terkait CTS Merchant.`
+      } membutuhkan bantuan terkait SpeakerKasirApp.`
     );
     window.open(
       `https://wa.me/${contactInfo.whatsapp}?text=${message}`,

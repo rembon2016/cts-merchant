@@ -1,6 +1,36 @@
 import { create } from 'zustand';
 
 export const useCSStore = create((set, get) => ({
+  csTeams: {
+    speakerKasir: {
+      key: 'speakerKasir',
+      title: 'Customer Service SpeakerKasir',
+      issueFocus: 'Kendala soundbox',
+      contactInfo: {
+        phone: '0800-123-4567',
+        whatsapp: '6281262989888',
+        email: 'speakerkasir-support@ctsmerchant.com',
+      },
+      operationalHours: {
+        weekdays: '08:00 - 17:00 WIB',
+        weekend: 'Tutup',
+      },
+    },
+    astraPay: {
+      key: 'astraPay',
+      title: 'Customer Service AstraPay',
+      issueFocus: 'Kendala transaksi/settlement',
+      contactInfo: {
+        phone: '0800-987-6543',
+        whatsapp: '628123456789',
+        email: 'astrapay-support@ctsmerchant.com',
+      },
+      operationalHours: {
+        weekdays: '08:00 - 17:00 WIB',
+        weekend: 'Tutup',
+      },
+    },
+  },
   // State
   contactInfo: {
     phone: '0800-123-4567',
@@ -16,6 +46,10 @@ export const useCSStore = create((set, get) => ({
   // Actions
   getContactInfo: () => {
     return get().contactInfo;
+  },
+
+  getCSTeams: () => {
+    return get().csTeams;
   },
 
   checkOperationalStatus: () => {

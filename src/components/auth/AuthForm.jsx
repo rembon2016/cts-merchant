@@ -184,7 +184,7 @@ const AuthForm = memo(function AuthForm({ formMode = "login" }) {
   };
 
   const getImage = useMemo(() => {
-    return isDark ? "/images/logo-cts.svg" : "/images/logo-cts-blue.svg";
+    return isDark ? "/images/logo-speakerkasir.png" : "/images/logo-speakerkasir.png";
   }, [isDark]);
 
   const getIconAndroid = useMemo(() => {
@@ -241,7 +241,7 @@ const AuthForm = memo(function AuthForm({ formMode = "login" }) {
             {isLoginMode ? "Masuk" : "Daftar"}
           </h2>
           <p className="text-slate-600 text-base">
-            {isLoginMode ? "Masuk ke CTS Merchant" : "Buat akun CTS Merchant"}
+            {isLoginMode ? "Masuk ke SpeakerKasirApp" : "Buat akun SpeakerKasirApp"}
           </p>
         </div>
 
@@ -326,7 +326,7 @@ const AuthForm = memo(function AuthForm({ formMode = "login" }) {
           {showInstallCTA && (
             <div className="flex flex-col gap-4 mt-5">
               <h4 className="font-bold text-md text-center">
-                Install CTS Merchant
+                Install SpeakerKasirApp
               </h4>
               <div className="flex gap-2">
                 <button
@@ -337,7 +337,7 @@ const AuthForm = memo(function AuthForm({ formMode = "login" }) {
                   aria-label="Install on Android"
                   title={
                     installEvent
-                      ? "Install aplikasi CTS Merchant"
+                      ? "Install aplikasi SpeakerKasirApp"
                       : "Jika tombol tidak memulai install, gunakan ikon Install Chrome"
                   }
                 >

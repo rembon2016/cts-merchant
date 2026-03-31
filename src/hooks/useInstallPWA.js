@@ -191,8 +191,8 @@ export const useInstallPWA = () => {
     if (activePlatform === "ios") {
       if (globalThis.navigator?.share) {
         await globalThis.navigator.share({
-          title: "CTS Merchant",
-          text: "Pasang CTS Merchant ke layar utama",
+          title: "SpeakerKasirApp",
+          text: "Pasang SpeakerKasirApp ke layar utama",
           url: globalThis.location.href,
         });
         return { success: true, outcome: "shared" };

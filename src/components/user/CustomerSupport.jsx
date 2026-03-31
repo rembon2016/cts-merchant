@@ -1,59 +1,105 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { FaWhatsapp } from "react-icons/fa";
+import { FaEnvelope, FaPhoneAlt, FaWhatsapp } from "react-icons/fa";
+import { useCSStore } from "../../store/csStore";
 
 export default function CustomerSupport() {
   const navigate = useNavigate();
+  const { csTeams } = useCSStore();
 
-  const handleWhatsAppRedirect = () => {
-    // Ganti nomor WhatsApp sesuai kebutuhan (format: 62xxxxxxxxxx tanpa +)
-    const phoneNumber = "6281262989888"; // Contoh nomor WhatsApp
-    const message = "Halo, saya membutuhkan bantuan customer support.";
+  const handleWhatsAppRedirect = (teamKey, phoneNumber, issueFocus) => {
+    const message = `Halo, saya membutuhkan bantuan ${issueFocus} untuk tim ${teamKey}.`;
     const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappURL, "_blank");
   };
 
-  const handleGoBack = () => {
-    navigate("/"); // Jika tidak ada halaman sebelumnya, arahkan ke homepage
+  const handleCall = (phoneNumber) => {
+    window.location.href = `tel:${phoneNumber}`;
   };
 
+  const handleEmail = (email) => {
+    window.location.href = `mailto:${email}`;
+  };
+
+  const handleGoBack = () => {
+    navigate("/");
+  };
+
+  const teams = Object.values(csTeams);
+
   return (
-    <div className="h-full mt-10 flex items-center justify-center px-4">
-      <div className="bg-white rounded-lg shadow-xl p-8 md:p-12 max-w-md w-full text-center">
-        {/* WhatsApp Icon */}
-        <div className="mb-8">
-          <FaWhatsapp className="w-24 h-24 mx-auto text-green-500" />
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 py-10 px-4">
+      <div className="max-w-3xl mx-auto space-y-6">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 md:p-8 text-center">
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-3">
+            Customer Support
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">
+            Silakan pilih tim customer service sesuai jenis kendala Anda.
+          </p>
         </div>
 
-        {/* Heading */}
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-300 mb-4">
-          Customer Support
-        </h1>
+        <div className="grid grid-cols-1 gap-4">
+          {teams.map((team) => (
+            <div
+              key={team.key}
+              className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-5 border border-slate-100 dark:border-slate-700"
+            >
+              <div className="mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  {team.title}
+                </h2>
+                <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">
+                  Hubungi untuk {team.issueFocus}
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                  Jam Operasional: Senin - Jumat {team.operationalHours.weekdays}
+                </p>
+              </div>
 
-        {/* Description */}
-        <p className="text-gray-600 dark:text-gray-300 mb-8">
-          Hubungi kami melalui WhatsApp untuk bantuan lebih lanjut
-        </p>
+              <div className="space-y-2">
+                <button
+                  onClick={() =>
+                    handleWhatsAppRedirect(
+                      team.title,
+                      team.contactInfo.whatsapp,
+                      team.issueFocus,
+                    )
+                  }
+                  className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition duration-300 ease-in-out flex items-center justify-center gap-2"
+                >
+                  <FaWhatsapp className="w-4 h-4" />
+                  WhatsApp
+                </button>
 
-        {/* Buttons */}
-        <div className="flex flex-col gap-4">
-          {/* WhatsApp Button */}
-          <button
-            onClick={handleWhatsAppRedirect}
-            className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center gap-2"
-          >
-            <FaWhatsapp className="w-5 h-5" />
-            Hubungi WhatsApp
-          </button>
+                <button
+                  onClick={() => handleCall(team.contactInfo.phone)}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-300 ease-in-out flex items-center justify-center gap-2"
+                >
+                  <FaPhoneAlt className="w-4 h-4" />
+                  Telepon ({team.contactInfo.phone})
+                </button>
 
-          {/* Back Button */}
+                <button
+                  onClick={() => handleEmail(team.contactInfo.email)}
+                  className="w-full bg-slate-700 hover:bg-slate-800 text-white font-semibold py-3 px-4 rounded-lg transition duration-300 ease-in-out flex items-center justify-center gap-2"
+                >
+                  <FaEnvelope className="w-4 h-4" />
+                  Email ({team.contactInfo.email})
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-5">
           <button
             onClick={handleGoBack}
-            className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105"
+            className="w-full bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 ease-in-out"
           >
             Kembali ke Beranda
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -19,7 +19,7 @@ const mockTickets = [
         id: 'reply1',
         sender: 'agent',
         senderName: 'CS Agent - Budi',
-        message: 'Selamat pagi, terima kasih sudah menghubungi Customer Support CTS Merchant. Saya Budi akan membantu menyelesaikan masalah Anda.',
+        message: 'Selamat pagi, terima kasih sudah menghubungi Customer Support SpeakerKasirApp. Saya Budi akan membantu menyelesaikan masalah Anda.',
         attachments: [],
         createdAt: '2025-10-26T09:00:00Z'
       },

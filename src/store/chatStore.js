@@ -44,7 +44,7 @@ const useChatStore = create(
               id: 'bot-welcome-1',
               sender: 'agent',
               senderName: 'CS Bot',
-              message: 'Halo! Selamat datang di Customer Support CTS Merchant. Ada yang bisa saya bantu?',
+              message: 'Halo! Selamat datang di Customer Support SpeakerKasirApp. Ada yang bisa saya bantu?',
               type: 'text',
               fileUrl: null,
               createdAt: new Date().toISOString(),
