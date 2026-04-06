@@ -274,6 +274,15 @@ const IncomeCard = () => {
             </span>
           </h2>
 
+          <div className="flex flex-col mt-3">
+            <h2 className="flex items-start justify-between flex-col gap-2 text-base">
+              <p>Dana Yang Dicairkan</p>
+              <span className="text-[1.5rem] font-extrabold tracking-tight text-white">
+                {isLoading ? "..." : TOTAL_AMOUNT}
+              </span>
+            </h2>
+          </div>
+
           <div className="flex flex-col gap-1 mt-1">
             <p className="flex gap-1 items-center">
               Biaya Cicil: <span className="font-semibold">{INSTALLMENT_FEE_DISPLAY}</span>
@@ -282,14 +291,6 @@ const IncomeCard = () => {
               Biaya Antar Bank:{" "}
               <span className="font-semibold">{INTERBANK_FEE_DISPLAY}</span>
             </p>
-          </div>
-
-          <div className="flex flex-col mt-3">
-            <h2 className="flex items-start justify-between flex-col gap-2 text-base">
-              <span className="text-[1.5rem] font-extrabold tracking-tight text-white">
-                {isLoading ? "..." : TOTAL_AMOUNT}
-              </span>
-            </h2>
           </div>
 
           <div className="mt-6" />
