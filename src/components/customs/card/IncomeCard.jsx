@@ -29,6 +29,11 @@ const MONTHS = [
   { key: "12", value: "Desember" },
 ];
 
+const TOTAL_INSTALLMENT_DAYS = 547;
+const TOTAL_INSTALLMENT_MONTHS = 18;
+const INSTALLMENT_FEE = 2000;
+const INTERBANK_FEE = 2000;
+
 const IncomeCard = () => {
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
   const [validationErrors, setValidationErrors] = useState({});
@@ -59,10 +64,12 @@ const IncomeCard = () => {
     [statistic.total_amount],
   );
 
-  const SUBSCRIPTION_FEE = useMemo(
-    () => formatCurrency(Number.parseFloat(statistic.subscription_fee || 0)),
-    [statistic.subscription_fee],
+  const INSTALLMENT_FEE_DISPLAY = useMemo(
+    () => formatCurrency(INSTALLMENT_FEE),
+    [],
   );
+
+  const INTERBANK_FEE_DISPLAY = useMemo(() => formatCurrency(INTERBANK_FEE), []);
 
   const SUBSCRIPTION_DAYS = useMemo(
     () => statistic.subscription_days || 0,
@@ -251,8 +258,11 @@ const IncomeCard = () => {
           </div>
           <div className="flex justify-between w-full mb-3">
             <p className="flex items-center justify-between font-semibold text-sm gap-1">
-              Durasi Langganan:{" "}
+              Durasi Cicilan:{" "}
               <span className="font-semibold">{SUBSCRIPTION_DAYS} Hari</span>
+              <span className="font-normal">
+                dari {TOTAL_INSTALLMENT_DAYS} Hari ({TOTAL_INSTALLMENT_MONTHS} bulan)
+              </span>
             </p>
           </div>
           <h2 className="flex items-start justify-between flex-col gap-2 text-base">
@@ -264,16 +274,18 @@ const IncomeCard = () => {
             </span>
           </h2>
 
-          <p className="flex gap-1 items-center mt-1">
-            Biaya Berlangganan:{" "}
-            <span className="font-semibold">
-              {isLoading ? "..." : SUBSCRIPTION_FEE}
-            </span>
-          </p>
+          <div className="flex flex-col gap-1 mt-1">
+            <p className="flex gap-1 items-center">
+              Biaya Cicil: <span className="font-semibold">{INSTALLMENT_FEE_DISPLAY}</span>
+            </p>
+            <p className="flex gap-1 items-center">
+              Biaya Antar Bank:{" "}
+              <span className="font-semibold">{INTERBANK_FEE_DISPLAY}</span>
+            </p>
+          </div>
 
           <div className="flex flex-col mt-3">
             <h2 className="flex items-start justify-between flex-col gap-2 text-base">
-              <p className="flex gap-1">Dana Yang Bisa Dicairkan</p>
               <span className="text-[1.5rem] font-extrabold tracking-tight text-white">
                 {isLoading ? "..." : TOTAL_AMOUNT}
               </span>

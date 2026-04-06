@@ -63,7 +63,6 @@ export default function AccountInformation() {
       { replace: true }
     );
   };
-
   return (
     <>
       <BackButton to="/profile" />
@@ -86,7 +85,7 @@ export default function AccountInformation() {
         </div>
         <div className="flex flex-col">
           {renderElement(
-            "Nama Bisnis",
+            "Nama Toko",
             userInfo?.business_account?.profile?.business_name
           )}
           {renderElement(
@@ -110,7 +109,7 @@ export default function AccountInformation() {
             userInfo?.business_account?.profile?.subdistrict_name
           )}
           {renderElement(
-            "Skala Bisnis",
+            "Skala Toko",
             userInfo?.business_account?.profile?.business_scale
           )}
           {renderElement(

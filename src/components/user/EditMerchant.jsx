@@ -103,11 +103,11 @@ export default function EditMerchant() {
     const newErrors = {};
 
     if (!formData.businessName.trim()) {
-      newErrors.businessName = "Nama Bisnis harus diisi";
+      newErrors.businessName = "Nama Toko harus diisi";
     }
 
     if (!formData.businessScale.trim()) {
-      newErrors.businessScale = "Skala Bisnis harus diisi";
+      newErrors.businessScale = "Skala Toko harus diisi";
     }
 
     setErrors(newErrors);
@@ -231,7 +231,7 @@ export default function EditMerchant() {
         <SimpleInput
           name="businessName"
           type="text"
-          label="Nama Bisnis *"
+          label="Nama Toko *"
           value={formData.businessName}
           errors={errors.businessName}
           handleChange={handleChange}
@@ -255,7 +255,7 @@ export default function EditMerchant() {
         <SimpleInput
           name="businessScale"
           type="text"
-          label="Skala Bisnis *"
+          label="Skala Toko *"
           value={formData.businessScale}
           errors={errors.businessScale}
           handleChange={handleChange}
