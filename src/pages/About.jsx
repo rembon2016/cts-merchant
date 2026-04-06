@@ -1,3 +1,5 @@
+import { formatCurrency } from "../helper/currency";
+
 const About = () => {
   const transactions = [
     {
@@ -113,8 +115,8 @@ const About = () => {
                       : "text-red-600 dark:text-red-400"
                   }`}
                 >
-                  {transaction.type === "income" ? "+" : "-"}Rp{" "}
-                  {transaction.amount.toLocaleString("id-ID")}
+                  {transaction.type === "income" ? "+" : "-"}
+                  {formatCurrency(transaction.amount)}
                 </p>
               </div>
             </div>
