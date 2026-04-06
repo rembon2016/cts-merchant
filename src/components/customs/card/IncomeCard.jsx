@@ -64,6 +64,11 @@ const IncomeCard = () => {
     [statistic.total_amount],
   );
 
+  const SUBSCRIPTION_FEE_DISPLAY = useMemo(
+    () => formatCurrency(Number.parseFloat(statistic.subscription_fee || 0)),
+    [statistic.subscription_fee],
+  );
+
   const INSTALLMENT_FEE_DISPLAY = useMemo(
     () => formatCurrency(INSTALLMENT_FEE),
     [],
@@ -273,6 +278,11 @@ const IncomeCard = () => {
               {isLoading ? "..." : AMOUNT}
             </span>
           </h2>
+
+          <p className="flex gap-1 items-center mt-1">
+            Biaya:{" "}
+            <span className="font-semibold">{SUBSCRIPTION_FEE_DISPLAY}</span>
+          </p>
 
           <div className="flex flex-col mt-3">
             <h2 className="flex items-start justify-between flex-col gap-2 text-base">
