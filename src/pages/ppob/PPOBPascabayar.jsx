@@ -6,6 +6,7 @@ import { usePPOBProductStore } from "../../store/ppobProductStore";
 import { usePPOBStore } from "../../store/ppobStore";
 import ConfirmationModal from "../../components/ppob/ConfirmationModal";
 import ProcessingModal from "../../components/ppob/ProcessingModal";
+import { formatCurrency } from "../../helper/currency";
 
 const PPOBPascabayar = () => {
   const navigate = useNavigate();
@@ -238,7 +239,7 @@ const PPOBPascabayar = () => {
                     Tagihan
                   </span>
                   <span className="font-medium text-gray-900 dark:text-white">
-                    Rp. {customerData.bill.toLocaleString("id-ID")}
+                    {formatCurrency(customerData.bill)}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -246,7 +247,7 @@ const PPOBPascabayar = () => {
                     Biaya Admin
                   </span>
                   <span className="font-medium text-gray-900 dark:text-white">
-                    Rp. {customerData.adminFee.toLocaleString("id-ID")}
+                    {formatCurrency(customerData.adminFee)}
                   </span>
                 </div>
                 <div className="flex justify-between font-semibold text-base pt-2 border-t border-gray-200 dark:border-gray-700 mt-2">
@@ -254,10 +255,7 @@ const PPOBPascabayar = () => {
                     Total Bayar
                   </span>
                   <span className="text-[var(--c-primary)] dark:text-blue-400">
-                    Rp.{" "}
-                    {(customerData.bill + customerData.adminFee).toLocaleString(
-                      "id-ID"
-                    )}
+                    {formatCurrency(customerData.bill + customerData.adminFee)}
                   </span>
                 </div>
               </div>
