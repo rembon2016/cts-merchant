@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useThemeStore } from "../../../store/themeStore";
 import { usePosStore } from "../../../store/posStore";
 import { toast } from "sonner";
+import { formatCurrency } from "../../../helper/currency";
 
 const VariantModal = ({ isOpen, onClose, product, onSelectVariant }) => {
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -142,7 +143,7 @@ const VariantModal = ({ isOpen, onClose, product, onSelectVariant }) => {
                       </div>
                       <div className="flex items-center justify-between mt-1">
                         <span className="text-sm font-semibold text-[var(--c-primary)]">
-                          Rp {price.toLocaleString("id-ID")}
+                          {formatCurrency(price)}
                         </span>
                         <span className="text-xs text-gray-500 dark:text-gray-400">
                           Stok: {stock}
