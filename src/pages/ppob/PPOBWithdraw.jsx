@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { usePPOBStore } from "../../store/ppobStore";
 import ConfirmationModal from "../../components/ppob/ConfirmationModal";
 import ProcessingModal from "../../components/ppob/ProcessingModal";
+import { formatCurrency } from "../../helper/currency";
 
 const PPOBWithdraw = () => {
   const navigate = useNavigate();
@@ -139,7 +140,7 @@ const PPOBWithdraw = () => {
         <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-4 text-white">
           <p className="text-sm opacity-90">Saldo PPOB Tersedia</p>
           <h2 className="text-2xl font-bold mt-1">
-            Rp. {balance.toLocaleString("id-ID")}
+            {formatCurrency(balance)}
           </h2>
         </div>
 
@@ -275,7 +276,7 @@ const PPOBWithdraw = () => {
                   Nominal Penarikan
                 </span>
                 <span className="font-medium text-gray-900 dark:text-white">
-                  Rp. {withdrawAmount.toLocaleString("id-ID")}
+                  {formatCurrency(withdrawAmount)}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -283,13 +284,13 @@ const PPOBWithdraw = () => {
                   Biaya Admin
                 </span>
                 <span className="font-medium text-gray-900 dark:text-white">
-                  Rp. {totalFee.toLocaleString("id-ID")}
+                  {formatCurrency(totalFee)}
                 </span>
               </div>
               <div className="flex justify-between font-semibold text-base pt-2 border-t border-gray-200 dark:border-gray-700">
                 <span className="text-gray-900 dark:text-white">Diterima</span>
                 <span className="text-[var(--c-primary)] dark:text-blue-400">
-                  Rp. {receivedAmount.toLocaleString("id-ID")}
+                  {formatCurrency(receivedAmount)}
                 </span>
               </div>
             </div>
