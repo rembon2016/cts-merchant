@@ -72,7 +72,7 @@ export default function AccountInformation() {
       content: (
         <div className="space-y-1">
           {renderElement(
-            "Nama Bisnis",
+            "Nama Toko",
             userInfo?.business_account?.profile?.business_name,
           )}
           {renderElement(
@@ -124,7 +124,7 @@ export default function AccountInformation() {
             );
           })()}
           {renderElement(
-            "Skala Bisnis",
+            "Skala Toko",
             userInfo?.business_account?.profile?.business_scale,
           )}
           {renderElement(
