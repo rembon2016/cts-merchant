@@ -143,6 +143,11 @@ body {
   pointer-events: none;
 }
 
+.income-card.income-card--plain::before,
+.income-card.income-card--plain::after {
+  content: none;
+}
+
 img {
   user-select: none;
   -webkit-user-drag: none;
