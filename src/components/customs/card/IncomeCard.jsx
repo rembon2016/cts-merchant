@@ -278,7 +278,7 @@ const IncomeCard = () => {
                 Filter Waktu
               </button>
               {filterOpen && (
-                <div className="absolute right-0 mt-2 w-44 rounded-2xl border border-slate-200 bg-white shadow-soft p-3 text-slate-700 z-50">
+                <div className="absolute left-0 mt-2 w-full rounded-2xl border border-slate-200 bg-white shadow-soft p-3 text-slate-700 z-50">
                   <div className="flex flex-col gap-2">
                     {CHIPS.map((chip) => (
                       <button
