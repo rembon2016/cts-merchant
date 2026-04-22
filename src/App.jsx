@@ -15,6 +15,7 @@ import MainLayout from "./layouts/MainLayout";
 import CustomToast from "./components/customs/toast/CustomToast";
 import LoadingSkeletonList from "./components/customs/loading/LoadingSkeletonList";
 import { useAppVersion } from "./hooks/useAppVersion";
+import CourierEducationModal from "./components/auth/CourierEducationModal";
 
 function App() {
   const { isDark } = useThemeStore();
@@ -102,6 +103,7 @@ function App() {
         duration={toast.duration}
       />
       <Toaster position="top-center" />
+      <CourierEducationModal />
       <Router>
         <Routes>
           <Route path="/" element={<MainLayout />}>
