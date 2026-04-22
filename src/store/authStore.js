@@ -31,6 +31,7 @@ export const useAuthStore = create((set, get) => ({
   isLoggedIn: !!sessionStorage.getItem(TOKEN_KEY),
   isLoading: false,
   isLogout: false,
+  showCourierEducationPopup: false,
   error: null,
   autoLogoutTimer: null,
   checkInterval: null,
@@ -97,6 +98,8 @@ export const useAuthStore = create((set, get) => ({
       const { setUserData } = useUserDataStore.getState();
       setUserData(userData?.data);
 
+      const isFirstLogin = userData?.data?.last_login_at === null;
+
       set({
         user: userData?.data,
         userId: userData?.id,
@@ -104,6 +107,7 @@ export const useAuthStore = create((set, get) => ({
         isLoggedIn: true,
         isLoading: false,
         isLogout: false,
+        showCourierEducationPopup: isFirstLogin,
         error: null,
       });
 
@@ -522,6 +526,46 @@ export const useAuthStore = create((set, get) => ({
       set({ isLoading: false, error: error?.message });
       // get().handleAutoLogout();
       return { success: false, error: error?.message, isLoading: false };
+    }
+  },
+
+  setCourierEducationPopup: (value) => {
+    set({ showCourierEducationPopup: value });
+  },
+
+  submitCourierEducation: async (isEducated) => {
+    const token = sessionStorage.getItem(TOKEN_KEY);
+    const user = get().user;
+    const businessAccountId = user?.business_account?.id;
+
+    try {
+      set({ isLoading: true, error: null });
+
+      const response = await fetch(`${ROOT_API}/v1/merchant/courier-education`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          business_account_id: businessAccountId,
+          is_educated_by_courier: isEducated,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        set({ isLoading: false, error: result?.message || "Gagal menyimpan data edukasi" });
+        return { success: false, error: result?.message };
+      }
+
+      set({ isLoading: false, showCourierEducationPopup: false });
+      return { success: true };
+    } catch (error) {
+      set({ isLoading: false, error: error?.message || "Terjadi kesalahan" });
+      return { success: false, error: error?.message };
     }
   },
 }));
