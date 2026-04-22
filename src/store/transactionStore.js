@@ -13,6 +13,12 @@ const useTransactionStore = create((set, get) => ({
     "Content-Type": "application/json",
   },
 
+  // Referral bonus state
+  referralBonus: 0,
+  hasPendingWithdrawal: false,
+  isLoadingReferral: false,
+  referralError: null,
+
   // Get transactions from API with pagination and filters
   getListTransactions: async (params = {}) => {
     const { page = 1, per_page = 10, search = "" } = params;
@@ -165,6 +171,96 @@ const useTransactionStore = create((set, get) => ({
       set({ isLoading: false, statistic: result.data, error: null });
     } catch (error) {
       set({ isLoading: false, statistic: [], error: error.message });
+    }
+  },
+
+  claimReferralBonus: async (pointsAmount) => {
+    const token = sessionStorage.getItem("authToken");
+
+    // Guard: token harus ada
+    if (!token) {
+      return { success: false, message: "Sesi tidak valid, silakan login ulang" };
+    }
+
+    // Guard: pointsAmount harus angka positif
+    const sanitizedAmount = Number(pointsAmount);
+    if (!sanitizedAmount || sanitizedAmount <= 0 || !Number.isFinite(sanitizedAmount)) {
+      return { success: false, message: "Nominal bonus tidak valid" };
+    }
+
+    try {
+      set({ isLoadingReferral: true, referralError: null });
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_ROUTES}/v1/merchant/referral/withdraw`,
+        {
+          method: "POST",
+          headers: {
+            ...get().headersAPIContent,
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ points_amount: sanitizedAmount }),
+        }
+      );
+
+      // Parse JSON dengan aman — server bisa return non-JSON saat 5xx
+      let result;
+      try {
+        result = await response.json();
+      } catch {
+        set({ isLoadingReferral: false, referralError: "Terjadi kesalahan pada server" });
+        return { success: false, message: "Terjadi kesalahan pada server" };
+      }
+
+      if (!response.ok) {
+        const message = result?.message ?? "Gagal klaim bonus";
+        set({ isLoadingReferral: false, referralError: message });
+        return { success: false, message };
+      }
+
+      // Re-fetch agar state sinkron dengan server
+      await get().getReferralBonus();
+
+      return { success: true, message: result?.message ?? "Berhasil klaim bonus" };
+    } catch (error) {
+      const message = error.message || "Terjadi kesalahan jaringan";
+      set({ isLoadingReferral: false, referralError: message });
+      return { success: false, message };
+    }
+  },
+
+  getReferralBonus: async () => {
+    const token = sessionStorage.getItem("authToken");
+
+    try {
+      set({ isLoadingReferral: true, referralError: null });
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_ROUTES}/v1/merchant/referral`,
+        {
+          headers: {
+            ...get().headersAPIContent,
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        set({ isLoadingReferral: false, referralBonus: 0, referralError: `HTTP error! status: ${response.status}` });
+        return;
+      }
+
+      const result = await response.json();
+      const hasPending = result?.data?.has_pending_withdrawal ?? false;
+      const totalPoints = result?.data?.total_points ?? 0;
+      const pendingAmount = result?.data?.pending_withdrawal_amount ?? 0;
+
+      // Jika ada pending withdrawal, kurangi total_points dengan pending_withdrawal_amount
+      const effectiveBonus = hasPending ? Math.max(0, totalPoints - pendingAmount) : totalPoints;
+
+      set({ isLoadingReferral: false, referralBonus: effectiveBonus, hasPendingWithdrawal: hasPending, referralError: null });
+    } catch (error) {
+      set({ isLoadingReferral: false, referralBonus: 0, hasPendingWithdrawal: false, referralError: error.message });
     }
   },
 }));
