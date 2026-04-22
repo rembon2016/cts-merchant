@@ -102,9 +102,9 @@ const IncomeCard = () => {
   const [showPopover, setShowPopover] = useState(null);
   const [filterOpen, setFilterOpen] = useState(false);
   const { updateIncomeAmount } = useUserStore();
-  const { getStatisticTransaction, statistic, isLoading } =
+  const { getStatisticTransaction, statistic, isLoading, getReferralBonus, referralBonus, hasPendingWithdrawal, isLoadingReferral, claimReferralBonus } =
     useTransactionStore();
-  const { toast, error: showError, hideToast } = useCustomToast();
+  const { toast, success: showSuccess, error: showError, hideToast } = useCustomToast();
 
   // Memoize years array to prevent recreation on every render
   const years = useMemo(() => {
@@ -130,6 +130,11 @@ const IncomeCard = () => {
   );
 
   const INTERBANK_FEE_DISPLAY = useMemo(() => formatCurrency(INTERBANK_FEE), []);
+
+  const REFERRAL_BONUS_DISPLAY = useMemo(
+    () => formatCurrency(Number.parseFloat(referralBonus || 0)),
+    [referralBonus],
+  );
 
   const SUBSCRIPTION_DAYS = useMemo(
     () => statistic.subscription_days || 0,
@@ -226,6 +231,16 @@ const IncomeCard = () => {
     return activeItem || "Hari Ini";
   }, [activeItem]);
 
+  const handleClaimReferral = useCallback(async () => {
+    if (!referralBonus || referralBonus <= 0) return;
+    const result = await claimReferralBonus(referralBonus);
+    if (result.success) {
+      showSuccess(result.message);
+    } else {
+      showError(result.message);
+    }
+  }, [referralBonus, claimReferralBonus, showSuccess, showError]);
+
   const resetLockRef = useRef(false);
   const resetTimeoutRef = useRef(null);
 
@@ -247,6 +262,10 @@ const IncomeCard = () => {
 
   useEffect(() => {
     getStatisticTransaction();
+  }, []);
+
+  useEffect(() => {
+    getReferralBonus();
   }, []);
 
   useEffect(() => {
@@ -452,6 +471,30 @@ const IncomeCard = () => {
               <span className="font-normal">Biaya Antar Bank :</span>
               <span className="font-bold">{INTERBANK_FEE_DISPLAY}</span>
             </p>
+          </div>
+
+          <div className="mt-3 flex items-center justify-between rounded-xl bg-white/10 px-4 py-2.5 text-[13px]">
+            <div className="flex items-center gap-2">
+              <span className="text-white/70">🎁</span>
+              <span className="font-normal text-white/80">Bonus Kode Referal</span>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <span className="font-bold text-white">
+                {isLoadingReferral ? (
+                  <span className="animate-pulse text-white/60">Memuat...</span>
+                ) : (
+                  REFERRAL_BONUS_DISPLAY
+                )}
+              </span>
+              {!isLoadingReferral && referralBonus > 0 && (
+                <button
+                  onClick={handleClaimReferral}
+                  className="rounded-full bg-[#F2C94C] px-3 py-1 text-[11px] font-bold text-black shadow-sm transition-all hover:bg-yellow-300 active:scale-95"
+                >
+                  Klaim
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
