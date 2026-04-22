@@ -475,7 +475,7 @@ const IncomeCard = () => {
 
           <div className="mt-3 flex items-center justify-between rounded-xl bg-white/10 px-4 py-2.5 text-[13px]">
             <div className="flex items-center gap-2">
-              <span className="text-white/70">🎁</span>
+              <span className="text-white/70"></span>
               <span className="font-normal text-white/80">Bonus Kode Referal</span>
             </div>
             <div className="flex items-center gap-2.5">
